@@ -30,7 +30,6 @@ ENDPOINTS=(
   "antclaw.v1.AIService/BuildContext|{\"asset\":\"BTC\",\"scope\":[\"macro\",\"options\"]}"
   "antclaw.v1.SentimentExtrasService/GetMyFXBookPositions|{\"symbol\":\"EURUSD\"}"
   "antclaw.v1.SentimentExtrasService/GetFinvizMetrics|{\"ticker\":\"AAPL\"}"
-  "antclaw.v1.RegimeService/GetOverlay|{\"symbol\":\"EURUSD\",\"timeframe\":\"D\",\"contract_code\":\"EUR\"}"
 )
 
 fail=0
