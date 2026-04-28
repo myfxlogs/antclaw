@@ -1,0 +1,42 @@
+# Dockerfile.web - Web frontend image (React + Vite + shadcn/ui)
+# See: AntClaw-重构解决方案.md §2.3
+
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy workspace config
+COPY pnpm-workspace.yaml ./
+
+# Copy root package.json if exists
+COPY package.json* ./
+
+# Copy all workspace package.json files (for caching)
+COPY frontend/web/package.json ./frontend/web/
+COPY gen/ts/package.json ./gen/ts/
+COPY frontend/packages/*/package.json ./frontend/packages/*/
+
+# Copy source code
+COPY gen/ts/ ./gen/ts/
+COPY frontend/web/ ./frontend/web/
+COPY frontend/packages/ ./frontend/packages/
+
+# Install dependencies (workspace-aware)
+RUN pnpm install
+
+# Build web app
+WORKDIR /app/frontend/web
+RUN pnpm build
+
+# Final stage: serve with nginx
+FROM nginx:alpine
+
+COPY --from=builder /app/frontend/web/dist /usr/share/nginx/html
+COPY deploy/nginx.web.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,145 @@
+# docker-compose.yaml - AntClaw minimal runnable stack
+# See: AntClaw-重构解决方案.md §2.3
+
+version: "3.9"
+
+services:
+  # PostgreSQL with TimescaleDB extension
+  postgres:
+    container_name: antclaw-postgres
+    image: timescale/timescaledb:latest-pg18
+    environment:
+      POSTGRES_USER: ${ANTCLAW_DB_USER:-antclaw}
+      POSTGRES_PASSWORD: ${ANTCLAW_DB_PASSWORD:-antclaw}
+      POSTGRES_DB: ${ANTCLAW_DB_NAME:-antclaw}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ANTCLAW_DB_USER:-antclaw}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for cache, rate limiting, and Streams
+  redis:
+    container_name: antclaw-redis
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO for object storage (audit WORM)
+  minio:
+    container_name: antclaw-minio
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${ANTCLAW_MINIO_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${ANTCLAW_MINIO_PASSWORD:-minioadmin}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API server
+  api:
+    container_name: antclaw-api
+    image: antclaw-api
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    ports:
+      - "8082:8080"
+    environment:
+      ANTCLAW_DB_HOST: postgres
+      ANTCLAW_DB_PORT: 5432
+      ANTCLAW_DB_USER: ${ANTCLAW_DB_USER:-antclaw}
+      ANTCLAW_DB_PASSWORD: ${ANTCLAW_DB_PASSWORD:-antclaw}
+      ANTCLAW_DB_NAME: ${ANTCLAW_DB_NAME:-antclaw}
+      ANTCLAW_REDIS_HOST: redis
+      ANTCLAW_REDIS_PORT: 6379
+      ANTCLAW_LOG_LEVEL: info
+      ANTCLAW_SERVICE_NAME: antclaw-api
+      # 数据源敏感字段加密主密钥（base64，至少 32B）
+      ANTCLAW_SECRET_MASTER_KEY: ${ANTCLAW_SECRET_MASTER_KEY:-Y2hhbmdlLW1lLXRoaXMtaXMtMzItYnl0ZXMtZm9yLWFudGNsYXc=}
+      ANTCLAW_RSA_KEY_PATH: /data/rsa_private.pem
+    volumes:
+      - api_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["antclaw-api"]
+    # P2: skeleton prints log and exits
+
+  # Backend worker
+  worker:
+    container_name: antclaw-worker
+    image: antclaw-worker
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    environment:
+      ANTCLAW_DB_HOST: postgres
+      ANTCLAW_DB_PORT: 5432
+      ANTCLAW_DB_USER: ${ANTCLAW_DB_USER:-antclaw}
+      ANTCLAW_DB_PASSWORD: ${ANTCLAW_DB_PASSWORD:-antclaw}
+      ANTCLAW_DB_NAME: ${ANTCLAW_DB_NAME:-antclaw}
+      ANTCLAW_REDIS_HOST: redis
+      ANTCLAW_REDIS_PORT: 6379
+      ANTCLAW_LOG_LEVEL: info
+      ANTCLAW_SERVICE_NAME: antclaw-worker
+      # 与 api 共用同一 master key，才能解密 data_source_configs 中的 secret
+      ANTCLAW_SECRET_MASTER_KEY: ${ANTCLAW_SECRET_MASTER_KEY:-Y2hhbmdlLW1lLXRoaXMtaXMtMzItYnl0ZXMtZm9yLWFudGNsYXc=}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["antclaw-worker"]
+    # P2: skeleton prints log and exits
+
+  # Web frontend (React + Vite)
+  web:
+    container_name: antclaw-web
+    image: antclaw-web
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  # Admin frontend (React + Vite)
+  admin:
+    container_name: antclaw-admin
+    image: antclaw-admin
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.admin
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  api_data:

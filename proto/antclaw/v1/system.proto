@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service SystemService {
+  rpc Healthz(HealthzRequest) returns (HealthzResponse);
+  rpc Readyz(ReadyzRequest) returns (ReadyzResponse);
+  rpc Info(InfoRequest) returns (InfoResponse);
+}
+
+message HealthzRequest {}
+message HealthzResponse {
+  string status = 1; // healthy | degraded | unhealthy
+  map<string, ComponentHealth> components = 2;
+  google.protobuf.Timestamp checked_at = 3;
+}
+message ComponentHealth {
+  string name = 1;
+  string status = 2; // up | degraded | down
+  string detail = 3;
+}
+
+message ReadyzRequest {}
+message ReadyzResponse { bool ready = 1; }
+
+message InfoRequest {}
+message InfoResponse {
+  string version = 1;
+  string git_commit = 2;
+  google.protobuf.Timestamp built_at = 3;
+}

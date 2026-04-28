@@ -1,0 +1,126 @@
+{
+  "nav": {
+    "dashboard": "仪表盘",
+    "users": "用户管理",
+    "jobs": "任务管理",
+    "audit": "审计日志",
+    "data": "采集数据",
+    "datasources": "数据源密钥",
+    "strategies": "策略管理",
+    "systemAI": "系统AI配置",
+    "settings": "系统设置",
+    "logout": "退出登录"
+  },
+  "login": {
+    "title": "AntClaw 管理后台",
+    "subtitle": "管理员登录",
+    "email": "邮箱",
+    "password": "密码",
+    "loginButton": "登录",
+    "emailPlaceholder": "请输入邮箱",
+    "passwordPlaceholder": "请输入密码",
+    "loginError": "登录失败，请检查邮箱和密码",
+    "requiredEmail": "请输入邮箱",
+    "requiredPassword": "请输入密码"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "stats": {
+      "totalUsers": "总用户数",
+      "activeJobs": "活跃任务",
+      "systemStatus": "系统状态",
+      "alerts": "告警"
+    },
+    "recentActivity": {
+      "title": "最近活动",
+      "actions": {
+        "updatedJobConfig": "更新任务配置",
+        "loggedIn": "登录",
+        "dailyBackupCompleted": "每日备份完成"
+      },
+      "time": {
+        "minAgo": "分钟前",
+        "hourAgo": "小时前"
+      }
+    },
+    "systemHealth": {
+      "title": "系统健康",
+      "status": {
+        "operational": "正常"
+      },
+      "services": {
+        "apiServer": "API 服务器",
+        "database": "数据库",
+        "redis": "Redis",
+        "worker": "工作进程"
+      }
+    }
+  },
+  "users": {
+    "title": "用户管理",
+    "email": "邮箱",
+    "role": "角色",
+    "status": "状态",
+    "banned": "已封禁",
+    "active": "正常",
+    "createdAt": "创建时间",
+    "actions": "操作",
+    "ban": "封禁",
+    "unban": "解封",
+    "setRole": "设置角色",
+    "loading": "加载中...",
+    "noUsers": "暂无用户",
+    "searchPlaceholder": "搜索邮箱...",
+    "filterRole": "筛选角色",
+    "filterStatus": "筛选状态",
+    "allRoles": "全部角色",
+    "allStatus": "全部状态"
+  },
+  "jobs": {
+    "title": "任务管理",
+    "jobName": "任务名称",
+    "status": "状态",
+    "lastRun": "上次运行",
+    "nextRun": "下次运行",
+    "actions": "操作",
+    "run": "运行",
+    "loading": "加载中...",
+    "noJobs": "暂无任务",
+    "filterStatus": "筛选状态",
+    "allStatus": "全部状态",
+    "running": "运行中",
+    "pending": "等待中",
+    "completed": "已完成",
+    "succeeded": "成功",
+    "failed": "失败",
+    "unknown": "未运行",
+    "enabled": "启用",
+    "enable": "启用",
+    "disable": "停用",
+    "jobId": "采集ID",
+    "runAll": "启动全部任务"
+  },
+  "audit": {
+    "title": "审计日志",
+    "userId": "用户ID",
+    "action": "操作",
+    "resource": "资源",
+    "details": "详情",
+    "createdAt": "创建时间",
+    "ipAddress": "IP地址",
+    "loading": "加载中...",
+    "noLogs": "暂无日志",
+    "filterAction": "筛选操作",
+    "filterUser": "筛选用户",
+    "allActions": "全部操作",
+    "allUsers": "全部用户"
+  },
+  "settings": {
+    "title": "系统设置",
+    "general": "通用设置",
+    "security": "安全设置",
+    "notifications": "通知设置",
+    "save": "保存",
+    "cancel": "取消"
+  }
+}

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service MacroExtrasService {
+  rpc GetSeries(MacroExtrasServiceGetSeriesRequest) returns (MacroExtrasServiceGetSeriesResponse);
+  rpc ListAvailableSeries(ListAvailableSeriesRequest) returns (ListAvailableSeriesResponse);
+}
+message MacroExtrasServiceGetSeriesRequest {
+  string source = 1;
+  string series_id = 2;
+  google.protobuf.Timestamp start = 3;
+  google.protobuf.Timestamp end = 4;
+}
+message MacroExtrasServiceGetSeriesResponse {
+  repeated MacroPoint points = 1;
+  string unit = 2;
+  string frequency = 3;
+}
+message MacroPoint {
+  google.protobuf.Timestamp time = 1;
+  double value = 2;
+  string label = 3; // 可选维度标签，如 DTCC 货币对、Eurostat 子分类等
+}
+message ListAvailableSeriesRequest { string source = 1; string keyword = 2; }
+message ListAvailableSeriesResponse { repeated MacroSeriesMeta items = 1; }
+message MacroSeriesMeta {
+  string source = 1;
+  string series_id = 2;
+  string name = 3;
+  string unit = 4;
+  string frequency = 5;
+}

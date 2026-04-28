@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+service OptionsService {
+  rpc GetGEX(GetGEXRequest) returns (GetGEXResponse);
+  rpc GetIVSurface(GetIVSurfaceRequest) returns (GetIVSurfaceResponse);
+  rpc GetOptionsSkew(GetOptionsSkewRequest) returns (GetOptionsSkewResponse);
+  rpc GetIVAlerts(GetIVAlertsRequest) returns (GetIVAlertsResponse);
+}
+
+message GetGEXRequest {
+  string asset = 1;
+  string venue = 2;
+}
+message GetGEXResponse {
+  double total_gex = 1;
+  double zero_gamma = 2;
+  repeated GEXBucket strikes = 3;
+}
+message GEXBucket {
+  double strike = 1;
+  double call_gex = 2;
+  double put_gex = 3;
+  double net_gex = 4;
+}
+
+message GetIVSurfaceRequest { string asset = 1; string venue = 2; }
+message GetIVSurfaceResponse { repeated IVPoint points = 1; }
+message IVPoint {
+  double strike = 1;
+  int32 dte = 2;
+  double iv = 3;
+  string option_type = 4;
+}
+
+message GetOptionsSkewRequest { string asset = 1; }
+message GetOptionsSkewResponse {
+  double rr_25d = 1;
+  double bf_25d = 2;
+  double atm_iv = 3;
+  double skew_z = 4;
+}
+
+message GetIVAlertsRequest { string asset = 1; }
+message GetIVAlertsResponse { repeated IVAlert alerts = 1; }
+message IVAlert {
+  string kind = 1;
+  string severity = 2;
+  string message = 3;
+}

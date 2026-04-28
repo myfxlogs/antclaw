@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/struct.proto";
+
+// StrategyService provides strategy and backtest management.
+service StrategyService {
+  rpc ListStrategies(ListStrategiesRequest) returns (ListStrategiesResponse);
+  rpc GetStrategy(GetStrategyRequest) returns (GetStrategyResponse);
+  rpc CreateStrategy(CreateStrategyRequest) returns (CreateStrategyResponse);
+  rpc UpdateStrategy(UpdateStrategyRequest) returns (UpdateStrategyResponse);
+  rpc DeleteStrategy(DeleteStrategyRequest) returns (DeleteStrategyResponse);
+  rpc EnableStrategy(EnableStrategyRequest) returns (EnableStrategyResponse);
+  rpc DisableStrategy(DisableStrategyRequest) returns (DisableStrategyResponse);
+  rpc RunStrategy(RunStrategyRequest) returns (RunStrategyResponse);
+  rpc ListStrategyRuns(ListStrategyRunsRequest) returns (ListStrategyRunsResponse);
+}
+
+message Strategy {
+  string id = 1;
+  string name = 2;
+  string kind = 3;
+  string symbol = 4;
+  string timeframe = 5;
+  google.protobuf.Struct params = 6;
+  string schedule_cron = 7;
+  bool enabled = 8;
+  string status = 9;
+  string description = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  string created_by = 13;
+  string updated_by = 14;
+  string last_run_at = 15;
+  string last_run_status = 16;
+}
+
+message StrategyRun {
+  string run_id = 1;
+  string strategy_id = 2;
+  string started_at = 3;
+  string finished_at = 4;
+  string status = 5;
+  google.protobuf.Struct metrics = 6;
+  bool mock = 7;
+  string error_message = 8;
+}
+
+message ListStrategiesRequest {
+  int32 offset = 1;
+  int32 limit = 2;
+}
+
+message ListStrategiesResponse {
+  repeated Strategy items = 1;
+  int32 total = 2;
+}
+
+message GetStrategyRequest {
+  string id = 1;
+}
+
+message GetStrategyResponse {
+  Strategy item = 1;
+}
+
+message CreateStrategyRequest {
+  string name = 1;
+  string kind = 2;
+  string symbol = 3;
+  string timeframe = 4;
+  google.protobuf.Struct params = 5;
+  string schedule_cron = 6;
+  string description = 7;
+}
+
+message CreateStrategyResponse {
+  Strategy item = 1;
+}
+
+message UpdateStrategyRequest {
+  string id = 1;
+  string name = 2;
+  string kind = 3;
+  string symbol = 4;
+  string timeframe = 5;
+  google.protobuf.Struct params = 6;
+  string schedule_cron = 7;
+  bool enabled = 8;
+  string status = 9;
+  string description = 10;
+}
+
+message UpdateStrategyResponse {
+  string id = 1;
+}
+
+message DeleteStrategyRequest {
+  string id = 1;
+}
+
+message DeleteStrategyResponse {}
+
+message EnableStrategyRequest {
+  string id = 1;
+}
+
+message EnableStrategyResponse {
+  string id = 1;
+  bool enabled = 2;
+}
+
+message DisableStrategyRequest {
+  string id = 1;
+}
+
+message DisableStrategyResponse {
+  string id = 1;
+  bool enabled = 2;
+}
+
+message RunStrategyRequest {
+  string id = 1;
+}
+
+message RunStrategyResponse {
+  StrategyRun item = 1;
+}
+
+message ListStrategyRunsRequest {
+  string id = 1;
+  int32 limit = 2;
+}
+
+message ListStrategyRunsResponse {
+  repeated StrategyRun items = 1;
+}

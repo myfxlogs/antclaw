@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+
+// COTService provides COT (Commitment of Traders) report data.
+// See: AntClaw-重构解决方案.md §3.3
+service COTService {
+  // Get COT summary for a pair
+  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse);
+
+  // Compare COT positions
+  rpc Compare(CompareRequest) returns (CompareResponse);
+
+  // Get COT signals
+  rpc GetSignals(GetSignalsRequest) returns (GetSignalsResponse);
+
+  // Get COT history
+  rpc GetHistory(COTServiceGetHistoryRequest) returns (COTServiceGetHistoryResponse);
+
+  // Subscribe to pair alert
+  rpc SubscribePairAlert(SubscribePairAlertRequest) returns (SubscribePairAlertResponse);
+}
+
+// COT report entry
+message COTEntry {
+  string pair = 1;
+  string date = 2;
+  int64 non_comm_long = 3;
+  int64 non_comm_short = 4;
+  int64 comm_long = 5;
+  int64 comm_short = 6;
+  int64 non_rep_long = 7;
+  int64 non_rep_short = 8;
+}
+
+// GetSummary request
+message GetSummaryRequest {
+  string pair = 1;
+}
+
+// GetSummary response
+message GetSummaryResponse {
+  COTEntry latest = 1;
+  repeated COTEntry history = 2;
+}
+
+// Compare request
+message CompareRequest {
+  string pair = 1;
+  string date_a = 2;
+  string date_b = 3;
+}
+
+// Compare response
+message CompareResponse {
+  COTEntry entry_a = 1;
+  COTEntry entry_b = 2;
+  string change_summary = 3;
+}
+
+// COTSignal
+message COTSignal {
+  string pair = 1;
+  string signal_type = 2;
+  string direction = 3;
+  double strength = 4;
+  string created_at = 5;
+}
+
+// GetSignals request
+message GetSignalsRequest {
+  string pair_filter = 1;
+}
+
+// GetSignals response
+message GetSignalsResponse {
+  repeated COTSignal signals = 1;
+}
+
+// COTServiceGetHistory request
+message COTServiceGetHistoryRequest {
+  string pair = 1;
+  TimeRange range = 2;
+}
+
+// COTServiceGetHistory response
+message COTServiceGetHistoryResponse {
+  repeated COTEntry entries = 1;
+}
+
+// SubscribePairAlert request
+message SubscribePairAlertRequest {
+  string pair = 1;
+  double threshold = 2;
+}
+
+// SubscribePairAlert response
+message SubscribePairAlertResponse {
+  string subscription_id = 1;
+}

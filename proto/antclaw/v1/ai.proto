@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// AIService provides AI-powered analysis and insights.
+// See: AntClaw-重构解决方案.md §3.3
+service AIService {
+  // Chat with AI (server-streaming)
+  rpc Chat(stream ChatRequest) returns (stream ChatResponse);
+
+  // Interpret market data with AI
+  rpc Interpret(InterpretRequest) returns (InterpretResponse);
+
+  // Get AI-generated market outlook
+  rpc Outlook(OutlookRequest) returns (OutlookResponse);
+
+  // Build a structured context payload for downstream AI prompts.
+  // 按 asset/scope 聚合若干领域的最新指标（macro/onchain/options/treasury 等）。
+  rpc BuildContext(BuildContextRequest) returns (BuildContextResponse);
+}
+
+// Chat message
+message ChatMessage {
+  string role = 1; // user, assistant, system
+  string content = 2;
+  int64 timestamp = 3;
+}
+
+// Chat request
+message ChatRequest {
+  string session_id = 1;
+  string message = 2;
+  repeated ChatMessage history = 3;
+  string locale = 4;
+}
+
+// Chat response (streaming)
+message ChatResponse {
+  string session_id = 1;
+  string chunk = 2;
+  bool done = 3;
+  ChatMessage full_message = 4;
+}
+
+// Interpret request
+message InterpretRequest {
+  string data_type = 1; // price, cot, macro, etc.
+  string raw_data = 2;
+  string question = 3;
+  string locale = 4;
+}
+
+// Interpret response
+message InterpretResponse {
+  string interpretation = 1;
+  repeated string key_points = 2;
+  double confidence = 3;
+  bool cache_hit = 4; // 是否命中 Redis 缓存
+}
+
+// Outlook request
+message OutlookRequest {
+  string pair = 1;
+  string timeframe = 2;
+  string locale = 3;
+}
+
+// Outlook response
+message OutlookResponse {
+  string pair = 1;
+  string summary = 2;
+  string bullish_case = 3;
+  string bearish_case = 4;
+  string key_levels = 5;
+  string generated_at = 6;
+}
+
+// BuildContext 请求
+message BuildContextRequest {
+  string asset = 1;   // BTC / ETH / EURUSD / ...
+  // scope 限定要聚合的领域。支持: macro, onchain, options, treasury, defi, sentiment。
+  // 为空时聚合全部已启用领域。
+  repeated string scope = 2;
+  string locale = 3;
+}
+
+// BuildContext 返回
+message BuildContextResponse {
+  string asset = 1;
+  // 每个 scope 的 KV 摘要，供 Prompt 模板消费。
+  map<string, ContextSection> sections = 2;
+  // 所有 sections 合并成的紧凑文本（便于直接注入 prompt）。
+  string prompt_ready = 3;
+  string generated_at = 4;
+}
+
+message ContextSection {
+  string scope = 1;
+  map<string, string> indicators = 2;
+  repeated string notes = 3;
+}

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service SECService {
+  rpc ListFilings(ListFilingsRequest) returns (ListFilingsResponse);
+  rpc GetFiling(GetFilingRequest) returns (GetFilingResponse);
+  rpc GetAnalysis(SECServiceGetAnalysisRequest) returns (SECServiceGetAnalysisResponse);
+}
+
+message ListFilingsRequest {
+  string cik = 1;
+  string form_type = 2;
+  int32 limit = 3;
+}
+message ListFilingsResponse { repeated SECFiling items = 1; }
+message SECFiling {
+  string accession_number = 1;
+  string form_type = 2;
+  google.protobuf.Timestamp filed_at = 3;
+  string company_name = 4;
+  string url = 5;
+}
+message GetFilingRequest { string accession_number = 1; }
+message GetFilingResponse {
+  SECFiling filing = 1;
+  string raw_text_excerpt = 2;
+}
+message SECServiceGetAnalysisRequest { string ticker = 1; }
+message SECServiceGetAnalysisResponse {
+  string sentiment = 1;
+  double risk_score = 2;
+  string highlights = 3;
+}

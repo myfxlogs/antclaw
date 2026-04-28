@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service FedWatchService {
+  rpc GetFOMCProbabilities(GetFOMCProbabilitiesRequest) returns (GetFOMCProbabilitiesResponse);
+}
+message GetFOMCProbabilitiesRequest { google.protobuf.Timestamp meeting_date = 1; }
+message GetFOMCProbabilitiesResponse {
+  google.protobuf.Timestamp meeting_date = 1;
+  repeated RateProbability probabilities = 2;
+}
+message RateProbability {
+  double rate_low = 1;
+  double rate_high = 2;
+  double probability = 3;
+}

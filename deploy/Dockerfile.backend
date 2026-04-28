@@ -1,0 +1,36 @@
+# Dockerfile.backend - Go backend service image
+# See: AntClaw-重构解决方案.md §2.3
+
+FROM golang:1.23-alpine AS builder
+
+ENV GOTOOLCHAIN=auto
+WORKDIR /app
+
+# Copy gen/go first (dependency)
+COPY gen/go/ ./gen/go/
+
+# Copy backend
+COPY backend/go.mod backend/go.sum* ./backend/
+RUN cd backend && go mod download 2>/dev/null || true
+
+COPY backend/ ./backend/
+
+# Build all binaries
+WORKDIR /app/backend
+RUN go build -o ../bin/antclaw-api ./cmd/antclaw-api
+RUN go build -o ../bin/antclaw-worker ./cmd/antclaw-worker
+RUN go build -o ../bin/antclaw-backtest-runner ./cmd/antclaw-backtest-runner
+RUN go build -o ../bin/antclaw-cli ./cmd/antclaw-cli
+
+# Final stage
+FROM alpine:3.19
+
+RUN apk add --no-cache ca-certificates tzdata
+
+WORKDIR /app
+
+# Copy binaries from builder
+COPY --from=builder /app/bin/ /usr/local/bin/
+
+# Default: run API server (override per service in docker-compose)
+CMD ["antclaw-api"]

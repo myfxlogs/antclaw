@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// SentimentService provides market sentiment data.
+// See: AntClaw-重构解决方案.md §3.3
+service SentimentService {
+  // Get overall market sentiment
+  rpc GetSentiment(GetSentimentRequest) returns (GetSentimentResponse);
+
+  // Get onchain metrics
+  rpc GetOnchain(GetOnchainRequest) returns (GetOnchainResponse);
+
+  // Get DeFi health metrics
+  rpc GetDefiHealth(GetDefiHealthRequest) returns (GetDefiHealthResponse);
+
+  // Get carry monitor
+  rpc GetCarryMonitor(GetCarryMonitorRequest) returns (GetCarryMonitorResponse);
+}
+
+// Sentiment data
+message SentimentData {
+  string asset = 1;
+  double score = 2; // -1 to 1
+  string label = 3; // extreme fear, fear, neutral, greed, extreme greed
+  string source = 4;
+  string timestamp = 5;
+}
+
+// GetSentiment request
+message GetSentimentRequest {
+  string asset = 1;
+}
+
+// GetSentiment response
+message GetSentimentResponse {
+  SentimentData sentiment = 1;
+  repeated SentimentData components = 2;
+}
+
+// Onchain metric
+message OnchainMetric {
+  string name = 1;
+  double value = 2;
+  string trend = 3;
+}
+
+// GetOnchain request
+message GetOnchainRequest {
+  string asset = 1;
+}
+
+// GetOnchain response
+message GetOnchainResponse {
+  string asset = 1;
+  repeated OnchainMetric metrics = 2;
+  string signal = 3;
+}
+
+// DeFi health metric
+message DefiMetric {
+  string protocol = 1;
+  string tvl = 2;
+  string tvl_change_24h = 3;
+  double utilization_rate = 4;
+  string health_score = 5;
+}
+
+// GetDefiHealth request
+message GetDefiHealthRequest {
+  string chain = 1;
+}
+
+// GetDefiHealth response
+message GetDefiHealthResponse {
+  string chain = 1;
+  repeated DefiMetric protocols = 2;
+  string overall_health = 3;
+}
+
+// Carry data
+message CarryData {
+  string pair = 1;
+  string spot = 2;
+  string futures = 3;
+  string basis = 4;
+  string annualized_yield = 5;
+}
+
+// GetCarryMonitor request
+message GetCarryMonitorRequest {
+  string category = 1; // fx, crypto
+}
+
+// GetCarryMonitor response
+message GetCarryMonitorResponse {
+  repeated CarryData carries = 1;
+}

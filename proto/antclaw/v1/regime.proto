@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+// RegimeService 提供 HMM/GARCH/ADX/COT 多模型融合的统一市场状态评分。
+// 设计参考：docs/替代实施方案 §3.2 Regime Overlay 多模型融合。
+service RegimeService {
+  // GetOverlay 计算 symbol+timeframe 的统一状态分（-100..+100）与子模型分量。
+  rpc GetOverlay(GetOverlayRequest) returns (GetOverlayResponse);
+
+  // ListRecent 列出近期 N 天的 overlay 历史，供时间线 UI 使用。
+  rpc ListRecent(ListRecentRequest) returns (ListRecentResponse);
+}
+
+message GetOverlayRequest {
+  string symbol = 1;        // 例如 "EURUSD"、"BTCUSDT"
+  string timeframe = 2;     // "D"、"4H"、"1H"
+  string contract_code = 3; // CFTC 合约代码（COT 子模型用），可选
+}
+
+message GetOverlayResponse {
+  string symbol = 1;
+  string timeframe = 2;
+  google.protobuf.Timestamp computed_at = 3;
+  double unified_score = 4;            // 加权融合分数 -100..+100
+  string unified_label = 5;            // STRONG_BULL / BULL / NEUTRAL / BEAR / STRONG_BEAR
+  RegimeSubModel hmm = 6;
+  RegimeSubModel garch = 7;
+  RegimeSubModel adx = 8;
+  RegimeSubModel cot = 9;
+  repeated string available_models = 10; // 实际参与融合的模型名
+}
+
+message RegimeSubModel {
+  string name = 1;        // hmm/garch/adx/cot
+  bool   available = 2;   // 是否成功计算
+  double score = 3;       // 子模型得分 -100..+100
+  double weight = 4;      // 实际加权（缺失模型权重会按比例重分配）
+  string state = 5;       // HMM 状态/GARCH 波动率区间/ADX 强弱/COT 极值方向
+  double confidence = 6;  // 0..1
+}
+
+message ListRecentRequest {
+  string symbol = 1;
+  string timeframe = 2;
+  int32  days = 3; // 默认 30
+}
+message ListRecentResponse {
+  repeated OverlaySnapshot items = 1;
+}
+message OverlaySnapshot {
+  google.protobuf.Timestamp time = 1;
+  double unified_score = 2;
+  string unified_label = 3;
+}

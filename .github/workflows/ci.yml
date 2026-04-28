@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main, refactor/*]
+  pull_request:
+    branches: [main, refactor/*]
+
+jobs:
+  naming-check:
+    name: Naming Compliance Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for forbidden ark/ARK strings
+        run: |
+          chmod +x scripts/ci/naming-guard.sh
+          ./scripts/ci/naming-guard.sh
+
+  protocol-lint:
+    name: Protocol & Filesize Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Protocol compliance lint
+        run: |
+          chmod +x backend/scripts/lint-protocol.sh
+          ./backend/scripts/lint-protocol.sh
+      - name: Filesize 800-line gate
+        run: |
+          chmod +x scripts/lint-filesize.sh
+          ./scripts/lint-filesize.sh
+
+  go-build:
+    name: Go Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Build Go modules
+        run: cd backend && go build ./...
+      - name: Vet
+        run: cd backend && go vet ./...
+      - name: Unit tests
+        run: cd backend && go test ./...
+
+  smoke-rpc:
+    name: RPC Smoke (docker-compose)
+    runs-on: ubuntu-latest
+    needs: [go-build, protocol-lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Boot stack
+        run: docker compose -f deploy/docker-compose.yaml up -d --build api postgres redis
+      - name: Wait for API
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" -X POST -H 'Content-Type: application/json' -d '{}' http://localhost:8082/antclaw.v1.SystemService/Healthz || echo 000)
+            if [ "$code" = "200" ]; then echo "api ready"; exit 0; fi
+            sleep 2
+          done
+          echo "api did not become ready" >&2
+          docker compose -f deploy/docker-compose.yaml logs api | tail -100
+          exit 1
+      - name: Run RPC smoke
+        run: API_BASE=http://localhost:8082 bash scripts/smoke-rpc.sh
+      - name: Tear down
+        if: always()
+        run: docker compose -f deploy/docker-compose.yaml down -v
+
+  buf-lint:
+    name: Protobuf Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bufbuild/buf-action@v1
+        with:
+          version: latest
+      - name: Buf lint
+        run: buf lint
+      - name: Buf breaking
+        run: |
+          # 仅在非 main 分支上对 main 做 breaking 检查；main 推送时跳过
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            buf breaking --against '.git#branch=main'
+          else
+            echo "skipping buf breaking on main"
+          fi
+
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || true
+      - name: Lint check
+        run: pnpm -r lint || true

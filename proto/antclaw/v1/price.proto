@@ -1,0 +1,171 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// PriceService provides price and market data.
+// See: AntClaw-重构解决方案.md §3.3
+service PriceService {
+  // Get current price for a pair
+  rpc GetPrice(GetPriceRequest) returns (GetPriceResponse);
+
+  // Get support/resistance levels
+  rpc GetLevels(GetLevelsRequest) returns (GetLevelsResponse);
+
+  // Get market overview
+  rpc GetMarketOverview(GetMarketOverviewRequest) returns (GetMarketOverviewResponse);
+
+  // Get trading session info
+  rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
+
+  // Run scenario analysis
+  rpc RunScenario(RunScenarioRequest) returns (RunScenarioResponse);
+
+  // Get market regime classification
+  rpc GetRegime(GetRegimeRequest) returns (GetRegimeResponse);
+
+  // Get seasonal analysis
+  rpc GetSeasonal(GetSeasonalRequest) returns (GetSeasonalResponse);
+}
+
+// Price bar
+message PriceBar {
+  string timestamp = 1;
+  string open = 2;
+  string high = 3;
+  string low = 4;
+  string close = 5;
+  int64 volume = 6;
+}
+
+// GetPrice request
+message GetPriceRequest {
+  string pair = 1;
+  string timeframe = 2; // e.g., "1m", "5m", "1h", "4h", "1d"
+  int32 count = 3;
+}
+
+// GetPrice response
+message GetPriceResponse {
+  string pair = 1;
+  string current = 2;
+  string change_24h = 3;
+  string change_pct_24h = 4;
+  repeated PriceBar bars = 5;
+}
+
+// Support/Resistance level
+message PriceLevel {
+  string price = 1;
+  string type = 2; // support, resistance, pivot
+  double strength = 3;
+}
+
+// GetLevels request
+message GetLevelsRequest {
+  string pair = 1;
+  string timeframe = 2;
+}
+
+// GetLevels response
+message GetLevelsResponse {
+  string pair = 1;
+  repeated PriceLevel levels = 2;
+}
+
+// Market overview item
+message MarketOverviewItem {
+  string pair = 1;
+  string price = 2;
+  string change_24h = 3;
+  string trend = 4; // bullish, bearish, neutral
+}
+
+// GetMarketOverview request
+message GetMarketOverviewRequest {
+  string category = 1; // majors, crosses, all
+}
+
+// GetMarketOverview response
+message GetMarketOverviewResponse {
+  repeated MarketOverviewItem items = 1;
+}
+
+// Session info
+message SessionInfo {
+  string session = 1; // sydney, tokyo, london, new_york
+  bool is_open = 2;
+  string opens_at = 3;
+  string closes_at = 4;
+  double volatility_index = 5;
+}
+
+// GetSession request
+message GetSessionRequest {
+  string pair = 1;
+}
+
+// GetSession response
+message GetSessionResponse {
+  string pair = 1;
+  repeated SessionInfo sessions = 2;
+  string current_session = 3;
+}
+
+// Scenario result
+message ScenarioResult {
+  string scenario_name = 1;
+  string outcome = 2;
+  double probability = 3;
+}
+
+// RunScenario request
+message RunScenarioRequest {
+  string pair = 1;
+  string event_type = 2;
+  map<string, string> params = 3;
+}
+
+// RunScenario response
+message RunScenarioResponse {
+  repeated ScenarioResult results = 1;
+}
+
+// Market regime
+message MarketRegime {
+  string regime = 1; // trending, ranging, volatile, calm
+  double confidence = 2;
+  string since = 3;
+}
+
+// GetRegime request
+message GetRegimeRequest {
+  string pair = 1;
+  string timeframe = 2;
+}
+
+// GetRegime response
+message GetRegimeResponse {
+  MarketRegime regime = 1;
+  repeated string recent_regimes = 2;
+}
+
+// Seasonal data point
+message SeasonalDataPoint {
+  string month = 1;
+  double avg_return = 2;
+  double win_rate = 3;
+}
+
+// GetSeasonal request
+message GetSeasonalRequest {
+  string pair = 1;
+  int32 years = 2;
+}
+
+// GetSeasonal response
+message GetSeasonalResponse {
+  string pair = 1;
+  repeated SeasonalDataPoint data = 2;
+}

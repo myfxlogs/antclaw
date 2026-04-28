@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+service SystemAIService {
+  rpc ListConfigs(ListSystemAIConfigsRequest) returns (ListSystemAIConfigsResponse);
+  rpc GetConfig(GetSystemAIConfigRequest) returns (GetSystemAIConfigResponse);
+  rpc UpdateConfig(UpdateSystemAIConfigRequest) returns (UpdateSystemAIConfigResponse);
+  rpc UpdateSecret(UpdateSystemAISecretRequest) returns (UpdateSystemAISecretResponse);
+  rpc DiscoverModels(DiscoverSystemAIModelsRequest) returns (DiscoverSystemAIModelsResponse);
+  rpc ValidateConnection(ValidateSystemAIConnectionRequest) returns (ValidateSystemAIConnectionResponse);
+}
+
+message SystemAIConfig {
+  string provider_id = 1;
+  string name = 2;
+  string base_url = 3;
+  string organization = 4;
+  repeated string models = 5;
+  string default_model = 6;
+  double temperature = 7;
+  int32 timeout_seconds = 8;
+  int32 max_tokens = 9;
+  repeated string purposes = 10;
+  repeated string primary_for = 11;
+  bool enabled = 12;
+  bool has_secret = 13;
+  string created_at = 14;
+  string updated_at = 15;
+  string updated_by = 16;
+}
+
+message ListSystemAIConfigsRequest {}
+
+message ListSystemAIConfigsResponse {
+  repeated SystemAIConfig items = 1;
+}
+
+message GetSystemAIConfigRequest {
+  string provider_id = 1;
+}
+
+message GetSystemAIConfigResponse {
+  SystemAIConfig item = 1;
+}
+
+message UpdateSystemAIConfigRequest {
+  string provider_id = 1;
+  string name = 2;
+  string base_url = 3;
+  string organization = 4;
+  repeated string models = 5;
+  string default_model = 6;
+  double temperature = 7;
+  int32 timeout_seconds = 8;
+  int32 max_tokens = 9;
+  repeated string purposes = 10;
+  repeated string primary_for = 11;
+  bool enabled = 12;
+}
+
+message UpdateSystemAIConfigResponse {
+  string provider_id = 1;
+}
+
+message UpdateSystemAISecretRequest {
+  string provider_id = 1;
+  string secret = 2;
+}
+
+message UpdateSystemAISecretResponse {
+  string provider_id = 1;
+  bool secret_updated = 2;
+}
+
+message DiscoverSystemAIModelsRequest {
+  string provider_id = 1;
+}
+
+message DiscoverSystemAIModelsResponse {
+  string provider_id = 1;
+  repeated string models = 2;
+  string default_model = 3;
+}
+
+message ValidateSystemAIConnectionRequest {
+  string provider_id = 1;
+}
+
+message ValidateSystemAIConnectionResponse {
+  string provider_id = 1;
+  bool ok = 2;
+  int32 model_count = 3;
+}

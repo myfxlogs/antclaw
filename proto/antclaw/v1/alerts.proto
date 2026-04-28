@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// AlertService provides alert and notification management.
+// See: AntClaw-重构解决方案.md §3.3
+service AlertService {
+  // List alert subscriptions
+  rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
+
+  // Subscribe to an alert
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse);
+
+  // Unsubscribe from an alert
+  rpc Unsubscribe(UnsubscribeRequest) returns (UnsubscribeResponse);
+
+  // Register a webhook
+  rpc RegisterWebhook(RegisterWebhookRequest) returns (RegisterWebhookResponse);
+
+  // List webhooks
+  rpc ListWebhooks(ListWebhooksRequest) returns (ListWebhooksResponse);
+
+  // Rule-based user alerts
+  rpc CreateAlert(CreateAlertRequest) returns (CreateAlertResponse);
+  rpc ListAlerts(ListAlertsRequest) returns (ListAlertsResponse);
+  rpc UpdateAlert(UpdateAlertRequest) returns (UpdateAlertResponse);
+  rpc DeleteAlert(DeleteAlertRequest) returns (DeleteAlertResponse);
+  rpc ToggleAlert(ToggleAlertRequest) returns (ToggleAlertResponse);
+}
+
+// Alert subscription
+message AlertSubscription {
+  string subscription_id = 1;
+  string alert_type = 2; // price, cot, volatility, etc.
+  string pair = 3;
+  string condition = 4; // above, below, crosses
+  string threshold = 5;
+  string notification_method = 6; // push, email, webhook
+  bool active = 7;
+  int64 created_at = 8;
+}
+
+// ListSubscriptions request
+message ListSubscriptionsRequest {
+  string alert_type_filter = 1;
+  bool active_only = 2;
+}
+
+// ListSubscriptions response
+message ListSubscriptionsResponse {
+  repeated AlertSubscription subscriptions = 1;
+}
+
+// Subscribe request
+message SubscribeRequest {
+  string alert_type = 1;
+  string pair = 2;
+  string condition = 3;
+  string threshold = 4;
+  string notification_method = 5;
+}
+
+// Subscribe response
+message SubscribeResponse {
+  AlertSubscription subscription = 1;
+}
+
+// Unsubscribe request
+message UnsubscribeRequest {
+  string subscription_id = 1;
+}
+
+// Unsubscribe response
+message UnsubscribeResponse {}
+
+// Webhook config
+message WebhookConfig {
+  string webhook_id = 1;
+  string url = 2;
+  string secret = 3;
+  repeated string event_types = 4;
+  bool active = 5;
+  int64 created_at = 6;
+}
+
+// RegisterWebhook request
+message RegisterWebhookRequest {
+  string url = 1;
+  string secret = 2;
+  repeated string event_types = 3;
+}
+
+// RegisterWebhook response
+message RegisterWebhookResponse {
+  WebhookConfig webhook = 1;
+}
+
+// ListWebhooks request
+message ListWebhooksRequest {}
+
+// ListWebhooks response
+message ListWebhooksResponse {
+  repeated WebhookConfig webhooks = 1;
+}
+
+message AlertRule {
+  int64 id = 1;
+  string user_id = 2;
+  string alert_type = 3;
+  string symbol = 4;
+  string params_json = 5;
+  bool enabled = 6;
+  int64 last_fired_at = 7;
+  int32 cooldown_seconds = 8;
+}
+
+message CreateAlertRequest {
+  string alert_type = 1;
+  string symbol = 2;
+  string params_json = 3;
+  int32 cooldown_seconds = 4;
+}
+message CreateAlertResponse { AlertRule alert = 1; }
+
+message ListAlertsRequest { string alert_type = 1; }
+message ListAlertsResponse { repeated AlertRule alerts = 1; }
+
+message UpdateAlertRequest {
+  int64 id = 1;
+  string params_json = 2;
+  int32 cooldown_seconds = 3;
+}
+message UpdateAlertResponse { AlertRule alert = 1; }
+
+message DeleteAlertRequest { int64 id = 1; }
+message DeleteAlertResponse { bool ok = 1; }
+
+message ToggleAlertRequest {
+  int64 id = 1;
+  bool enabled = 2;
+}
+message ToggleAlertResponse { AlertRule alert = 1; }

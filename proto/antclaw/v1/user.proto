@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+
+// UserService provides user profile management.
+// See: AntClaw-重构解决方案.md §3.3
+service UserService {
+  // Get current user profile
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+
+  // Update user settings
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse);
+
+  // Get membership info
+  rpc GetMembership(GetMembershipRequest) returns (GetMembershipResponse);
+
+  // Start onboarding flow
+  rpc StartOnboarding(StartOnboardingRequest) returns (StartOnboardingResponse);
+
+  // Get interaction history
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+
+  // Clear interaction history
+  rpc ClearHistory(ClearHistoryRequest) returns (ClearHistoryResponse);
+
+  // List pinned items
+  rpc ListPins(ListPinsRequest) returns (ListPinsResponse);
+
+  // Pin an item
+  rpc Pin(PinRequest) returns (PinResponse);
+
+  // Unpin an item
+  rpc Unpin(UnpinRequest) returns (UnpinResponse);
+
+  // Submit feedback
+  rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse);
+
+  // Set AI key (BYOK)
+  rpc SetAiKey(SetAiKeyRequest) returns (SetAiKeyResponse);
+}
+
+// User profile
+message User {
+  string user_id = 1;
+  string email = 2;
+  string username = 3;
+  string display_name = 4;
+  Locale locale = 5;
+  string timezone = 6;
+  repeated string roles = 7;
+  bool email_verified = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+// GetMe request
+message GetMeRequest {}
+
+// GetMe response
+message GetMeResponse {
+  User user = 1;
+}
+
+// UpdateSettings request
+message UpdateSettingsRequest {
+  string display_name = 1;
+  Locale locale = 2;
+  string timezone = 3;
+}
+
+// UpdateSettings response
+message UpdateSettingsResponse {
+  User user = 1;
+}
+
+// Membership tier
+enum MembershipTier {
+  MEMBERSHIP_TIER_UNSPECIFIED = 0;
+  MEMBERSHIP_TIER_FREE = 1;
+  MEMBERSHIP_TIER_PREMIUM = 2;
+}
+
+// Membership info
+message Membership {
+  MembershipTier tier = 1;
+  int64 expires_at = 2;
+  int64 quota_daily = 3;
+  int64 quota_used_today = 4;
+}
+
+// GetMembership request
+message GetMembershipRequest {}
+
+// GetMembership response
+message GetMembershipResponse {
+  Membership membership = 1;
+}
+
+// StartOnboarding request
+message StartOnboardingRequest {}
+
+// StartOnboarding response
+message StartOnboardingResponse {
+  string onboarding_id = 1;
+  repeated string steps = 2;
+}
+
+// History item
+message HistoryItem {
+  string item_id = 1;
+  string type = 2;
+  string title = 3;
+  string payload = 4;
+  int64 created_at = 5;
+}
+
+// GetHistory request
+message GetHistoryRequest {
+  string cursor = 1;
+  int32 page_size = 2;
+}
+
+// GetHistory response
+message GetHistoryResponse {
+  repeated HistoryItem items = 1;
+  string next_cursor = 2;
+}
+
+// ClearHistory request
+message ClearHistoryRequest {
+  bool all = 1;
+  repeated string types = 2;
+}
+
+// ClearHistory response
+message ClearHistoryResponse {
+  int32 cleared_count = 1;
+}
+
+// Pin item
+message Pin {
+  string pin_id = 1;
+  string item_id = 2;
+  string item_type = 3;
+  string title = 4;
+  int64 created_at = 5;
+}
+
+// ListPins request
+message ListPinsRequest {}
+
+// ListPins response
+message ListPinsResponse {
+  repeated Pin pins = 1;
+}
+
+// PinRequest
+message PinRequest {
+  string item_id = 1;
+  string item_type = 2;
+  string title = 3;
+}
+
+// PinResponse
+message PinResponse {
+  Pin pin = 1;
+}
+
+// UnpinRequest
+message UnpinRequest {
+  string pin_id = 1;
+}
+
+// UnpinResponse
+message UnpinResponse {}
+
+// SubmitFeedback request
+message SubmitFeedbackRequest {
+  string category = 1;
+  string content = 2;
+  string contact = 3;
+}
+
+// SubmitFeedback response
+message SubmitFeedbackResponse {
+  string feedback_id = 1;
+}
+
+// AI Provider
+enum AiProvider {
+  AI_PROVIDER_UNSPECIFIED = 0;
+  AI_PROVIDER_GEMINI = 1;
+  AI_PROVIDER_CLAUDE = 2;
+}
+
+// SetAiKey request
+message SetAiKeyRequest {
+  AiProvider provider = 1;
+  string api_key = 2;
+}
+
+// SetAiKey response
+message SetAiKeyResponse {
+  bool success = 1;
+}

@@ -1,0 +1,200 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+import "antclaw/v1/user.proto";
+
+// AdminService provides administrative operations.
+// See: AntClaw-重构解决方案.md §3.3
+// NOTE: Admin NEVER exposes GetUserAiKeyPlaintext - this is a hard boundary per §十二.A2
+service AdminService {
+  // List users with pagination
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+
+  // Set user role
+  rpc SetRole(SetRoleRequest) returns (SetRoleResponse);
+
+  // Ban a user
+  rpc Ban(BanRequest) returns (BanResponse);
+
+  // Unban a user
+  rpc Unban(UnbanRequest) returns (UnbanResponse);
+
+  // Run a background job manually
+  rpc RunJob(RunJobRequest) returns (RunJobResponse);
+
+  // List scheduled jobs
+  rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
+
+  // Enable or disable a scheduled job
+  rpc SetJobEnabled(SetJobEnabledRequest) returns (SetJobEnabledResponse);
+
+  // List audit logs
+  rpc ListAuditLogs(ListAuditLogsRequest) returns (ListAuditLogsResponse);
+
+  // List webhook deliveries
+  rpc ListWebhookDeliveries(ListWebhookDeliveriesRequest) returns (ListWebhookDeliveriesResponse);
+
+  // Force logout user (all sessions)
+  rpc ForceLogout(ForceLogoutRequest) returns (ForceLogoutResponse);
+
+  // Admin sets a user's password directly（原 POST /admin/users/{id}/reset-password）。
+  rpc AdminResetUserPassword(AdminResetUserPasswordRequest) returns (AdminResetUserPasswordResponse);
+}
+
+// ListUsers request
+message ListUsersRequest {
+  string cursor = 1;
+  int32 page_size = 2;
+  string email_filter = 3;
+  string role_filter = 4;
+  bool banned_only = 5;
+}
+
+// ListUsers response
+message ListUsersResponse {
+  repeated User users = 1;
+  string next_cursor = 2;
+  int32 total = 3;
+}
+
+// SetRole request
+message SetRoleRequest {
+  string user_id = 1;
+  repeated string roles = 2;
+}
+
+// SetRole response
+message SetRoleResponse {
+  User user = 1;
+}
+
+// Ban request
+message BanRequest {
+  string user_id = 1;
+  string reason = 2;
+  int64 expires_at = 3; // 0 = permanent
+}
+
+// Ban response
+message BanResponse {}
+
+// Unban request
+message UnbanRequest {
+  string user_id = 1;
+}
+
+// Unban response
+message UnbanResponse {}
+
+// RunJob request
+message RunJobRequest {
+  string job_name = 1;
+  map<string, string> params = 2;
+}
+
+// RunJob response
+message RunJobResponse {
+  string job_id = 1;
+  string status = 2;
+}
+
+// Job info
+message Job {
+  string job_id = 1;
+  string job_name = 2;
+  string status = 3;
+  string last_run = 4;
+  string next_run = 5;
+  bool enabled = 6;
+  string last_error = 7; // 最近一次失败/警告原因（succeeded 时为空）
+}
+
+// ListJobs request
+message ListJobsRequest {
+  string status_filter = 1;
+}
+
+// ListJobs response
+message ListJobsResponse {
+  repeated Job jobs = 1;
+}
+
+// SetJobEnabled request
+message SetJobEnabledRequest {
+  string job_id = 1;
+  bool enabled = 2;
+}
+
+// SetJobEnabled response
+message SetJobEnabledResponse {
+  string job_id = 1;
+  bool enabled = 2;
+}
+
+// Audit log entry
+message AuditLogEntry {
+  string log_id = 1;
+  string user_id = 2;
+  string action = 3;
+  string resource = 4;
+  string details = 5;
+  int64 created_at = 6;
+  string ip_address = 7;
+}
+
+// ListAuditLogs request
+message ListAuditLogsRequest {
+  string cursor = 1;
+  int32 page_size = 2;
+  string user_id_filter = 3;
+  string action_filter = 4;
+  TimeRange time_range = 5;
+}
+
+// ListAuditLogs response
+message ListAuditLogsResponse {
+  repeated AuditLogEntry entries = 1;
+  string next_cursor = 2;
+}
+
+// Webhook delivery
+message WebhookDelivery {
+  string delivery_id = 1;
+  string webhook_id = 2;
+  string event_type = 3;
+  int32 status_code = 4;
+  bool success = 5;
+  int64 created_at = 6;
+}
+
+// ListWebhookDeliveries request
+message ListWebhookDeliveriesRequest {
+  string cursor = 1;
+  int32 page_size = 2;
+  string webhook_id_filter = 3;
+}
+
+// ListWebhookDeliveries response
+message ListWebhookDeliveriesResponse {
+  repeated WebhookDelivery deliveries = 1;
+  string next_cursor = 2;
+}
+
+// ForceLogout request
+message ForceLogoutRequest {
+  string user_id = 1;
+}
+
+// ForceLogout response
+message ForceLogoutResponse {}
+
+message AdminResetUserPasswordRequest {
+  string user_id = 1;
+  string new_password = 2;
+}
+
+message AdminResetUserPasswordResponse {}

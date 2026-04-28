@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+
+// CalendarService provides economic calendar data.
+// See: AntClaw-重构解决方案.md §3.3
+service CalendarService {
+  // List economic events
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
+
+  // Get event details
+  rpc GetEvent(GetEventRequest) returns (GetEventResponse);
+
+  // Get event impact analysis
+  rpc GetImpact(GetImpactRequest) returns (GetImpactResponse);
+
+  // Get impact history
+  rpc GetImpactHistory(GetImpactHistoryRequest) returns (GetImpactHistoryResponse);
+}
+
+// Impact level
+enum ImpactLevel {
+  IMPACT_LEVEL_UNSPECIFIED = 0;
+  IMPACT_LEVEL_LOW = 1;
+  IMPACT_LEVEL_MEDIUM = 2;
+  IMPACT_LEVEL_HIGH = 3;
+}
+
+// Calendar event
+message CalendarEvent {
+  string event_id = 1;
+  string title = 2;
+  string country = 3;
+  string currency = 4;
+  ImpactLevel impact = 5;
+  string scheduled_at = 6;
+  string previous = 7;
+  string forecast = 8;
+  string actual = 9;
+}
+
+// ListEvents request
+message ListEventsRequest {
+  string date = 1; // YYYY-MM-DD
+  string currency_filter = 2;
+  ImpactLevel min_impact = 3;
+  TimeRange range = 4;
+}
+
+// ListEvents response
+message ListEventsResponse {
+  repeated CalendarEvent events = 1;
+}
+
+// GetEvent request
+message GetEventRequest {
+  string event_id = 1;
+}
+
+// GetEvent response
+message GetEventResponse {
+  CalendarEvent event = 1;
+  string description = 2;
+}
+
+// Impact analysis
+message ImpactAnalysis {
+  string event_id = 1;
+  repeated string affected_pairs = 2;
+  string expected_direction = 3;
+  double confidence = 4;
+}
+
+// GetImpact request
+message GetImpactRequest {
+  string event_id = 1;
+}
+
+// GetImpact response
+message GetImpactResponse {
+  ImpactAnalysis analysis = 1;
+}
+
+// Historical impact
+message HistoricalImpact {
+  string event_id = 1;
+  string date = 2;
+  string pair = 3;
+  double price_change = 4;
+  double volatility = 5;
+}
+
+// GetImpactHistory request
+message GetImpactHistoryRequest {
+  string event_type = 1;
+  string pair = 2;
+  int32 count = 3;
+}
+
+// GetImpactHistory response
+message GetImpactHistoryResponse {
+  repeated HistoricalImpact impacts = 1;
+}

@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+
+// MacroService provides macroeconomic indicator data.
+// See: AntClaw-重构解决方案.md §3.3
+service MacroService {
+  // Get FRED data
+  rpc GetFred(GetFredRequest) returns (GetFredResponse);
+
+  // Get ECB data
+  rpc GetEcb(GetEcbRequest) returns (GetEcbResponse);
+
+  // Get SNB data
+  rpc GetSnb(GetSnbRequest) returns (GetSnbResponse);
+
+  // Get OECD Leading Indicators
+  rpc GetOecdLeading(GetOecdLeadingRequest) returns (GetOecdLeadingResponse);
+
+  // Get Eurostat data
+  rpc GetEurostat(GetEurostatRequest) returns (GetEurostatResponse);
+
+  // Get BIS data
+  rpc GetBis(GetBisRequest) returns (GetBisResponse);
+
+  // Get Trading Economics data
+  rpc GetTradingEconomics(GetTradingEconomicsRequest) returns (GetTradingEconomicsResponse);
+
+  // Get DTCC Swaps data
+  rpc GetDtccSwaps(GetDtccSwapsRequest) returns (GetDtccSwapsResponse);
+
+  // Get SEC 13F data
+  rpc GetSec13f(GetSec13fRequest) returns (GetSec13fResponse);
+
+  // Get Treasury Auctions data
+  rpc GetTreasuryAuctions(GetTreasuryAuctionsRequest) returns (GetTreasuryAuctionsResponse);
+
+  // Get FedWatch (CME FedWatch)
+  rpc GetFedWatch(GetFedWatchRequest) returns (GetFedWatchResponse);
+
+  // Get World Bank data
+  rpc GetWorldBank(GetWorldBankRequest) returns (GetWorldBankResponse);
+
+  // Get IMF WEO data
+  rpc GetImfWeo(GetImfWeoRequest) returns (GetImfWeoResponse);
+}
+
+// Macro data point
+message MacroDataPoint {
+  string date = 1;
+  string value = 2;
+  string unit = 3;
+}
+
+// GetFred request
+message GetFredRequest {
+  string series_id = 1;
+  TimeRange range = 2;
+}
+
+// GetFred response
+message GetFredResponse {
+  string series_id = 1;
+  string series_name = 2;
+  repeated MacroDataPoint data = 3;
+}
+
+// GetEcb request
+message GetEcbRequest {
+  string series_key = 1;
+  TimeRange range = 2;
+}
+
+// GetEcb response
+message GetEcbResponse {
+  string series_key = 1;
+  string description = 2;
+  repeated MacroDataPoint data = 3;
+}
+
+// GetSnb request
+message GetSnbRequest {
+  string indicator = 1;
+  TimeRange range = 2;
+}
+
+// GetSnb response
+message GetSnbResponse {
+  string indicator = 1;
+  repeated MacroDataPoint data = 2;
+}
+
+// OECD leading indicator
+message OecdIndicator {
+  string country = 1;
+  string date = 2;
+  double cli = 3; // Composite Leading Indicator
+  string phase = 4; // expansion, slowdown, downturn, recovery
+}
+
+// GetOecdLeading request
+message GetOecdLeadingRequest {
+  string country = 1;
+}
+
+// GetOecdLeading response
+message GetOecdLeadingResponse {
+  repeated OecdIndicator indicators = 1;
+}
+
+// GetEurostat request
+message GetEurostatRequest {
+  string dataset = 1;
+  string geo = 2;
+  TimeRange range = 3;
+}
+
+// GetEurostat response
+message GetEurostatResponse {
+  string dataset = 1;
+  repeated MacroDataPoint data = 2;
+}
+
+// BIS data point
+message BisDataPoint {
+  string date = 1;
+  string value = 2;
+  string currency = 3;
+}
+
+// GetBis request
+message GetBisRequest {
+  string dataset = 1; // credit, debt_securities, etc.
+  string jurisdiction = 2;
+}
+
+// GetBis response
+message GetBisResponse {
+  string dataset = 1;
+  repeated BisDataPoint data = 2;
+}
+
+// Trading Economics indicator
+message TeIndicator {
+  string country = 1;
+  string category = 2;
+  string last = 3;
+  string previous = 4;
+  string frequency = 5;
+}
+
+// GetTradingEconomics request
+message GetTradingEconomicsRequest {
+  string country = 1;
+  string category = 2;
+}
+
+// GetTradingEconomics response
+message GetTradingEconomicsResponse {
+  repeated TeIndicator indicators = 1;
+}
+
+// DTCC swap data
+message DtccSwap {
+  string date = 1;
+  string pair = 2;
+  string tenor = 3;
+  double volume = 4;
+  double open_interest = 5;
+}
+
+// GetDtccSwaps request
+message GetDtccSwapsRequest {
+  string pair = 1;
+  string tenor = 2;
+}
+
+// GetDtccSwaps response
+message GetDtccSwapsResponse {
+  repeated DtccSwap swaps = 1;
+}
+
+// 13F holding
+message Holding13f {
+  string cusip = 1;
+  string issuer = 2;
+  string class = 3;
+  int64 shares = 4;
+  string value = 5;
+}
+
+// GetSec13f request
+message GetSec13fRequest {
+  string cik = 1;
+  string quarter = 2; // YYYY-QN format
+}
+
+// GetSec13f response
+message GetSec13fResponse {
+  string cik = 1;
+  string filer_name = 2;
+  int64 quarter = 3;
+  repeated Holding13f holdings = 4;
+}
+
+// Treasury auction
+message TreasuryAuction {
+  string date = 1;
+  string security_type = 2;
+  string term = 3;
+  string amount = 4;
+  double high_yield = 5;
+  double bid_to_cover = 6;
+}
+
+// GetTreasuryAuctions request
+message GetTreasuryAuctionsRequest {
+  string security_type = 1;
+  int32 count = 2;
+}
+
+// GetTreasuryAuctions response
+message GetTreasuryAuctionsResponse {
+  repeated TreasuryAuction auctions = 1;
+}
+
+// FedWatch probability
+message FedWatchProb {
+  string meeting_date = 1;
+  string target_range = 2;
+  double probability = 3;
+}
+
+// GetFedWatch request
+message GetFedWatchRequest {}
+
+// GetFedWatch response
+message GetFedWatchResponse {
+  string current_target = 1;
+  repeated FedWatchProb probabilities = 2;
+}
+
+// World Bank indicator
+message WbIndicator {
+  string indicator_code = 1;
+  string country = 2;
+  string year = 3;
+  string value = 4;
+}
+
+// GetWorldBank request
+message GetWorldBankRequest {
+  string indicator = 1;
+  string country = 2;
+}
+
+// GetWorldBank response
+message GetWorldBankResponse {
+  string indicator = 1;
+  repeated WbIndicator data = 2;
+}
+
+// IMF WEO data
+message ImfWeoData {
+  string country = 1;
+  string year = 2;
+  double gdp_growth = 3;
+  double inflation = 4;
+  double unemployment = 5;
+}
+
+// GetImfWeo request
+message GetImfWeoRequest {
+  string country = 1;
+  string year = 2;
+}
+
+// GetImfWeo response
+message GetImfWeoResponse {
+  repeated ImfWeoData data = 1;
+}

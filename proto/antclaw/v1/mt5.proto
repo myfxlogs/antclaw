@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// MT5Service provides MT5 equivalence layer (reserved for later phase).
+service MT5Service {
+  // RPCs return UNIMPLEMENTED in MVP
+}
+
+// Placeholder messages for P2 skeleton
+message MT5PlaceHolderRequest {}
+message MT5PlaceHolderResponse {}

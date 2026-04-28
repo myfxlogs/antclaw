@@ -1,0 +1,99 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "jobs": "Jobs",
+    "audit": "Audit",
+    "data": "Data",
+    "datasources": "Data Sources",
+    "strategies": "Strategies",
+    "systemAI": "System AI",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "stats": {
+      "totalUsers": "Total Users",
+      "activeJobs": "Active Jobs",
+      "systemStatus": "System Status",
+      "alerts": "Alerts"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "actions": {
+        "updatedJobConfig": "Updated job config",
+        "loggedIn": "Logged in",
+        "dailyBackupCompleted": "Daily backup completed"
+      },
+      "time": {
+        "minAgo": "min ago",
+        "hourAgo": "hour ago"
+      }
+    },
+    "systemHealth": {
+      "title": "System Health",
+      "status": {
+        "operational": "Operational"
+      },
+      "services": {
+        "apiServer": "API Server",
+        "database": "Database",
+        "redis": "Redis",
+        "worker": "Worker"
+      }
+    }
+  },
+  "users": {
+    "title": "User Management",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "banned": "Banned",
+    "active": "Active",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "ban": "Ban",
+    "unban": "Unban",
+    "setRole": "Set Role"
+  },
+  "jobs": {
+    "title": "Job Management",
+    "jobName": "Job Name",
+    "status": "Status",
+    "lastRun": "Last Run",
+    "nextRun": "Next Run",
+    "actions": "Actions",
+    "run": "Run",
+    "loading": "Loading...",
+    "noJobs": "No Jobs",
+    "filterStatus": "Filter Status",
+    "allStatus": "All",
+    "running": "Running",
+    "pending": "Pending",
+    "completed": "Completed",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "unknown": "Not Run",
+    "enabled": "Enabled",
+    "enable": "Enable",
+    "disable": "Disable",
+    "jobId": "Job ID",
+    "runAll": "Run All Jobs"
+  },
+  "audit": {
+    "title": "Audit Logs",
+    "userId": "User ID",
+    "action": "Action",
+    "resource": "Resource",
+    "details": "Details",
+    "createdAt": "Created At",
+    "ipAddress": "IP Address"
+  },
+  "settings": {
+    "title": "System Settings",
+    "general": "General Settings",
+    "security": "Security Settings",
+    "notifications": "Notification Settings"
+  }
+}

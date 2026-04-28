@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// AdminDataService 管理端采集数据汇总与预览（原 /admin/data/* JSON）。
+service AdminDataService {
+  rpc GetDataSummary(GetDataSummaryRequest) returns (GetDataSummaryResponse);
+  rpc GetDataPreview(GetDataPreviewRequest) returns (GetDataPreviewResponse);
+}
+
+message DataSummaryItem {
+  string job_id = 1;
+  string name = 2;
+  string table = 3;
+  int64 count = 4;
+  int64 latest_time = 5;
+  string error = 6;
+}
+
+message GetDataSummaryRequest {}
+
+message GetDataSummaryResponse {
+  repeated DataSummaryItem items = 1;
+  int64 updated_at = 2;
+}
+
+message GetDataPreviewRequest {
+  string job_id = 1;
+  int32 limit = 2;
+}
+
+message GetDataPreviewResponse {
+  string job_id = 1;
+  string table = 2;
+  string time_col = 3;
+  repeated string columns = 4;
+  // JSON 数组，元素为对象（与旧 REST 预览 rows 一致），便于前端直接 JSON.parse。
+  string rows_json = 5;
+  int32 total_sampled = 6;
+}

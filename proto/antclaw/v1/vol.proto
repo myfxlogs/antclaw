@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// VolService provides volatility analysis data.
+// See: AntClaw-重构解决方案.md §3.3
+service VolService {
+  // Get VIX index
+  rpc GetVix(GetVixRequest) returns (GetVixResponse);
+
+  // Get MOVE index (bond volatility)
+  rpc GetMove(GetMoveRequest) returns (GetMoveResponse);
+
+  // Get DVol (crypto volatility)
+  rpc GetDvol(GetDvolRequest) returns (GetDvolResponse);
+
+  // Get Gamma Exposure (GEX)
+  rpc GetGex(GetGexRequest) returns (GetGexResponse);
+
+  // Get Implied Volatility
+  rpc GetIvol(GetIvolRequest) returns (GetIvolResponse);
+
+  // Get Volatility Skew
+  rpc GetSkew(GetSkewRequest) returns (GetSkewResponse);
+
+  // Get Skew-VIX Alert
+  rpc GetSkewVixAlert(GetSkewVixAlertRequest) returns (GetSkewVixAlertResponse);
+}
+
+// VIX data
+message VixData {
+  string timestamp = 1;
+  double spot = 2;
+  double term_structure = 3;
+  double percentile_30d = 4;
+  string regime = 5; // low, normal, high, extreme
+}
+
+// GetVix request
+message GetVixRequest {}
+
+// GetVix response
+message GetVixResponse {
+  VixData vix = 1;
+  repeated VixData history = 2;
+}
+
+// MOVE index data
+message MoveData {
+  string timestamp = 1;
+  double value = 2;
+  string trend = 3;
+}
+
+// GetMove request
+message GetMoveRequest {}
+
+// GetMove response
+message GetMoveResponse {
+  MoveData move = 1;
+}
+
+// DVol data
+message DvolData {
+  string timestamp = 1;
+  double value = 2;
+  string asset = 3;
+}
+
+// GetDvol request
+message GetDvolRequest {
+  string asset = 1; // BTC, ETH, etc.
+}
+
+// GetDvol response
+message GetDvolResponse {
+  DvolData dvol = 1;
+}
+
+// GEX data
+message GexData {
+  string timestamp = 1;
+  string pair = 2;
+  double net_gex = 3;
+  double flip_point = 4;
+  string wall = 5;
+}
+
+// GetGex request
+message GetGexRequest {
+  string pair = 1;
+}
+
+// GetGex response
+message GetGexResponse {
+  GexData gex = 1;
+}
+
+// IV surface point
+message IvolPoint {
+  double strike = 1;
+  double iv = 2;
+  double delta = 3;
+  double gamma = 4;
+  double theta = 5;
+  double vega = 6;
+}
+
+// GetIvol request
+message GetIvolRequest {
+  string pair = 1;
+  string expiry = 2;
+}
+
+// GetIvol response
+message GetIvolResponse {
+  string pair = 1;
+  repeated IvolPoint surface = 2;
+  double atm_iv = 3;
+}
+
+// Skew data
+message SkewData {
+  string timestamp = 1;
+  string pair = 2;
+  double risk_reversal = 3; // 25d call - 25d put
+  double fly = 4;           // butterfly
+  string term_structure = 5;
+}
+
+// GetSkew request
+message GetSkewRequest {
+  string pair = 1;
+}
+
+// GetSkew response
+message GetSkewResponse {
+  SkewData skew = 1;
+}
+
+// Skew-VIX alert
+message SkewVixAlert {
+  string alert_id = 1;
+  string timestamp = 2;
+  string pair = 3;
+  string signal = 4;
+  double confidence = 5;
+  string reason = 6;
+}
+
+// GetSkewVixAlert request
+message GetSkewVixAlertRequest {
+  string pair = 1;
+}
+
+// GetSkewVixAlert response
+message GetSkewVixAlertResponse {
+  repeated SkewVixAlert alerts = 1;
+}

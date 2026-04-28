@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+
+// BacktestService provides backtesting functionality.
+// See: AntClaw-重构解决方案.md §3.3
+// MVP: All RPCs return UNIMPLEMENTED per P6c (sandbox reserved for later phase)
+service BacktestService {
+  // Run a backtest
+  rpc RunBacktest(RunBacktestRequest) returns (RunBacktestResponse);
+
+  // Get backtest result
+  rpc GetBacktest(GetBacktestRequest) returns (GetBacktestResponse);
+
+  // Get backtest accuracy metrics
+  rpc GetAccuracy(GetAccuracyRequest) returns (GetAccuracyResponse);
+
+  // Run quant backtest
+  rpc RunQuantBt(RunQuantBtRequest) returns (RunQuantBtResponse);
+
+  // Run volume profile backtest
+  rpc RunVpBt(RunVpBtRequest) returns (RunVpBtResponse);
+
+  // Run CTA backtest
+  rpc RunCtaBt(RunCtaBtRequest) returns (RunCtaBtResponse);
+
+  // Advanced backtest capabilities
+  rpc RunWalkforward(RunWalkforwardRequest) returns (RunWalkforwardResponse);
+  rpc GetWalkforwardResult(GetWalkforwardResultRequest) returns (GetWalkforwardResultResponse);
+  rpc RunBootstrap(RunBootstrapRequest) returns (RunBootstrapResponse);
+}
+
+// Backtest configuration
+message BacktestConfig {
+  string strategy_id = 1;
+  string pair = 2;
+  TimeRange period = 3;
+  string timeframe = 4;
+  Money initial_balance = 5;
+  double max_position_size = 6;
+  double stop_loss_pct = 7;
+  double take_profit_pct = 8;
+}
+
+// RunBacktest request
+message RunBacktestRequest {
+  BacktestConfig config = 1;
+  string idempotency_key = 2;
+}
+
+// RunBacktest response
+message RunBacktestResponse {
+  string task_id = 1;
+  string status = 2; // pending, running, completed, failed
+}
+
+// GetBacktest request
+message GetBacktestRequest {
+  string task_id = 1;
+}
+
+// Trade record
+message TradeRecord {
+  string trade_id = 1;
+  string entry_time = 2;
+  string exit_time = 3;
+  string direction = 4; // long, short
+  string entry_price = 5;
+  string exit_price = 6;
+  string pnl = 7;
+  string pnl_pct = 8;
+}
+
+// Backtest metrics
+message BacktestMetrics {
+  string total_return = 1;
+  string total_return_pct = 2;
+  double sharpe_ratio = 3;
+  double max_drawdown = 4;
+  double win_rate = 5;
+  int32 total_trades = 6;
+  double profit_factor = 7;
+}
+
+// GetBacktest response
+message GetBacktestResponse {
+  string task_id = 1;
+  string status = 2;
+  BacktestConfig config = 3;
+  BacktestMetrics metrics = 4;
+  repeated TradeRecord trades = 5;
+}
+
+// GetAccuracy request
+message GetAccuracyRequest {
+  string strategy_id = 1;
+  TimeRange period = 2;
+}
+
+// Accuracy metrics
+message AccuracyMetrics {
+  double directional_accuracy = 1;
+  double avg_return = 2;
+  double hit_rate = 3;
+  double sharpe = 4;
+  double sortino = 5;
+  int32 sample_size = 6;
+  double std_dev = 7;
+}
+
+// GetAccuracy response
+message GetAccuracyResponse {
+  string strategy_id = 1;
+  AccuracyMetrics metrics = 2;
+}
+
+// Quant backtest config
+message QuantBtConfig {
+  string pair = 1;
+  string strategy_name = 2;
+  TimeRange period = 3;
+  map<string, string> params = 4;
+}
+
+// RunQuantBt request
+message RunQuantBtRequest {
+  QuantBtConfig config = 1;
+}
+
+// RunQuantBt response
+message RunQuantBtResponse {
+  string task_id = 1;
+  string status = 2;
+}
+
+// VP backtest config
+message VpBtConfig {
+  string pair = 1;
+  TimeRange period = 2;
+  int32 num_bins = 3;
+}
+
+// RunVpBt request
+message RunVpBtRequest {
+  VpBtConfig config = 1;
+}
+
+// RunVpBt response
+message RunVpBtResponse {
+  string task_id = 1;
+  string status = 2;
+}
+
+// CTA backtest config
+message CtaBtConfig {
+  string pair = 1;
+  TimeRange period = 2;
+  int32 lookback = 3;
+  string strategy = 4;
+  repeated string symbols = 5;
+  string timeframe = 6;
+  string secondary_timeframe = 7;
+  double target_vol = 8;
+}
+
+// RunCtaBt request
+message RunCtaBtRequest {
+  CtaBtConfig config = 1;
+}
+
+// RunCtaBt response
+message RunCtaBtResponse {
+  string task_id = 1;
+  string status = 2;
+}
+
+message ParamRange {
+  double min = 1;
+  double max = 2;
+  double step = 3;
+}
+
+message RunWalkforwardRequest {
+  string strategy = 1;
+  repeated string symbols = 2;
+  string from_date = 3;
+  string to_date = 4;
+  int32 folds = 5;
+  double train_ratio = 6;
+  map<string, ParamRange> param_grid = 7;
+}
+
+message RunWalkforwardResponse {
+  string job_id = 1;
+  string status = 2;
+}
+
+message WalkforwardFold {
+  int32 fold_idx = 1;
+  string train_from = 2;
+  string train_to = 3;
+  string test_from = 4;
+  string test_to = 5;
+  double in_sample_sharpe = 6;
+  double oos_sharpe = 7;
+}
+
+message GetWalkforwardResultRequest {
+  string job_id = 1;
+}
+
+message GetWalkforwardResultResponse {
+  string job_id = 1;
+  repeated WalkforwardFold folds = 2;
+}
+
+message RunBootstrapRequest {
+  string base_job_id = 1;
+  int32 iterations = 2;
+  uint64 random_seed = 3;
+}
+
+message RunBootstrapResponse {
+  double sharpe_p5 = 1;
+  double sharpe_p50 = 2;
+  double sharpe_p95 = 3;
+  double maxdd_p5 = 4;
+  double maxdd_p50 = 5;
+  double maxdd_p95 = 6;
+  int32 iterations = 7;
+}

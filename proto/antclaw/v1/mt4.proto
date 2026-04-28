@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// MT4Service provides MT4 equivalence layer (reserved for later phase).
+// See: AntClaw-未决项清单.md
+service MT4Service {
+  // RPCs return UNIMPLEMENTED in MVP
+}
+
+// Placeholder messages for P2 skeleton
+message MT4PlaceHolderRequest {}
+message MT4PlaceHolderResponse {}

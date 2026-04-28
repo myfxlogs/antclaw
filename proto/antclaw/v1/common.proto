@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// Money represents a monetary amount with currency.
+message Money {
+  string amount = 1;
+  string currency = 2;
+}
+
+// TimeRange specifies a time interval.
+message TimeRange {
+  string start = 1; // RFC3339 format
+  string end = 2;   // RFC3339 format
+}
+
+// Locale for internationalization.
+enum Locale {
+  LOCALE_UNSPECIFIED = 0;
+  LOCALE_ZH_CN = 1;
+  LOCALE_EN_US = 2;
+}
+
+// Standard error details.
+message ErrorDetail {
+  string field = 1;
+  string message_key = 2;
+  map<string, string> params = 3;
+}
+
+// ErrorCode enum per Appendix B.4.
+// All business error codes must be registered here.
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+
+  // Auth errors
+  ERROR_CODE_AUTH_INVALID_CREDENTIALS = 100;
+  ERROR_CODE_AUTH_TOKEN_EXPIRED = 101;
+  ERROR_CODE_AUTH_FORBIDDEN = 102;
+  ERROR_CODE_AUTH_REFRESH_EXPIRED = 103;
+  ERROR_CODE_AUTH_REFRESH_REUSED = 104;
+  ERROR_CODE_AUTH_SESSION_REVOKED = 105;
+  ERROR_CODE_AUTH_INVALID_EMAIL = 106;
+  ERROR_CODE_AUTH_WEAK_PASSWORD = 107;
+  ERROR_CODE_AUTH_EMAIL_TAKEN = 108;
+
+  // User errors
+  ERROR_CODE_USER_NOT_FOUND = 200;
+  ERROR_CODE_USER_LOCKED = 201;
+
+  // Rate limiting
+  ERROR_CODE_RATE_LIMITED = 300;
+
+  // BYOK errors
+  ERROR_CODE_KEY_MISSING = 400;
+  ERROR_CODE_KEY_INVALID = 401;
+
+  // AI errors
+  ERROR_CODE_AI_UPSTREAM_ERROR = 500;
+  ERROR_CODE_AI_DEGRADED = 501;
+
+  // Backtest errors
+  ERROR_CODE_BACKTEST_CANCELED = 600;
+  ERROR_CODE_BACKTEST_RESOURCE_LIMIT = 601;
+
+  // Stream errors
+  ERROR_CODE_STREAM_BACKPRESSURE = 700;
+
+  // Validation errors
+  ERROR_CODE_VALIDATION_FAILED = 800;
+
+  // Conflict
+  ERROR_CODE_CONFLICT = 900;
+
+  // Internal
+  ERROR_CODE_INTERNAL = 999;
+
+  // Signals/strategy/backtest shared
+  ERROR_CODE_DATA_INSUFFICIENT = 50;
+  ERROR_CODE_REGIME_UNAVAILABLE = 51;
+  ERROR_CODE_BACKTEST_RUNNING = 52;
+  ERROR_CODE_BACKTEST_FAILED = 53;
+  ERROR_CODE_CALIBRATION_NOT_TRAINED = 54;
+  ERROR_CODE_ALERT_QUOTA_EXCEEDED = 55;
+}

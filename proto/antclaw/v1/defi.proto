@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service DeFiService {
+  rpc GetTopProtocols(GetTopProtocolsRequest) returns (GetTopProtocolsResponse);
+  rpc GetProtocolTVL(GetProtocolTVLRequest) returns (GetProtocolTVLResponse);
+  rpc GetAnalysis(DeFiServiceGetAnalysisRequest) returns (DeFiServiceGetAnalysisResponse);
+}
+
+message GetTopProtocolsRequest { int32 limit = 1; string chain = 2; }
+message GetTopProtocolsResponse { repeated DeFiProtocol items = 1; }
+message DeFiProtocol {
+  string slug = 1;
+  string name = 2;
+  string category = 3;
+  double tvl_usd = 4;
+  double change_1d = 5;
+  double change_7d = 6;
+}
+message GetProtocolTVLRequest { string slug = 1; }
+message GetProtocolTVLResponse { repeated TVLPoint points = 1; }
+message TVLPoint { google.protobuf.Timestamp time = 1; double tvl_usd = 2; }
+message DeFiServiceGetAnalysisRequest { string chain = 1; }
+message DeFiServiceGetAnalysisResponse {
+  double total_tvl = 1;
+  double tvl_change_7d = 2;
+  string regime = 3;
+  string narrative = 4;
+}

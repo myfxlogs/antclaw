@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service OnchainService {
+  rpc GetMetrics(OnchainServiceGetMetricsRequest) returns (OnchainServiceGetMetricsResponse);
+  rpc GetAnalysis(OnchainServiceGetAnalysisRequest) returns (OnchainServiceGetAnalysisResponse);
+}
+
+message OnchainServiceGetMetricsRequest {
+  string asset = 1;
+  google.protobuf.Timestamp start = 2;
+  google.protobuf.Timestamp end = 3;
+}
+message OnchainServiceGetMetricsResponse { repeated OnchainPoint points = 1; }
+message OnchainPoint {
+  google.protobuf.Timestamp time = 1;
+  double active_addresses = 2;
+  double tx_count = 3;
+  double exchange_netflow = 4;
+  double mvrv = 5;
+  double sopr = 6;
+}
+
+message OnchainServiceGetAnalysisRequest { string asset = 1; }
+message OnchainServiceGetAnalysisResponse {
+  string regime = 1;
+  double confidence = 2;
+  string narrative = 3;
+}

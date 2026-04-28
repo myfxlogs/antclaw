@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/common.proto";
+
+// AuthService handles authentication and authorization.
+// See: AntClaw-用户系统与鉴权.md §6
+service AuthService {
+  // Register a new user with email and password
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+
+  // Login with email/username and password
+  rpc Login(LoginRequest) returns (LoginResponse);
+
+  // Refresh access token using refresh token
+  rpc Refresh(RefreshRequest) returns (RefreshResponse);
+
+  // Logout and revoke session
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+
+  // Request password reset email
+  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (RequestPasswordResetResponse);
+
+  // Reset password with token from email
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+
+  // Verify email with token
+  rpc VerifyEmail(VerifyEmailRequest) returns (VerifyEmailResponse);
+}
+
+// Client metadata for tracking
+message ClientInfo {
+  string user_agent = 1;
+  string ip_address = 2;
+  string device_id = 3;
+}
+
+// Register request
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  string display_name = 3;
+  Locale locale = 4;
+  string timezone = 5;
+  ClientInfo client = 6;
+  string idempotency_key = 7;
+}
+
+// Register response
+message RegisterResponse {
+  string user_id = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  int64 expires_at = 4; // Unix timestamp
+}
+
+// Login request
+message LoginRequest {
+  string email = 1;    // Can also be username
+  string password = 2;
+  ClientInfo client = 3;
+}
+
+// Login response
+message LoginResponse {
+  string user_id = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  int64 expires_at = 4;
+}
+
+// Refresh request
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+// Refresh response
+message RefreshResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 expires_at = 3;
+}
+
+// Logout request
+message LogoutRequest {
+  string refresh_token = 1;
+  bool all_devices = 2; // If true, logout all sessions
+}
+
+// Logout response
+message LogoutResponse {}
+
+// Request password reset request
+message RequestPasswordResetRequest {
+  string email = 1;
+}
+
+// Request password reset response
+message RequestPasswordResetResponse {
+  bool sent = 1; // Always true to prevent email enumeration
+}
+
+// Reset password request
+message ResetPasswordRequest {
+  string token = 1;
+  string new_password = 2;
+}
+
+// Reset password response
+message ResetPasswordResponse {
+  string user_id = 1;
+}
+
+// Verify email request
+message VerifyEmailRequest {
+  string token = 1;
+}
+
+// Verify email response
+message VerifyEmailResponse {
+  string user_id = 1;
+  bool verified = 2;
+}

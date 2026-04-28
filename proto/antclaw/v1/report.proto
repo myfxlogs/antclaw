@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+message GetReportRequest {
+  string symbol = 1;
+  repeated string sections = 2;
+  bool with_ai_summary = 3;
+}
+
+message ReportBias {
+  string pair = 1;
+  string direction = 2;
+  double confidence = 3;
+  string timeframe = 4;
+}
+
+message ReportUnified {
+  string symbol = 1;
+  string issued_at = 2;
+  string recommendation = 3;
+  double unified_score = 4;
+  double confidence = 5;
+}
+
+message GetReportResponse {
+  string symbol = 1;
+  string generated_at = 2;
+  ReportBias bias = 3;
+  ReportUnified unified = 4;
+  double accuracy_1w = 5;
+  double accuracy_1m = 6;
+  repeated string missing_sections = 7;
+}
+
+service ReportService {
+  rpc GetReport(GetReportRequest) returns (GetReportResponse);
+}

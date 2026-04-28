@@ -1,0 +1,268 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// SignalsService provides trading signals and analysis.
+// See: AntClaw-重构解决方案.md §3.3
+service SignalsService {
+  // Get directional bias
+  rpc GetBias(GetBiasRequest) returns (GetBiasResponse);
+
+  // Get asset ranking
+  rpc GetRank(GetRankRequest) returns (GetRankResponse);
+
+  // Get X-Factors analysis
+  rpc GetXFactors(GetXFactorsRequest) returns (GetXFactorsResponse);
+
+  // Get radar view
+  rpc GetRadar(GetRadarRequest) returns (GetRadarResponse);
+
+  // Get signal intensity
+  rpc GetIntensity(GetIntensityRequest) returns (GetIntensityResponse);
+
+  // Get transition probability
+  rpc GetTransition(GetTransitionRequest) returns (GetTransitionResponse);
+
+  // Get crypto alpha signals
+  rpc GetCryptoAlpha(GetCryptoAlphaRequest) returns (GetCryptoAlphaResponse);
+
+  // Get unified signal
+  rpc GetUnified(GetUnifiedRequest) returns (GetUnifiedResponse);
+
+  // Get quant signals
+  rpc GetQuant(GetQuantRequest) returns (GetQuantResponse);
+
+  // Get CTA signals
+  rpc GetCta(GetCtaRequest) returns (GetCtaResponse);
+
+  // Get market briefing
+  rpc GetBriefing(GetBriefingRequest) returns (GetBriefingResponse);
+
+  // Get market outlook
+  rpc GetOutlook(GetOutlookRequest) returns (GetOutlookResponse);
+}
+
+// Bias data
+message BiasData {
+  string pair = 1;
+  string direction = 2; // bullish, bearish, neutral
+  double confidence = 3;
+  string timeframe = 4;
+}
+
+// GetBias request
+message GetBiasRequest {
+  string pair = 1;
+  string timeframe = 2;
+}
+
+// GetBias response
+message GetBiasResponse {
+  repeated BiasData biases = 1;
+}
+
+// Rank item
+message RankItem {
+  string pair = 1;
+  int32 rank = 2;
+  double score = 3;
+  string trend = 4;
+}
+
+// GetRank request
+message GetRankRequest {
+  string category = 1; // majors, crosses, crypto, all
+}
+
+// GetRank response
+message GetRankResponse {
+  repeated RankItem rankings = 1;
+}
+
+// X-Factor
+message XFactor {
+  string name = 1;
+  double weight = 2;
+  string direction = 3;
+  string description = 4;
+}
+
+// GetXFactors request
+message GetXFactorsRequest {
+  string pair = 1;
+}
+
+// GetXFactors response
+message GetXFactorsResponse {
+  string pair = 1;
+  repeated XFactor factors = 2;
+  string composite_signal = 3;
+}
+
+// Radar data point
+message RadarDataPoint {
+  string pair = 1;
+  double x = 2;
+  double y = 3;
+  string quadrant = 4;
+  double strength = 5;
+}
+
+// GetRadar request
+message GetRadarRequest {
+  string category = 1;
+}
+
+// GetRadar response
+message GetRadarResponse {
+  repeated RadarDataPoint points = 1;
+}
+
+// Intensity data
+message IntensityData {
+  string pair = 1;
+  double intensity = 2;
+  string strength_label = 3; // weak, moderate, strong, extreme
+  double percentile_30d = 4;
+}
+
+// GetIntensity request
+message GetIntensityRequest {
+  string pair = 1;
+}
+
+// GetIntensity response
+message GetIntensityResponse {
+  IntensityData intensity = 1;
+}
+
+// Transition probability
+message TransitionProb {
+  string from_state = 1;
+  string to_state = 2;
+  double probability = 3;
+}
+
+// GetTransition request
+message GetTransitionRequest {
+  string pair = 1;
+  string current_state = 2;
+}
+
+// GetTransition response
+message GetTransitionResponse {
+  string pair = 1;
+  repeated TransitionProb transitions = 2;
+}
+
+// Crypto alpha signal
+message CryptoAlphaSignal {
+  string asset = 1;
+  string signal_type = 2;
+  double confidence = 3;
+  string timeframe = 4;
+}
+
+// GetCryptoAlpha request
+message GetCryptoAlphaRequest {
+  string asset_filter = 1;
+}
+
+// GetCryptoAlpha response
+message GetCryptoAlphaResponse {
+  repeated CryptoAlphaSignal signals = 1;
+}
+
+// Unified signal
+message UnifiedSignal {
+  string pair = 1;
+  string direction = 2;
+  double confidence = 3;
+  repeated string contributing_factors = 4;
+}
+
+// GetUnified request
+message GetUnifiedRequest {
+  string pair = 1;
+}
+
+// GetUnified response
+message GetUnifiedResponse {
+  UnifiedSignal signal = 1;
+}
+
+// Quant signal
+message QuantSignal {
+  string pair = 1;
+  string strategy = 2;
+  string signal = 3; // long, short, flat
+  double sharpe = 4;
+  double drawdown = 5;
+}
+
+// GetQuant request
+message GetQuantRequest {
+  string pair = 1;
+}
+
+// GetQuant response
+message GetQuantResponse {
+  repeated QuantSignal signals = 1;
+}
+
+// CTA signal
+message CtaSignal {
+  string pair = 1;
+  string trend = 2;
+  double momentum = 3;
+  string regime = 4;
+}
+
+// GetCta request
+message GetCtaRequest {
+  string pair = 1;
+}
+
+// GetCta response
+message GetCtaResponse {
+  CtaSignal signal = 1;
+}
+
+// Briefing section
+message BriefingSection {
+  string title = 1;
+  string content = 2;
+  string priority = 3; // high, medium, low
+}
+
+// GetBriefing request
+message GetBriefingRequest {
+  string category = 1; // fx, crypto, macro, all
+}
+
+// GetBriefing response
+message GetBriefingResponse {
+  repeated BriefingSection sections = 1;
+  string generated_at = 2;
+}
+
+// Outlook data
+message OutlookData {
+  string pair = 1;
+  string outlook = 2; // bullish, bearish, neutral
+  double confidence = 3;
+  string horizon = 4; // short, medium, long
+}
+
+// GetOutlook request
+message GetOutlookRequest {
+  string pair = 1;
+  string horizon = 2;
+}
+
+// GetOutlook response
+message GetOutlookResponse {
+  repeated OutlookData outlooks = 1;
+}

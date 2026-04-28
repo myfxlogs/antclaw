@@ -1,0 +1,21 @@
+name: Similarity Check
+
+on:
+  pull_request:
+    branches: [main, refactor/*]
+  push:
+    branches: [main, refactor/*]
+
+jobs:
+  similarity-guard:
+    name: Code Similarity Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run similarity guard
+        run: |
+          chmod +x scripts/ci/similarity-guard.py
+          python3 scripts/ci/similarity-guard.py

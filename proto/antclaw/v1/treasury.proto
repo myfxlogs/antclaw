@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+service TreasuryService {
+  rpc GetCurve(GetCurveRequest) returns (GetCurveResponse);
+  rpc GetAnalysis(TreasuryServiceGetAnalysisRequest) returns (TreasuryServiceGetAnalysisResponse);
+}
+message GetCurveRequest { google.protobuf.Timestamp date = 1; }
+message GetCurveResponse {
+  google.protobuf.Timestamp date = 1;
+  repeated YieldPoint points = 2;
+}
+message YieldPoint { string tenor = 1; double yield = 2; }
+message TreasuryServiceGetAnalysisRequest {}
+message TreasuryServiceGetAnalysisResponse {
+  double curve_2s10s = 1;
+  double curve_3m10y = 2;
+  string regime = 3;
+}

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "google/protobuf/timestamp.proto";
+
+// SentimentExtrasService 容纳 CBOE PutCall/MyFXBook/Insider/CryptoSocial/Finviz 等扩展情绪指标。
+service SentimentExtrasService {
+  rpc GetCBOEPutCall(GetCBOEPutCallRequest) returns (GetCBOEPutCallResponse);
+  rpc GetMyFXBookPositions(GetMyFXBookPositionsRequest) returns (GetMyFXBookPositionsResponse);
+  rpc GetInsiderTrades(GetInsiderTradesRequest) returns (GetInsiderTradesResponse);
+  rpc GetCryptoSocial(GetCryptoSocialRequest) returns (GetCryptoSocialResponse);
+  rpc GetFinvizMetrics(GetFinvizMetricsRequest) returns (GetFinvizMetricsResponse);
+}
+
+message GetCBOEPutCallRequest {}
+message GetCBOEPutCallResponse {
+  google.protobuf.Timestamp date = 1;
+  double total_pc = 2;
+  double equity_pc = 3;
+  double index_pc = 4;
+}
+
+message GetMyFXBookPositionsRequest { string symbol = 1; }
+message GetMyFXBookPositionsResponse {
+  string symbol = 1;
+  double long_pct = 2;
+  double short_pct = 3;
+  int64 long_lots = 4;
+  int64 short_lots = 5;
+}
+
+message GetInsiderTradesRequest { string ticker = 1; int32 limit = 2; }
+message GetInsiderTradesResponse { repeated InsiderTrade items = 1; }
+message InsiderTrade {
+  string ticker = 1;
+  string insider = 2;
+  string title = 3;
+  string action = 4;
+  google.protobuf.Timestamp date = 5;
+  double price = 6;
+  int64 quantity = 7;
+}
+
+message GetCryptoSocialRequest { string asset = 1; }
+message GetCryptoSocialResponse {
+  google.protobuf.Timestamp date = 1;
+  double twitter_followers_growth = 2;
+  double reddit_subscribers_growth = 3;
+  double sentiment_score = 4;
+}
+
+message GetFinvizMetricsRequest { string ticker = 1; }
+message GetFinvizMetricsResponse {
+  double short_ratio = 1;
+  double short_pct_float = 2;
+  double inst_own_pct = 3;
+}

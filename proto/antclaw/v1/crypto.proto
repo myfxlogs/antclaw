@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// CryptoService 暴露与混合加密相关的只读能力（无鉴权：公钥可公开）。
+service CryptoService {
+  rpc GetCryptoPublicKey(GetCryptoPublicKeyRequest) returns (GetCryptoPublicKeyResponse);
+  // PostEnvelope 发送一个经过 RSA-OAEP + AES-GCM 加密且带 HMAC 签名的信封。
+  // 该接口用于在浏览器端安全传输敏感参数。目标路径为 Connect RPC 路径。
+  rpc PostEnvelope(PostEnvelopeRequest) returns (PostEnvelopeResponse);
+}
+
+message GetCryptoPublicKeyRequest {}
+
+message GetCryptoPublicKeyResponse {
+  // RSA 公钥 PEM（SPKI），与旧 GET /crypto/pubkey 响应体一致。
+  string pem = 1;
+}
+
+// 加密信封请求
+message PostEnvelopeRequest {
+  // 外层：混合加密后的 envelope（base64 载荷 JSON 串，具体字段见 internal/crypto.HybridEnvelope）
+  string body_b64 = 1;
+  // HMAC-SHA256 的输入：timestamp + "\n" + nonce + "\n" + body
+  string ts = 2;
+  string nonce = 3;
+  string sig = 4; // hex 编码
+  // 目标 Connect 路径，例如 "antclaw.v1.DataSourceService/UpdateDataSource"
+  string target_path = 5;
+  // 目标 RPC 的原始 JSON 请求体（未加密的内层），base64 编码。
+  // 后端在完成解密与验签后可选择忽略该字段，按业务自行组装请求。
+  string target_body_b64 = 6;
+}
+
+message PostEnvelopeResponse {
+  // 可选：返回值若需要加密回传，则放置在此字段（base64 of encrypted body）。
+  string body_b64 = 1;
+}

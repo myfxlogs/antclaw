@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// TAService provides technical analysis indicators.
+// See: AntClaw-重构解决方案.md §3.3
+service TAService {
+  // Get technical indicators
+  rpc GetIndicators(GetIndicatorsRequest) returns (GetIndicatorsResponse);
+
+  // Get Elliott Wave analysis
+  rpc GetElliott(GetElliottRequest) returns (GetElliottResponse);
+
+  // Get Wyckoff analysis
+  rpc GetWyckoff(GetWyckoffRequest) returns (GetWyckoffResponse);
+
+  // Get ICT (Inner Circle Trader) analysis
+  rpc GetIct(GetIctRequest) returns (GetIctResponse);
+
+  // Get Auction Market Theory analysis
+  rpc GetAmt(GetAmtRequest) returns (GetAmtResponse);
+
+  // Get Orderflow analysis
+  rpc GetOrderflow(GetOrderflowRequest) returns (GetOrderflowResponse);
+
+  // Get Volume Profile
+  rpc GetVolumeProfile(GetVolumeProfileRequest) returns (GetVolumeProfileResponse);
+
+  // Get Intermarket analysis
+  rpc GetIntermarket(GetIntermarketRequest) returns (GetIntermarketResponse);
+}
+
+// Indicator value
+message IndicatorValue {
+  string name = 1;
+  double value = 2;
+  string signal = 3; // bullish, bearish, neutral
+}
+
+// GetIndicators request
+message GetIndicatorsRequest {
+  string pair = 1;
+  string timeframe = 2;
+  repeated string indicators = 3;
+}
+
+// GetIndicators response
+message GetIndicatorsResponse {
+  string pair = 1;
+  string timeframe = 2;
+  repeated IndicatorValue values = 3;
+}
+
+// Elliott Wave wave
+message ElliottWave {
+  int32 wave_number = 1;
+  string direction = 2;
+  double price_start = 3;
+  double price_end = 4;
+}
+
+// GetElliott request
+message GetElliottRequest {
+  string pair = 1;
+  string timeframe = 2;
+}
+
+// GetElliott response
+message GetElliottResponse {
+  string pair = 1;
+  string current_count = 2;
+  repeated ElliottWave waves = 3;
+  string next_projection = 4;
+}
+
+// Wyckoff phase
+message WyckoffPhase {
+  string phase = 1; // accumulation, markup, distribution, markdown
+  double start_price = 2;
+  double current_price = 3;
+  string evidence = 4;
+}
+
+// GetWyckoff request
+message GetWyckoffRequest {
+  string pair = 1;
+}
+
+// GetWyckoff response
+message GetWyckoffResponse {
+  string pair = 1;
+  WyckoffPhase phase = 2;
+  string structure = 3;
+}
+
+// ICT level
+message IctLevel {
+  string type = 1; // fair value gap, order block, liquidity pool
+  double price = 2;
+  string timeframe = 3;
+}
+
+// GetIct request
+message GetIctRequest {
+  string pair = 1;
+  string timeframe = 2;
+}
+
+// GetIct response
+message GetIctResponse {
+  string pair = 1;
+  repeated IctLevel levels = 2;
+  string bias = 3;
+}
+
+// AMT zone
+message AmtZone {
+  string type = 1; // value area high, value area low, point of control
+  double price = 2;
+  double volume = 3;
+}
+
+// GetAmt request
+message GetAmtRequest {
+  string pair = 1;
+  int32 lookback_days = 2;
+}
+
+// GetAmt response
+message GetAmtResponse {
+  string pair = 1;
+  repeated AmtZone zones = 2;
+  string auction_context = 3;
+}
+
+// Orderflow imbalance
+message Imbalance {
+  string type = 1; // buy imbalance, sell imbalance
+  double price = 2;
+  double delta = 3;
+}
+
+// GetOrderflow request
+message GetOrderflowRequest {
+  string pair = 1;
+  string timeframe = 2;
+}
+
+// GetOrderflow response
+message GetOrderflowResponse {
+  string pair = 1;
+  repeated Imbalance imbalances = 2;
+  double cumulative_delta = 3;
+}
+
+// Volume profile level
+message VpLevel {
+  double price = 1;
+  double volume = 2;
+}
+
+// GetVolumeProfile request
+message GetVolumeProfileRequest {
+  string pair = 1;
+  string timeframe = 2;
+  int32 num_bins = 3;
+}
+
+// GetVolumeProfile response
+message GetVolumeProfileResponse {
+  string pair = 1;
+  repeated VpLevel profile = 2;
+  double poc = 3; // point of control
+  double value_area_high = 4;
+  double value_area_low = 5;
+}
+
+// Intermarket correlation
+message Correlation {
+  string asset_a = 1;
+  string asset_b = 2;
+  double correlation = 3;
+  string timeframe = 4;
+}
+
+// GetIntermarket request
+message GetIntermarketRequest {
+  string pair = 1;
+}
+
+// GetIntermarket response
+message GetIntermarketResponse {
+  string pair = 1;
+  repeated Correlation correlations = 2;
+  string dominant_driver = 3;
+}
