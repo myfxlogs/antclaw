@@ -5,7 +5,9 @@ services:
   # PostgreSQL with TimescaleDB extension
   postgres:
     container_name: antclaw-postgres
-    image: timescale/timescaledb:latest-pg18
+    # 固定到本地实测可用的镜像（latest-pg18 标签会漂移导致 CI 失败）。
+    # 升级时同步替换 digest。
+    image: timescale/timescaledb@sha256:52c2817087cbd70dfe48ccfaed8ab30c00a430a7348d2989676ed27332042ded
     environment:
       POSTGRES_USER: ${ANTCLAW_DB_USER:-antclaw}
       POSTGRES_PASSWORD: ${ANTCLAW_DB_PASSWORD:-antclaw}
