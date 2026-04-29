@@ -1,8 +1,8 @@
 -- name: CreateUser :one
 INSERT INTO users (
-    email, username, display_name, password_hash, locale, timezone
+    email, username, display_name, password_hash, locale, timezone, code_id
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7
 )
 RETURNING *;
 
@@ -14,6 +14,12 @@ SELECT * FROM users WHERE username = $1 AND deleted_at IS NULL;
 
 -- name: GetUserByID :one
 SELECT * FROM users WHERE id = $1 AND deleted_at IS NULL;
+
+-- name: GetUserByCodeID :one
+SELECT * FROM users WHERE code_id = $1 AND deleted_at IS NULL;
+
+-- name: UpdateUserCodeID :exec
+UPDATE users SET code_id = $2, updated_at = NOW() WHERE id = $1 AND deleted_at IS NULL;
 
 -- name: UpdatePasswordVersion :exec
 UPDATE users SET password_version = password_version + 1, updated_at = NOW() WHERE id = $1;

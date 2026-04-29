@@ -14,14 +14,29 @@ import (
 )
 
 // FedWatchHandler CME FedWatch 概率，通过 Firecrawl JSON 抽取实现。
-// 未配置 FIRECRAWL_API_KEY 时返回空概率列表（HTTP 200，避免阻塞前端）。
+// 未配置 firecrawl Key 时返回空概率列表（HTTP 200，避免阻塞前端）。
 type FedWatchHandler struct {
 	fc *firecrawl.Client
+}
+
+// SecretReader 最小接口，解耦 resolver 依赖，便于测试。
+type SecretReader interface {
+	GetSecret(sourceID string) string
 }
 
 func NewFedWatchHandler() *FedWatchHandler {
 	src := apiclient.NewSource("firecrawl", apiclient.Options{Timeout: 60 * time.Second})
 	return &FedWatchHandler{fc: firecrawl.NewClient(src)}
+}
+
+// NewFedWatchHandlerWithResolver 优先使用数据库中的 firecrawl 密钥构造客户端。
+func NewFedWatchHandlerWithResolver(r SecretReader) *FedWatchHandler {
+	src := apiclient.NewSource("firecrawl", apiclient.Options{Timeout: 60 * time.Second})
+	key := ""
+	if r != nil {
+		key = r.GetSecret("firecrawl")
+	}
+	return &FedWatchHandler{fc: firecrawl.NewClientWithKey(src, key)}
 }
 
 func (h *FedWatchHandler) GetFOMCProbabilities(ctx context.Context, req *connect.Request[v1.GetFOMCProbabilitiesRequest]) (*connect.Response[v1.GetFOMCProbabilitiesResponse], error) {

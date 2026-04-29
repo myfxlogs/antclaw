@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"connectrpc.com/connect"
@@ -37,6 +38,8 @@ func toSystemAIProto(cfg systemai.Config) *systemaiv1.SystemAIConfig {
 		CreatedAt:      cfg.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:      cfg.UpdatedAt.Format(time.RFC3339),
 		UpdatedBy:      cfg.UpdatedBy,
+		DocsUrl:        cfg.DocsURL,
+		ApplyUrl:       cfg.ApplyURL,
 	}
 }
 
@@ -94,6 +97,7 @@ func (h *SystemAIConnectHandler) UpdateSecret(ctx context.Context, req *connect.
 func (h *SystemAIConnectHandler) DiscoverModels(ctx context.Context, req *connect.Request[systemaiv1.DiscoverSystemAIModelsRequest]) (*connect.Response[systemaiv1.DiscoverSystemAIModelsResponse], error) {
 	models, err := h.svc.DiscoverModels(ctx, req.Msg.ProviderId)
 	if err != nil {
+		log.Printf("systemai: DiscoverModels provider=%s raw_err=%v", req.Msg.ProviderId, err)
 		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New(systemai.FriendlyDiscoverError(err)))
 	}
 	if len(models) == 0 {

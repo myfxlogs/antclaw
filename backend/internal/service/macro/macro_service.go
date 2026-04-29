@@ -16,8 +16,6 @@ import (
 type MacroService struct {
 	repo      postgres.MacroRepository
 	fred      *apiclient.FredClient
-	bis       *apiclient.BISClient
-	fedWatch  *apiclient.FedWatchClient
 	logger    *slog.Logger
 }
 
@@ -49,11 +47,9 @@ type CompositeIndex struct {
 // NewMacroService creates a new macro service
 func NewMacroService(repo postgres.MacroRepository, fredKey string, logger *slog.Logger) *MacroService {
 	return &MacroService{
-		repo:     repo,
-		fred:     apiclient.NewFredClient(fredKey),
-		bis:      apiclient.NewBISClient(),
-		fedWatch: apiclient.NewFedWatchClient(),
-		logger:   logger,
+		repo:   repo,
+		fred:   apiclient.NewFredClient(fredKey),
+		logger: logger,
 	}
 }
 
@@ -179,10 +175,8 @@ func (s *MacroService) CalculateCompositeIndex(ctx context.Context, name string,
 	return index, nil
 }
 
-// FetchFedWatch fetches Fed probability data
-func (s *MacroService) FetchFedWatch(ctx context.Context) (*apiclient.FedWatchData, error) {
-	return s.fedWatch.GetNextMeetingProbability(ctx)
-}
+// FedWatch 能力已迁到 adapter/rpc/fedwatch_handler.go（走 firecrawl 抽取路径）。
+
 
 // fetchKeyIndicators fetches key macro indicators
 func (s *MacroService) fetchKeyIndicators(ctx context.Context) map[string]float64 {

@@ -6,6 +6,7 @@ export const PROVIDER_LINKS: Record<string, string> = {
   moonshot: 'https://platform.moonshot.cn/console/api-keys',
   qwen: 'https://bailian.console.aliyun.com/?apiKey=1',
   zhipu: 'https://open.bigmodel.cn/usercenter/apikeys',
+  gemini: 'https://aistudio.google.com/apikey',
 }
 
 export const ALL_PURPOSES = ['chat', 'embedding', 'summarizer', 'reasoning']
@@ -17,6 +18,8 @@ export const OFFICIAL_PROVIDER_BASE_URLS: Record<string, string> = {
   moonshot: 'https://api.moonshot.cn/v1',
   qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   zhipu: 'https://open.bigmodel.cn/api/paas/v4',
+  // Gemini 通过 OpenAI 兼容端点暴露：https://ai.google.dev/gemini-api/docs/openai
+  gemini: 'https://generativelanguage.googleapis.com/v1beta/openai',
 }
 
 export function toFriendlyDiscoverMessage(msg: string) {

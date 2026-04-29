@@ -55,11 +55,15 @@ message RegisterResponse {
   string access_token = 2;
   string refresh_token = 3;
   int64 expires_at = 4; // Unix timestamp
+  // 注册时自动分配的 5 位数字 ID（避开 4/7，不以 0 开头）。
+  string code_id = 5;
 }
 
 // Login request
 message LoginRequest {
-  string email = 1;    // Can also be username
+  // identifier：邮箱（含 @）/ 用户ID（纯数字）/ username。
+  // 字段名保留为 email 以维持向后兼容；后端按内容智能识别。
+  string email = 1;
   string password = 2;
   ClientInfo client = 3;
 }
@@ -70,6 +74,8 @@ message LoginResponse {
   string access_token = 2;
   string refresh_token = 3;
   int64 expires_at = 4;
+  // 用户的数字 ID（5 位起，避开 4/7），可用于下次登录。
+  string code_id = 5;
 }
 
 // Refresh request

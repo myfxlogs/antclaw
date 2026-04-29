@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	adminv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/gen/go/antclaw/v1/antclawv1connect"
+	"github.com/antclaw/antclaw/internal/auth"
 	"github.com/antclaw/antclaw/internal/service/admin"
 )
 
@@ -99,6 +100,27 @@ func (h *AdminHandler) ListWebhookDeliveries(ctx context.Context, req *connect.R
 func (h *AdminHandler) ForceLogout(ctx context.Context, req *connect.Request[adminv1.ForceLogoutRequest]) (*connect.Response[adminv1.ForceLogoutResponse], error) {
 	resp, err := h.svc.ForceLogout(ctx, req.Msg.UserId)
 	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+// SetUserCodeID 管理员为用户分配/修改数字 ID（5-10 位，避开 4/7，不以 0 开头）。
+// code_id 留空触发系统自动生成；非空时要求满足格式且全局唯一。
+func (h *AdminHandler) SetUserCodeID(ctx context.Context, req *connect.Request[adminv1.SetUserCodeIDRequest]) (*connect.Response[adminv1.SetUserCodeIDResponse], error) {
+	if req.Msg.GetUserId() == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("user_id required"))
+	}
+	resp, err := h.svc.SetUserCodeID(ctx, req.Msg.GetUserId(), req.Msg.GetCodeId())
+	if err != nil {
+		switch {
+		case errors.Is(err, admin.ErrCodeIDTaken):
+			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+		case errors.Is(err, auth.ErrInvalidCodeID):
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		case strings.Contains(err.Error(), "invalid user_id"):
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return connect.NewResponse(resp), nil

@@ -1,8 +1,6 @@
 # docker-compose.yaml - AntClaw minimal runnable stack
 # See: AntClaw-重构解决方案.md §2.3
 
-version: "3.9"
-
 services:
   # PostgreSQL with TimescaleDB extension
   postgres:

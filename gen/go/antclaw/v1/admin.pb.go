@@ -1424,6 +1424,105 @@ func (*AdminResetUserPasswordResponse) Descriptor() ([]byte, []int) {
 	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{24}
 }
 
+// 管理员设置/重置数字 ID
+type SetUserCodeIDRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// 留空：系统自动重新生成；非空：按指定值设置（须满足格式）。
+	CodeId        string `protobuf:"bytes,2,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetUserCodeIDRequest) Reset() {
+	*x = SetUserCodeIDRequest{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetUserCodeIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetUserCodeIDRequest) ProtoMessage() {}
+
+func (x *SetUserCodeIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetUserCodeIDRequest.ProtoReflect.Descriptor instead.
+func (*SetUserCodeIDRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *SetUserCodeIDRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SetUserCodeIDRequest) GetCodeId() string {
+	if x != nil {
+		return x.CodeId
+	}
+	return ""
+}
+
+type SetUserCodeIDResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 实际生效的 code_id（包含自动生成的情况）。
+	CodeId        string `protobuf:"bytes,1,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetUserCodeIDResponse) Reset() {
+	*x = SetUserCodeIDResponse{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetUserCodeIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetUserCodeIDResponse) ProtoMessage() {}
+
+func (x *SetUserCodeIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetUserCodeIDResponse.ProtoReflect.Descriptor instead.
+func (*SetUserCodeIDResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SetUserCodeIDResponse) GetCodeId() string {
+	if x != nil {
+		return x.CodeId
+	}
+	return ""
+}
+
 var File_antclaw_v1_admin_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_admin_proto_rawDesc = "" +
@@ -1535,7 +1634,12 @@ const file_antclaw_v1_admin_proto_rawDesc = "" +
 	"\x1dAdminResetUserPasswordRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\" \n" +
-	"\x1eAdminResetUserPasswordResponse2\xf5\x06\n" +
+	"\x1eAdminResetUserPasswordResponse\"H\n" +
+	"\x14SetUserCodeIDRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x17\n" +
+	"\acode_id\x18\x02 \x01(\tR\x06codeId\"0\n" +
+	"\x15SetUserCodeIDResponse\x12\x17\n" +
+	"\acode_id\x18\x01 \x01(\tR\x06codeId2\xcb\a\n" +
 	"\fAdminService\x12H\n" +
 	"\tListUsers\x12\x1c.antclaw.v1.ListUsersRequest\x1a\x1d.antclaw.v1.ListUsersResponse\x12B\n" +
 	"\aSetRole\x12\x1a.antclaw.v1.SetRoleRequest\x1a\x1b.antclaw.v1.SetRoleResponse\x126\n" +
@@ -1547,7 +1651,8 @@ const file_antclaw_v1_admin_proto_rawDesc = "" +
 	"\rListAuditLogs\x12 .antclaw.v1.ListAuditLogsRequest\x1a!.antclaw.v1.ListAuditLogsResponse\x12l\n" +
 	"\x15ListWebhookDeliveries\x12(.antclaw.v1.ListWebhookDeliveriesRequest\x1a).antclaw.v1.ListWebhookDeliveriesResponse\x12N\n" +
 	"\vForceLogout\x12\x1e.antclaw.v1.ForceLogoutRequest\x1a\x1f.antclaw.v1.ForceLogoutResponse\x12o\n" +
-	"\x16AdminResetUserPassword\x12).antclaw.v1.AdminResetUserPasswordRequest\x1a*.antclaw.v1.AdminResetUserPasswordResponseB\x9d\x01\n" +
+	"\x16AdminResetUserPassword\x12).antclaw.v1.AdminResetUserPasswordRequest\x1a*.antclaw.v1.AdminResetUserPasswordResponse\x12T\n" +
+	"\rSetUserCodeID\x12 .antclaw.v1.SetUserCodeIDRequest\x1a!.antclaw.v1.SetUserCodeIDResponseB\x9d\x01\n" +
 	"\x0ecom.antclaw.v1B\n" +
 	"AdminProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
@@ -1565,7 +1670,7 @@ func file_antclaw_v1_admin_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_admin_proto_rawDescData
 }
 
-var file_antclaw_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_antclaw_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_antclaw_v1_admin_proto_goTypes = []any{
 	(*ListUsersRequest)(nil),               // 0: antclaw.v1.ListUsersRequest
 	(*ListUsersResponse)(nil),              // 1: antclaw.v1.ListUsersResponse
@@ -1592,16 +1697,18 @@ var file_antclaw_v1_admin_proto_goTypes = []any{
 	(*ForceLogoutResponse)(nil),            // 22: antclaw.v1.ForceLogoutResponse
 	(*AdminResetUserPasswordRequest)(nil),  // 23: antclaw.v1.AdminResetUserPasswordRequest
 	(*AdminResetUserPasswordResponse)(nil), // 24: antclaw.v1.AdminResetUserPasswordResponse
-	nil,                                    // 25: antclaw.v1.RunJobRequest.ParamsEntry
-	(*User)(nil),                           // 26: antclaw.v1.User
-	(*TimeRange)(nil),                      // 27: antclaw.v1.TimeRange
+	(*SetUserCodeIDRequest)(nil),           // 25: antclaw.v1.SetUserCodeIDRequest
+	(*SetUserCodeIDResponse)(nil),          // 26: antclaw.v1.SetUserCodeIDResponse
+	nil,                                    // 27: antclaw.v1.RunJobRequest.ParamsEntry
+	(*User)(nil),                           // 28: antclaw.v1.User
+	(*TimeRange)(nil),                      // 29: antclaw.v1.TimeRange
 }
 var file_antclaw_v1_admin_proto_depIdxs = []int32{
-	26, // 0: antclaw.v1.ListUsersResponse.users:type_name -> antclaw.v1.User
-	26, // 1: antclaw.v1.SetRoleResponse.user:type_name -> antclaw.v1.User
-	25, // 2: antclaw.v1.RunJobRequest.params:type_name -> antclaw.v1.RunJobRequest.ParamsEntry
+	28, // 0: antclaw.v1.ListUsersResponse.users:type_name -> antclaw.v1.User
+	28, // 1: antclaw.v1.SetRoleResponse.user:type_name -> antclaw.v1.User
+	27, // 2: antclaw.v1.RunJobRequest.params:type_name -> antclaw.v1.RunJobRequest.ParamsEntry
 	10, // 3: antclaw.v1.ListJobsResponse.jobs:type_name -> antclaw.v1.Job
-	27, // 4: antclaw.v1.ListAuditLogsRequest.time_range:type_name -> antclaw.v1.TimeRange
+	29, // 4: antclaw.v1.ListAuditLogsRequest.time_range:type_name -> antclaw.v1.TimeRange
 	15, // 5: antclaw.v1.ListAuditLogsResponse.entries:type_name -> antclaw.v1.AuditLogEntry
 	18, // 6: antclaw.v1.ListWebhookDeliveriesResponse.deliveries:type_name -> antclaw.v1.WebhookDelivery
 	0,  // 7: antclaw.v1.AdminService.ListUsers:input_type -> antclaw.v1.ListUsersRequest
@@ -1615,19 +1722,21 @@ var file_antclaw_v1_admin_proto_depIdxs = []int32{
 	19, // 15: antclaw.v1.AdminService.ListWebhookDeliveries:input_type -> antclaw.v1.ListWebhookDeliveriesRequest
 	21, // 16: antclaw.v1.AdminService.ForceLogout:input_type -> antclaw.v1.ForceLogoutRequest
 	23, // 17: antclaw.v1.AdminService.AdminResetUserPassword:input_type -> antclaw.v1.AdminResetUserPasswordRequest
-	1,  // 18: antclaw.v1.AdminService.ListUsers:output_type -> antclaw.v1.ListUsersResponse
-	3,  // 19: antclaw.v1.AdminService.SetRole:output_type -> antclaw.v1.SetRoleResponse
-	5,  // 20: antclaw.v1.AdminService.Ban:output_type -> antclaw.v1.BanResponse
-	7,  // 21: antclaw.v1.AdminService.Unban:output_type -> antclaw.v1.UnbanResponse
-	9,  // 22: antclaw.v1.AdminService.RunJob:output_type -> antclaw.v1.RunJobResponse
-	12, // 23: antclaw.v1.AdminService.ListJobs:output_type -> antclaw.v1.ListJobsResponse
-	14, // 24: antclaw.v1.AdminService.SetJobEnabled:output_type -> antclaw.v1.SetJobEnabledResponse
-	17, // 25: antclaw.v1.AdminService.ListAuditLogs:output_type -> antclaw.v1.ListAuditLogsResponse
-	20, // 26: antclaw.v1.AdminService.ListWebhookDeliveries:output_type -> antclaw.v1.ListWebhookDeliveriesResponse
-	22, // 27: antclaw.v1.AdminService.ForceLogout:output_type -> antclaw.v1.ForceLogoutResponse
-	24, // 28: antclaw.v1.AdminService.AdminResetUserPassword:output_type -> antclaw.v1.AdminResetUserPasswordResponse
-	18, // [18:29] is the sub-list for method output_type
-	7,  // [7:18] is the sub-list for method input_type
+	25, // 18: antclaw.v1.AdminService.SetUserCodeID:input_type -> antclaw.v1.SetUserCodeIDRequest
+	1,  // 19: antclaw.v1.AdminService.ListUsers:output_type -> antclaw.v1.ListUsersResponse
+	3,  // 20: antclaw.v1.AdminService.SetRole:output_type -> antclaw.v1.SetRoleResponse
+	5,  // 21: antclaw.v1.AdminService.Ban:output_type -> antclaw.v1.BanResponse
+	7,  // 22: antclaw.v1.AdminService.Unban:output_type -> antclaw.v1.UnbanResponse
+	9,  // 23: antclaw.v1.AdminService.RunJob:output_type -> antclaw.v1.RunJobResponse
+	12, // 24: antclaw.v1.AdminService.ListJobs:output_type -> antclaw.v1.ListJobsResponse
+	14, // 25: antclaw.v1.AdminService.SetJobEnabled:output_type -> antclaw.v1.SetJobEnabledResponse
+	17, // 26: antclaw.v1.AdminService.ListAuditLogs:output_type -> antclaw.v1.ListAuditLogsResponse
+	20, // 27: antclaw.v1.AdminService.ListWebhookDeliveries:output_type -> antclaw.v1.ListWebhookDeliveriesResponse
+	22, // 28: antclaw.v1.AdminService.ForceLogout:output_type -> antclaw.v1.ForceLogoutResponse
+	24, // 29: antclaw.v1.AdminService.AdminResetUserPassword:output_type -> antclaw.v1.AdminResetUserPasswordResponse
+	26, // 30: antclaw.v1.AdminService.SetUserCodeID:output_type -> antclaw.v1.SetUserCodeIDResponse
+	19, // [19:31] is the sub-list for method output_type
+	7,  // [7:19] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -1646,7 +1755,7 @@ func file_antclaw_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_admin_proto_rawDesc), len(file_antclaw_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

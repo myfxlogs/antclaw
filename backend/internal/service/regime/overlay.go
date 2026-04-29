@@ -72,7 +72,7 @@ func (s *Service) Compute(ctx context.Context, symbol, timeframe, contractCode s
 		return nil, fmt.Errorf("regime: load daily: %w", err)
 	}
 	if len(closes) < 30 {
-		return nil, fmt.Errorf("regime: insufficient daily bars: %d", len(closes))
+		return nil, fmt.Errorf("regime: %s/%s 仅 %d 根日线，至少需 30 根（请先在 worker 中拉取 price_daily）", symbol, timeframe, len(closes))
 	}
 
 	res := &Result{

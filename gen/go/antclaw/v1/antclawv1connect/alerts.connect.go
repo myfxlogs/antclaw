@@ -61,6 +61,21 @@ const (
 	// AlertServiceToggleAlertProcedure is the fully-qualified name of the AlertService's ToggleAlert
 	// RPC.
 	AlertServiceToggleAlertProcedure = "/antclaw.v1.AlertService/ToggleAlert"
+	// AlertServiceDecideAlertProcedure is the fully-qualified name of the AlertService's DecideAlert
+	// RPC.
+	AlertServiceDecideAlertProcedure = "/antclaw.v1.AlertService/DecideAlert"
+	// AlertServiceGetPreferencesProcedure is the fully-qualified name of the AlertService's
+	// GetPreferences RPC.
+	AlertServiceGetPreferencesProcedure = "/antclaw.v1.AlertService/GetPreferences"
+	// AlertServiceUpdatePreferencesProcedure is the fully-qualified name of the AlertService's
+	// UpdatePreferences RPC.
+	AlertServiceUpdatePreferencesProcedure = "/antclaw.v1.AlertService/UpdatePreferences"
+	// AlertServiceSetUserTierProcedure is the fully-qualified name of the AlertService's SetUserTier
+	// RPC.
+	AlertServiceSetUserTierProcedure = "/antclaw.v1.AlertService/SetUserTier"
+	// AlertServiceGetAlertHistoryProcedure is the fully-qualified name of the AlertService's
+	// GetAlertHistory RPC.
+	AlertServiceGetAlertHistoryProcedure = "/antclaw.v1.AlertService/GetAlertHistory"
 )
 
 // AlertServiceClient is a client for the antclaw.v1.AlertService service.
@@ -81,6 +96,12 @@ type AlertServiceClient interface {
 	UpdateAlert(context.Context, *connect.Request[v1.UpdateAlertRequest]) (*connect.Response[v1.UpdateAlertResponse], error)
 	DeleteAlert(context.Context, *connect.Request[v1.DeleteAlertRequest]) (*connect.Response[v1.DeleteAlertResponse], error)
 	ToggleAlert(context.Context, *connect.Request[v1.ToggleAlertRequest]) (*connect.Response[v1.ToggleAlertResponse], error)
+	// M-E: alert gate + 偏好 + 配额
+	DecideAlert(context.Context, *connect.Request[v1.DecideAlertRequest]) (*connect.Response[v1.DecideAlertResponse], error)
+	GetPreferences(context.Context, *connect.Request[v1.GetPreferencesRequest]) (*connect.Response[v1.GetPreferencesResponse], error)
+	UpdatePreferences(context.Context, *connect.Request[v1.UpdatePreferencesRequest]) (*connect.Response[v1.UpdatePreferencesResponse], error)
+	SetUserTier(context.Context, *connect.Request[v1.SetUserTierRequest]) (*connect.Response[v1.SetUserTierResponse], error)
+	GetAlertHistory(context.Context, *connect.Request[v1.GetAlertHistoryRequest]) (*connect.Response[v1.GetAlertHistoryResponse], error)
 }
 
 // NewAlertServiceClient constructs a client for the antclaw.v1.AlertService service. By default, it
@@ -154,6 +175,36 @@ func NewAlertServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(alertServiceMethods.ByName("ToggleAlert")),
 			connect.WithClientOptions(opts...),
 		),
+		decideAlert: connect.NewClient[v1.DecideAlertRequest, v1.DecideAlertResponse](
+			httpClient,
+			baseURL+AlertServiceDecideAlertProcedure,
+			connect.WithSchema(alertServiceMethods.ByName("DecideAlert")),
+			connect.WithClientOptions(opts...),
+		),
+		getPreferences: connect.NewClient[v1.GetPreferencesRequest, v1.GetPreferencesResponse](
+			httpClient,
+			baseURL+AlertServiceGetPreferencesProcedure,
+			connect.WithSchema(alertServiceMethods.ByName("GetPreferences")),
+			connect.WithClientOptions(opts...),
+		),
+		updatePreferences: connect.NewClient[v1.UpdatePreferencesRequest, v1.UpdatePreferencesResponse](
+			httpClient,
+			baseURL+AlertServiceUpdatePreferencesProcedure,
+			connect.WithSchema(alertServiceMethods.ByName("UpdatePreferences")),
+			connect.WithClientOptions(opts...),
+		),
+		setUserTier: connect.NewClient[v1.SetUserTierRequest, v1.SetUserTierResponse](
+			httpClient,
+			baseURL+AlertServiceSetUserTierProcedure,
+			connect.WithSchema(alertServiceMethods.ByName("SetUserTier")),
+			connect.WithClientOptions(opts...),
+		),
+		getAlertHistory: connect.NewClient[v1.GetAlertHistoryRequest, v1.GetAlertHistoryResponse](
+			httpClient,
+			baseURL+AlertServiceGetAlertHistoryProcedure,
+			connect.WithSchema(alertServiceMethods.ByName("GetAlertHistory")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -169,6 +220,11 @@ type alertServiceClient struct {
 	updateAlert       *connect.Client[v1.UpdateAlertRequest, v1.UpdateAlertResponse]
 	deleteAlert       *connect.Client[v1.DeleteAlertRequest, v1.DeleteAlertResponse]
 	toggleAlert       *connect.Client[v1.ToggleAlertRequest, v1.ToggleAlertResponse]
+	decideAlert       *connect.Client[v1.DecideAlertRequest, v1.DecideAlertResponse]
+	getPreferences    *connect.Client[v1.GetPreferencesRequest, v1.GetPreferencesResponse]
+	updatePreferences *connect.Client[v1.UpdatePreferencesRequest, v1.UpdatePreferencesResponse]
+	setUserTier       *connect.Client[v1.SetUserTierRequest, v1.SetUserTierResponse]
+	getAlertHistory   *connect.Client[v1.GetAlertHistoryRequest, v1.GetAlertHistoryResponse]
 }
 
 // ListSubscriptions calls antclaw.v1.AlertService.ListSubscriptions.
@@ -221,6 +277,31 @@ func (c *alertServiceClient) ToggleAlert(ctx context.Context, req *connect.Reque
 	return c.toggleAlert.CallUnary(ctx, req)
 }
 
+// DecideAlert calls antclaw.v1.AlertService.DecideAlert.
+func (c *alertServiceClient) DecideAlert(ctx context.Context, req *connect.Request[v1.DecideAlertRequest]) (*connect.Response[v1.DecideAlertResponse], error) {
+	return c.decideAlert.CallUnary(ctx, req)
+}
+
+// GetPreferences calls antclaw.v1.AlertService.GetPreferences.
+func (c *alertServiceClient) GetPreferences(ctx context.Context, req *connect.Request[v1.GetPreferencesRequest]) (*connect.Response[v1.GetPreferencesResponse], error) {
+	return c.getPreferences.CallUnary(ctx, req)
+}
+
+// UpdatePreferences calls antclaw.v1.AlertService.UpdatePreferences.
+func (c *alertServiceClient) UpdatePreferences(ctx context.Context, req *connect.Request[v1.UpdatePreferencesRequest]) (*connect.Response[v1.UpdatePreferencesResponse], error) {
+	return c.updatePreferences.CallUnary(ctx, req)
+}
+
+// SetUserTier calls antclaw.v1.AlertService.SetUserTier.
+func (c *alertServiceClient) SetUserTier(ctx context.Context, req *connect.Request[v1.SetUserTierRequest]) (*connect.Response[v1.SetUserTierResponse], error) {
+	return c.setUserTier.CallUnary(ctx, req)
+}
+
+// GetAlertHistory calls antclaw.v1.AlertService.GetAlertHistory.
+func (c *alertServiceClient) GetAlertHistory(ctx context.Context, req *connect.Request[v1.GetAlertHistoryRequest]) (*connect.Response[v1.GetAlertHistoryResponse], error) {
+	return c.getAlertHistory.CallUnary(ctx, req)
+}
+
 // AlertServiceHandler is an implementation of the antclaw.v1.AlertService service.
 type AlertServiceHandler interface {
 	// List alert subscriptions
@@ -239,6 +320,12 @@ type AlertServiceHandler interface {
 	UpdateAlert(context.Context, *connect.Request[v1.UpdateAlertRequest]) (*connect.Response[v1.UpdateAlertResponse], error)
 	DeleteAlert(context.Context, *connect.Request[v1.DeleteAlertRequest]) (*connect.Response[v1.DeleteAlertResponse], error)
 	ToggleAlert(context.Context, *connect.Request[v1.ToggleAlertRequest]) (*connect.Response[v1.ToggleAlertResponse], error)
+	// M-E: alert gate + 偏好 + 配额
+	DecideAlert(context.Context, *connect.Request[v1.DecideAlertRequest]) (*connect.Response[v1.DecideAlertResponse], error)
+	GetPreferences(context.Context, *connect.Request[v1.GetPreferencesRequest]) (*connect.Response[v1.GetPreferencesResponse], error)
+	UpdatePreferences(context.Context, *connect.Request[v1.UpdatePreferencesRequest]) (*connect.Response[v1.UpdatePreferencesResponse], error)
+	SetUserTier(context.Context, *connect.Request[v1.SetUserTierRequest]) (*connect.Response[v1.SetUserTierResponse], error)
+	GetAlertHistory(context.Context, *connect.Request[v1.GetAlertHistoryRequest]) (*connect.Response[v1.GetAlertHistoryResponse], error)
 }
 
 // NewAlertServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -308,6 +395,36 @@ func NewAlertServiceHandler(svc AlertServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(alertServiceMethods.ByName("ToggleAlert")),
 		connect.WithHandlerOptions(opts...),
 	)
+	alertServiceDecideAlertHandler := connect.NewUnaryHandler(
+		AlertServiceDecideAlertProcedure,
+		svc.DecideAlert,
+		connect.WithSchema(alertServiceMethods.ByName("DecideAlert")),
+		connect.WithHandlerOptions(opts...),
+	)
+	alertServiceGetPreferencesHandler := connect.NewUnaryHandler(
+		AlertServiceGetPreferencesProcedure,
+		svc.GetPreferences,
+		connect.WithSchema(alertServiceMethods.ByName("GetPreferences")),
+		connect.WithHandlerOptions(opts...),
+	)
+	alertServiceUpdatePreferencesHandler := connect.NewUnaryHandler(
+		AlertServiceUpdatePreferencesProcedure,
+		svc.UpdatePreferences,
+		connect.WithSchema(alertServiceMethods.ByName("UpdatePreferences")),
+		connect.WithHandlerOptions(opts...),
+	)
+	alertServiceSetUserTierHandler := connect.NewUnaryHandler(
+		AlertServiceSetUserTierProcedure,
+		svc.SetUserTier,
+		connect.WithSchema(alertServiceMethods.ByName("SetUserTier")),
+		connect.WithHandlerOptions(opts...),
+	)
+	alertServiceGetAlertHistoryHandler := connect.NewUnaryHandler(
+		AlertServiceGetAlertHistoryProcedure,
+		svc.GetAlertHistory,
+		connect.WithSchema(alertServiceMethods.ByName("GetAlertHistory")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.AlertService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AlertServiceListSubscriptionsProcedure:
@@ -330,6 +447,16 @@ func NewAlertServiceHandler(svc AlertServiceHandler, opts ...connect.HandlerOpti
 			alertServiceDeleteAlertHandler.ServeHTTP(w, r)
 		case AlertServiceToggleAlertProcedure:
 			alertServiceToggleAlertHandler.ServeHTTP(w, r)
+		case AlertServiceDecideAlertProcedure:
+			alertServiceDecideAlertHandler.ServeHTTP(w, r)
+		case AlertServiceGetPreferencesProcedure:
+			alertServiceGetPreferencesHandler.ServeHTTP(w, r)
+		case AlertServiceUpdatePreferencesProcedure:
+			alertServiceUpdatePreferencesHandler.ServeHTTP(w, r)
+		case AlertServiceSetUserTierProcedure:
+			alertServiceSetUserTierHandler.ServeHTTP(w, r)
+		case AlertServiceGetAlertHistoryProcedure:
+			alertServiceGetAlertHistoryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -377,4 +504,24 @@ func (UnimplementedAlertServiceHandler) DeleteAlert(context.Context, *connect.Re
 
 func (UnimplementedAlertServiceHandler) ToggleAlert(context.Context, *connect.Request[v1.ToggleAlertRequest]) (*connect.Response[v1.ToggleAlertResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AlertService.ToggleAlert is not implemented"))
+}
+
+func (UnimplementedAlertServiceHandler) DecideAlert(context.Context, *connect.Request[v1.DecideAlertRequest]) (*connect.Response[v1.DecideAlertResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AlertService.DecideAlert is not implemented"))
+}
+
+func (UnimplementedAlertServiceHandler) GetPreferences(context.Context, *connect.Request[v1.GetPreferencesRequest]) (*connect.Response[v1.GetPreferencesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AlertService.GetPreferences is not implemented"))
+}
+
+func (UnimplementedAlertServiceHandler) UpdatePreferences(context.Context, *connect.Request[v1.UpdatePreferencesRequest]) (*connect.Response[v1.UpdatePreferencesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AlertService.UpdatePreferences is not implemented"))
+}
+
+func (UnimplementedAlertServiceHandler) SetUserTier(context.Context, *connect.Request[v1.SetUserTierRequest]) (*connect.Response[v1.SetUserTierResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AlertService.SetUserTier is not implemented"))
+}
+
+func (UnimplementedAlertServiceHandler) GetAlertHistory(context.Context, *connect.Request[v1.GetAlertHistoryRequest]) (*connect.Response[v1.GetAlertHistoryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AlertService.GetAlertHistory is not implemented"))
 }

@@ -1285,6 +1285,674 @@ func (x *ToggleAlertResponse) GetAlert() *AlertRule {
 	return nil
 }
 
+type DecideAlertRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AlertType     string                 `protobuf:"bytes,2,opt,name=alert_type,json=alertType,proto3" json:"alert_type,omitempty"`
+	Severity      string                 `protobuf:"bytes,3,opt,name=severity,proto3" json:"severity,omitempty"` // low / medium / high / critical
+	Pairs         []string               `protobuf:"bytes,4,rep,name=pairs,proto3" json:"pairs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DecideAlertRequest) Reset() {
+	*x = DecideAlertRequest{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DecideAlertRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DecideAlertRequest) ProtoMessage() {}
+
+func (x *DecideAlertRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DecideAlertRequest.ProtoReflect.Descriptor instead.
+func (*DecideAlertRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *DecideAlertRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *DecideAlertRequest) GetAlertType() string {
+	if x != nil {
+		return x.AlertType
+	}
+	return ""
+}
+
+func (x *DecideAlertRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *DecideAlertRequest) GetPairs() []string {
+	if x != nil {
+		return x.Pairs
+	}
+	return nil
+}
+
+type DecideAlertResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Send          bool                   `protobuf:"varint,1,opt,name=send,proto3" json:"send,omitempty"`
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"` // tier_blocked / quiet_hours / cooldown / unsubscribed_pair / ok
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DecideAlertResponse) Reset() {
+	*x = DecideAlertResponse{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DecideAlertResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DecideAlertResponse) ProtoMessage() {}
+
+func (x *DecideAlertResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DecideAlertResponse.ProtoReflect.Descriptor instead.
+func (*DecideAlertResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *DecideAlertResponse) GetSend() bool {
+	if x != nil {
+		return x.Send
+	}
+	return false
+}
+
+func (x *DecideAlertResponse) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+type GetPreferencesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPreferencesRequest) Reset() {
+	*x = GetPreferencesRequest{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPreferencesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPreferencesRequest) ProtoMessage() {}
+
+func (x *GetPreferencesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPreferencesRequest.ProtoReflect.Descriptor instead.
+func (*GetPreferencesRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetPreferencesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetPreferencesResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserId          string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Pairs           []string               `protobuf:"bytes,2,rep,name=pairs,proto3" json:"pairs,omitempty"`
+	HighImpactOnly  bool                   `protobuf:"varint,3,opt,name=high_impact_only,json=highImpactOnly,proto3" json:"high_impact_only,omitempty"`
+	QuietHoursStart int32                  `protobuf:"varint,4,opt,name=quiet_hours_start,json=quietHoursStart,proto3" json:"quiet_hours_start,omitempty"`
+	QuietHoursEnd   int32                  `protobuf:"varint,5,opt,name=quiet_hours_end,json=quietHoursEnd,proto3" json:"quiet_hours_end,omitempty"`
+	Timezone        string                 `protobuf:"bytes,6,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetPreferencesResponse) Reset() {
+	*x = GetPreferencesResponse{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPreferencesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPreferencesResponse) ProtoMessage() {}
+
+func (x *GetPreferencesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPreferencesResponse.ProtoReflect.Descriptor instead.
+func (*GetPreferencesResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GetPreferencesResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GetPreferencesResponse) GetPairs() []string {
+	if x != nil {
+		return x.Pairs
+	}
+	return nil
+}
+
+func (x *GetPreferencesResponse) GetHighImpactOnly() bool {
+	if x != nil {
+		return x.HighImpactOnly
+	}
+	return false
+}
+
+func (x *GetPreferencesResponse) GetQuietHoursStart() int32 {
+	if x != nil {
+		return x.QuietHoursStart
+	}
+	return 0
+}
+
+func (x *GetPreferencesResponse) GetQuietHoursEnd() int32 {
+	if x != nil {
+		return x.QuietHoursEnd
+	}
+	return 0
+}
+
+func (x *GetPreferencesResponse) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+type UpdatePreferencesRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserId          string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Pairs           []string               `protobuf:"bytes,2,rep,name=pairs,proto3" json:"pairs,omitempty"`
+	HighImpactOnly  bool                   `protobuf:"varint,3,opt,name=high_impact_only,json=highImpactOnly,proto3" json:"high_impact_only,omitempty"`
+	QuietHoursStart int32                  `protobuf:"varint,4,opt,name=quiet_hours_start,json=quietHoursStart,proto3" json:"quiet_hours_start,omitempty"`
+	QuietHoursEnd   int32                  `protobuf:"varint,5,opt,name=quiet_hours_end,json=quietHoursEnd,proto3" json:"quiet_hours_end,omitempty"`
+	Timezone        string                 `protobuf:"bytes,6,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *UpdatePreferencesRequest) Reset() {
+	*x = UpdatePreferencesRequest{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePreferencesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePreferencesRequest) ProtoMessage() {}
+
+func (x *UpdatePreferencesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePreferencesRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePreferencesRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UpdatePreferencesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdatePreferencesRequest) GetPairs() []string {
+	if x != nil {
+		return x.Pairs
+	}
+	return nil
+}
+
+func (x *UpdatePreferencesRequest) GetHighImpactOnly() bool {
+	if x != nil {
+		return x.HighImpactOnly
+	}
+	return false
+}
+
+func (x *UpdatePreferencesRequest) GetQuietHoursStart() int32 {
+	if x != nil {
+		return x.QuietHoursStart
+	}
+	return 0
+}
+
+func (x *UpdatePreferencesRequest) GetQuietHoursEnd() int32 {
+	if x != nil {
+		return x.QuietHoursEnd
+	}
+	return 0
+}
+
+func (x *UpdatePreferencesRequest) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+type UpdatePreferencesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePreferencesResponse) Reset() {
+	*x = UpdatePreferencesResponse{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePreferencesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePreferencesResponse) ProtoMessage() {}
+
+func (x *UpdatePreferencesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePreferencesResponse.ProtoReflect.Descriptor instead.
+func (*UpdatePreferencesResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *UpdatePreferencesResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+type SetUserTierRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Tier          string                 `protobuf:"bytes,2,opt,name=tier,proto3" json:"tier,omitempty"`
+	AiMaxPerDay   int32                  `protobuf:"varint,3,opt,name=ai_max_per_day,json=aiMaxPerDay,proto3" json:"ai_max_per_day,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetUserTierRequest) Reset() {
+	*x = SetUserTierRequest{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetUserTierRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetUserTierRequest) ProtoMessage() {}
+
+func (x *SetUserTierRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetUserTierRequest.ProtoReflect.Descriptor instead.
+func (*SetUserTierRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *SetUserTierRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SetUserTierRequest) GetTier() string {
+	if x != nil {
+		return x.Tier
+	}
+	return ""
+}
+
+func (x *SetUserTierRequest) GetAiMaxPerDay() int32 {
+	if x != nil {
+		return x.AiMaxPerDay
+	}
+	return 0
+}
+
+type SetUserTierResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetUserTierResponse) Reset() {
+	*x = SetUserTierResponse{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetUserTierResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetUserTierResponse) ProtoMessage() {}
+
+func (x *SetUserTierResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetUserTierResponse.ProtoReflect.Descriptor instead.
+func (*SetUserTierResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *SetUserTierResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+type GetAlertHistoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertHistoryRequest) Reset() {
+	*x = GetAlertHistoryRequest{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertHistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertHistoryRequest) ProtoMessage() {}
+
+func (x *GetAlertHistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertHistoryRequest.ProtoReflect.Descriptor instead.
+func (*GetAlertHistoryRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *GetAlertHistoryRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GetAlertHistoryRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type AlertLogItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AlertType     string                 `protobuf:"bytes,3,opt,name=alert_type,json=alertType,proto3" json:"alert_type,omitempty"`
+	Severity      string                 `protobuf:"bytes,4,opt,name=severity,proto3" json:"severity,omitempty"`
+	Sent          bool                   `protobuf:"varint,5,opt,name=sent,proto3" json:"sent,omitempty"`
+	Reason        string                 `protobuf:"bytes,6,opt,name=reason,proto3" json:"reason,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AlertLogItem) Reset() {
+	*x = AlertLogItem{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AlertLogItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AlertLogItem) ProtoMessage() {}
+
+func (x *AlertLogItem) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AlertLogItem.ProtoReflect.Descriptor instead.
+func (*AlertLogItem) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *AlertLogItem) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *AlertLogItem) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *AlertLogItem) GetAlertType() string {
+	if x != nil {
+		return x.AlertType
+	}
+	return ""
+}
+
+func (x *AlertLogItem) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *AlertLogItem) GetSent() bool {
+	if x != nil {
+		return x.Sent
+	}
+	return false
+}
+
+func (x *AlertLogItem) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *AlertLogItem) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type GetAlertHistoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*AlertLogItem        `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertHistoryResponse) Reset() {
+	*x = GetAlertHistoryResponse{}
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertHistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertHistoryResponse) ProtoMessage() {}
+
+func (x *GetAlertHistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_alerts_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertHistoryResponse.ProtoReflect.Descriptor instead.
+func (*GetAlertHistoryResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_alerts_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *GetAlertHistoryResponse) GetItems() []*AlertLogItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_antclaw_v1_alerts_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_alerts_proto_rawDesc = "" +
@@ -1380,7 +2048,55 @@ const file_antclaw_v1_alerts_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\aenabled\x18\x02 \x01(\bR\aenabled\"B\n" +
 	"\x13ToggleAlertResponse\x12+\n" +
-	"\x05alert\x18\x01 \x01(\v2\x15.antclaw.v1.AlertRuleR\x05alert2\xc6\x06\n" +
+	"\x05alert\x18\x01 \x01(\v2\x15.antclaw.v1.AlertRuleR\x05alert\"~\n" +
+	"\x12DecideAlertRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"alert_type\x18\x02 \x01(\tR\talertType\x12\x1a\n" +
+	"\bseverity\x18\x03 \x01(\tR\bseverity\x12\x14\n" +
+	"\x05pairs\x18\x04 \x03(\tR\x05pairs\"A\n" +
+	"\x13DecideAlertResponse\x12\x12\n" +
+	"\x04send\x18\x01 \x01(\bR\x04send\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\"0\n" +
+	"\x15GetPreferencesRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xe1\x01\n" +
+	"\x16GetPreferencesResponse\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05pairs\x18\x02 \x03(\tR\x05pairs\x12(\n" +
+	"\x10high_impact_only\x18\x03 \x01(\bR\x0ehighImpactOnly\x12*\n" +
+	"\x11quiet_hours_start\x18\x04 \x01(\x05R\x0fquietHoursStart\x12&\n" +
+	"\x0fquiet_hours_end\x18\x05 \x01(\x05R\rquietHoursEnd\x12\x1a\n" +
+	"\btimezone\x18\x06 \x01(\tR\btimezone\"\xe3\x01\n" +
+	"\x18UpdatePreferencesRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05pairs\x18\x02 \x03(\tR\x05pairs\x12(\n" +
+	"\x10high_impact_only\x18\x03 \x01(\bR\x0ehighImpactOnly\x12*\n" +
+	"\x11quiet_hours_start\x18\x04 \x01(\x05R\x0fquietHoursStart\x12&\n" +
+	"\x0fquiet_hours_end\x18\x05 \x01(\x05R\rquietHoursEnd\x12\x1a\n" +
+	"\btimezone\x18\x06 \x01(\tR\btimezone\"+\n" +
+	"\x19UpdatePreferencesResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"f\n" +
+	"\x12SetUserTierRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04tier\x18\x02 \x01(\tR\x04tier\x12#\n" +
+	"\x0eai_max_per_day\x18\x03 \x01(\x05R\vaiMaxPerDay\"%\n" +
+	"\x13SetUserTierResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"G\n" +
+	"\x16GetAlertHistoryRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\xbd\x01\n" +
+	"\fAlertLogItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"alert_type\x18\x03 \x01(\tR\talertType\x12\x1a\n" +
+	"\bseverity\x18\x04 \x01(\tR\bseverity\x12\x12\n" +
+	"\x04sent\x18\x05 \x01(\bR\x04sent\x12\x16\n" +
+	"\x06reason\x18\x06 \x01(\tR\x06reason\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\"I\n" +
+	"\x17GetAlertHistoryResponse\x12.\n" +
+	"\x05items\x18\x01 \x03(\v2\x18.antclaw.v1.AlertLogItemR\x05items2\xfd\t\n" +
 	"\fAlertService\x12`\n" +
 	"\x11ListSubscriptions\x12$.antclaw.v1.ListSubscriptionsRequest\x1a%.antclaw.v1.ListSubscriptionsResponse\x12H\n" +
 	"\tSubscribe\x12\x1c.antclaw.v1.SubscribeRequest\x1a\x1d.antclaw.v1.SubscribeResponse\x12N\n" +
@@ -1392,7 +2108,12 @@ const file_antclaw_v1_alerts_proto_rawDesc = "" +
 	"ListAlerts\x12\x1d.antclaw.v1.ListAlertsRequest\x1a\x1e.antclaw.v1.ListAlertsResponse\x12N\n" +
 	"\vUpdateAlert\x12\x1e.antclaw.v1.UpdateAlertRequest\x1a\x1f.antclaw.v1.UpdateAlertResponse\x12N\n" +
 	"\vDeleteAlert\x12\x1e.antclaw.v1.DeleteAlertRequest\x1a\x1f.antclaw.v1.DeleteAlertResponse\x12N\n" +
-	"\vToggleAlert\x12\x1e.antclaw.v1.ToggleAlertRequest\x1a\x1f.antclaw.v1.ToggleAlertResponseB\x9e\x01\n" +
+	"\vToggleAlert\x12\x1e.antclaw.v1.ToggleAlertRequest\x1a\x1f.antclaw.v1.ToggleAlertResponse\x12N\n" +
+	"\vDecideAlert\x12\x1e.antclaw.v1.DecideAlertRequest\x1a\x1f.antclaw.v1.DecideAlertResponse\x12W\n" +
+	"\x0eGetPreferences\x12!.antclaw.v1.GetPreferencesRequest\x1a\".antclaw.v1.GetPreferencesResponse\x12`\n" +
+	"\x11UpdatePreferences\x12$.antclaw.v1.UpdatePreferencesRequest\x1a%.antclaw.v1.UpdatePreferencesResponse\x12N\n" +
+	"\vSetUserTier\x12\x1e.antclaw.v1.SetUserTierRequest\x1a\x1f.antclaw.v1.SetUserTierResponse\x12Z\n" +
+	"\x0fGetAlertHistory\x12\".antclaw.v1.GetAlertHistoryRequest\x1a#.antclaw.v1.GetAlertHistoryResponseB\x9e\x01\n" +
 	"\x0ecom.antclaw.v1B\vAlertsProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -1409,7 +2130,7 @@ func file_antclaw_v1_alerts_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_alerts_proto_rawDescData
 }
 
-var file_antclaw_v1_alerts_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_antclaw_v1_alerts_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_antclaw_v1_alerts_proto_goTypes = []any{
 	(*AlertSubscription)(nil),         // 0: antclaw.v1.AlertSubscription
 	(*ListSubscriptionsRequest)(nil),  // 1: antclaw.v1.ListSubscriptionsRequest
@@ -1434,6 +2155,17 @@ var file_antclaw_v1_alerts_proto_goTypes = []any{
 	(*DeleteAlertResponse)(nil),       // 20: antclaw.v1.DeleteAlertResponse
 	(*ToggleAlertRequest)(nil),        // 21: antclaw.v1.ToggleAlertRequest
 	(*ToggleAlertResponse)(nil),       // 22: antclaw.v1.ToggleAlertResponse
+	(*DecideAlertRequest)(nil),        // 23: antclaw.v1.DecideAlertRequest
+	(*DecideAlertResponse)(nil),       // 24: antclaw.v1.DecideAlertResponse
+	(*GetPreferencesRequest)(nil),     // 25: antclaw.v1.GetPreferencesRequest
+	(*GetPreferencesResponse)(nil),    // 26: antclaw.v1.GetPreferencesResponse
+	(*UpdatePreferencesRequest)(nil),  // 27: antclaw.v1.UpdatePreferencesRequest
+	(*UpdatePreferencesResponse)(nil), // 28: antclaw.v1.UpdatePreferencesResponse
+	(*SetUserTierRequest)(nil),        // 29: antclaw.v1.SetUserTierRequest
+	(*SetUserTierResponse)(nil),       // 30: antclaw.v1.SetUserTierResponse
+	(*GetAlertHistoryRequest)(nil),    // 31: antclaw.v1.GetAlertHistoryRequest
+	(*AlertLogItem)(nil),              // 32: antclaw.v1.AlertLogItem
+	(*GetAlertHistoryResponse)(nil),   // 33: antclaw.v1.GetAlertHistoryResponse
 }
 var file_antclaw_v1_alerts_proto_depIdxs = []int32{
 	0,  // 0: antclaw.v1.ListSubscriptionsResponse.subscriptions:type_name -> antclaw.v1.AlertSubscription
@@ -1444,31 +2176,42 @@ var file_antclaw_v1_alerts_proto_depIdxs = []int32{
 	12, // 5: antclaw.v1.ListAlertsResponse.alerts:type_name -> antclaw.v1.AlertRule
 	12, // 6: antclaw.v1.UpdateAlertResponse.alert:type_name -> antclaw.v1.AlertRule
 	12, // 7: antclaw.v1.ToggleAlertResponse.alert:type_name -> antclaw.v1.AlertRule
-	1,  // 8: antclaw.v1.AlertService.ListSubscriptions:input_type -> antclaw.v1.ListSubscriptionsRequest
-	3,  // 9: antclaw.v1.AlertService.Subscribe:input_type -> antclaw.v1.SubscribeRequest
-	5,  // 10: antclaw.v1.AlertService.Unsubscribe:input_type -> antclaw.v1.UnsubscribeRequest
-	8,  // 11: antclaw.v1.AlertService.RegisterWebhook:input_type -> antclaw.v1.RegisterWebhookRequest
-	10, // 12: antclaw.v1.AlertService.ListWebhooks:input_type -> antclaw.v1.ListWebhooksRequest
-	13, // 13: antclaw.v1.AlertService.CreateAlert:input_type -> antclaw.v1.CreateAlertRequest
-	15, // 14: antclaw.v1.AlertService.ListAlerts:input_type -> antclaw.v1.ListAlertsRequest
-	17, // 15: antclaw.v1.AlertService.UpdateAlert:input_type -> antclaw.v1.UpdateAlertRequest
-	19, // 16: antclaw.v1.AlertService.DeleteAlert:input_type -> antclaw.v1.DeleteAlertRequest
-	21, // 17: antclaw.v1.AlertService.ToggleAlert:input_type -> antclaw.v1.ToggleAlertRequest
-	2,  // 18: antclaw.v1.AlertService.ListSubscriptions:output_type -> antclaw.v1.ListSubscriptionsResponse
-	4,  // 19: antclaw.v1.AlertService.Subscribe:output_type -> antclaw.v1.SubscribeResponse
-	6,  // 20: antclaw.v1.AlertService.Unsubscribe:output_type -> antclaw.v1.UnsubscribeResponse
-	9,  // 21: antclaw.v1.AlertService.RegisterWebhook:output_type -> antclaw.v1.RegisterWebhookResponse
-	11, // 22: antclaw.v1.AlertService.ListWebhooks:output_type -> antclaw.v1.ListWebhooksResponse
-	14, // 23: antclaw.v1.AlertService.CreateAlert:output_type -> antclaw.v1.CreateAlertResponse
-	16, // 24: antclaw.v1.AlertService.ListAlerts:output_type -> antclaw.v1.ListAlertsResponse
-	18, // 25: antclaw.v1.AlertService.UpdateAlert:output_type -> antclaw.v1.UpdateAlertResponse
-	20, // 26: antclaw.v1.AlertService.DeleteAlert:output_type -> antclaw.v1.DeleteAlertResponse
-	22, // 27: antclaw.v1.AlertService.ToggleAlert:output_type -> antclaw.v1.ToggleAlertResponse
-	18, // [18:28] is the sub-list for method output_type
-	8,  // [8:18] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	32, // 8: antclaw.v1.GetAlertHistoryResponse.items:type_name -> antclaw.v1.AlertLogItem
+	1,  // 9: antclaw.v1.AlertService.ListSubscriptions:input_type -> antclaw.v1.ListSubscriptionsRequest
+	3,  // 10: antclaw.v1.AlertService.Subscribe:input_type -> antclaw.v1.SubscribeRequest
+	5,  // 11: antclaw.v1.AlertService.Unsubscribe:input_type -> antclaw.v1.UnsubscribeRequest
+	8,  // 12: antclaw.v1.AlertService.RegisterWebhook:input_type -> antclaw.v1.RegisterWebhookRequest
+	10, // 13: antclaw.v1.AlertService.ListWebhooks:input_type -> antclaw.v1.ListWebhooksRequest
+	13, // 14: antclaw.v1.AlertService.CreateAlert:input_type -> antclaw.v1.CreateAlertRequest
+	15, // 15: antclaw.v1.AlertService.ListAlerts:input_type -> antclaw.v1.ListAlertsRequest
+	17, // 16: antclaw.v1.AlertService.UpdateAlert:input_type -> antclaw.v1.UpdateAlertRequest
+	19, // 17: antclaw.v1.AlertService.DeleteAlert:input_type -> antclaw.v1.DeleteAlertRequest
+	21, // 18: antclaw.v1.AlertService.ToggleAlert:input_type -> antclaw.v1.ToggleAlertRequest
+	23, // 19: antclaw.v1.AlertService.DecideAlert:input_type -> antclaw.v1.DecideAlertRequest
+	25, // 20: antclaw.v1.AlertService.GetPreferences:input_type -> antclaw.v1.GetPreferencesRequest
+	27, // 21: antclaw.v1.AlertService.UpdatePreferences:input_type -> antclaw.v1.UpdatePreferencesRequest
+	29, // 22: antclaw.v1.AlertService.SetUserTier:input_type -> antclaw.v1.SetUserTierRequest
+	31, // 23: antclaw.v1.AlertService.GetAlertHistory:input_type -> antclaw.v1.GetAlertHistoryRequest
+	2,  // 24: antclaw.v1.AlertService.ListSubscriptions:output_type -> antclaw.v1.ListSubscriptionsResponse
+	4,  // 25: antclaw.v1.AlertService.Subscribe:output_type -> antclaw.v1.SubscribeResponse
+	6,  // 26: antclaw.v1.AlertService.Unsubscribe:output_type -> antclaw.v1.UnsubscribeResponse
+	9,  // 27: antclaw.v1.AlertService.RegisterWebhook:output_type -> antclaw.v1.RegisterWebhookResponse
+	11, // 28: antclaw.v1.AlertService.ListWebhooks:output_type -> antclaw.v1.ListWebhooksResponse
+	14, // 29: antclaw.v1.AlertService.CreateAlert:output_type -> antclaw.v1.CreateAlertResponse
+	16, // 30: antclaw.v1.AlertService.ListAlerts:output_type -> antclaw.v1.ListAlertsResponse
+	18, // 31: antclaw.v1.AlertService.UpdateAlert:output_type -> antclaw.v1.UpdateAlertResponse
+	20, // 32: antclaw.v1.AlertService.DeleteAlert:output_type -> antclaw.v1.DeleteAlertResponse
+	22, // 33: antclaw.v1.AlertService.ToggleAlert:output_type -> antclaw.v1.ToggleAlertResponse
+	24, // 34: antclaw.v1.AlertService.DecideAlert:output_type -> antclaw.v1.DecideAlertResponse
+	26, // 35: antclaw.v1.AlertService.GetPreferences:output_type -> antclaw.v1.GetPreferencesResponse
+	28, // 36: antclaw.v1.AlertService.UpdatePreferences:output_type -> antclaw.v1.UpdatePreferencesResponse
+	30, // 37: antclaw.v1.AlertService.SetUserTier:output_type -> antclaw.v1.SetUserTierResponse
+	33, // 38: antclaw.v1.AlertService.GetAlertHistory:output_type -> antclaw.v1.GetAlertHistoryResponse
+	24, // [24:39] is the sub-list for method output_type
+	9,  // [9:24] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_alerts_proto_init() }
@@ -1482,7 +2225,7 @@ func file_antclaw_v1_alerts_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_alerts_proto_rawDesc), len(file_antclaw_v1_alerts_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   23,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -13,7 +13,7 @@
 import { getCryptoPublicKeyPem } from './api'
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { CryptoService, PostEnvelopeRequestSchema } from '@antclaw/proto/antclaw/v1/crypto_pb'
+import { CryptoService } from '@antclaw/proto/antclaw/v1/crypto_pb'
 
 const enc = new TextEncoder()
 

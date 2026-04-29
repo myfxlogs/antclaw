@@ -15,7 +15,7 @@ func ensureDataSourceSeeds(ctx context.Context, pool *pgxpool.Pool) error {
 		// ===== 必需 API Key 的数据源 =====
 		{"twelve_data", "TwelveData (行情主力)", "api_key", "https://api.twelvedata.com"},
 		{"alpha_vantage", "Alpha Vantage (行情备援)", "api_key", "https://www.alphavantage.co"},
-		{"fred", "FRED 宏观数据", "api_key", "https://api.stlouisfed.org"},
+		{"fred", "FRED 宏观数据", "api_key", "https://api.stlouisfed.org/fred"},
 		{"eia", "EIA 能源数据", "api_key", "https://api.eia.gov"},
 		{"coingecko", "CoinGecko (Demo Key)", "api_key", "https://api.coingecko.com"},
 		{"firecrawl", "Firecrawl 网页爬取", "api_key", "https://api.firecrawl.dev"},
@@ -84,24 +84,43 @@ func ensureSystemAIConfigSeeds(ctx context.Context, pool *pgxpool.Pool) error {
 		models       []string
 		defaultModel string
 		purposes     []string
+		docsURL      string
+		applyURL     string
 	}
 	seeds := []aiSeed{
-		{"openai", "OpenAI", "https://api.openai.com/v1", []string{}, "", []string{"chat", "embedding", "summarizer"}},
-		{"openai_compatible", "OpenAI Compatible", "", []string{}, "", []string{"chat", "reasoning", "summarizer"}},
-		{"anthropic", "Anthropic Claude", "https://api.anthropic.com/v1", []string{}, "", []string{"chat", "reasoning"}},
-		{"gemini", "Google Gemini", "https://generativelanguage.googleapis.com/v1beta", []string{}, "", []string{"chat", "reasoning"}},
-		{"deepseek", "DeepSeek", "https://api.deepseek.com/v1", []string{}, "", []string{"chat", "reasoning"}},
-		{"moonshot", "月之暗面 Kimi", "https://api.moonshot.cn/v1", []string{}, "", []string{"chat", "summarizer"}},
-		{"qwen", "通义千问", "https://dashscope.aliyuncs.com/compatible-mode/v1", []string{}, "", []string{"chat", "embedding"}},
-		{"zhipu", "智谱 GLM", "https://open.bigmodel.cn/api/paas/v4", []string{}, "", []string{"chat"}},
+		{"openai", "OpenAI", "https://api.openai.com/v1", []string{}, "", []string{"chat", "embedding", "summarizer"},
+			"https://platform.openai.com/docs/api-reference", "https://platform.openai.com/api-keys"},
+		{"openai_compatible", "OpenAI Compatible", "", []string{}, "", []string{"chat", "reasoning", "summarizer"},
+			"https://platform.openai.com/docs/api-reference", ""},
+		{"anthropic", "Anthropic Claude", "https://api.anthropic.com/v1", []string{}, "", []string{"chat", "reasoning"},
+			"https://docs.anthropic.com/en/api", "https://console.anthropic.com/settings/keys"},
+		// Gemini 默认使用官方 OpenAI 兼容端点 /v1beta/openai。
+		{"gemini", "Google Gemini", "https://generativelanguage.googleapis.com/v1beta/openai", []string{}, "", []string{"chat", "reasoning"},
+			"https://ai.google.dev/gemini-api/docs/openai", "https://aistudio.google.com/apikey"},
+		{"deepseek", "DeepSeek", "https://api.deepseek.com/v1", []string{}, "", []string{"chat", "reasoning"},
+			"https://api-docs.deepseek.com", "https://platform.deepseek.com/api_keys"},
+		{"moonshot", "月之暗面 Kimi", "https://api.moonshot.cn/v1", []string{}, "", []string{"chat", "summarizer"},
+			"https://platform.moonshot.cn/docs", "https://platform.moonshot.cn/console/api-keys"},
+		{"qwen", "通义千问", "https://dashscope.aliyuncs.com/compatible-mode/v1", []string{}, "", []string{"chat", "embedding"},
+			"https://help.aliyun.com/zh/model-studio/developer-reference/use-qwen-by-calling-api", "https://bailian.console.aliyun.com/?apiKey=1"},
+		{"zhipu", "智谱 GLM", "https://open.bigmodel.cn/api/paas/v4", []string{}, "", []string{"chat"},
+			"https://www.bigmodel.cn/dev/api", "https://www.bigmodel.cn/usercenter/apikeys"},
 	}
 	for _, s := range seeds {
 		_, err := pool.Exec(ctx, `
-			INSERT INTO system_ai_configs (provider_id, name, base_url, models, default_model, purposes, enabled)
-			VALUES ($1, $2, $3, $4, $5, $6, FALSE)
+			INSERT INTO system_ai_configs (provider_id, name, base_url, models, default_model, purposes, enabled, docs_url, apply_url)
+			VALUES ($1, $2, $3, $4, $5, $6, FALSE, $7, $8)
 			ON CONFLICT (provider_id) DO NOTHING
-		`, s.id, s.name, s.baseURL, s.models, s.defaultModel, s.purposes)
+		`, s.id, s.name, s.baseURL, s.models, s.defaultModel, s.purposes, s.docsURL, s.applyURL)
 		if err != nil {
+			return err
+		}
+		// 幂等补齐 docs_url / apply_url（只在当前为空时写入，不覆盖运维手改）
+		if _, err := pool.Exec(ctx, `
+			UPDATE system_ai_configs
+			   SET docs_url  = COALESCE(NULLIF(docs_url, ''),  $2),
+			       apply_url = COALESCE(NULLIF(apply_url, ''), $3)
+			 WHERE provider_id = $1`, s.id, s.docsURL, s.applyURL); err != nil {
 			return err
 		}
 		if s.baseURL != "" {

@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
 )
+
+var timeNow = time.Now
 
 // Client 封装 Deribit 公开 API（无需鉴权）。
 type Client struct {
@@ -79,3 +82,64 @@ func (c *Client) GetBookSummaries(ctx context.Context, currency string) ([]BookS
 	}
 	return out.Result, nil
 }
+
+// DVOLPoint 单条 DVOL 时间序列点（OHLC + ts，单位百分点）。
+type DVOLPoint struct {
+	Timestamp int64
+	Open      float64
+	High      float64
+	Low       float64
+	Close     float64
+}
+
+// GetVolatilityIndexData 拉取 Deribit DVOL 指数（BTC/ETH 等）历史数据，返回升序点。
+// resolution 单位秒；常用 60(1m)/3600(1h)/43200(12h)/86400(1d)。
+// startMs/endMs 为 Unix 毫秒；endMs<=0 时取当前时间。
+func (c *Client) GetVolatilityIndexData(ctx context.Context, currency string, resolutionSec int, startMs, endMs int64) ([]DVOLPoint, error) {
+	if resolutionSec <= 0 {
+		resolutionSec = 86400
+	}
+	if endMs <= 0 {
+		endMs = nowMs()
+	}
+	if startMs <= 0 {
+		startMs = endMs - int64(30)*86400000 // 默认 30 天
+	}
+	url := fmt.Sprintf("%s/public/get_volatility_index_data?currency=%s&start_timestamp=%d&end_timestamp=%d&resolution=%d",
+		c.base, currency, startMs, endMs, resolutionSec)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	resp, err := c.src.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("deribit http %d", resp.StatusCode)
+	}
+	var raw struct {
+		Result struct {
+			Data           [][]float64 `json:"data"`
+			Continuation   string      `json:"continuation"`
+			Volatility     float64     `json:"volatility"`
+		} `json:"result"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
+		return nil, err
+	}
+	out := make([]DVOLPoint, 0, len(raw.Result.Data))
+	for _, row := range raw.Result.Data {
+		if len(row) < 5 {
+			continue
+		}
+		out = append(out, DVOLPoint{
+			Timestamp: int64(row[0]),
+			Open:      row[1],
+			High:      row[2],
+			Low:       row[3],
+			Close:     row[4],
+		})
+	}
+	return out, nil
+}
+
+func nowMs() int64 { return timeNow().UnixMilli() }

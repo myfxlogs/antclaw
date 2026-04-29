@@ -32,6 +32,15 @@ service BacktestService {
   rpc RunWalkforward(RunWalkforwardRequest) returns (RunWalkforwardResponse);
   rpc GetWalkforwardResult(GetWalkforwardResultRequest) returns (GetWalkforwardResultResponse);
   rpc RunBootstrap(RunBootstrapRequest) returns (RunBootstrapResponse);
+
+  // M-B: Monte Carlo path simulation using GARCH residuals.
+  rpc RunMonteCarlo(RunMonteCarloRequest) returns (RunMonteCarloResponse);
+
+  // M-B: trade-level breakdown with MFE/MAE/cost.
+  rpc GetTrades(GetTradesRequest) returns (GetTradesResponse);
+
+  // M-B: regime-stratified metrics.
+  rpc GetMetricsByRegime(GetMetricsByRegimeRequest) returns (GetMetricsByRegimeResponse);
 }
 
 // Backtest configuration
@@ -232,4 +241,79 @@ message RunBootstrapResponse {
   double maxdd_p50 = 5;
   double maxdd_p95 = 6;
   int32 iterations = 7;
+}
+
+// ============================================================
+// M-B 增量
+// ============================================================
+
+message RunMonteCarloRequest {
+  string pair = 1;
+  string timeframe = 2;
+  int32 paths = 3;        // 默认 1000；上限 10000
+  int32 horizon_bars = 4; // 默认 20
+  uint64 random_seed = 5;
+  int32 lookback = 6;     // 用于 GARCH 拟合的历史长度，默认 500
+}
+
+message MCPath {
+  // 中位数路径 / 上下分位数路径（为减小 payload 不返回所有路径）。
+  string label = 1; // p05 / p50 / p95
+  repeated double values = 2;
+}
+
+message RunMonteCarloResponse {
+  string pair = 1;
+  int32 paths = 2;
+  int32 horizon_bars = 3;
+  double terminal_p05 = 4;
+  double terminal_p50 = 5;
+  double terminal_p95 = 6;
+  repeated MCPath quantile_paths = 7;
+  // GARCH 拟合参数（透明可审）
+  double garch_omega = 8;
+  double garch_alpha = 9;
+  double garch_beta = 10;
+}
+
+message GetTradesRequest {
+  string job_id = 1;
+}
+
+message TradeDetail {
+  int32 seq = 1;
+  string opened_at = 2;
+  string closed_at = 3;
+  string side = 4; // long / short
+  double entry = 5;
+  double exit = 6;
+  double pnl = 7;
+  double pnl_pct = 8;
+  double mfe = 9;     // max favorable excursion
+  double mae = 10;    // max adverse excursion
+  double cost = 11;   // total transaction cost
+  string regime = 12; // 当时所处状态（可空）
+}
+
+message GetTradesResponse {
+  string job_id = 1;
+  repeated TradeDetail trades = 2;
+}
+
+message GetMetricsByRegimeRequest {
+  string job_id = 1;
+}
+
+message RegimeMetrics {
+  string regime = 1;
+  int32 n_trades = 2;
+  double sharpe = 3;
+  double sortino = 4;
+  double max_drawdown = 5;
+  double win_rate = 6;
+}
+
+message GetMetricsByRegimeResponse {
+  string job_id = 1;
+  repeated RegimeMetrics metrics = 2;
 }

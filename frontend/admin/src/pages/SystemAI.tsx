@@ -46,6 +46,7 @@ const PROVIDER_META: Record<string, ProviderMeta> = {
   moonshot: { label: 'Moonshot', tagline: 'Kimi · 长上下文', icon: Cpu, accent: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
   qwen: { label: '通义千问', tagline: '阿里云 · 中文优化', icon: Sparkles, accent: 'bg-purple-50 text-purple-700 border-purple-200' },
   zhipu: { label: '智谱 GLM', tagline: '清华系 · 通用', icon: Bot, accent: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+  gemini: { label: 'Google Gemini', tagline: 'Google AI · OpenAI 兼容端点', icon: Sparkles, accent: 'bg-rose-50 text-rose-700 border-rose-200' },
   openai_compatible: { label: '自定义（OpenAI 兼容）', tagline: '任意兼容端点', icon: Link2, accent: 'bg-slate-50 text-slate-700 border-slate-200' },
 }
 
@@ -115,7 +116,7 @@ export default function SystemAI() {
 
   // ---------- Render ----------
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-6 pb-24 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

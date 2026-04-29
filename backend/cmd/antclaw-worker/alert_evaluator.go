@@ -7,9 +7,17 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/antclaw/antclaw/internal/adapter/storage/postgres/db"
+	"github.com/antclaw/antclaw/internal/notify"
 )
 
+// evaluateAlerts 扫描用户告警，命中即通过 notify.Service 统一投递（持久化 + 实时 SSE）。
+//
+// 与 ark-intelligent 的 Telegram 推送对照：等价于 news/scheduler 的"逐用户匹配 → 发送"链路；
+// 此处的传输层是 SSE，分发由 Redis Pub/Sub 完成。
 func evaluateAlerts(ctx context.Context, pool *pgxpool.Pool, logger *slog.Logger) error {
 	rows, err := pool.Query(ctx, `SELECT id,user_id,alert_type,symbol,params::text,COALESCE(last_fired_at,'1970-01-01'::timestamptz),cooldown_seconds
 FROM user_signal_alerts WHERE enabled=true AND deleted_at IS NULL`)
@@ -17,12 +25,15 @@ FROM user_signal_alerts WHERE enabled=true AND deleted_at IS NULL`)
 		return fmt.Errorf("alert evaluator query: %w", err)
 	}
 	defer rows.Close()
+
+	notifySvc := notify.NewService(db.New(pool), globalRedis.Raw())
+
 	for rows.Next() {
 		var id int64
-		var userID, alertType, symbol, params string
+		var userIDStr, alertType, symbol, params string
 		var lastFired time.Time
 		var cooldown int32
-		if err := rows.Scan(&id, &userID, &alertType, &symbol, &params, &lastFired, &cooldown); err != nil {
+		if err := rows.Scan(&id, &userIDStr, &alertType, &symbol, &params, &lastFired, &cooldown); err != nil {
 			continue
 		}
 		if time.Since(lastFired) < time.Duration(cooldown)*time.Second {
@@ -31,12 +42,30 @@ FROM user_signal_alerts WHERE enabled=true AND deleted_at IS NULL`)
 		if !alertTriggered(ctx, pool, alertType, symbol, params) {
 			continue
 		}
-		payload, _ := json.Marshal(map[string]any{
-			"type": "alert.fired", "alert_id": id, "alert_type": alertType, "symbol": symbol, "fired_at": time.Now().UTC().Format(time.RFC3339),
-		})
-		_, _ = pool.Exec(ctx, `INSERT INTO notifications(user_id,type,title,body,data,priority) VALUES ($1::uuid,'in_app',$2,$3,$4::jsonb,'high')`,
-			userID, "策略告警触发", "您的 "+symbol+" 告警已触发", string(payload))
-		_ = globalRedis.Raw().Publish(ctx, "user:"+userID+":alerts", string(payload)).Err()
+		uid, err := uuid.Parse(userIDStr)
+		if err != nil {
+			logger.Warn("alert: invalid user_id", "id", id, "user_id", userIDStr)
+			continue
+		}
+		// dedup_key：同一告警在 cooldown 周期内只发一次。
+		dedup := fmt.Sprintf("alert:%d:%s", id, time.Now().UTC().Format("20060102T1504"))
+		if err := notifySvc.Send(ctx, &notify.Notification{
+			UserID:   uid,
+			Category: "alert",
+			Severity: "high",
+			Title:    "策略告警触发",
+			Body:     "您的 " + symbol + " 告警已触发",
+			Data: map[string]string{
+				"alert_id":   fmt.Sprintf("%d", id),
+				"alert_type": alertType,
+				"symbol":     symbol,
+				"fired_at":   time.Now().UTC().Format(time.RFC3339),
+			},
+			DedupKey: dedup,
+			DedupTTL: time.Duration(cooldown) * time.Second,
+		}); err != nil {
+			logger.Warn("alert: notify send failed", "id", id, "err", err)
+		}
 		_, _ = pool.Exec(ctx, `UPDATE user_signal_alerts SET last_fired_at=NOW(),updated_at=NOW() WHERE id=$1`, id)
 	}
 	return nil

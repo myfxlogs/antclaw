@@ -59,7 +59,39 @@ func (h *PriceHandler) RunScenario(ctx context.Context, req *connect.Request[pri
 }
 
 func (h *PriceHandler) GetRegime(ctx context.Context, req *connect.Request[pricev1.GetRegimeRequest]) (*connect.Response[pricev1.GetRegimeResponse], error) {
-	resp, err := h.svc.GetRegime(ctx, req.Msg.Pair, req.Msg.Timeframe)
+	resp, err := h.svc.GetRegime(ctx, req.Msg.Pair, req.Msg.Timeframe, req.Msg.Engine, req.Msg.NStates)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (h *PriceHandler) GetVolatility(ctx context.Context, req *connect.Request[pricev1.GetVolatilityRequest]) (*connect.Response[pricev1.GetVolatilityResponse], error) {
+	resp, err := h.svc.GetVolatility(ctx, req.Msg.Pair, req.Msg.Timeframe, req.Msg.Lookback)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (h *PriceHandler) GetHurst(ctx context.Context, req *connect.Request[pricev1.GetHurstRequest]) (*connect.Response[pricev1.GetHurstResponse], error) {
+	resp, err := h.svc.GetHurst(ctx, req.Msg.Pair, req.Msg.Timeframe, req.Msg.Lookback)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (h *PriceHandler) GetCorrelations(ctx context.Context, req *connect.Request[pricev1.GetCorrelationsRequest]) (*connect.Response[pricev1.GetCorrelationsResponse], error) {
+	resp, err := h.svc.GetCorrelations(ctx, req.Msg.Assets, req.Msg.Timeframe, req.Msg.Window)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (h *PriceHandler) GetDivergences(ctx context.Context, req *connect.Request[pricev1.GetDivergencesRequest]) (*connect.Response[pricev1.GetDivergencesResponse], error) {
+	resp, err := h.svc.GetDivergences(ctx, req.Msg.Pair, req.Msg.Timeframe, req.Msg.Lookback, req.Msg.Indicators)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}

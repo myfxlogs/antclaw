@@ -19,6 +19,17 @@ service AIService {
   // Build a structured context payload for downstream AI prompts.
   // 按 asset/scope 聚合若干领域的最新指标（macro/onchain/options/treasury 等）。
   rpc BuildContext(BuildContextRequest) returns (BuildContextResponse);
+
+  // M-F: 记忆与多轮会话
+  rpc RememberFact(RememberFactRequest) returns (RememberFactResponse);
+  rpc RecallFact(RecallFactRequest) returns (RecallFactResponse);
+  rpc SearchMemory(SearchMemoryRequest) returns (SearchMemoryResponse);
+
+  // M-F: 限流配额查询（已发送/上限）
+  rpc CheckRateLimit(CheckRateLimitRequest) returns (CheckRateLimitResponse);
+
+  // M-F: 工具调用入口（OpenAI function calling 风格）
+  rpc RunWithTools(RunWithToolsRequest) returns (RunWithToolsResponse);
 }
 
 // Chat message
@@ -100,4 +111,84 @@ message ContextSection {
   string scope = 1;
   map<string, string> indicators = 2;
   repeated string notes = 3;
+}
+
+// ============================================================
+// M-F 增量
+// ============================================================
+
+message RememberFactRequest {
+  string user_id = 1;
+  string scope = 2;        // 'global' / 'thread'
+  string key = 3;
+  string value = 4;
+  int64 ttl_seconds = 5;   // 0 = 永久
+}
+message RememberFactResponse { string id = 1; }
+
+message RecallFactRequest {
+  string user_id = 1;
+  string scope = 2;
+  string key = 3;
+}
+message RecallFactResponse {
+  string id = 1;
+  string value = 2;
+  string created_at = 3;
+}
+
+message SearchMemoryRequest {
+  string user_id = 1;
+  string query = 2;
+  int32 limit = 3;
+}
+message MemoryHit {
+  string id = 1;
+  string scope = 2;
+  string key = 3;
+  string value = 4;
+}
+message SearchMemoryResponse { repeated MemoryHit hits = 1; }
+
+message CheckRateLimitRequest {
+  string user_id = 1;
+  string provider = 2;     // 留空表示总配额
+}
+message CheckRateLimitResponse {
+  int32 used_today = 1;
+  int32 max_per_day = 2;
+  int32 remaining = 3;
+  bool allowed = 4;
+}
+
+message ToolCall {
+  string name = 1;
+  string args_json = 2;     // JSON 序列化的参数
+  string result_json = 3;   // 工具返回 JSON
+  string error = 4;
+}
+
+message RunWithToolsRequest {
+  string user_id = 1;
+  string thread_id = 2;     // 可空，自动创建
+  string message = 3;
+  // 期望调用的工具白名单；空表示全部内置工具。
+  repeated string tools = 4;
+  int32 max_hops = 5;       // 默认 5
+  // 可选：覆盖默认 LLM 模型；空则用 SystemAI 配置的 default_model。
+  string model = 6;
+  // 可选：覆盖 provider_id（多个 provider 共存时切换）。
+  string provider_id = 7;
+}
+message RunWithToolsResponse {
+  string thread_id = 1;
+  string answer = 2;
+  repeated ToolCall calls = 3;
+  bool cache_hit = 4;
+  // 实际生效的模型与 token 使用量（无 LLM 调用时为空 / 0）。
+  string model = 5;
+  string provider_id = 6;
+  int32 prompt_tokens = 7;
+  int32 completion_tokens = 8;
+  int32 total_tokens = 9;
 }

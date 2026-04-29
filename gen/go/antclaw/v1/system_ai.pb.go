@@ -39,8 +39,12 @@ type SystemAIConfig struct {
 	CreatedAt      string                 `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt      string                 `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	UpdatedBy      string                 `protobuf:"bytes,16,opt,name=updated_by,json=updatedBy,proto3" json:"updated_by,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// docs_url: 官方 API 文档链接（只读，前端显示）
+	DocsUrl string `protobuf:"bytes,17,opt,name=docs_url,json=docsUrl,proto3" json:"docs_url,omitempty"`
+	// apply_url: 申请 API Key 的入口链接（只读，前端显示）
+	ApplyUrl      string `protobuf:"bytes,18,opt,name=apply_url,json=applyUrl,proto3" json:"apply_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SystemAIConfig) Reset() {
@@ -181,6 +185,20 @@ func (x *SystemAIConfig) GetUpdatedAt() string {
 func (x *SystemAIConfig) GetUpdatedBy() string {
 	if x != nil {
 		return x.UpdatedBy
+	}
+	return ""
+}
+
+func (x *SystemAIConfig) GetDocsUrl() string {
+	if x != nil {
+		return x.DocsUrl
+	}
+	return ""
+}
+
+func (x *SystemAIConfig) GetApplyUrl() string {
+	if x != nil {
+		return x.ApplyUrl
 	}
 	return ""
 }
@@ -846,7 +864,7 @@ var File_antclaw_v1_system_ai_proto protoreflect.FileDescriptor
 const file_antclaw_v1_system_ai_proto_rawDesc = "" +
 	"\n" +
 	"\x1aantclaw/v1/system_ai.proto\x12\n" +
-	"antclaw.v1\"\xfe\x03\n" +
+	"antclaw.v1\"\xb6\x04\n" +
 	"\x0eSystemAIConfig\x12\x1f\n" +
 	"\vprovider_id\x18\x01 \x01(\tR\n" +
 	"providerId\x12\x12\n" +
@@ -871,7 +889,9 @@ const file_antclaw_v1_system_ai_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x0f \x01(\tR\tupdatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_by\x18\x10 \x01(\tR\tupdatedBy\"\x1c\n" +
+	"updated_by\x18\x10 \x01(\tR\tupdatedBy\x12\x19\n" +
+	"\bdocs_url\x18\x11 \x01(\tR\adocsUrl\x12\x1b\n" +
+	"\tapply_url\x18\x12 \x01(\tR\bapplyUrl\"\x1c\n" +
 	"\x1aListSystemAIConfigsRequest\"O\n" +
 	"\x1bListSystemAIConfigsResponse\x120\n" +
 	"\x05items\x18\x01 \x03(\v2\x1a.antclaw.v1.SystemAIConfigR\x05items\";\n" +

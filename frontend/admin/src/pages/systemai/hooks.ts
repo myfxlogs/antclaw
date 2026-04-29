@@ -164,7 +164,10 @@ export function useSystemAIPage() {
     if (!draft) return
     const base = (draft.base_url || '').trim()
     if (!base) return
-    const key = `${draft.provider_id}|${base}`
+    // 只有在 key 已经可用时才拉取模型。拉取 /models 基本都需要鉴权，
+    // 预取只会返回 401/403/failed_precondition 等无用噪音。
+    if (!draft.has_secret && !secretInput.trim()) return
+    const key = `${draft.provider_id}|${base}|${draft.has_secret ? 'saved' : 'pending'}`
     if (key === lastAutoDiscoverKey) return
 
     const timer = setTimeout(async () => {
@@ -191,11 +194,7 @@ export function useSystemAIPage() {
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : '拉取模型失败'
-        if (msg.includes('401/403') && !draft.has_secret && !secretInput.trim()) {
-          setError('当前厂商地址返回 401/403：请先在下方填写并保存 API Key，再点击“验证连接”拉取模型。')
-        } else {
-          setError(toFriendlyDiscoverMessage(msg))
-        }
+        setError(toFriendlyDiscoverMessage(msg))
       } finally {
         setDiscovering(false)
       }

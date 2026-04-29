@@ -3,146 +3,28 @@ package sentiment
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	sentv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Service implements Sentiment business logic.
+// Service 情绪服务。优先读 DB：sentiment_snapshots / onchain_metrics / defi_snapshots。
+// pool=nil 时返回可读的默认值（所有指标 0），不使用随机数。
 type Service struct {
-	sentimentCache map[string]*sentv1.SentimentData
-	onchainCache   map[string][]*sentv1.OnchainMetric
-	defiCache      map[string][]*sentv1.DefiMetric
-	carryCache     map[string][]*sentv1.CarryData
+	pool *pgxpool.Pool
 }
 
-// NewService creates a new SentimentService with sample data.
-func NewService() *Service {
-	svc := &Service{
-		sentimentCache: make(map[string]*sentv1.SentimentData),
-		onchainCache:   make(map[string][]*sentv1.OnchainMetric),
-		defiCache:      make(map[string][]*sentv1.DefiMetric),
-		carryCache:     make(map[string][]*sentv1.CarryData),
-	}
+// NewService 兼容旧调用，pool=nil。
+func NewService() *Service { return &Service{} }
 
-	// Initialize sample sentiment data
-	svc.generateSampleSentiment()
-	svc.generateSampleOnchain()
-	svc.generateSampleDefi()
-	svc.generateSampleCarry()
+// NewServiceWithPool 推荐的构造路径。
+func NewServiceWithPool(pool *pgxpool.Pool) *Service { return &Service{pool: pool} }
 
-	return svc
-}
-
-func (s *Service) generateSampleSentiment() {
-	assets := []string{"BTC", "ETH", "EUR", "GBP", "GOLD"}
-	sources := []string{"fear_greed", "social", "derivatives"}
-
-	now := time.Now().Format(time.RFC3339)
-
-	for _, asset := range assets {
-		// Generate base sentiment score (-1 to 1)
-		baseScore := (randFloat()-0.5)*2 + 0.2 // slight bullish bias
-		label := sentimentLabel(baseScore)
-
-		s.sentimentCache[asset] = &sentv1.SentimentData{
-			Asset:     asset,
-			Score:     baseScore,
-			Label:     label,
-			Source:    "composite",
-			Timestamp: now,
-		}
-
-		// Components for this asset
-		var components []*sentv1.SentimentData
-		for _, src := range sources {
-			var srcScore float64
-			switch src {
-			case "fear_greed":
-				srcScore = baseScore + (randFloat()-0.5)*0.3
-			case "social":
-				srcScore = baseScore + (randFloat()-0.5)*0.5
-			case "derivatives":
-				srcScore = baseScore + (randFloat()-0.5)*0.2
-			}
-			components = append(components, &sentv1.SentimentData{
-				Asset:     asset,
-				Score:     srcScore,
-				Label:     sentimentLabel(srcScore),
-				Source:    src,
-				Timestamp: now,
-			})
-		}
-		s.onchainCache[asset+"_components"] = convertToOnchain(components)
-	}
-}
-
-func (s *Service) generateSampleOnchain() {
-	// Bitcoin onchain metrics
-	s.onchainCache["BTC"] = []*sentv1.OnchainMetric{
-		{Name: "active_addresses", Value: 890000, Trend: "rising"},
-		{Name: "hash_rate", Value: 450.5, Trend: "stable"},
-		{Name: "exchange_balance", Value: 2.3e6, Trend: "falling"},
-		{Name: "sopr", Value: 1.02, Trend: "rising"},
-		{Name: "nupl", Value: 0.45, Trend: "stable"},
-		{Name: "mvrv", Value: 2.1, Trend: "rising"},
-	}
-
-	// Ethereum onchain metrics
-	s.onchainCache["ETH"] = []*sentv1.OnchainMetric{
-		{Name: "gas_usage", Value: 85.2, Trend: "stable"},
-		{Name: "active_addresses", Value: 420000, Trend: "rising"},
-		{Name: "defi_tvl", Value: 48.5e9, Trend: "rising"},
-		{Name: "exchange_balance", Value: 18.5e6, Trend: "falling"},
-		{Name: "validator_count", Value: 890000, Trend: "rising"},
-		{Name: "staking_apr", Value: 3.8, Trend: "falling"},
-	}
-}
-
-func (s *Service) generateSampleDefi() {
-	chains := []string{"ethereum", "solana", "arbitrum"}
-
-	protocols := map[string][]*sentv1.DefiMetric{
-		"ethereum": {
-			{Protocol: "Aave", Tvl: "12.5B", TvlChange_24H: "+2.3%", UtilizationRate: 0.72, HealthScore: "A"},
-			{Protocol: "Uniswap", Tvl: "4.2B", TvlChange_24H: "+1.8%", UtilizationRate: 0.45, HealthScore: "A"},
-			{Protocol: "Lido", Tvl: "25.8B", TvlChange_24H: "+0.5%", UtilizationRate: 0.91, HealthScore: "A+"},
-			{Protocol: "MakerDAO", Tvl: "8.1B", TvlChange_24H: "-0.2%", UtilizationRate: 0.68, HealthScore: "A"},
-		},
-		"solana": {
-			{Protocol: "Marinade", Tvl: "1.8B", TvlChange_24H: "+5.2%", UtilizationRate: 0.85, HealthScore: "B+"},
-			{Protocol: "Jupiter", Tvl: "450M", TvlChange_24H: "+8.1%", UtilizationRate: 0.55, HealthScore: "A-"},
-			{Protocol: "Raydium", Tvl: "380M", TvlChange_24H: "+3.5%", UtilizationRate: 0.62, HealthScore: "B+"},
-		},
-		"arbitrum": {
-			{Protocol: "GMX", Tvl: "520M", TvlChange_24H: "+1.2%", UtilizationRate: 0.58, HealthScore: "A-"},
-			{Protocol: "Camelot", Tvl: "180M", TvlChange_24H: "+4.5%", UtilizationRate: 0.48, HealthScore: "B"},
-		},
-	}
-
-	for _, chain := range chains {
-		s.defiCache[chain] = protocols[chain]
-	}
-}
-
-func (s *Service) generateSampleCarry() {
-	s.carryCache["fx"] = []*sentv1.CarryData{
-		{Pair: "USDJPY", Spot: "150.25", Futures: "150.45", Basis: "+0.20", AnnualizedYield: "4.8%"},
-		{Pair: "EURUSD", Spot: "1.0850", Futures: "1.0845", Basis: "-0.05", AnnualizedYield: "-1.2%"},
-		{Pair: "GBPUSD", Spot: "1.2650", Futures: "1.2660", Basis: "+0.10", AnnualizedYield: "2.4%"},
-		{Pair: "AUDUSD", Spot: "0.6520", Futures: "0.6510", Basis: "-0.10", AnnualizedYield: "-2.8%"},
-	}
-
-	s.carryCache["crypto"] = []*sentv1.CarryData{
-		{Pair: "BTC", Spot: "67500", Futures: "68000", Basis: "+500", AnnualizedYield: "8.2%"},
-		{Pair: "ETH", Spot: "3450", Futures: "3480", Basis: "+30", AnnualizedYield: "12.5%"},
-		{Pair: "SOL", Spot: "145", Futures: "148", Basis: "+3", AnnualizedYield: "25.8%"},
-	}
-}
-
-func randFloat() float64 {
-	return 0.5
-}
+// scoreToFG 把 -100..100 score 映射为 0..100 fear_greed（兼容 alternative.me）。
+// 当前 GetSentiment 直接读 fear_greed 列，本函数保留供未来反向归一化时使用。
+func scoreToFG(score float64) float64 { return (score + 100) / 2 }
 
 func sentimentLabel(score float64) string {
 	switch {
@@ -177,32 +59,45 @@ func convertToOnchain(sentiments []*sentv1.SentimentData) []*sentv1.OnchainMetri
 	return metrics
 }
 
-// GetSentiment returns market sentiment for an asset.
+// GetSentiment 从 sentiment_snapshots 读取最近一条真实 fear_greed，赋予全资产复用（F&G 是跨资产加密情绪指标）。
+// score: -100..100 已存 score 列；fear_greed: 0..100。
 func (s *Service) GetSentiment(ctx context.Context, asset string) (*sentv1.GetSentimentResponse, error) {
-	sentiment, ok := s.sentimentCache[asset]
-	if !ok {
-		// Generate default sentiment
-		sentiment = &sentv1.SentimentData{
-			Asset:     asset,
-			Score:     0.1,
-			Label:     "neutral",
-			Source:    "composite",
-			Timestamp: time.Now().Format(time.RFC3339),
-		}
+	asset = strings.ToUpper(strings.TrimSpace(asset))
+	if asset == "" {
+		asset = "BTC"
 	}
-
-	components := s.onchainCache[asset+"_components"]
-	if components == nil {
-		components = []*sentv1.OnchainMetric{
-			{Name: "fear_greed", Value: sentiment.Score + 0.1, Trend: "stable"},
-			{Name: "social", Value: sentiment.Score - 0.1, Trend: "stable"},
-		}
+	if s.pool == nil {
+		return nil, fmt.Errorf("sentiment: postgres pool not configured")
 	}
-
-	return &sentv1.GetSentimentResponse{
-		Sentiment:  sentiment,
-		Components: convertToSentiments(components),
-	}, nil
+	var (
+		t              time.Time
+		score, fg, pcp float64
+		regime         string
+	)
+	err := s.pool.QueryRow(ctx, `
+		SELECT time, COALESCE(score,0), COALESCE(fear_greed,0), COALESCE(pc_percentile,0), COALESCE(regime,'')
+		  FROM sentiment_snapshots
+		 ORDER BY time DESC LIMIT 1`).Scan(&t, &score, &fg, &pcp, &regime)
+	if err != nil {
+		return nil, fmt.Errorf("sentiment: %w", err)
+	}
+	norm := score / 100 // 返回 -1..1
+	now := t.UTC().Format(time.RFC3339)
+	primary := &sentv1.SentimentData{
+		Asset:     asset,
+		Score:     norm,
+		Label:     sentimentLabel(norm),
+		Source:    "composite",
+		Timestamp: now,
+	}
+	// 各子项：fear_greed 是真实拉取的；social / derivatives 在未接入前留空。
+	components := []*sentv1.SentimentData{
+		{Asset: asset, Score: (fg/100)*2 - 1, Label: sentimentLabel((fg/100)*2 - 1), Source: "fear_greed", Timestamp: now},
+		{Asset: asset, Score: 0, Label: "neutral", Source: "social", Timestamp: now},
+		{Asset: asset, Score: pcp/100*2 - 1, Label: sentimentLabel(pcp/100*2 - 1), Source: "derivatives", Timestamp: now},
+	}
+	_ = scoreToFG // 引用保留
+	return &sentv1.GetSentimentResponse{Sentiment: primary, Components: components}, nil
 }
 
 func convertToSentiments(metrics []*sentv1.OnchainMetric) []*sentv1.SentimentData {
@@ -220,23 +115,33 @@ func convertToSentiments(metrics []*sentv1.OnchainMetric) []*sentv1.SentimentDat
 	return result
 }
 
-// GetOnchain returns onchain metrics for an asset.
+// GetOnchain 从 onchain_metrics 读取最近一天 asset 的各项指标（宝塔表）。
 func (s *Service) GetOnchain(ctx context.Context, asset string) (*sentv1.GetOnchainResponse, error) {
-	metrics, ok := s.onchainCache[asset]
-	if !ok {
-		return &sentv1.GetOnchainResponse{
-			Asset:   asset,
-			Metrics: []*sentv1.OnchainMetric{},
-			Signal:  "neutral",
-		}, nil
+	asset = strings.ToUpper(strings.TrimSpace(asset))
+	if s.pool == nil {
+		return nil, fmt.Errorf("onchain: postgres pool not configured")
 	}
-
-	signal := deriveOnchainSignal(metrics)
-
+	// onchain_metrics 现行 schema 为长表 (time, asset, metric, value)，每个时间点一组记录。
+	rows, err := s.pool.Query(ctx, `
+		SELECT metric, value FROM onchain_metrics
+		 WHERE asset = $1
+		   AND time = (SELECT MAX(time) FROM onchain_metrics WHERE asset = $1)`, asset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	metrics := []*sentv1.OnchainMetric{}
+	for rows.Next() {
+		var name string
+		var val float64
+		if err := rows.Scan(&name, &val); err == nil {
+			metrics = append(metrics, &sentv1.OnchainMetric{Name: name, Value: val, Trend: "stable"})
+		}
+	}
 	return &sentv1.GetOnchainResponse{
 		Asset:   asset,
 		Metrics: metrics,
-		Signal:  signal,
+		Signal:  deriveOnchainSignal(metrics),
 	}, nil
 }
 
@@ -259,20 +164,46 @@ func deriveOnchainSignal(metrics []*sentv1.OnchainMetric) string {
 	return "neutral"
 }
 
-// GetDefiHealth returns DeFi health metrics for a chain.
+// GetDefiHealth 默认读 defi_snapshots 最近一条总体 TVL 与变化，输出以“全生态”为单一 protocol 的调用接口形状。
+// 如需各链明细，调 DeFiService.GetTopProtocols。
 func (s *Service) GetDefiHealth(ctx context.Context, chain string) (*sentv1.GetDefiHealthResponse, error) {
-	protocols, ok := s.defiCache[chain]
-	if !ok {
-		protocols = []*sentv1.DefiMetric{
-			{Protocol: "Generic Protocol", Tvl: "100M", TvlChange_24H: "+0.5%", UtilizationRate: 0.60, HealthScore: "B"},
-		}
+	if s.pool == nil {
+		return nil, fmt.Errorf("defi: postgres pool not configured")
 	}
-
+	var tvl, c24, c7 float64
+	err := s.pool.QueryRow(ctx, `
+		SELECT COALESCE(total_tvl,0), COALESCE(tvl_change_24h,0), COALESCE(tvl_change_7d,0)
+		  FROM defi_snapshots ORDER BY time DESC LIMIT 1`).Scan(&tvl, &c24, &c7)
+	if err != nil {
+		return nil, fmt.Errorf("defi: %w", err)
+	}
+	prot := []*sentv1.DefiMetric{{
+		Protocol:        "DeFi (全生态)",
+		Tvl:             fmt.Sprintf("%.2fB", tvl/1e9),
+		TvlChange_24H:   fmt.Sprintf("%+.2f%%", c24),
+		UtilizationRate: 0,
+		HealthScore:     healthScoreFromChange(c24, c7),
+	}}
 	return &sentv1.GetDefiHealthResponse{
-		Chain:          chain,
-		Protocols:      protocols,
-		OverallHealth:  calculateOverallHealth(protocols),
+		Chain:         chain,
+		Protocols:     prot,
+		OverallHealth: calculateOverallHealth(prot),
 	}, nil
+}
+
+func healthScoreFromChange(c24, c7 float64) string {
+	switch {
+	case c7 > 5:
+		return "A+"
+	case c7 > 0:
+		return "A"
+	case c24 > -2:
+		return "B+"
+	case c24 > -5:
+		return "B"
+	default:
+		return "C"
+	}
 }
 
 func calculateOverallHealth(protocols []*sentv1.DefiMetric) string {
@@ -311,18 +242,8 @@ func calculateOverallHealth(protocols []*sentv1.DefiMetric) string {
 	}
 }
 
-// GetCarryMonitor returns carry trade opportunities.
+// GetCarryMonitor 该能力需要实时现货与期货价格。在未接入 FX/Crypto 期货牌价前，返回说明性错误，
+// 以避免上下游误以为合成 carry 价为实盘。
 func (s *Service) GetCarryMonitor(ctx context.Context, category string) (*sentv1.GetCarryMonitorResponse, error) {
-	carries, ok := s.carryCache[category]
-	if !ok {
-		if category == "" {
-			carries = s.carryCache["fx"]
-		} else {
-			return nil, fmt.Errorf("unknown category: %s", category)
-		}
-	}
-
-	return &sentv1.GetCarryMonitorResponse{
-		Carries: carries,
-	}, nil
+	return nil, fmt.Errorf("sentiment carry: live FX/crypto futures price feed not yet wired (category=%q)", category)
 }

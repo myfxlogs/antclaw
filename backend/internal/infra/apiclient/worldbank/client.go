@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
@@ -26,15 +27,29 @@ type Point struct {
 	Value float64
 }
 
-// GetSeries 拉取 country/indicator 时间序列；series_id 形如 "USA/NY.GDP.MKTP.CD"。
+// GetSeries 拉取 country/indicator 时间序列。series_id 接受三种写法：
+//   1) "NY.GDP.MKTP.CD"            —— 只填 indicator，默认 country=WLD（世界总量）
+//   2) "USA/NY.GDP.MKTP.CD"        —— ISO + indicator
+//   3) "USA/indicator/NY.GDP.MKTP.CD" —— 完整 v2 子路径
 func (c *Client) GetSeries(ctx context.Context, seriesID string) ([]Point, error) {
-	url := fmt.Sprintf("%s/country/%s?format=json&per_page=1000", c.base, seriesID)
-	// World Bank uses /country/<iso>/indicator/<id>
-	// seriesID expected like "USA/indicator/NY.GDP.MKTP.CD"
+	seriesID = strings.TrimSpace(seriesID)
 	if seriesID == "" {
 		return nil, fmt.Errorf("worldbank: empty series_id")
 	}
-	url = fmt.Sprintf("%s/country/%s?format=json&per_page=1000", c.base, seriesID)
+	parts := strings.SplitN(seriesID, "/", 3)
+	var path string
+	switch len(parts) {
+	case 1:
+		// 只给了 indicator，自动落到 World 聚合，避免要求用户记忆 ISO 代码。
+		path = fmt.Sprintf("country/WLD/indicator/%s", parts[0])
+	case 2:
+		path = fmt.Sprintf("country/%s/indicator/%s", parts[0], parts[1])
+	case 3:
+		path = fmt.Sprintf("country/%s", seriesID)
+	default:
+		return nil, fmt.Errorf("worldbank: invalid series_id %q", seriesID)
+	}
+	url := fmt.Sprintf("%s/%s?format=json&per_page=1000", c.base, path)
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	resp, err := c.src.Do(ctx, req)
 	if err != nil {

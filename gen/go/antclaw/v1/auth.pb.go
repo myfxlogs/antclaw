@@ -177,11 +177,13 @@ func (x *RegisterRequest) GetIdempotencyKey() string {
 
 // Register response
 type RegisterResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	ExpiresAt     int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // Unix timestamp
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	UserId       string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AccessToken  string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	ExpiresAt    int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // Unix timestamp
+	// 注册时自动分配的 5 位数字 ID（避开 4/7，不以 0 开头）。
+	CodeId        string `protobuf:"bytes,5,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -244,12 +246,21 @@ func (x *RegisterResponse) GetExpiresAt() int64 {
 	return 0
 }
 
+func (x *RegisterResponse) GetCodeId() string {
+	if x != nil {
+		return x.CodeId
+	}
+	return ""
+}
+
 // Login request
 type LoginRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"` // Can also be username
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Client        *ClientInfo            `protobuf:"bytes,3,opt,name=client,proto3" json:"client,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// identifier：邮箱（含 @）/ 用户ID（纯数字）/ username。
+	// 字段名保留为 email 以维持向后兼容；后端按内容智能识别。
+	Email         string      `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Password      string      `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Client        *ClientInfo `protobuf:"bytes,3,opt,name=client,proto3" json:"client,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -307,11 +318,13 @@ func (x *LoginRequest) GetClient() *ClientInfo {
 
 // Login response
 type LoginResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	ExpiresAt     int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	UserId       string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AccessToken  string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	ExpiresAt    int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	// 用户的数字 ID（5 位起，避开 4/7），可用于下次登录。
+	CodeId        string `protobuf:"bytes,5,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -372,6 +385,13 @@ func (x *LoginResponse) GetExpiresAt() int64 {
 		return x.ExpiresAt
 	}
 	return 0
+}
+
+func (x *LoginResponse) GetCodeId() string {
+	if x != nil {
+		return x.CodeId
+	}
+	return ""
 }
 
 // Refresh request
@@ -876,23 +896,25 @@ const file_antclaw_v1_auth_proto_rawDesc = "" +
 	"\x06locale\x18\x04 \x01(\x0e2\x12.antclaw.v1.LocaleR\x06locale\x12\x1a\n" +
 	"\btimezone\x18\x05 \x01(\tR\btimezone\x12.\n" +
 	"\x06client\x18\x06 \x01(\v2\x16.antclaw.v1.ClientInfoR\x06client\x12'\n" +
-	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\"\x92\x01\n" +
+	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\"\xab\x01\n" +
 	"\x10RegisterResponse\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x03 \x01(\tR\frefreshToken\x12\x1d\n" +
 	"\n" +
-	"expires_at\x18\x04 \x01(\x03R\texpiresAt\"p\n" +
+	"expires_at\x18\x04 \x01(\x03R\texpiresAt\x12\x17\n" +
+	"\acode_id\x18\x05 \x01(\tR\x06codeId\"p\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12.\n" +
-	"\x06client\x18\x03 \x01(\v2\x16.antclaw.v1.ClientInfoR\x06client\"\x8f\x01\n" +
+	"\x06client\x18\x03 \x01(\v2\x16.antclaw.v1.ClientInfoR\x06client\"\xa8\x01\n" +
 	"\rLoginResponse\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x03 \x01(\tR\frefreshToken\x12\x1d\n" +
 	"\n" +
-	"expires_at\x18\x04 \x01(\x03R\texpiresAt\"5\n" +
+	"expires_at\x18\x04 \x01(\x03R\texpiresAt\x12\x17\n" +
+	"\acode_id\x18\x05 \x01(\tR\x06codeId\"5\n" +
 	"\x0eRefreshRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"x\n" +
 	"\x0fRefreshResponse\x12!\n" +

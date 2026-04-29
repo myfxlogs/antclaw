@@ -30,6 +30,10 @@ message SystemAIConfig {
   string created_at = 14;
   string updated_at = 15;
   string updated_by = 16;
+  // docs_url: 官方 API 文档链接（只读，前端显示）
+  string docs_url = 17;
+  // apply_url: 申请 API Key 的入口链接（只读，前端显示）
+  string apply_url = 18;
 }
 
 message ListSystemAIConfigsRequest {}

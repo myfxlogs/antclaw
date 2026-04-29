@@ -64,6 +64,15 @@ const (
 	// SignalsServiceGetOutlookProcedure is the fully-qualified name of the SignalsService's GetOutlook
 	// RPC.
 	SignalsServiceGetOutlookProcedure = "/antclaw.v1.SignalsService/GetOutlook"
+	// SignalsServiceFitCalibrationProcedure is the fully-qualified name of the SignalsService's
+	// FitCalibration RPC.
+	SignalsServiceFitCalibrationProcedure = "/antclaw.v1.SignalsService/FitCalibration"
+	// SignalsServicePredictCalibratedProcedure is the fully-qualified name of the SignalsService's
+	// PredictCalibrated RPC.
+	SignalsServicePredictCalibratedProcedure = "/antclaw.v1.SignalsService/PredictCalibrated"
+	// SignalsServiceListCalibrationsProcedure is the fully-qualified name of the SignalsService's
+	// ListCalibrations RPC.
+	SignalsServiceListCalibrationsProcedure = "/antclaw.v1.SignalsService/ListCalibrations"
 )
 
 // SignalsServiceClient is a client for the antclaw.v1.SignalsService service.
@@ -92,6 +101,12 @@ type SignalsServiceClient interface {
 	GetBriefing(context.Context, *connect.Request[v1.GetBriefingRequest]) (*connect.Response[v1.GetBriefingResponse], error)
 	// Get market outlook
 	GetOutlook(context.Context, *connect.Request[v1.GetOutlookRequest]) (*connect.Response[v1.GetOutlookResponse], error)
+	// M-C: 拟合并入库 Platt / Isotonic 校准模型。
+	FitCalibration(context.Context, *connect.Request[v1.FitCalibrationRequest]) (*connect.Response[v1.FitCalibrationResponse], error)
+	// M-C: 把原始 raw_score 通过校准模型映射到 [0,1] 概率。
+	PredictCalibrated(context.Context, *connect.Request[v1.PredictCalibratedRequest]) (*connect.Response[v1.PredictCalibratedResponse], error)
+	// M-C: 列出已入库的校准模型与 Brier。
+	ListCalibrations(context.Context, *connect.Request[v1.ListCalibrationsRequest]) (*connect.Response[v1.ListCalibrationsResponse], error)
 }
 
 // NewSignalsServiceClient constructs a client for the antclaw.v1.SignalsService service. By
@@ -177,23 +192,44 @@ func NewSignalsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(signalsServiceMethods.ByName("GetOutlook")),
 			connect.WithClientOptions(opts...),
 		),
+		fitCalibration: connect.NewClient[v1.FitCalibrationRequest, v1.FitCalibrationResponse](
+			httpClient,
+			baseURL+SignalsServiceFitCalibrationProcedure,
+			connect.WithSchema(signalsServiceMethods.ByName("FitCalibration")),
+			connect.WithClientOptions(opts...),
+		),
+		predictCalibrated: connect.NewClient[v1.PredictCalibratedRequest, v1.PredictCalibratedResponse](
+			httpClient,
+			baseURL+SignalsServicePredictCalibratedProcedure,
+			connect.WithSchema(signalsServiceMethods.ByName("PredictCalibrated")),
+			connect.WithClientOptions(opts...),
+		),
+		listCalibrations: connect.NewClient[v1.ListCalibrationsRequest, v1.ListCalibrationsResponse](
+			httpClient,
+			baseURL+SignalsServiceListCalibrationsProcedure,
+			connect.WithSchema(signalsServiceMethods.ByName("ListCalibrations")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // signalsServiceClient implements SignalsServiceClient.
 type signalsServiceClient struct {
-	getBias        *connect.Client[v1.GetBiasRequest, v1.GetBiasResponse]
-	getRank        *connect.Client[v1.GetRankRequest, v1.GetRankResponse]
-	getXFactors    *connect.Client[v1.GetXFactorsRequest, v1.GetXFactorsResponse]
-	getRadar       *connect.Client[v1.GetRadarRequest, v1.GetRadarResponse]
-	getIntensity   *connect.Client[v1.GetIntensityRequest, v1.GetIntensityResponse]
-	getTransition  *connect.Client[v1.GetTransitionRequest, v1.GetTransitionResponse]
-	getCryptoAlpha *connect.Client[v1.GetCryptoAlphaRequest, v1.GetCryptoAlphaResponse]
-	getUnified     *connect.Client[v1.GetUnifiedRequest, v1.GetUnifiedResponse]
-	getQuant       *connect.Client[v1.GetQuantRequest, v1.GetQuantResponse]
-	getCta         *connect.Client[v1.GetCtaRequest, v1.GetCtaResponse]
-	getBriefing    *connect.Client[v1.GetBriefingRequest, v1.GetBriefingResponse]
-	getOutlook     *connect.Client[v1.GetOutlookRequest, v1.GetOutlookResponse]
+	getBias           *connect.Client[v1.GetBiasRequest, v1.GetBiasResponse]
+	getRank           *connect.Client[v1.GetRankRequest, v1.GetRankResponse]
+	getXFactors       *connect.Client[v1.GetXFactorsRequest, v1.GetXFactorsResponse]
+	getRadar          *connect.Client[v1.GetRadarRequest, v1.GetRadarResponse]
+	getIntensity      *connect.Client[v1.GetIntensityRequest, v1.GetIntensityResponse]
+	getTransition     *connect.Client[v1.GetTransitionRequest, v1.GetTransitionResponse]
+	getCryptoAlpha    *connect.Client[v1.GetCryptoAlphaRequest, v1.GetCryptoAlphaResponse]
+	getUnified        *connect.Client[v1.GetUnifiedRequest, v1.GetUnifiedResponse]
+	getQuant          *connect.Client[v1.GetQuantRequest, v1.GetQuantResponse]
+	getCta            *connect.Client[v1.GetCtaRequest, v1.GetCtaResponse]
+	getBriefing       *connect.Client[v1.GetBriefingRequest, v1.GetBriefingResponse]
+	getOutlook        *connect.Client[v1.GetOutlookRequest, v1.GetOutlookResponse]
+	fitCalibration    *connect.Client[v1.FitCalibrationRequest, v1.FitCalibrationResponse]
+	predictCalibrated *connect.Client[v1.PredictCalibratedRequest, v1.PredictCalibratedResponse]
+	listCalibrations  *connect.Client[v1.ListCalibrationsRequest, v1.ListCalibrationsResponse]
 }
 
 // GetBias calls antclaw.v1.SignalsService.GetBias.
@@ -256,6 +292,21 @@ func (c *signalsServiceClient) GetOutlook(ctx context.Context, req *connect.Requ
 	return c.getOutlook.CallUnary(ctx, req)
 }
 
+// FitCalibration calls antclaw.v1.SignalsService.FitCalibration.
+func (c *signalsServiceClient) FitCalibration(ctx context.Context, req *connect.Request[v1.FitCalibrationRequest]) (*connect.Response[v1.FitCalibrationResponse], error) {
+	return c.fitCalibration.CallUnary(ctx, req)
+}
+
+// PredictCalibrated calls antclaw.v1.SignalsService.PredictCalibrated.
+func (c *signalsServiceClient) PredictCalibrated(ctx context.Context, req *connect.Request[v1.PredictCalibratedRequest]) (*connect.Response[v1.PredictCalibratedResponse], error) {
+	return c.predictCalibrated.CallUnary(ctx, req)
+}
+
+// ListCalibrations calls antclaw.v1.SignalsService.ListCalibrations.
+func (c *signalsServiceClient) ListCalibrations(ctx context.Context, req *connect.Request[v1.ListCalibrationsRequest]) (*connect.Response[v1.ListCalibrationsResponse], error) {
+	return c.listCalibrations.CallUnary(ctx, req)
+}
+
 // SignalsServiceHandler is an implementation of the antclaw.v1.SignalsService service.
 type SignalsServiceHandler interface {
 	// Get directional bias
@@ -282,6 +333,12 @@ type SignalsServiceHandler interface {
 	GetBriefing(context.Context, *connect.Request[v1.GetBriefingRequest]) (*connect.Response[v1.GetBriefingResponse], error)
 	// Get market outlook
 	GetOutlook(context.Context, *connect.Request[v1.GetOutlookRequest]) (*connect.Response[v1.GetOutlookResponse], error)
+	// M-C: 拟合并入库 Platt / Isotonic 校准模型。
+	FitCalibration(context.Context, *connect.Request[v1.FitCalibrationRequest]) (*connect.Response[v1.FitCalibrationResponse], error)
+	// M-C: 把原始 raw_score 通过校准模型映射到 [0,1] 概率。
+	PredictCalibrated(context.Context, *connect.Request[v1.PredictCalibratedRequest]) (*connect.Response[v1.PredictCalibratedResponse], error)
+	// M-C: 列出已入库的校准模型与 Brier。
+	ListCalibrations(context.Context, *connect.Request[v1.ListCalibrationsRequest]) (*connect.Response[v1.ListCalibrationsResponse], error)
 }
 
 // NewSignalsServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -363,6 +420,24 @@ func NewSignalsServiceHandler(svc SignalsServiceHandler, opts ...connect.Handler
 		connect.WithSchema(signalsServiceMethods.ByName("GetOutlook")),
 		connect.WithHandlerOptions(opts...),
 	)
+	signalsServiceFitCalibrationHandler := connect.NewUnaryHandler(
+		SignalsServiceFitCalibrationProcedure,
+		svc.FitCalibration,
+		connect.WithSchema(signalsServiceMethods.ByName("FitCalibration")),
+		connect.WithHandlerOptions(opts...),
+	)
+	signalsServicePredictCalibratedHandler := connect.NewUnaryHandler(
+		SignalsServicePredictCalibratedProcedure,
+		svc.PredictCalibrated,
+		connect.WithSchema(signalsServiceMethods.ByName("PredictCalibrated")),
+		connect.WithHandlerOptions(opts...),
+	)
+	signalsServiceListCalibrationsHandler := connect.NewUnaryHandler(
+		SignalsServiceListCalibrationsProcedure,
+		svc.ListCalibrations,
+		connect.WithSchema(signalsServiceMethods.ByName("ListCalibrations")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.SignalsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SignalsServiceGetBiasProcedure:
@@ -389,6 +464,12 @@ func NewSignalsServiceHandler(svc SignalsServiceHandler, opts ...connect.Handler
 			signalsServiceGetBriefingHandler.ServeHTTP(w, r)
 		case SignalsServiceGetOutlookProcedure:
 			signalsServiceGetOutlookHandler.ServeHTTP(w, r)
+		case SignalsServiceFitCalibrationProcedure:
+			signalsServiceFitCalibrationHandler.ServeHTTP(w, r)
+		case SignalsServicePredictCalibratedProcedure:
+			signalsServicePredictCalibratedHandler.ServeHTTP(w, r)
+		case SignalsServiceListCalibrationsProcedure:
+			signalsServiceListCalibrationsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -444,4 +525,16 @@ func (UnimplementedSignalsServiceHandler) GetBriefing(context.Context, *connect.
 
 func (UnimplementedSignalsServiceHandler) GetOutlook(context.Context, *connect.Request[v1.GetOutlookRequest]) (*connect.Response[v1.GetOutlookResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SignalsService.GetOutlook is not implemented"))
+}
+
+func (UnimplementedSignalsServiceHandler) FitCalibration(context.Context, *connect.Request[v1.FitCalibrationRequest]) (*connect.Response[v1.FitCalibrationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SignalsService.FitCalibration is not implemented"))
+}
+
+func (UnimplementedSignalsServiceHandler) PredictCalibrated(context.Context, *connect.Request[v1.PredictCalibratedRequest]) (*connect.Response[v1.PredictCalibratedResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SignalsService.PredictCalibrated is not implemented"))
+}
+
+func (UnimplementedSignalsServiceHandler) ListCalibrations(context.Context, *connect.Request[v1.ListCalibrationsRequest]) (*connect.Response[v1.ListCalibrationsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SignalsService.ListCalibrations is not implemented"))
 }

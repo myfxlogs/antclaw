@@ -42,6 +42,15 @@ service SignalsService {
 
   // Get market outlook
   rpc GetOutlook(GetOutlookRequest) returns (GetOutlookResponse);
+
+  // M-C: 拟合并入库 Platt / Isotonic 校准模型。
+  rpc FitCalibration(FitCalibrationRequest) returns (FitCalibrationResponse);
+
+  // M-C: 把原始 raw_score 通过校准模型映射到 [0,1] 概率。
+  rpc PredictCalibrated(PredictCalibratedRequest) returns (PredictCalibratedResponse);
+
+  // M-C: 列出已入库的校准模型与 Brier。
+  rpc ListCalibrations(ListCalibrationsRequest) returns (ListCalibrationsResponse);
 }
 
 // Bias data
@@ -265,4 +274,46 @@ message GetOutlookRequest {
 // GetOutlook response
 message GetOutlookResponse {
   repeated OutlookData outlooks = 1;
+}
+
+// ============================================================
+// M-C 校准
+// ============================================================
+
+message FitCalibrationRequest {
+  string model_id = 1;       // 自定义标识
+  string type = 2;           // 'platt' / 'isotonic'
+  repeated double scores = 3;
+  repeated bool outcomes = 4;
+}
+
+message FitCalibrationResponse {
+  string model_id = 1;
+  string type = 2;
+  int32 n_samples = 3;
+  double brier = 4;
+}
+
+message PredictCalibratedRequest {
+  string model_id = 1;
+  double score = 2;
+}
+
+message PredictCalibratedResponse {
+  string model_id = 1;
+  double calibrated = 2;
+}
+
+message ListCalibrationsRequest {}
+
+message CalibrationSummary {
+  string model_id = 1;
+  string type = 2;
+  int32 n_samples = 3;
+  double brier = 4;
+  string fitted_at = 5;
+}
+
+message ListCalibrationsResponse {
+  repeated CalibrationSummary items = 1;
 }

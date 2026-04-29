@@ -37,6 +37,8 @@ type Config struct {
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 	UpdatedBy      string    `json:"updated_by"`
+	DocsURL        string    `json:"docs_url"`
+	ApplyURL       string    `json:"apply_url"`
 }
 
 // Service provides CRUD for system AI configs.
@@ -55,7 +57,8 @@ func (s *Service) List(ctx context.Context) ([]Config, error) {
 	rows, err := s.pool.Query(ctx, `
 		SELECT provider_id, name, base_url, organization, models, default_model,
 		       temperature, timeout_seconds, max_tokens, purposes, primary_for,
-		       enabled, has_secret, created_at, updated_at, updated_by
+		       enabled, has_secret, created_at, updated_at, updated_by,
+		       COALESCE(docs_url,''), COALESCE(apply_url,'')
 		FROM system_ai_configs ORDER BY provider_id`)
 	if err != nil {
 		return nil, err
@@ -67,7 +70,8 @@ func (s *Service) List(ctx context.Context) ([]Config, error) {
 		var c Config
 		err := rows.Scan(&c.ProviderID, &c.Name, &c.BaseURL, &c.Organization, &c.Models, &c.DefaultModel,
 			&c.Temperature, &c.TimeoutSeconds, &c.MaxTokens, &c.Purposes, &c.PrimaryFor,
-			&c.Enabled, &c.HasSecret, &c.CreatedAt, &c.UpdatedAt, &c.UpdatedBy)
+			&c.Enabled, &c.HasSecret, &c.CreatedAt, &c.UpdatedAt, &c.UpdatedBy,
+			&c.DocsURL, &c.ApplyURL)
 		if err != nil {
 			continue
 		}
@@ -82,11 +86,13 @@ func (s *Service) Get(ctx context.Context, providerID string) (*Config, error) {
 	err := s.pool.QueryRow(ctx, `
 		SELECT provider_id, name, base_url, organization, models, default_model,
 		       temperature, timeout_seconds, max_tokens, purposes, primary_for,
-		       enabled, has_secret, created_at, updated_at, updated_by
+		       enabled, has_secret, created_at, updated_at, updated_by,
+		       COALESCE(docs_url,''), COALESCE(apply_url,'')
 		FROM system_ai_configs WHERE provider_id = $1`, providerID).Scan(
 		&c.ProviderID, &c.Name, &c.BaseURL, &c.Organization, &c.Models, &c.DefaultModel,
 		&c.Temperature, &c.TimeoutSeconds, &c.MaxTokens, &c.Purposes, &c.PrimaryFor,
-		&c.Enabled, &c.HasSecret, &c.CreatedAt, &c.UpdatedAt, &c.UpdatedBy)
+		&c.Enabled, &c.HasSecret, &c.CreatedAt, &c.UpdatedAt, &c.UpdatedBy,
+		&c.DocsURL, &c.ApplyURL)
 	if err != nil {
 		return nil, err
 	}
@@ -217,17 +223,15 @@ func (s *Service) DiscoverModels(ctx context.Context, providerID string) ([]stri
 }
 
 func fetchModelsPage(ctx context.Context, baseURL, secret, after string) ([]string, string, bool, error) {
-	values := neturl.Values{}
-	values.Set("limit", "100")
-	// Be liberal in what we accept: some providers use page_size or size
-	values.Set("page_size", "100")
-	values.Set("size", "100")
-	if after != "" {
-		values.Set("after", after)
-	}
+	// OpenAI /v1/models 规范上不接受 limit/page_size/size 等分页参数；
+	// Gemini 的 OpenAI 兼容端点（generativelanguage.googleapis.com/v1beta/openai）
+	// 对未知参数会直接 400 INVALID_ARGUMENT。因此默认不发送分页参数。
+	// 仅在分页继续场景下传 `after`（如厂商显式返回 has_more=true + next）。
 	modelsURL := baseURL + "/models"
-	if encoded := values.Encode(); encoded != "" {
-		modelsURL += "?" + encoded
+	if after != "" {
+		values := neturl.Values{}
+		values.Set("after", after)
+		modelsURL += "?" + values.Encode()
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, modelsURL, nil)

@@ -1,5 +1,10 @@
 # AntClaw 对 ARK Intelligent 的全面替代 · 差距清单
 
+> **2026-04-29 状态摘要**：阶段 0~6 后端工作基本完成，E2E 18 SC 场景 16/18 PASS（88.9%），完整状态见 `docs/AntClaw-100替代验收报告.md`。
+> 仍待完成：13 个前端 `features/*` 模块、`service/sentiment / ta / price` 中余下 `randFloat()=0.5` 兜底替换、Insider/CryptoSocial/MOVE 真端点、AI 凭据余额充值（SC-15/16）。
+> 后端真数据已落地：Treasury 收益率曲线、WorldBank GDP、Deribit GEX/IV/Skew/DVOL、CBOE VIX、CFTC COT 312 条、CoinGecko Onchain 465 条、price_daily 3584 条、SEC EDGAR、DefiLlama TVL、FedWatch、BIS/IMF/ECB/Eurostat/OECD/SNB/DTCC、Finviz（firecrawl）、Walk-Forward（SMA crossover real）。
+
+
 > 目标：AntClaw 100% 替代 `Emulator/ark-intelligent`，业务能力**零回退**。
 > 范围：业务能力 + 数据源接入 + 出口协议合规性。
 > 出口协议硬约束：**所有对外接口必须使用 Connect-RPC / gRPC / SSE**，禁用轮询、WebSocket、REST。

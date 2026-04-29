@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// NotificationService —— 用户面通知 RPC：
+//   - 列表（未读 / 历史）/ 计数 / 标记已读
+//   - 偏好设置（类型白名单、最低严重度、静默时段）
+//
+// 实时推送通过 SSE 端点 GET /sse/notifications 完成（Cookie/Bearer 鉴权）。
+service NotificationService {
+  rpc ListUnread(ListUnreadRequest) returns (ListUnreadResponse);
+  rpc ListHistory(ListHistoryRequest) returns (ListHistoryResponse);
+  rpc UnreadCount(UnreadCountRequest) returns (UnreadCountResponse);
+  rpc MarkRead(MarkReadRequest) returns (MarkReadResponse);
+  rpc MarkAllRead(MarkAllReadRequest) returns (MarkAllReadResponse);
+
+  rpc GetPrefs(GetPrefsRequest) returns (NotificationPrefs);
+  rpc UpdatePrefs(NotificationPrefs) returns (NotificationPrefs);
+}
+
+message Notification {
+  string id          = 1;
+  string user_id     = 2;
+  string type        = 3;   // in_app / email / push
+  string category    = 4;   // alert / signal / system / digest
+  string severity    = 5;   // low / normal / high / critical
+  string title       = 6;
+  string body        = 7;
+  map<string, string> data = 8;
+  bool   is_read     = 9;
+  int64  created_at  = 10;  // unix seconds
+  int64  read_at     = 11;  // unix seconds，未读为 0
+}
+
+message NotificationPrefs {
+  repeated string enabled_types = 1; // 见 Notification.category 取值
+  string min_severity = 2;
+  string quiet_start  = 3;           // "HH:MM"，与 quiet_end 相等表示不静默
+  string quiet_end    = 4;
+  string timezone     = 5;           // IANA tz，如 "Asia/Shanghai"
+  bool   push_enabled = 6;
+  bool   email_enabled = 7;
+}
+
+message ListUnreadRequest  { int32 limit = 1; }
+message ListUnreadResponse { repeated Notification items = 1; }
+
+message ListHistoryRequest  { int32 limit = 1; }
+message ListHistoryResponse { repeated Notification items = 1; }
+
+message UnreadCountRequest  {}
+message UnreadCountResponse { int64 count = 1; }
+
+message MarkReadRequest    { string id = 1; }
+message MarkReadResponse   {}
+
+message MarkAllReadRequest {}
+message MarkAllReadResponse { int64 marked = 1; }
+
+message GetPrefsRequest    {}

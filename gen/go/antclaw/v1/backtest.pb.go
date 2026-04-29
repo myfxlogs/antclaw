@@ -1812,6 +1812,668 @@ func (x *RunBootstrapResponse) GetIterations() int32 {
 	return 0
 }
 
+type RunMonteCarloRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pair          string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Timeframe     string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"`
+	Paths         int32                  `protobuf:"varint,3,opt,name=paths,proto3" json:"paths,omitempty"`                                // 默认 1000；上限 10000
+	HorizonBars   int32                  `protobuf:"varint,4,opt,name=horizon_bars,json=horizonBars,proto3" json:"horizon_bars,omitempty"` // 默认 20
+	RandomSeed    uint64                 `protobuf:"varint,5,opt,name=random_seed,json=randomSeed,proto3" json:"random_seed,omitempty"`
+	Lookback      int32                  `protobuf:"varint,6,opt,name=lookback,proto3" json:"lookback,omitempty"` // 用于 GARCH 拟合的历史长度，默认 500
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RunMonteCarloRequest) Reset() {
+	*x = RunMonteCarloRequest{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RunMonteCarloRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RunMonteCarloRequest) ProtoMessage() {}
+
+func (x *RunMonteCarloRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RunMonteCarloRequest.ProtoReflect.Descriptor instead.
+func (*RunMonteCarloRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *RunMonteCarloRequest) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *RunMonteCarloRequest) GetTimeframe() string {
+	if x != nil {
+		return x.Timeframe
+	}
+	return ""
+}
+
+func (x *RunMonteCarloRequest) GetPaths() int32 {
+	if x != nil {
+		return x.Paths
+	}
+	return 0
+}
+
+func (x *RunMonteCarloRequest) GetHorizonBars() int32 {
+	if x != nil {
+		return x.HorizonBars
+	}
+	return 0
+}
+
+func (x *RunMonteCarloRequest) GetRandomSeed() uint64 {
+	if x != nil {
+		return x.RandomSeed
+	}
+	return 0
+}
+
+func (x *RunMonteCarloRequest) GetLookback() int32 {
+	if x != nil {
+		return x.Lookback
+	}
+	return 0
+}
+
+type MCPath struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 中位数路径 / 上下分位数路径（为减小 payload 不返回所有路径）。
+	Label         string    `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"` // p05 / p50 / p95
+	Values        []float64 `protobuf:"fixed64,2,rep,packed,name=values,proto3" json:"values,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MCPath) Reset() {
+	*x = MCPath{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MCPath) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MCPath) ProtoMessage() {}
+
+func (x *MCPath) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MCPath.ProtoReflect.Descriptor instead.
+func (*MCPath) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *MCPath) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *MCPath) GetValues() []float64 {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
+type RunMonteCarloResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pair          string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Paths         int32                  `protobuf:"varint,2,opt,name=paths,proto3" json:"paths,omitempty"`
+	HorizonBars   int32                  `protobuf:"varint,3,opt,name=horizon_bars,json=horizonBars,proto3" json:"horizon_bars,omitempty"`
+	TerminalP05   float64                `protobuf:"fixed64,4,opt,name=terminal_p05,json=terminalP05,proto3" json:"terminal_p05,omitempty"`
+	TerminalP50   float64                `protobuf:"fixed64,5,opt,name=terminal_p50,json=terminalP50,proto3" json:"terminal_p50,omitempty"`
+	TerminalP95   float64                `protobuf:"fixed64,6,opt,name=terminal_p95,json=terminalP95,proto3" json:"terminal_p95,omitempty"`
+	QuantilePaths []*MCPath              `protobuf:"bytes,7,rep,name=quantile_paths,json=quantilePaths,proto3" json:"quantile_paths,omitempty"`
+	// GARCH 拟合参数（透明可审）
+	GarchOmega    float64 `protobuf:"fixed64,8,opt,name=garch_omega,json=garchOmega,proto3" json:"garch_omega,omitempty"`
+	GarchAlpha    float64 `protobuf:"fixed64,9,opt,name=garch_alpha,json=garchAlpha,proto3" json:"garch_alpha,omitempty"`
+	GarchBeta     float64 `protobuf:"fixed64,10,opt,name=garch_beta,json=garchBeta,proto3" json:"garch_beta,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RunMonteCarloResponse) Reset() {
+	*x = RunMonteCarloResponse{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RunMonteCarloResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RunMonteCarloResponse) ProtoMessage() {}
+
+func (x *RunMonteCarloResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RunMonteCarloResponse.ProtoReflect.Descriptor instead.
+func (*RunMonteCarloResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *RunMonteCarloResponse) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *RunMonteCarloResponse) GetPaths() int32 {
+	if x != nil {
+		return x.Paths
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetHorizonBars() int32 {
+	if x != nil {
+		return x.HorizonBars
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetTerminalP05() float64 {
+	if x != nil {
+		return x.TerminalP05
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetTerminalP50() float64 {
+	if x != nil {
+		return x.TerminalP50
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetTerminalP95() float64 {
+	if x != nil {
+		return x.TerminalP95
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetQuantilePaths() []*MCPath {
+	if x != nil {
+		return x.QuantilePaths
+	}
+	return nil
+}
+
+func (x *RunMonteCarloResponse) GetGarchOmega() float64 {
+	if x != nil {
+		return x.GarchOmega
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetGarchAlpha() float64 {
+	if x != nil {
+		return x.GarchAlpha
+	}
+	return 0
+}
+
+func (x *RunMonteCarloResponse) GetGarchBeta() float64 {
+	if x != nil {
+		return x.GarchBeta
+	}
+	return 0
+}
+
+type GetTradesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTradesRequest) Reset() {
+	*x = GetTradesRequest{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTradesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTradesRequest) ProtoMessage() {}
+
+func (x *GetTradesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTradesRequest.ProtoReflect.Descriptor instead.
+func (*GetTradesRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *GetTradesRequest) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+type TradeDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Seq           int32                  `protobuf:"varint,1,opt,name=seq,proto3" json:"seq,omitempty"`
+	OpenedAt      string                 `protobuf:"bytes,2,opt,name=opened_at,json=openedAt,proto3" json:"opened_at,omitempty"`
+	ClosedAt      string                 `protobuf:"bytes,3,opt,name=closed_at,json=closedAt,proto3" json:"closed_at,omitempty"`
+	Side          string                 `protobuf:"bytes,4,opt,name=side,proto3" json:"side,omitempty"` // long / short
+	Entry         float64                `protobuf:"fixed64,5,opt,name=entry,proto3" json:"entry,omitempty"`
+	Exit          float64                `protobuf:"fixed64,6,opt,name=exit,proto3" json:"exit,omitempty"`
+	Pnl           float64                `protobuf:"fixed64,7,opt,name=pnl,proto3" json:"pnl,omitempty"`
+	PnlPct        float64                `protobuf:"fixed64,8,opt,name=pnl_pct,json=pnlPct,proto3" json:"pnl_pct,omitempty"`
+	Mfe           float64                `protobuf:"fixed64,9,opt,name=mfe,proto3" json:"mfe,omitempty"`      // max favorable excursion
+	Mae           float64                `protobuf:"fixed64,10,opt,name=mae,proto3" json:"mae,omitempty"`     // max adverse excursion
+	Cost          float64                `protobuf:"fixed64,11,opt,name=cost,proto3" json:"cost,omitempty"`   // total transaction cost
+	Regime        string                 `protobuf:"bytes,12,opt,name=regime,proto3" json:"regime,omitempty"` // 当时所处状态（可空）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TradeDetail) Reset() {
+	*x = TradeDetail{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TradeDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TradeDetail) ProtoMessage() {}
+
+func (x *TradeDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TradeDetail.ProtoReflect.Descriptor instead.
+func (*TradeDetail) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *TradeDetail) GetSeq() int32 {
+	if x != nil {
+		return x.Seq
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetOpenedAt() string {
+	if x != nil {
+		return x.OpenedAt
+	}
+	return ""
+}
+
+func (x *TradeDetail) GetClosedAt() string {
+	if x != nil {
+		return x.ClosedAt
+	}
+	return ""
+}
+
+func (x *TradeDetail) GetSide() string {
+	if x != nil {
+		return x.Side
+	}
+	return ""
+}
+
+func (x *TradeDetail) GetEntry() float64 {
+	if x != nil {
+		return x.Entry
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetExit() float64 {
+	if x != nil {
+		return x.Exit
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetPnl() float64 {
+	if x != nil {
+		return x.Pnl
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetPnlPct() float64 {
+	if x != nil {
+		return x.PnlPct
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetMfe() float64 {
+	if x != nil {
+		return x.Mfe
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetMae() float64 {
+	if x != nil {
+		return x.Mae
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetCost() float64 {
+	if x != nil {
+		return x.Cost
+	}
+	return 0
+}
+
+func (x *TradeDetail) GetRegime() string {
+	if x != nil {
+		return x.Regime
+	}
+	return ""
+}
+
+type GetTradesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Trades        []*TradeDetail         `protobuf:"bytes,2,rep,name=trades,proto3" json:"trades,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTradesResponse) Reset() {
+	*x = GetTradesResponse{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTradesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTradesResponse) ProtoMessage() {}
+
+func (x *GetTradesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTradesResponse.ProtoReflect.Descriptor instead.
+func (*GetTradesResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *GetTradesResponse) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *GetTradesResponse) GetTrades() []*TradeDetail {
+	if x != nil {
+		return x.Trades
+	}
+	return nil
+}
+
+type GetMetricsByRegimeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMetricsByRegimeRequest) Reset() {
+	*x = GetMetricsByRegimeRequest{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMetricsByRegimeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMetricsByRegimeRequest) ProtoMessage() {}
+
+func (x *GetMetricsByRegimeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMetricsByRegimeRequest.ProtoReflect.Descriptor instead.
+func (*GetMetricsByRegimeRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *GetMetricsByRegimeRequest) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+type RegimeMetrics struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Regime        string                 `protobuf:"bytes,1,opt,name=regime,proto3" json:"regime,omitempty"`
+	NTrades       int32                  `protobuf:"varint,2,opt,name=n_trades,json=nTrades,proto3" json:"n_trades,omitempty"`
+	Sharpe        float64                `protobuf:"fixed64,3,opt,name=sharpe,proto3" json:"sharpe,omitempty"`
+	Sortino       float64                `protobuf:"fixed64,4,opt,name=sortino,proto3" json:"sortino,omitempty"`
+	MaxDrawdown   float64                `protobuf:"fixed64,5,opt,name=max_drawdown,json=maxDrawdown,proto3" json:"max_drawdown,omitempty"`
+	WinRate       float64                `protobuf:"fixed64,6,opt,name=win_rate,json=winRate,proto3" json:"win_rate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegimeMetrics) Reset() {
+	*x = RegimeMetrics{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegimeMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegimeMetrics) ProtoMessage() {}
+
+func (x *RegimeMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegimeMetrics.ProtoReflect.Descriptor instead.
+func (*RegimeMetrics) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *RegimeMetrics) GetRegime() string {
+	if x != nil {
+		return x.Regime
+	}
+	return ""
+}
+
+func (x *RegimeMetrics) GetNTrades() int32 {
+	if x != nil {
+		return x.NTrades
+	}
+	return 0
+}
+
+func (x *RegimeMetrics) GetSharpe() float64 {
+	if x != nil {
+		return x.Sharpe
+	}
+	return 0
+}
+
+func (x *RegimeMetrics) GetSortino() float64 {
+	if x != nil {
+		return x.Sortino
+	}
+	return 0
+}
+
+func (x *RegimeMetrics) GetMaxDrawdown() float64 {
+	if x != nil {
+		return x.MaxDrawdown
+	}
+	return 0
+}
+
+func (x *RegimeMetrics) GetWinRate() float64 {
+	if x != nil {
+		return x.WinRate
+	}
+	return 0
+}
+
+type GetMetricsByRegimeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Metrics       []*RegimeMetrics       `protobuf:"bytes,2,rep,name=metrics,proto3" json:"metrics,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMetricsByRegimeResponse) Reset() {
+	*x = GetMetricsByRegimeResponse{}
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMetricsByRegimeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMetricsByRegimeResponse) ProtoMessage() {}
+
+func (x *GetMetricsByRegimeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_backtest_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMetricsByRegimeResponse.ProtoReflect.Descriptor instead.
+func (*GetMetricsByRegimeResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_backtest_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *GetMetricsByRegimeResponse) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *GetMetricsByRegimeResponse) GetMetrics() []*RegimeMetrics {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
 var File_antclaw_v1_backtest_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_backtest_proto_rawDesc = "" +
@@ -1972,7 +2634,64 @@ const file_antclaw_v1_backtest_proto_rawDesc = "" +
 	"\tmaxdd_p95\x18\x06 \x01(\x01R\bmaxddP95\x12\x1e\n" +
 	"\n" +
 	"iterations\x18\a \x01(\x05R\n" +
-	"iterations2\xf0\x05\n" +
+	"iterations\"\xbe\x01\n" +
+	"\x14RunMonteCarloRequest\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x1c\n" +
+	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\x12\x14\n" +
+	"\x05paths\x18\x03 \x01(\x05R\x05paths\x12!\n" +
+	"\fhorizon_bars\x18\x04 \x01(\x05R\vhorizonBars\x12\x1f\n" +
+	"\vrandom_seed\x18\x05 \x01(\x04R\n" +
+	"randomSeed\x12\x1a\n" +
+	"\blookback\x18\x06 \x01(\x05R\blookback\"6\n" +
+	"\x06MCPath\x12\x14\n" +
+	"\x05label\x18\x01 \x01(\tR\x05label\x12\x16\n" +
+	"\x06values\x18\x02 \x03(\x01R\x06values\"\xe9\x02\n" +
+	"\x15RunMonteCarloResponse\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x14\n" +
+	"\x05paths\x18\x02 \x01(\x05R\x05paths\x12!\n" +
+	"\fhorizon_bars\x18\x03 \x01(\x05R\vhorizonBars\x12!\n" +
+	"\fterminal_p05\x18\x04 \x01(\x01R\vterminalP05\x12!\n" +
+	"\fterminal_p50\x18\x05 \x01(\x01R\vterminalP50\x12!\n" +
+	"\fterminal_p95\x18\x06 \x01(\x01R\vterminalP95\x129\n" +
+	"\x0equantile_paths\x18\a \x03(\v2\x12.antclaw.v1.MCPathR\rquantilePaths\x12\x1f\n" +
+	"\vgarch_omega\x18\b \x01(\x01R\n" +
+	"garchOmega\x12\x1f\n" +
+	"\vgarch_alpha\x18\t \x01(\x01R\n" +
+	"garchAlpha\x12\x1d\n" +
+	"\n" +
+	"garch_beta\x18\n" +
+	" \x01(\x01R\tgarchBeta\")\n" +
+	"\x10GetTradesRequest\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"\x92\x02\n" +
+	"\vTradeDetail\x12\x10\n" +
+	"\x03seq\x18\x01 \x01(\x05R\x03seq\x12\x1b\n" +
+	"\topened_at\x18\x02 \x01(\tR\bopenedAt\x12\x1b\n" +
+	"\tclosed_at\x18\x03 \x01(\tR\bclosedAt\x12\x12\n" +
+	"\x04side\x18\x04 \x01(\tR\x04side\x12\x14\n" +
+	"\x05entry\x18\x05 \x01(\x01R\x05entry\x12\x12\n" +
+	"\x04exit\x18\x06 \x01(\x01R\x04exit\x12\x10\n" +
+	"\x03pnl\x18\a \x01(\x01R\x03pnl\x12\x17\n" +
+	"\apnl_pct\x18\b \x01(\x01R\x06pnlPct\x12\x10\n" +
+	"\x03mfe\x18\t \x01(\x01R\x03mfe\x12\x10\n" +
+	"\x03mae\x18\n" +
+	" \x01(\x01R\x03mae\x12\x12\n" +
+	"\x04cost\x18\v \x01(\x01R\x04cost\x12\x16\n" +
+	"\x06regime\x18\f \x01(\tR\x06regime\"[\n" +
+	"\x11GetTradesResponse\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12/\n" +
+	"\x06trades\x18\x02 \x03(\v2\x17.antclaw.v1.TradeDetailR\x06trades\"2\n" +
+	"\x19GetMetricsByRegimeRequest\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"\xb2\x01\n" +
+	"\rRegimeMetrics\x12\x16\n" +
+	"\x06regime\x18\x01 \x01(\tR\x06regime\x12\x19\n" +
+	"\bn_trades\x18\x02 \x01(\x05R\anTrades\x12\x16\n" +
+	"\x06sharpe\x18\x03 \x01(\x01R\x06sharpe\x12\x18\n" +
+	"\asortino\x18\x04 \x01(\x01R\asortino\x12!\n" +
+	"\fmax_drawdown\x18\x05 \x01(\x01R\vmaxDrawdown\x12\x19\n" +
+	"\bwin_rate\x18\x06 \x01(\x01R\awinRate\"h\n" +
+	"\x1aGetMetricsByRegimeResponse\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x123\n" +
+	"\ametrics\x18\x02 \x03(\v2\x19.antclaw.v1.RegimeMetricsR\ametrics2\xf5\a\n" +
 	"\x0fBacktestService\x12N\n" +
 	"\vRunBacktest\x12\x1e.antclaw.v1.RunBacktestRequest\x1a\x1f.antclaw.v1.RunBacktestResponse\x12N\n" +
 	"\vGetBacktest\x12\x1e.antclaw.v1.GetBacktestRequest\x1a\x1f.antclaw.v1.GetBacktestResponse\x12N\n" +
@@ -1983,7 +2702,10 @@ const file_antclaw_v1_backtest_proto_rawDesc = "" +
 	"\bRunCtaBt\x12\x1b.antclaw.v1.RunCtaBtRequest\x1a\x1c.antclaw.v1.RunCtaBtResponse\x12W\n" +
 	"\x0eRunWalkforward\x12!.antclaw.v1.RunWalkforwardRequest\x1a\".antclaw.v1.RunWalkforwardResponse\x12i\n" +
 	"\x14GetWalkforwardResult\x12'.antclaw.v1.GetWalkforwardResultRequest\x1a(.antclaw.v1.GetWalkforwardResultResponse\x12Q\n" +
-	"\fRunBootstrap\x12\x1f.antclaw.v1.RunBootstrapRequest\x1a .antclaw.v1.RunBootstrapResponseB\xa0\x01\n" +
+	"\fRunBootstrap\x12\x1f.antclaw.v1.RunBootstrapRequest\x1a .antclaw.v1.RunBootstrapResponse\x12T\n" +
+	"\rRunMonteCarlo\x12 .antclaw.v1.RunMonteCarloRequest\x1a!.antclaw.v1.RunMonteCarloResponse\x12H\n" +
+	"\tGetTrades\x12\x1c.antclaw.v1.GetTradesRequest\x1a\x1d.antclaw.v1.GetTradesResponse\x12c\n" +
+	"\x12GetMetricsByRegime\x12%.antclaw.v1.GetMetricsByRegimeRequest\x1a&.antclaw.v1.GetMetricsByRegimeResponseB\xa0\x01\n" +
 	"\x0ecom.antclaw.v1B\rBacktestProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -2000,7 +2722,7 @@ func file_antclaw_v1_backtest_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_backtest_proto_rawDescData
 }
 
-var file_antclaw_v1_backtest_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_antclaw_v1_backtest_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_antclaw_v1_backtest_proto_goTypes = []any{
 	(*BacktestConfig)(nil),               // 0: antclaw.v1.BacktestConfig
 	(*RunBacktestRequest)(nil),           // 1: antclaw.v1.RunBacktestRequest
@@ -2029,53 +2751,71 @@ var file_antclaw_v1_backtest_proto_goTypes = []any{
 	(*GetWalkforwardResultResponse)(nil), // 24: antclaw.v1.GetWalkforwardResultResponse
 	(*RunBootstrapRequest)(nil),          // 25: antclaw.v1.RunBootstrapRequest
 	(*RunBootstrapResponse)(nil),         // 26: antclaw.v1.RunBootstrapResponse
-	nil,                                  // 27: antclaw.v1.QuantBtConfig.ParamsEntry
-	nil,                                  // 28: antclaw.v1.RunWalkforwardRequest.ParamGridEntry
-	(*TimeRange)(nil),                    // 29: antclaw.v1.TimeRange
-	(*Money)(nil),                        // 30: antclaw.v1.Money
+	(*RunMonteCarloRequest)(nil),         // 27: antclaw.v1.RunMonteCarloRequest
+	(*MCPath)(nil),                       // 28: antclaw.v1.MCPath
+	(*RunMonteCarloResponse)(nil),        // 29: antclaw.v1.RunMonteCarloResponse
+	(*GetTradesRequest)(nil),             // 30: antclaw.v1.GetTradesRequest
+	(*TradeDetail)(nil),                  // 31: antclaw.v1.TradeDetail
+	(*GetTradesResponse)(nil),            // 32: antclaw.v1.GetTradesResponse
+	(*GetMetricsByRegimeRequest)(nil),    // 33: antclaw.v1.GetMetricsByRegimeRequest
+	(*RegimeMetrics)(nil),                // 34: antclaw.v1.RegimeMetrics
+	(*GetMetricsByRegimeResponse)(nil),   // 35: antclaw.v1.GetMetricsByRegimeResponse
+	nil,                                  // 36: antclaw.v1.QuantBtConfig.ParamsEntry
+	nil,                                  // 37: antclaw.v1.RunWalkforwardRequest.ParamGridEntry
+	(*TimeRange)(nil),                    // 38: antclaw.v1.TimeRange
+	(*Money)(nil),                        // 39: antclaw.v1.Money
 }
 var file_antclaw_v1_backtest_proto_depIdxs = []int32{
-	29, // 0: antclaw.v1.BacktestConfig.period:type_name -> antclaw.v1.TimeRange
-	30, // 1: antclaw.v1.BacktestConfig.initial_balance:type_name -> antclaw.v1.Money
+	38, // 0: antclaw.v1.BacktestConfig.period:type_name -> antclaw.v1.TimeRange
+	39, // 1: antclaw.v1.BacktestConfig.initial_balance:type_name -> antclaw.v1.Money
 	0,  // 2: antclaw.v1.RunBacktestRequest.config:type_name -> antclaw.v1.BacktestConfig
 	0,  // 3: antclaw.v1.GetBacktestResponse.config:type_name -> antclaw.v1.BacktestConfig
 	5,  // 4: antclaw.v1.GetBacktestResponse.metrics:type_name -> antclaw.v1.BacktestMetrics
 	4,  // 5: antclaw.v1.GetBacktestResponse.trades:type_name -> antclaw.v1.TradeRecord
-	29, // 6: antclaw.v1.GetAccuracyRequest.period:type_name -> antclaw.v1.TimeRange
+	38, // 6: antclaw.v1.GetAccuracyRequest.period:type_name -> antclaw.v1.TimeRange
 	8,  // 7: antclaw.v1.GetAccuracyResponse.metrics:type_name -> antclaw.v1.AccuracyMetrics
-	29, // 8: antclaw.v1.QuantBtConfig.period:type_name -> antclaw.v1.TimeRange
-	27, // 9: antclaw.v1.QuantBtConfig.params:type_name -> antclaw.v1.QuantBtConfig.ParamsEntry
+	38, // 8: antclaw.v1.QuantBtConfig.period:type_name -> antclaw.v1.TimeRange
+	36, // 9: antclaw.v1.QuantBtConfig.params:type_name -> antclaw.v1.QuantBtConfig.ParamsEntry
 	10, // 10: antclaw.v1.RunQuantBtRequest.config:type_name -> antclaw.v1.QuantBtConfig
-	29, // 11: antclaw.v1.VpBtConfig.period:type_name -> antclaw.v1.TimeRange
+	38, // 11: antclaw.v1.VpBtConfig.period:type_name -> antclaw.v1.TimeRange
 	13, // 12: antclaw.v1.RunVpBtRequest.config:type_name -> antclaw.v1.VpBtConfig
-	29, // 13: antclaw.v1.CtaBtConfig.period:type_name -> antclaw.v1.TimeRange
+	38, // 13: antclaw.v1.CtaBtConfig.period:type_name -> antclaw.v1.TimeRange
 	16, // 14: antclaw.v1.RunCtaBtRequest.config:type_name -> antclaw.v1.CtaBtConfig
-	28, // 15: antclaw.v1.RunWalkforwardRequest.param_grid:type_name -> antclaw.v1.RunWalkforwardRequest.ParamGridEntry
+	37, // 15: antclaw.v1.RunWalkforwardRequest.param_grid:type_name -> antclaw.v1.RunWalkforwardRequest.ParamGridEntry
 	22, // 16: antclaw.v1.GetWalkforwardResultResponse.folds:type_name -> antclaw.v1.WalkforwardFold
-	19, // 17: antclaw.v1.RunWalkforwardRequest.ParamGridEntry.value:type_name -> antclaw.v1.ParamRange
-	1,  // 18: antclaw.v1.BacktestService.RunBacktest:input_type -> antclaw.v1.RunBacktestRequest
-	3,  // 19: antclaw.v1.BacktestService.GetBacktest:input_type -> antclaw.v1.GetBacktestRequest
-	7,  // 20: antclaw.v1.BacktestService.GetAccuracy:input_type -> antclaw.v1.GetAccuracyRequest
-	11, // 21: antclaw.v1.BacktestService.RunQuantBt:input_type -> antclaw.v1.RunQuantBtRequest
-	14, // 22: antclaw.v1.BacktestService.RunVpBt:input_type -> antclaw.v1.RunVpBtRequest
-	17, // 23: antclaw.v1.BacktestService.RunCtaBt:input_type -> antclaw.v1.RunCtaBtRequest
-	20, // 24: antclaw.v1.BacktestService.RunWalkforward:input_type -> antclaw.v1.RunWalkforwardRequest
-	23, // 25: antclaw.v1.BacktestService.GetWalkforwardResult:input_type -> antclaw.v1.GetWalkforwardResultRequest
-	25, // 26: antclaw.v1.BacktestService.RunBootstrap:input_type -> antclaw.v1.RunBootstrapRequest
-	2,  // 27: antclaw.v1.BacktestService.RunBacktest:output_type -> antclaw.v1.RunBacktestResponse
-	6,  // 28: antclaw.v1.BacktestService.GetBacktest:output_type -> antclaw.v1.GetBacktestResponse
-	9,  // 29: antclaw.v1.BacktestService.GetAccuracy:output_type -> antclaw.v1.GetAccuracyResponse
-	12, // 30: antclaw.v1.BacktestService.RunQuantBt:output_type -> antclaw.v1.RunQuantBtResponse
-	15, // 31: antclaw.v1.BacktestService.RunVpBt:output_type -> antclaw.v1.RunVpBtResponse
-	18, // 32: antclaw.v1.BacktestService.RunCtaBt:output_type -> antclaw.v1.RunCtaBtResponse
-	21, // 33: antclaw.v1.BacktestService.RunWalkforward:output_type -> antclaw.v1.RunWalkforwardResponse
-	24, // 34: antclaw.v1.BacktestService.GetWalkforwardResult:output_type -> antclaw.v1.GetWalkforwardResultResponse
-	26, // 35: antclaw.v1.BacktestService.RunBootstrap:output_type -> antclaw.v1.RunBootstrapResponse
-	27, // [27:36] is the sub-list for method output_type
-	18, // [18:27] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	28, // 17: antclaw.v1.RunMonteCarloResponse.quantile_paths:type_name -> antclaw.v1.MCPath
+	31, // 18: antclaw.v1.GetTradesResponse.trades:type_name -> antclaw.v1.TradeDetail
+	34, // 19: antclaw.v1.GetMetricsByRegimeResponse.metrics:type_name -> antclaw.v1.RegimeMetrics
+	19, // 20: antclaw.v1.RunWalkforwardRequest.ParamGridEntry.value:type_name -> antclaw.v1.ParamRange
+	1,  // 21: antclaw.v1.BacktestService.RunBacktest:input_type -> antclaw.v1.RunBacktestRequest
+	3,  // 22: antclaw.v1.BacktestService.GetBacktest:input_type -> antclaw.v1.GetBacktestRequest
+	7,  // 23: antclaw.v1.BacktestService.GetAccuracy:input_type -> antclaw.v1.GetAccuracyRequest
+	11, // 24: antclaw.v1.BacktestService.RunQuantBt:input_type -> antclaw.v1.RunQuantBtRequest
+	14, // 25: antclaw.v1.BacktestService.RunVpBt:input_type -> antclaw.v1.RunVpBtRequest
+	17, // 26: antclaw.v1.BacktestService.RunCtaBt:input_type -> antclaw.v1.RunCtaBtRequest
+	20, // 27: antclaw.v1.BacktestService.RunWalkforward:input_type -> antclaw.v1.RunWalkforwardRequest
+	23, // 28: antclaw.v1.BacktestService.GetWalkforwardResult:input_type -> antclaw.v1.GetWalkforwardResultRequest
+	25, // 29: antclaw.v1.BacktestService.RunBootstrap:input_type -> antclaw.v1.RunBootstrapRequest
+	27, // 30: antclaw.v1.BacktestService.RunMonteCarlo:input_type -> antclaw.v1.RunMonteCarloRequest
+	30, // 31: antclaw.v1.BacktestService.GetTrades:input_type -> antclaw.v1.GetTradesRequest
+	33, // 32: antclaw.v1.BacktestService.GetMetricsByRegime:input_type -> antclaw.v1.GetMetricsByRegimeRequest
+	2,  // 33: antclaw.v1.BacktestService.RunBacktest:output_type -> antclaw.v1.RunBacktestResponse
+	6,  // 34: antclaw.v1.BacktestService.GetBacktest:output_type -> antclaw.v1.GetBacktestResponse
+	9,  // 35: antclaw.v1.BacktestService.GetAccuracy:output_type -> antclaw.v1.GetAccuracyResponse
+	12, // 36: antclaw.v1.BacktestService.RunQuantBt:output_type -> antclaw.v1.RunQuantBtResponse
+	15, // 37: antclaw.v1.BacktestService.RunVpBt:output_type -> antclaw.v1.RunVpBtResponse
+	18, // 38: antclaw.v1.BacktestService.RunCtaBt:output_type -> antclaw.v1.RunCtaBtResponse
+	21, // 39: antclaw.v1.BacktestService.RunWalkforward:output_type -> antclaw.v1.RunWalkforwardResponse
+	24, // 40: antclaw.v1.BacktestService.GetWalkforwardResult:output_type -> antclaw.v1.GetWalkforwardResultResponse
+	26, // 41: antclaw.v1.BacktestService.RunBootstrap:output_type -> antclaw.v1.RunBootstrapResponse
+	29, // 42: antclaw.v1.BacktestService.RunMonteCarlo:output_type -> antclaw.v1.RunMonteCarloResponse
+	32, // 43: antclaw.v1.BacktestService.GetTrades:output_type -> antclaw.v1.GetTradesResponse
+	35, // 44: antclaw.v1.BacktestService.GetMetricsByRegime:output_type -> antclaw.v1.GetMetricsByRegimeResponse
+	33, // [33:45] is the sub-list for method output_type
+	21, // [21:33] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_backtest_proto_init() }
@@ -2090,7 +2830,7 @@ func file_antclaw_v1_backtest_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_backtest_proto_rawDesc), len(file_antclaw_v1_backtest_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   29,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

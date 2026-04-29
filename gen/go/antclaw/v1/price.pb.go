@@ -983,9 +983,13 @@ func (x *MarketRegime) GetSince() string {
 
 // GetRegime request
 type GetRegimeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Pair          string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
-	Timeframe     string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Pair      string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Timeframe string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"`
+	// M-A: classifier engine: "adx" (default, simple) or "hmm" (Gaussian HMM).
+	Engine string `protobuf:"bytes,3,opt,name=engine,proto3" json:"engine,omitempty"`
+	// Optional: number of HMM states (2 or 3); defaults 2 when engine=hmm.
+	NStates       int32 `protobuf:"varint,4,opt,name=n_states,json=nStates,proto3" json:"n_states,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1034,11 +1038,27 @@ func (x *GetRegimeRequest) GetTimeframe() string {
 	return ""
 }
 
+func (x *GetRegimeRequest) GetEngine() string {
+	if x != nil {
+		return x.Engine
+	}
+	return ""
+}
+
+func (x *GetRegimeRequest) GetNStates() int32 {
+	if x != nil {
+		return x.NStates
+	}
+	return 0
+}
+
 // GetRegime response
 type GetRegimeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Regime        *MarketRegime          `protobuf:"bytes,1,opt,name=regime,proto3" json:"regime,omitempty"`
 	RecentRegimes []string               `protobuf:"bytes,2,rep,name=recent_regimes,json=recentRegimes,proto3" json:"recent_regimes,omitempty"`
+	// M-A: which engine actually produced the result (may differ on fallback).
+	EngineUsed    string `protobuf:"bytes,3,opt,name=engine_used,json=engineUsed,proto3" json:"engine_used,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1085,6 +1105,13 @@ func (x *GetRegimeResponse) GetRecentRegimes() []string {
 		return x.RecentRegimes
 	}
 	return nil
+}
+
+func (x *GetRegimeResponse) GetEngineUsed() string {
+	if x != nil {
+		return x.EngineUsed
+	}
+	return ""
 }
 
 // Seasonal data point
@@ -1254,6 +1281,738 @@ func (x *GetSeasonalResponse) GetData() []*SeasonalDataPoint {
 	return nil
 }
 
+// GetVolatility request: 计算 GARCH(1,1) 条件波动率。
+type GetVolatilityRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pair          string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Timeframe     string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"` // 默认 1d
+	Lookback      int32                  `protobuf:"varint,3,opt,name=lookback,proto3" json:"lookback,omitempty"`  // 用最近 N 根 K 线，默认 500，最大 5000
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetVolatilityRequest) Reset() {
+	*x = GetVolatilityRequest{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetVolatilityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetVolatilityRequest) ProtoMessage() {}
+
+func (x *GetVolatilityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetVolatilityRequest.ProtoReflect.Descriptor instead.
+func (*GetVolatilityRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetVolatilityRequest) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *GetVolatilityRequest) GetTimeframe() string {
+	if x != nil {
+		return x.Timeframe
+	}
+	return ""
+}
+
+func (x *GetVolatilityRequest) GetLookback() int32 {
+	if x != nil {
+		return x.Lookback
+	}
+	return 0
+}
+
+// 单个时间点的条件波动率。
+type VolatilityPoint struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp      string                 `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	ConditionalVol float64                `protobuf:"fixed64,2,opt,name=conditional_vol,json=conditionalVol,proto3" json:"conditional_vol,omitempty"` // 年化标准差（小数，例如 0.18 = 18%）
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *VolatilityPoint) Reset() {
+	*x = VolatilityPoint{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VolatilityPoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VolatilityPoint) ProtoMessage() {}
+
+func (x *VolatilityPoint) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VolatilityPoint.ProtoReflect.Descriptor instead.
+func (*VolatilityPoint) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *VolatilityPoint) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+func (x *VolatilityPoint) GetConditionalVol() float64 {
+	if x != nil {
+		return x.ConditionalVol
+	}
+	return 0
+}
+
+type GetVolatilityResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Pair  string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	// GARCH 拟合参数：sigma^2_t = omega + alpha*r^2_{t-1} + beta*sigma^2_{t-1}
+	Omega            float64            `protobuf:"fixed64,2,opt,name=omega,proto3" json:"omega,omitempty"`
+	Alpha            float64            `protobuf:"fixed64,3,opt,name=alpha,proto3" json:"alpha,omitempty"`
+	Beta             float64            `protobuf:"fixed64,4,opt,name=beta,proto3" json:"beta,omitempty"`
+	Persistence      float64            `protobuf:"fixed64,5,opt,name=persistence,proto3" json:"persistence,omitempty"`                                     // alpha + beta
+	UnconditionalVol float64            `protobuf:"fixed64,6,opt,name=unconditional_vol,json=unconditionalVol,proto3" json:"unconditional_vol,omitempty"`   // sqrt(omega/(1-alpha-beta)) 年化
+	NextStepForecast float64            `protobuf:"fixed64,7,opt,name=next_step_forecast,json=nextStepForecast,proto3" json:"next_step_forecast,omitempty"` // 1 步预测，年化标准差
+	Series           []*VolatilityPoint `protobuf:"bytes,8,rep,name=series,proto3" json:"series,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *GetVolatilityResponse) Reset() {
+	*x = GetVolatilityResponse{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetVolatilityResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetVolatilityResponse) ProtoMessage() {}
+
+func (x *GetVolatilityResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetVolatilityResponse.ProtoReflect.Descriptor instead.
+func (*GetVolatilityResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetVolatilityResponse) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *GetVolatilityResponse) GetOmega() float64 {
+	if x != nil {
+		return x.Omega
+	}
+	return 0
+}
+
+func (x *GetVolatilityResponse) GetAlpha() float64 {
+	if x != nil {
+		return x.Alpha
+	}
+	return 0
+}
+
+func (x *GetVolatilityResponse) GetBeta() float64 {
+	if x != nil {
+		return x.Beta
+	}
+	return 0
+}
+
+func (x *GetVolatilityResponse) GetPersistence() float64 {
+	if x != nil {
+		return x.Persistence
+	}
+	return 0
+}
+
+func (x *GetVolatilityResponse) GetUnconditionalVol() float64 {
+	if x != nil {
+		return x.UnconditionalVol
+	}
+	return 0
+}
+
+func (x *GetVolatilityResponse) GetNextStepForecast() float64 {
+	if x != nil {
+		return x.NextStepForecast
+	}
+	return 0
+}
+
+func (x *GetVolatilityResponse) GetSeries() []*VolatilityPoint {
+	if x != nil {
+		return x.Series
+	}
+	return nil
+}
+
+// GetHurst request
+type GetHurstRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pair          string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Timeframe     string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"`
+	Lookback      int32                  `protobuf:"varint,3,opt,name=lookback,proto3" json:"lookback,omitempty"` // 默认 500
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetHurstRequest) Reset() {
+	*x = GetHurstRequest{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetHurstRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetHurstRequest) ProtoMessage() {}
+
+func (x *GetHurstRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetHurstRequest.ProtoReflect.Descriptor instead.
+func (*GetHurstRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetHurstRequest) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *GetHurstRequest) GetTimeframe() string {
+	if x != nil {
+		return x.Timeframe
+	}
+	return ""
+}
+
+func (x *GetHurstRequest) GetLookback() int32 {
+	if x != nil {
+		return x.Lookback
+	}
+	return 0
+}
+
+type GetHurstResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Pair           string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Hurst          float64                `protobuf:"fixed64,2,opt,name=hurst,proto3" json:"hurst,omitempty"`                 // [0, 1]
+	Interpretation string                 `protobuf:"bytes,3,opt,name=interpretation,proto3" json:"interpretation,omitempty"` // "trending" / "mean_reverting" / "random_walk"
+	SampleSize     int32                  `protobuf:"varint,4,opt,name=sample_size,json=sampleSize,proto3" json:"sample_size,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetHurstResponse) Reset() {
+	*x = GetHurstResponse{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetHurstResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetHurstResponse) ProtoMessage() {}
+
+func (x *GetHurstResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetHurstResponse.ProtoReflect.Descriptor instead.
+func (*GetHurstResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetHurstResponse) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *GetHurstResponse) GetHurst() float64 {
+	if x != nil {
+		return x.Hurst
+	}
+	return 0
+}
+
+func (x *GetHurstResponse) GetInterpretation() string {
+	if x != nil {
+		return x.Interpretation
+	}
+	return ""
+}
+
+func (x *GetHurstResponse) GetSampleSize() int32 {
+	if x != nil {
+		return x.SampleSize
+	}
+	return 0
+}
+
+// GetCorrelations request
+type GetCorrelationsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Assets        []string               `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"` // 资产列表；空时使用默认 8 主流货币对
+	Timeframe     string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"`
+	Window        int32                  `protobuf:"varint,3,opt,name=window,proto3" json:"window,omitempty"` // 滚动窗 K 线数；默认 30
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCorrelationsRequest) Reset() {
+	*x = GetCorrelationsRequest{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCorrelationsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCorrelationsRequest) ProtoMessage() {}
+
+func (x *GetCorrelationsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCorrelationsRequest.ProtoReflect.Descriptor instead.
+func (*GetCorrelationsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GetCorrelationsRequest) GetAssets() []string {
+	if x != nil {
+		return x.Assets
+	}
+	return nil
+}
+
+func (x *GetCorrelationsRequest) GetTimeframe() string {
+	if x != nil {
+		return x.Timeframe
+	}
+	return ""
+}
+
+func (x *GetCorrelationsRequest) GetWindow() int32 {
+	if x != nil {
+		return x.Window
+	}
+	return 0
+}
+
+type CorrelationCell struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AssetA        string                 `protobuf:"bytes,1,opt,name=asset_a,json=assetA,proto3" json:"asset_a,omitempty"`
+	AssetB        string                 `protobuf:"bytes,2,opt,name=asset_b,json=assetB,proto3" json:"asset_b,omitempty"`
+	Value         float64                `protobuf:"fixed64,3,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CorrelationCell) Reset() {
+	*x = CorrelationCell{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CorrelationCell) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CorrelationCell) ProtoMessage() {}
+
+func (x *CorrelationCell) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CorrelationCell.ProtoReflect.Descriptor instead.
+func (*CorrelationCell) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *CorrelationCell) GetAssetA() string {
+	if x != nil {
+		return x.AssetA
+	}
+	return ""
+}
+
+func (x *CorrelationCell) GetAssetB() string {
+	if x != nil {
+		return x.AssetB
+	}
+	return ""
+}
+
+func (x *CorrelationCell) GetValue() float64 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+type GetCorrelationsResponse struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Assets []string               `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
+	Window int32                  `protobuf:"varint,2,opt,name=window,proto3" json:"window,omitempty"`
+	// 完整 N*N 矩阵（按 assets 顺序），便于前端直接渲染。
+	Matrix        []*CorrelationCell `protobuf:"bytes,3,rep,name=matrix,proto3" json:"matrix,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCorrelationsResponse) Reset() {
+	*x = GetCorrelationsResponse{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCorrelationsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCorrelationsResponse) ProtoMessage() {}
+
+func (x *GetCorrelationsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCorrelationsResponse.ProtoReflect.Descriptor instead.
+func (*GetCorrelationsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetCorrelationsResponse) GetAssets() []string {
+	if x != nil {
+		return x.Assets
+	}
+	return nil
+}
+
+func (x *GetCorrelationsResponse) GetWindow() int32 {
+	if x != nil {
+		return x.Window
+	}
+	return 0
+}
+
+func (x *GetCorrelationsResponse) GetMatrix() []*CorrelationCell {
+	if x != nil {
+		return x.Matrix
+	}
+	return nil
+}
+
+// GetDivergences request
+type GetDivergencesRequest struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Pair      string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Timeframe string                 `protobuf:"bytes,2,opt,name=timeframe,proto3" json:"timeframe,omitempty"`
+	Lookback  int32                  `protobuf:"varint,3,opt,name=lookback,proto3" json:"lookback,omitempty"` // 默认 200
+	// 留空 = 全部启用：rsi / obv / macd
+	Indicators    []string `protobuf:"bytes,4,rep,name=indicators,proto3" json:"indicators,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDivergencesRequest) Reset() {
+	*x = GetDivergencesRequest{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDivergencesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDivergencesRequest) ProtoMessage() {}
+
+func (x *GetDivergencesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDivergencesRequest.ProtoReflect.Descriptor instead.
+func (*GetDivergencesRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *GetDivergencesRequest) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *GetDivergencesRequest) GetTimeframe() string {
+	if x != nil {
+		return x.Timeframe
+	}
+	return ""
+}
+
+func (x *GetDivergencesRequest) GetLookback() int32 {
+	if x != nil {
+		return x.Lookback
+	}
+	return 0
+}
+
+func (x *GetDivergencesRequest) GetIndicators() []string {
+	if x != nil {
+		return x.Indicators
+	}
+	return nil
+}
+
+type DivergenceEvent struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Indicator      string                 `protobuf:"bytes,1,opt,name=indicator,proto3" json:"indicator,omitempty"`                     // rsi / obv / macd
+	Kind           string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`                               // bullish / bearish
+	DetectedAt     string                 `protobuf:"bytes,3,opt,name=detected_at,json=detectedAt,proto3" json:"detected_at,omitempty"` // RFC3339
+	PricePivot     float64                `protobuf:"fixed64,4,opt,name=price_pivot,json=pricePivot,proto3" json:"price_pivot,omitempty"`
+	IndicatorPivot float64                `protobuf:"fixed64,5,opt,name=indicator_pivot,json=indicatorPivot,proto3" json:"indicator_pivot,omitempty"`
+	Note           string                 `protobuf:"bytes,6,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DivergenceEvent) Reset() {
+	*x = DivergenceEvent{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DivergenceEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DivergenceEvent) ProtoMessage() {}
+
+func (x *DivergenceEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DivergenceEvent.ProtoReflect.Descriptor instead.
+func (*DivergenceEvent) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *DivergenceEvent) GetIndicator() string {
+	if x != nil {
+		return x.Indicator
+	}
+	return ""
+}
+
+func (x *DivergenceEvent) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *DivergenceEvent) GetDetectedAt() string {
+	if x != nil {
+		return x.DetectedAt
+	}
+	return ""
+}
+
+func (x *DivergenceEvent) GetPricePivot() float64 {
+	if x != nil {
+		return x.PricePivot
+	}
+	return 0
+}
+
+func (x *DivergenceEvent) GetIndicatorPivot() float64 {
+	if x != nil {
+		return x.IndicatorPivot
+	}
+	return 0
+}
+
+func (x *DivergenceEvent) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+type GetDivergencesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pair          string                 `protobuf:"bytes,1,opt,name=pair,proto3" json:"pair,omitempty"`
+	Events        []*DivergenceEvent     `protobuf:"bytes,2,rep,name=events,proto3" json:"events,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDivergencesResponse) Reset() {
+	*x = GetDivergencesResponse{}
+	mi := &file_antclaw_v1_price_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDivergencesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDivergencesResponse) ProtoMessage() {}
+
+func (x *GetDivergencesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_price_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDivergencesResponse.ProtoReflect.Descriptor instead.
+func (*GetDivergencesResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_price_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *GetDivergencesResponse) GetPair() string {
+	if x != nil {
+		return x.Pair
+	}
+	return ""
+}
+
+func (x *GetDivergencesResponse) GetEvents() []*DivergenceEvent {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
 var File_antclaw_v1_price_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_price_proto_rawDesc = "" +
@@ -1330,13 +2089,17 @@ const file_antclaw_v1_price_proto_rawDesc = "" +
 	"\n" +
 	"confidence\x18\x02 \x01(\x01R\n" +
 	"confidence\x12\x14\n" +
-	"\x05since\x18\x03 \x01(\tR\x05since\"D\n" +
+	"\x05since\x18\x03 \x01(\tR\x05since\"w\n" +
 	"\x10GetRegimeRequest\x12\x12\n" +
 	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x1c\n" +
-	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\"l\n" +
+	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\x12\x16\n" +
+	"\x06engine\x18\x03 \x01(\tR\x06engine\x12\x19\n" +
+	"\bn_states\x18\x04 \x01(\x05R\anStates\"\x8d\x01\n" +
 	"\x11GetRegimeResponse\x120\n" +
 	"\x06regime\x18\x01 \x01(\v2\x18.antclaw.v1.MarketRegimeR\x06regime\x12%\n" +
-	"\x0erecent_regimes\x18\x02 \x03(\tR\rrecentRegimes\"c\n" +
+	"\x0erecent_regimes\x18\x02 \x03(\tR\rrecentRegimes\x12\x1f\n" +
+	"\vengine_used\x18\x03 \x01(\tR\n" +
+	"engineUsed\"c\n" +
 	"\x11SeasonalDataPoint\x12\x14\n" +
 	"\x05month\x18\x01 \x01(\tR\x05month\x12\x1d\n" +
 	"\n" +
@@ -1347,7 +2110,64 @@ const file_antclaw_v1_price_proto_rawDesc = "" +
 	"\x05years\x18\x02 \x01(\x05R\x05years\"\\\n" +
 	"\x13GetSeasonalResponse\x12\x12\n" +
 	"\x04pair\x18\x01 \x01(\tR\x04pair\x121\n" +
-	"\x04data\x18\x02 \x03(\v2\x1d.antclaw.v1.SeasonalDataPointR\x04data2\xb8\x04\n" +
+	"\x04data\x18\x02 \x03(\v2\x1d.antclaw.v1.SeasonalDataPointR\x04data\"d\n" +
+	"\x14GetVolatilityRequest\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x1c\n" +
+	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\x12\x1a\n" +
+	"\blookback\x18\x03 \x01(\x05R\blookback\"X\n" +
+	"\x0fVolatilityPoint\x12\x1c\n" +
+	"\ttimestamp\x18\x01 \x01(\tR\ttimestamp\x12'\n" +
+	"\x0fconditional_vol\x18\x02 \x01(\x01R\x0econditionalVol\"\x9d\x02\n" +
+	"\x15GetVolatilityResponse\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x14\n" +
+	"\x05omega\x18\x02 \x01(\x01R\x05omega\x12\x14\n" +
+	"\x05alpha\x18\x03 \x01(\x01R\x05alpha\x12\x12\n" +
+	"\x04beta\x18\x04 \x01(\x01R\x04beta\x12 \n" +
+	"\vpersistence\x18\x05 \x01(\x01R\vpersistence\x12+\n" +
+	"\x11unconditional_vol\x18\x06 \x01(\x01R\x10unconditionalVol\x12,\n" +
+	"\x12next_step_forecast\x18\a \x01(\x01R\x10nextStepForecast\x123\n" +
+	"\x06series\x18\b \x03(\v2\x1b.antclaw.v1.VolatilityPointR\x06series\"_\n" +
+	"\x0fGetHurstRequest\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x1c\n" +
+	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\x12\x1a\n" +
+	"\blookback\x18\x03 \x01(\x05R\blookback\"\x85\x01\n" +
+	"\x10GetHurstResponse\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x14\n" +
+	"\x05hurst\x18\x02 \x01(\x01R\x05hurst\x12&\n" +
+	"\x0einterpretation\x18\x03 \x01(\tR\x0einterpretation\x12\x1f\n" +
+	"\vsample_size\x18\x04 \x01(\x05R\n" +
+	"sampleSize\"f\n" +
+	"\x16GetCorrelationsRequest\x12\x16\n" +
+	"\x06assets\x18\x01 \x03(\tR\x06assets\x12\x1c\n" +
+	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\x12\x16\n" +
+	"\x06window\x18\x03 \x01(\x05R\x06window\"Y\n" +
+	"\x0fCorrelationCell\x12\x17\n" +
+	"\aasset_a\x18\x01 \x01(\tR\x06assetA\x12\x17\n" +
+	"\aasset_b\x18\x02 \x01(\tR\x06assetB\x12\x14\n" +
+	"\x05value\x18\x03 \x01(\x01R\x05value\"~\n" +
+	"\x17GetCorrelationsResponse\x12\x16\n" +
+	"\x06assets\x18\x01 \x03(\tR\x06assets\x12\x16\n" +
+	"\x06window\x18\x02 \x01(\x05R\x06window\x123\n" +
+	"\x06matrix\x18\x03 \x03(\v2\x1b.antclaw.v1.CorrelationCellR\x06matrix\"\x85\x01\n" +
+	"\x15GetDivergencesRequest\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x1c\n" +
+	"\ttimeframe\x18\x02 \x01(\tR\ttimeframe\x12\x1a\n" +
+	"\blookback\x18\x03 \x01(\x05R\blookback\x12\x1e\n" +
+	"\n" +
+	"indicators\x18\x04 \x03(\tR\n" +
+	"indicators\"\xc2\x01\n" +
+	"\x0fDivergenceEvent\x12\x1c\n" +
+	"\tindicator\x18\x01 \x01(\tR\tindicator\x12\x12\n" +
+	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x1f\n" +
+	"\vdetected_at\x18\x03 \x01(\tR\n" +
+	"detectedAt\x12\x1f\n" +
+	"\vprice_pivot\x18\x04 \x01(\x01R\n" +
+	"pricePivot\x12'\n" +
+	"\x0findicator_pivot\x18\x05 \x01(\x01R\x0eindicatorPivot\x12\x12\n" +
+	"\x04note\x18\x06 \x01(\tR\x04note\"a\n" +
+	"\x16GetDivergencesResponse\x12\x12\n" +
+	"\x04pair\x18\x01 \x01(\tR\x04pair\x123\n" +
+	"\x06events\x18\x02 \x03(\v2\x1b.antclaw.v1.DivergenceEventR\x06events2\x8a\a\n" +
 	"\fPriceService\x12E\n" +
 	"\bGetPrice\x12\x1b.antclaw.v1.GetPriceRequest\x1a\x1c.antclaw.v1.GetPriceResponse\x12H\n" +
 	"\tGetLevels\x12\x1c.antclaw.v1.GetLevelsRequest\x1a\x1d.antclaw.v1.GetLevelsResponse\x12`\n" +
@@ -1356,7 +2176,11 @@ const file_antclaw_v1_price_proto_rawDesc = "" +
 	"GetSession\x12\x1d.antclaw.v1.GetSessionRequest\x1a\x1e.antclaw.v1.GetSessionResponse\x12N\n" +
 	"\vRunScenario\x12\x1e.antclaw.v1.RunScenarioRequest\x1a\x1f.antclaw.v1.RunScenarioResponse\x12H\n" +
 	"\tGetRegime\x12\x1c.antclaw.v1.GetRegimeRequest\x1a\x1d.antclaw.v1.GetRegimeResponse\x12N\n" +
-	"\vGetSeasonal\x12\x1e.antclaw.v1.GetSeasonalRequest\x1a\x1f.antclaw.v1.GetSeasonalResponseB\x9d\x01\n" +
+	"\vGetSeasonal\x12\x1e.antclaw.v1.GetSeasonalRequest\x1a\x1f.antclaw.v1.GetSeasonalResponse\x12T\n" +
+	"\rGetVolatility\x12 .antclaw.v1.GetVolatilityRequest\x1a!.antclaw.v1.GetVolatilityResponse\x12E\n" +
+	"\bGetHurst\x12\x1b.antclaw.v1.GetHurstRequest\x1a\x1c.antclaw.v1.GetHurstResponse\x12Z\n" +
+	"\x0fGetCorrelations\x12\".antclaw.v1.GetCorrelationsRequest\x1a#.antclaw.v1.GetCorrelationsResponse\x12W\n" +
+	"\x0eGetDivergences\x12!.antclaw.v1.GetDivergencesRequest\x1a\".antclaw.v1.GetDivergencesResponseB\x9d\x01\n" +
 	"\x0ecom.antclaw.v1B\n" +
 	"PriceProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
@@ -1374,7 +2198,7 @@ func file_antclaw_v1_price_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_price_proto_rawDescData
 }
 
-var file_antclaw_v1_price_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_antclaw_v1_price_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
 var file_antclaw_v1_price_proto_goTypes = []any{
 	(*PriceBar)(nil),                  // 0: antclaw.v1.PriceBar
 	(*GetPriceRequest)(nil),           // 1: antclaw.v1.GetPriceRequest
@@ -1397,36 +2221,58 @@ var file_antclaw_v1_price_proto_goTypes = []any{
 	(*SeasonalDataPoint)(nil),         // 18: antclaw.v1.SeasonalDataPoint
 	(*GetSeasonalRequest)(nil),        // 19: antclaw.v1.GetSeasonalRequest
 	(*GetSeasonalResponse)(nil),       // 20: antclaw.v1.GetSeasonalResponse
-	nil,                               // 21: antclaw.v1.RunScenarioRequest.ParamsEntry
+	(*GetVolatilityRequest)(nil),      // 21: antclaw.v1.GetVolatilityRequest
+	(*VolatilityPoint)(nil),           // 22: antclaw.v1.VolatilityPoint
+	(*GetVolatilityResponse)(nil),     // 23: antclaw.v1.GetVolatilityResponse
+	(*GetHurstRequest)(nil),           // 24: antclaw.v1.GetHurstRequest
+	(*GetHurstResponse)(nil),          // 25: antclaw.v1.GetHurstResponse
+	(*GetCorrelationsRequest)(nil),    // 26: antclaw.v1.GetCorrelationsRequest
+	(*CorrelationCell)(nil),           // 27: antclaw.v1.CorrelationCell
+	(*GetCorrelationsResponse)(nil),   // 28: antclaw.v1.GetCorrelationsResponse
+	(*GetDivergencesRequest)(nil),     // 29: antclaw.v1.GetDivergencesRequest
+	(*DivergenceEvent)(nil),           // 30: antclaw.v1.DivergenceEvent
+	(*GetDivergencesResponse)(nil),    // 31: antclaw.v1.GetDivergencesResponse
+	nil,                               // 32: antclaw.v1.RunScenarioRequest.ParamsEntry
 }
 var file_antclaw_v1_price_proto_depIdxs = []int32{
 	0,  // 0: antclaw.v1.GetPriceResponse.bars:type_name -> antclaw.v1.PriceBar
 	3,  // 1: antclaw.v1.GetLevelsResponse.levels:type_name -> antclaw.v1.PriceLevel
 	6,  // 2: antclaw.v1.GetMarketOverviewResponse.items:type_name -> antclaw.v1.MarketOverviewItem
 	9,  // 3: antclaw.v1.GetSessionResponse.sessions:type_name -> antclaw.v1.SessionInfo
-	21, // 4: antclaw.v1.RunScenarioRequest.params:type_name -> antclaw.v1.RunScenarioRequest.ParamsEntry
+	32, // 4: antclaw.v1.RunScenarioRequest.params:type_name -> antclaw.v1.RunScenarioRequest.ParamsEntry
 	12, // 5: antclaw.v1.RunScenarioResponse.results:type_name -> antclaw.v1.ScenarioResult
 	15, // 6: antclaw.v1.GetRegimeResponse.regime:type_name -> antclaw.v1.MarketRegime
 	18, // 7: antclaw.v1.GetSeasonalResponse.data:type_name -> antclaw.v1.SeasonalDataPoint
-	1,  // 8: antclaw.v1.PriceService.GetPrice:input_type -> antclaw.v1.GetPriceRequest
-	4,  // 9: antclaw.v1.PriceService.GetLevels:input_type -> antclaw.v1.GetLevelsRequest
-	7,  // 10: antclaw.v1.PriceService.GetMarketOverview:input_type -> antclaw.v1.GetMarketOverviewRequest
-	10, // 11: antclaw.v1.PriceService.GetSession:input_type -> antclaw.v1.GetSessionRequest
-	13, // 12: antclaw.v1.PriceService.RunScenario:input_type -> antclaw.v1.RunScenarioRequest
-	16, // 13: antclaw.v1.PriceService.GetRegime:input_type -> antclaw.v1.GetRegimeRequest
-	19, // 14: antclaw.v1.PriceService.GetSeasonal:input_type -> antclaw.v1.GetSeasonalRequest
-	2,  // 15: antclaw.v1.PriceService.GetPrice:output_type -> antclaw.v1.GetPriceResponse
-	5,  // 16: antclaw.v1.PriceService.GetLevels:output_type -> antclaw.v1.GetLevelsResponse
-	8,  // 17: antclaw.v1.PriceService.GetMarketOverview:output_type -> antclaw.v1.GetMarketOverviewResponse
-	11, // 18: antclaw.v1.PriceService.GetSession:output_type -> antclaw.v1.GetSessionResponse
-	14, // 19: antclaw.v1.PriceService.RunScenario:output_type -> antclaw.v1.RunScenarioResponse
-	17, // 20: antclaw.v1.PriceService.GetRegime:output_type -> antclaw.v1.GetRegimeResponse
-	20, // 21: antclaw.v1.PriceService.GetSeasonal:output_type -> antclaw.v1.GetSeasonalResponse
-	15, // [15:22] is the sub-list for method output_type
-	8,  // [8:15] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	22, // 8: antclaw.v1.GetVolatilityResponse.series:type_name -> antclaw.v1.VolatilityPoint
+	27, // 9: antclaw.v1.GetCorrelationsResponse.matrix:type_name -> antclaw.v1.CorrelationCell
+	30, // 10: antclaw.v1.GetDivergencesResponse.events:type_name -> antclaw.v1.DivergenceEvent
+	1,  // 11: antclaw.v1.PriceService.GetPrice:input_type -> antclaw.v1.GetPriceRequest
+	4,  // 12: antclaw.v1.PriceService.GetLevels:input_type -> antclaw.v1.GetLevelsRequest
+	7,  // 13: antclaw.v1.PriceService.GetMarketOverview:input_type -> antclaw.v1.GetMarketOverviewRequest
+	10, // 14: antclaw.v1.PriceService.GetSession:input_type -> antclaw.v1.GetSessionRequest
+	13, // 15: antclaw.v1.PriceService.RunScenario:input_type -> antclaw.v1.RunScenarioRequest
+	16, // 16: antclaw.v1.PriceService.GetRegime:input_type -> antclaw.v1.GetRegimeRequest
+	19, // 17: antclaw.v1.PriceService.GetSeasonal:input_type -> antclaw.v1.GetSeasonalRequest
+	21, // 18: antclaw.v1.PriceService.GetVolatility:input_type -> antclaw.v1.GetVolatilityRequest
+	24, // 19: antclaw.v1.PriceService.GetHurst:input_type -> antclaw.v1.GetHurstRequest
+	26, // 20: antclaw.v1.PriceService.GetCorrelations:input_type -> antclaw.v1.GetCorrelationsRequest
+	29, // 21: antclaw.v1.PriceService.GetDivergences:input_type -> antclaw.v1.GetDivergencesRequest
+	2,  // 22: antclaw.v1.PriceService.GetPrice:output_type -> antclaw.v1.GetPriceResponse
+	5,  // 23: antclaw.v1.PriceService.GetLevels:output_type -> antclaw.v1.GetLevelsResponse
+	8,  // 24: antclaw.v1.PriceService.GetMarketOverview:output_type -> antclaw.v1.GetMarketOverviewResponse
+	11, // 25: antclaw.v1.PriceService.GetSession:output_type -> antclaw.v1.GetSessionResponse
+	14, // 26: antclaw.v1.PriceService.RunScenario:output_type -> antclaw.v1.RunScenarioResponse
+	17, // 27: antclaw.v1.PriceService.GetRegime:output_type -> antclaw.v1.GetRegimeResponse
+	20, // 28: antclaw.v1.PriceService.GetSeasonal:output_type -> antclaw.v1.GetSeasonalResponse
+	23, // 29: antclaw.v1.PriceService.GetVolatility:output_type -> antclaw.v1.GetVolatilityResponse
+	25, // 30: antclaw.v1.PriceService.GetHurst:output_type -> antclaw.v1.GetHurstResponse
+	28, // 31: antclaw.v1.PriceService.GetCorrelations:output_type -> antclaw.v1.GetCorrelationsResponse
+	31, // 32: antclaw.v1.PriceService.GetDivergences:output_type -> antclaw.v1.GetDivergencesResponse
+	22, // [22:33] is the sub-list for method output_type
+	11, // [11:22] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_price_proto_init() }
@@ -1440,7 +2286,7 @@ func file_antclaw_v1_price_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_price_proto_rawDesc), len(file_antclaw_v1_price_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

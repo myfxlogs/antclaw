@@ -3,7 +3,9 @@ package admin
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	adminv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
@@ -93,6 +95,7 @@ func dbUserToProto(u db.User) *adminv1.User {
 		EmailVerified: u.EmailVerifiedAt.Valid,
 		CreatedAt:     u.CreatedAt.Time.Unix(),
 		UpdatedAt:     u.UpdatedAt.Time.Unix(),
+		CodeId:        derefString(u.CodeID),
 	}
 	// Status may not exist in proto, skip it
 	return user
@@ -382,3 +385,71 @@ func (s *Service) AdminResetUserPassword(ctx context.Context, userID, newPasswor
 	}
 	return &adminv1.AdminResetUserPasswordResponse{}, nil
 }
+
+// SetUserCodeID 管理员设置/重置用户的数字 ID。
+//
+//   - codeID 留空：自动重新随机分配（最多 codeIDAllocAttempts 次重试，与注册一致）。
+//   - codeID 非空：先校验格式（avoid 4/7、首位非 0、5-10 位），再尝试落库；
+//     若已被占用返回 ErrCodeIDTaken（handler 转 InvalidArgument）。
+func (s *Service) SetUserCodeID(ctx context.Context, userID, codeID string) (*adminv1.SetUserCodeIDResponse, error) {
+	id := parseUUID(userID)
+	if id == uuid.Nil {
+		return nil, fmt.Errorf("invalid user_id")
+	}
+
+	final := strings.TrimSpace(codeID)
+	if final != "" {
+		if err := auth.ValidateCodeID(final); err != nil {
+			return nil, err
+		}
+		if err := s.applyCodeID(ctx, id, final); err != nil {
+			return nil, err
+		}
+	} else {
+		var allocErr error
+		final, allocErr = s.allocateCodeID(ctx, id)
+		if allocErr != nil {
+			return nil, allocErr
+		}
+	}
+
+	if s.auditSvc != nil {
+		_, _ = s.auditSvc.Log(ctx, audit.AuditEntry{
+			Action:   "admin_set_code_id",
+			Resource: "user:" + userID,
+			Details:  "code_id=" + final,
+		})
+	}
+	return &adminv1.SetUserCodeIDResponse{CodeId: final}, nil
+}
+
+// allocateCodeID 随机生成并落库，唯一冲突自动重试。
+func (s *Service) allocateCodeID(ctx context.Context, userID uuid.UUID) (string, error) {
+	for attempt := 0; attempt < codeIDAllocAttempts; attempt++ {
+		cid, err := auth.GenerateCodeID(auth.CodeIDDefaultDigits)
+		if err != nil {
+			return "", err
+		}
+		if err := s.applyCodeID(ctx, userID, cid); err == nil {
+			return cid, nil
+		} else if !errors.Is(err, ErrCodeIDTaken) {
+			return "", err
+		}
+	}
+	return "", errors.New("failed to allocate unique code_id after retries")
+}
+
+// applyCodeID 把 code_id 落库；唯一冲突映射为 ErrCodeIDTaken。
+func (s *Service) applyCodeID(ctx context.Context, userID uuid.UUID, codeID string) error {
+	cid := codeID
+	if err := s.queries.UpdateUserCodeID(ctx, db.UpdateUserCodeIDParams{ID: userID, CodeID: &cid}); err != nil {
+		if strings.Contains(err.Error(), "users_code_id_uq") {
+			return ErrCodeIDTaken
+		}
+		return err
+	}
+	return nil
+}
+
+// codeIDAllocAttempts 与 userstore.codeIDAllocAttempts 同义；定义在 service 包以便独立调整。
+const codeIDAllocAttempts = 8

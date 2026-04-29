@@ -41,6 +41,17 @@ const (
 	AIServiceOutlookProcedure = "/antclaw.v1.AIService/Outlook"
 	// AIServiceBuildContextProcedure is the fully-qualified name of the AIService's BuildContext RPC.
 	AIServiceBuildContextProcedure = "/antclaw.v1.AIService/BuildContext"
+	// AIServiceRememberFactProcedure is the fully-qualified name of the AIService's RememberFact RPC.
+	AIServiceRememberFactProcedure = "/antclaw.v1.AIService/RememberFact"
+	// AIServiceRecallFactProcedure is the fully-qualified name of the AIService's RecallFact RPC.
+	AIServiceRecallFactProcedure = "/antclaw.v1.AIService/RecallFact"
+	// AIServiceSearchMemoryProcedure is the fully-qualified name of the AIService's SearchMemory RPC.
+	AIServiceSearchMemoryProcedure = "/antclaw.v1.AIService/SearchMemory"
+	// AIServiceCheckRateLimitProcedure is the fully-qualified name of the AIService's CheckRateLimit
+	// RPC.
+	AIServiceCheckRateLimitProcedure = "/antclaw.v1.AIService/CheckRateLimit"
+	// AIServiceRunWithToolsProcedure is the fully-qualified name of the AIService's RunWithTools RPC.
+	AIServiceRunWithToolsProcedure = "/antclaw.v1.AIService/RunWithTools"
 )
 
 // AIServiceClient is a client for the antclaw.v1.AIService service.
@@ -54,6 +65,14 @@ type AIServiceClient interface {
 	// Build a structured context payload for downstream AI prompts.
 	// 按 asset/scope 聚合若干领域的最新指标（macro/onchain/options/treasury 等）。
 	BuildContext(context.Context, *connect.Request[v1.BuildContextRequest]) (*connect.Response[v1.BuildContextResponse], error)
+	// M-F: 记忆与多轮会话
+	RememberFact(context.Context, *connect.Request[v1.RememberFactRequest]) (*connect.Response[v1.RememberFactResponse], error)
+	RecallFact(context.Context, *connect.Request[v1.RecallFactRequest]) (*connect.Response[v1.RecallFactResponse], error)
+	SearchMemory(context.Context, *connect.Request[v1.SearchMemoryRequest]) (*connect.Response[v1.SearchMemoryResponse], error)
+	// M-F: 限流配额查询（已发送/上限）
+	CheckRateLimit(context.Context, *connect.Request[v1.CheckRateLimitRequest]) (*connect.Response[v1.CheckRateLimitResponse], error)
+	// M-F: 工具调用入口（OpenAI function calling 风格）
+	RunWithTools(context.Context, *connect.Request[v1.RunWithToolsRequest]) (*connect.Response[v1.RunWithToolsResponse], error)
 }
 
 // NewAIServiceClient constructs a client for the antclaw.v1.AIService service. By default, it uses
@@ -91,15 +110,50 @@ func NewAIServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...c
 			connect.WithSchema(aIServiceMethods.ByName("BuildContext")),
 			connect.WithClientOptions(opts...),
 		),
+		rememberFact: connect.NewClient[v1.RememberFactRequest, v1.RememberFactResponse](
+			httpClient,
+			baseURL+AIServiceRememberFactProcedure,
+			connect.WithSchema(aIServiceMethods.ByName("RememberFact")),
+			connect.WithClientOptions(opts...),
+		),
+		recallFact: connect.NewClient[v1.RecallFactRequest, v1.RecallFactResponse](
+			httpClient,
+			baseURL+AIServiceRecallFactProcedure,
+			connect.WithSchema(aIServiceMethods.ByName("RecallFact")),
+			connect.WithClientOptions(opts...),
+		),
+		searchMemory: connect.NewClient[v1.SearchMemoryRequest, v1.SearchMemoryResponse](
+			httpClient,
+			baseURL+AIServiceSearchMemoryProcedure,
+			connect.WithSchema(aIServiceMethods.ByName("SearchMemory")),
+			connect.WithClientOptions(opts...),
+		),
+		checkRateLimit: connect.NewClient[v1.CheckRateLimitRequest, v1.CheckRateLimitResponse](
+			httpClient,
+			baseURL+AIServiceCheckRateLimitProcedure,
+			connect.WithSchema(aIServiceMethods.ByName("CheckRateLimit")),
+			connect.WithClientOptions(opts...),
+		),
+		runWithTools: connect.NewClient[v1.RunWithToolsRequest, v1.RunWithToolsResponse](
+			httpClient,
+			baseURL+AIServiceRunWithToolsProcedure,
+			connect.WithSchema(aIServiceMethods.ByName("RunWithTools")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // aIServiceClient implements AIServiceClient.
 type aIServiceClient struct {
-	chat         *connect.Client[v1.ChatRequest, v1.ChatResponse]
-	interpret    *connect.Client[v1.InterpretRequest, v1.InterpretResponse]
-	outlook      *connect.Client[v1.OutlookRequest, v1.OutlookResponse]
-	buildContext *connect.Client[v1.BuildContextRequest, v1.BuildContextResponse]
+	chat           *connect.Client[v1.ChatRequest, v1.ChatResponse]
+	interpret      *connect.Client[v1.InterpretRequest, v1.InterpretResponse]
+	outlook        *connect.Client[v1.OutlookRequest, v1.OutlookResponse]
+	buildContext   *connect.Client[v1.BuildContextRequest, v1.BuildContextResponse]
+	rememberFact   *connect.Client[v1.RememberFactRequest, v1.RememberFactResponse]
+	recallFact     *connect.Client[v1.RecallFactRequest, v1.RecallFactResponse]
+	searchMemory   *connect.Client[v1.SearchMemoryRequest, v1.SearchMemoryResponse]
+	checkRateLimit *connect.Client[v1.CheckRateLimitRequest, v1.CheckRateLimitResponse]
+	runWithTools   *connect.Client[v1.RunWithToolsRequest, v1.RunWithToolsResponse]
 }
 
 // Chat calls antclaw.v1.AIService.Chat.
@@ -122,6 +176,31 @@ func (c *aIServiceClient) BuildContext(ctx context.Context, req *connect.Request
 	return c.buildContext.CallUnary(ctx, req)
 }
 
+// RememberFact calls antclaw.v1.AIService.RememberFact.
+func (c *aIServiceClient) RememberFact(ctx context.Context, req *connect.Request[v1.RememberFactRequest]) (*connect.Response[v1.RememberFactResponse], error) {
+	return c.rememberFact.CallUnary(ctx, req)
+}
+
+// RecallFact calls antclaw.v1.AIService.RecallFact.
+func (c *aIServiceClient) RecallFact(ctx context.Context, req *connect.Request[v1.RecallFactRequest]) (*connect.Response[v1.RecallFactResponse], error) {
+	return c.recallFact.CallUnary(ctx, req)
+}
+
+// SearchMemory calls antclaw.v1.AIService.SearchMemory.
+func (c *aIServiceClient) SearchMemory(ctx context.Context, req *connect.Request[v1.SearchMemoryRequest]) (*connect.Response[v1.SearchMemoryResponse], error) {
+	return c.searchMemory.CallUnary(ctx, req)
+}
+
+// CheckRateLimit calls antclaw.v1.AIService.CheckRateLimit.
+func (c *aIServiceClient) CheckRateLimit(ctx context.Context, req *connect.Request[v1.CheckRateLimitRequest]) (*connect.Response[v1.CheckRateLimitResponse], error) {
+	return c.checkRateLimit.CallUnary(ctx, req)
+}
+
+// RunWithTools calls antclaw.v1.AIService.RunWithTools.
+func (c *aIServiceClient) RunWithTools(ctx context.Context, req *connect.Request[v1.RunWithToolsRequest]) (*connect.Response[v1.RunWithToolsResponse], error) {
+	return c.runWithTools.CallUnary(ctx, req)
+}
+
 // AIServiceHandler is an implementation of the antclaw.v1.AIService service.
 type AIServiceHandler interface {
 	// Chat with AI (server-streaming)
@@ -133,6 +212,14 @@ type AIServiceHandler interface {
 	// Build a structured context payload for downstream AI prompts.
 	// 按 asset/scope 聚合若干领域的最新指标（macro/onchain/options/treasury 等）。
 	BuildContext(context.Context, *connect.Request[v1.BuildContextRequest]) (*connect.Response[v1.BuildContextResponse], error)
+	// M-F: 记忆与多轮会话
+	RememberFact(context.Context, *connect.Request[v1.RememberFactRequest]) (*connect.Response[v1.RememberFactResponse], error)
+	RecallFact(context.Context, *connect.Request[v1.RecallFactRequest]) (*connect.Response[v1.RecallFactResponse], error)
+	SearchMemory(context.Context, *connect.Request[v1.SearchMemoryRequest]) (*connect.Response[v1.SearchMemoryResponse], error)
+	// M-F: 限流配额查询（已发送/上限）
+	CheckRateLimit(context.Context, *connect.Request[v1.CheckRateLimitRequest]) (*connect.Response[v1.CheckRateLimitResponse], error)
+	// M-F: 工具调用入口（OpenAI function calling 风格）
+	RunWithTools(context.Context, *connect.Request[v1.RunWithToolsRequest]) (*connect.Response[v1.RunWithToolsResponse], error)
 }
 
 // NewAIServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -166,6 +253,36 @@ func NewAIServiceHandler(svc AIServiceHandler, opts ...connect.HandlerOption) (s
 		connect.WithSchema(aIServiceMethods.ByName("BuildContext")),
 		connect.WithHandlerOptions(opts...),
 	)
+	aIServiceRememberFactHandler := connect.NewUnaryHandler(
+		AIServiceRememberFactProcedure,
+		svc.RememberFact,
+		connect.WithSchema(aIServiceMethods.ByName("RememberFact")),
+		connect.WithHandlerOptions(opts...),
+	)
+	aIServiceRecallFactHandler := connect.NewUnaryHandler(
+		AIServiceRecallFactProcedure,
+		svc.RecallFact,
+		connect.WithSchema(aIServiceMethods.ByName("RecallFact")),
+		connect.WithHandlerOptions(opts...),
+	)
+	aIServiceSearchMemoryHandler := connect.NewUnaryHandler(
+		AIServiceSearchMemoryProcedure,
+		svc.SearchMemory,
+		connect.WithSchema(aIServiceMethods.ByName("SearchMemory")),
+		connect.WithHandlerOptions(opts...),
+	)
+	aIServiceCheckRateLimitHandler := connect.NewUnaryHandler(
+		AIServiceCheckRateLimitProcedure,
+		svc.CheckRateLimit,
+		connect.WithSchema(aIServiceMethods.ByName("CheckRateLimit")),
+		connect.WithHandlerOptions(opts...),
+	)
+	aIServiceRunWithToolsHandler := connect.NewUnaryHandler(
+		AIServiceRunWithToolsProcedure,
+		svc.RunWithTools,
+		connect.WithSchema(aIServiceMethods.ByName("RunWithTools")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.AIService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AIServiceChatProcedure:
@@ -176,6 +293,16 @@ func NewAIServiceHandler(svc AIServiceHandler, opts ...connect.HandlerOption) (s
 			aIServiceOutlookHandler.ServeHTTP(w, r)
 		case AIServiceBuildContextProcedure:
 			aIServiceBuildContextHandler.ServeHTTP(w, r)
+		case AIServiceRememberFactProcedure:
+			aIServiceRememberFactHandler.ServeHTTP(w, r)
+		case AIServiceRecallFactProcedure:
+			aIServiceRecallFactHandler.ServeHTTP(w, r)
+		case AIServiceSearchMemoryProcedure:
+			aIServiceSearchMemoryHandler.ServeHTTP(w, r)
+		case AIServiceCheckRateLimitProcedure:
+			aIServiceCheckRateLimitHandler.ServeHTTP(w, r)
+		case AIServiceRunWithToolsProcedure:
+			aIServiceRunWithToolsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -199,4 +326,24 @@ func (UnimplementedAIServiceHandler) Outlook(context.Context, *connect.Request[v
 
 func (UnimplementedAIServiceHandler) BuildContext(context.Context, *connect.Request[v1.BuildContextRequest]) (*connect.Response[v1.BuildContextResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AIService.BuildContext is not implemented"))
+}
+
+func (UnimplementedAIServiceHandler) RememberFact(context.Context, *connect.Request[v1.RememberFactRequest]) (*connect.Response[v1.RememberFactResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AIService.RememberFact is not implemented"))
+}
+
+func (UnimplementedAIServiceHandler) RecallFact(context.Context, *connect.Request[v1.RecallFactRequest]) (*connect.Response[v1.RecallFactResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AIService.RecallFact is not implemented"))
+}
+
+func (UnimplementedAIServiceHandler) SearchMemory(context.Context, *connect.Request[v1.SearchMemoryRequest]) (*connect.Response[v1.SearchMemoryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AIService.SearchMemory is not implemented"))
+}
+
+func (UnimplementedAIServiceHandler) CheckRateLimit(context.Context, *connect.Request[v1.CheckRateLimitRequest]) (*connect.Response[v1.CheckRateLimitResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AIService.CheckRateLimit is not implemented"))
+}
+
+func (UnimplementedAIServiceHandler) RunWithTools(context.Context, *connect.Request[v1.RunWithToolsRequest]) (*connect.Response[v1.RunWithToolsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AIService.RunWithTools is not implemented"))
 }

@@ -97,11 +97,11 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    email, username, display_name, password_hash, locale, timezone
+    email, username, display_name, password_hash, locale, timezone, code_id
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7
 )
-RETURNING id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at
+RETURNING id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at, code_id
 `
 
 type CreateUserParams struct {
@@ -111,6 +111,7 @@ type CreateUserParams struct {
 	PasswordHash string  `json:"password_hash"`
 	Locale       string  `json:"locale"`
 	Timezone     string  `json:"timezone"`
+	CodeID       *string `json:"code_id"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -121,6 +122,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.PasswordHash,
 		arg.Locale,
 		arg.Timezone,
+		arg.CodeID,
 	)
 	var i User
 	err := row.Scan(
@@ -140,6 +142,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CodeID,
 	)
 	return i, err
 }
@@ -200,8 +203,37 @@ func (q *Queries) GetSessionByID(ctx context.Context, id uuid.UUID) (Session, er
 	return i, err
 }
 
+const getUserByCodeID = `-- name: GetUserByCodeID :one
+SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at, code_id FROM users WHERE code_id = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) GetUserByCodeID(ctx context.Context, codeID *string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByCodeID, codeID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.EmailVerifiedAt,
+		&i.Username,
+		&i.DisplayName,
+		&i.PasswordHash,
+		&i.PasswordVersion,
+		&i.Role,
+		&i.Status,
+		&i.Locale,
+		&i.Timezone,
+		&i.TotpSecretEnc,
+		&i.TotpEnabled,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CodeID,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at FROM users WHERE email = $1 AND deleted_at IS NULL
+SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at, code_id FROM users WHERE email = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -224,12 +256,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CodeID,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at FROM users WHERE id = $1 AND deleted_at IS NULL
+SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at, code_id FROM users WHERE id = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -252,12 +285,13 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CodeID,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at FROM users WHERE username = $1 AND deleted_at IS NULL
+SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at, code_id FROM users WHERE username = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username *string) (User, error) {
@@ -280,6 +314,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username *string) (User
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CodeID,
 	)
 	return i, err
 }
@@ -339,7 +374,7 @@ func (q *Queries) ListUserSessions(ctx context.Context, userID uuid.UUID) ([]Ses
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at FROM users
+SELECT id, email, email_verified_at, username, display_name, password_hash, password_version, role, status, locale, timezone, totp_secret_enc, totp_enabled, created_at, updated_at, deleted_at, code_id FROM users
 WHERE deleted_at IS NULL
   AND ($1::text = '' OR email ILIKE '%' || $1 || '%')
   AND ($2::text = '' OR role = $2)
@@ -388,6 +423,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.CodeID,
 		); err != nil {
 			return nil, err
 		}
@@ -501,6 +537,20 @@ type UpdateSessionLastSeenParams struct {
 
 func (q *Queries) UpdateSessionLastSeen(ctx context.Context, arg UpdateSessionLastSeenParams) error {
 	_, err := q.db.Exec(ctx, updateSessionLastSeen, arg.ID, arg.Ip)
+	return err
+}
+
+const updateUserCodeID = `-- name: UpdateUserCodeID :exec
+UPDATE users SET code_id = $2, updated_at = NOW() WHERE id = $1 AND deleted_at IS NULL
+`
+
+type UpdateUserCodeIDParams struct {
+	ID     uuid.UUID `json:"id"`
+	CodeID *string   `json:"code_id"`
+}
+
+func (q *Queries) UpdateUserCodeID(ctx context.Context, arg UpdateUserCodeIDParams) error {
+	_, err := q.db.Exec(ctx, updateUserCodeID, arg.ID, arg.CodeID)
 	return err
 }
 

@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/signals.proto.
  */
 export const file_antclaw_v1_signals: GenFile = /*@__PURE__*/
-  fileDesc("ChhhbnRjbGF3L3YxL3NpZ25hbHMucHJvdG8SCmFudGNsYXcudjEiUgoIQmlhc0RhdGESDAoEcGFpchgBIAEoCRIRCglkaXJlY3Rpb24YAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIRCgl0aW1lZnJhbWUYBCABKAkiMQoOR2V0Qmlhc1JlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkiNwoPR2V0Qmlhc1Jlc3BvbnNlEiQKBmJpYXNlcxgBIAMoCzIULmFudGNsYXcudjEuQmlhc0RhdGEiRAoIUmFua0l0ZW0SDAoEcGFpchgBIAEoCRIMCgRyYW5rGAIgASgFEg0KBXNjb3JlGAMgASgBEg0KBXRyZW5kGAQgASgJIiIKDkdldFJhbmtSZXF1ZXN0EhAKCGNhdGVnb3J5GAEgASgJIjkKD0dldFJhbmtSZXNwb25zZRImCghyYW5raW5ncxgBIAMoCzIULmFudGNsYXcudjEuUmFua0l0ZW0iTwoHWEZhY3RvchIMCgRuYW1lGAEgASgJEg4KBndlaWdodBgCIAEoARIRCglkaXJlY3Rpb24YAyABKAkSEwoLZGVzY3JpcHRpb24YBCABKAkiIgoSR2V0WEZhY3RvcnNSZXF1ZXN0EgwKBHBhaXIYASABKAkiYwoTR2V0WEZhY3RvcnNSZXNwb25zZRIMCgRwYWlyGAEgASgJEiQKB2ZhY3RvcnMYAiADKAsyEy5hbnRjbGF3LnYxLlhGYWN0b3ISGAoQY29tcG9zaXRlX3NpZ25hbBgDIAEoCSJYCg5SYWRhckRhdGFQb2ludBIMCgRwYWlyGAEgASgJEgkKAXgYAiABKAESCQoBeRgDIAEoARIQCghxdWFkcmFudBgEIAEoCRIQCghzdHJlbmd0aBgFIAEoASIjCg9HZXRSYWRhclJlcXVlc3QSEAoIY2F0ZWdvcnkYASABKAkiPgoQR2V0UmFkYXJSZXNwb25zZRIqCgZwb2ludHMYASADKAsyGi5hbnRjbGF3LnYxLlJhZGFyRGF0YVBvaW50ImAKDUludGVuc2l0eURhdGESDAoEcGFpchgBIAEoCRIRCglpbnRlbnNpdHkYAiABKAESFgoOc3RyZW5ndGhfbGFiZWwYAyABKAkSFgoOcGVyY2VudGlsZV8zMGQYBCABKAEiIwoTR2V0SW50ZW5zaXR5UmVxdWVzdBIMCgRwYWlyGAEgASgJIkQKFEdldEludGVuc2l0eVJlc3BvbnNlEiwKCWludGVuc2l0eRgBIAEoCzIZLmFudGNsYXcudjEuSW50ZW5zaXR5RGF0YSJLCg5UcmFuc2l0aW9uUHJvYhISCgpmcm9tX3N0YXRlGAEgASgJEhAKCHRvX3N0YXRlGAIgASgJEhMKC3Byb2JhYmlsaXR5GAMgASgBIjsKFEdldFRyYW5zaXRpb25SZXF1ZXN0EgwKBHBhaXIYASABKAkSFQoNY3VycmVudF9zdGF0ZRgCIAEoCSJWChVHZXRUcmFuc2l0aW9uUmVzcG9uc2USDAoEcGFpchgBIAEoCRIvCgt0cmFuc2l0aW9ucxgCIAMoCzIaLmFudGNsYXcudjEuVHJhbnNpdGlvblByb2IiXgoRQ3J5cHRvQWxwaGFTaWduYWwSDQoFYXNzZXQYASABKAkSEwoLc2lnbmFsX3R5cGUYAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIRCgl0aW1lZnJhbWUYBCABKAkiLQoVR2V0Q3J5cHRvQWxwaGFSZXF1ZXN0EhQKDGFzc2V0X2ZpbHRlchgBIAEoCSJIChZHZXRDcnlwdG9BbHBoYVJlc3BvbnNlEi4KB3NpZ25hbHMYASADKAsyHS5hbnRjbGF3LnYxLkNyeXB0b0FscGhhU2lnbmFsImIKDVVuaWZpZWRTaWduYWwSDAoEcGFpchgBIAEoCRIRCglkaXJlY3Rpb24YAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIcChRjb250cmlidXRpbmdfZmFjdG9ycxgEIAMoCSIhChFHZXRVbmlmaWVkUmVxdWVzdBIMCgRwYWlyGAEgASgJIj8KEkdldFVuaWZpZWRSZXNwb25zZRIpCgZzaWduYWwYASABKAsyGS5hbnRjbGF3LnYxLlVuaWZpZWRTaWduYWwiXwoLUXVhbnRTaWduYWwSDAoEcGFpchgBIAEoCRIQCghzdHJhdGVneRgCIAEoCRIOCgZzaWduYWwYAyABKAkSDgoGc2hhcnBlGAQgASgBEhAKCGRyYXdkb3duGAUgASgBIh8KD0dldFF1YW50UmVxdWVzdBIMCgRwYWlyGAEgASgJIjwKEEdldFF1YW50UmVzcG9uc2USKAoHc2lnbmFscxgBIAMoCzIXLmFudGNsYXcudjEuUXVhbnRTaWduYWwiSgoJQ3RhU2lnbmFsEgwKBHBhaXIYASABKAkSDQoFdHJlbmQYAiABKAkSEAoIbW9tZW50dW0YAyABKAESDgoGcmVnaW1lGAQgASgJIh0KDUdldEN0YVJlcXVlc3QSDAoEcGFpchgBIAEoCSI3Cg5HZXRDdGFSZXNwb25zZRIlCgZzaWduYWwYASABKAsyFS5hbnRjbGF3LnYxLkN0YVNpZ25hbCJDCg9CcmllZmluZ1NlY3Rpb24SDQoFdGl0bGUYASABKAkSDwoHY29udGVudBgCIAEoCRIQCghwcmlvcml0eRgDIAEoCSImChJHZXRCcmllZmluZ1JlcXVlc3QSEAoIY2F0ZWdvcnkYASABKAkiWgoTR2V0QnJpZWZpbmdSZXNwb25zZRItCghzZWN0aW9ucxgBIAMoCzIbLmFudGNsYXcudjEuQnJpZWZpbmdTZWN0aW9uEhQKDGdlbmVyYXRlZF9hdBgCIAEoCSJRCgtPdXRsb29rRGF0YRIMCgRwYWlyGAEgASgJEg8KB291dGxvb2sYAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIPCgdob3Jpem9uGAQgASgJIjIKEUdldE91dGxvb2tSZXF1ZXN0EgwKBHBhaXIYASABKAkSDwoHaG9yaXpvbhgCIAEoCSI/ChJHZXRPdXRsb29rUmVzcG9uc2USKQoIb3V0bG9va3MYASADKAsyFy5hbnRjbGF3LnYxLk91dGxvb2tEYXRhMqMHCg5TaWduYWxzU2VydmljZRJCCgdHZXRCaWFzEhouYW50Y2xhdy52MS5HZXRCaWFzUmVxdWVzdBobLmFudGNsYXcudjEuR2V0Qmlhc1Jlc3BvbnNlEkIKB0dldFJhbmsSGi5hbnRjbGF3LnYxLkdldFJhbmtSZXF1ZXN0GhsuYW50Y2xhdy52MS5HZXRSYW5rUmVzcG9uc2USTgoLR2V0WEZhY3RvcnMSHi5hbnRjbGF3LnYxLkdldFhGYWN0b3JzUmVxdWVzdBofLmFudGNsYXcudjEuR2V0WEZhY3RvcnNSZXNwb25zZRJFCghHZXRSYWRhchIbLmFudGNsYXcudjEuR2V0UmFkYXJSZXF1ZXN0GhwuYW50Y2xhdy52MS5HZXRSYWRhclJlc3BvbnNlElEKDEdldEludGVuc2l0eRIfLmFudGNsYXcudjEuR2V0SW50ZW5zaXR5UmVxdWVzdBogLmFudGNsYXcudjEuR2V0SW50ZW5zaXR5UmVzcG9uc2USVAoNR2V0VHJhbnNpdGlvbhIgLmFudGNsYXcudjEuR2V0VHJhbnNpdGlvblJlcXVlc3QaIS5hbnRjbGF3LnYxLkdldFRyYW5zaXRpb25SZXNwb25zZRJXCg5HZXRDcnlwdG9BbHBoYRIhLmFudGNsYXcudjEuR2V0Q3J5cHRvQWxwaGFSZXF1ZXN0GiIuYW50Y2xhdy52MS5HZXRDcnlwdG9BbHBoYVJlc3BvbnNlEksKCkdldFVuaWZpZWQSHS5hbnRjbGF3LnYxLkdldFVuaWZpZWRSZXF1ZXN0Gh4uYW50Y2xhdy52MS5HZXRVbmlmaWVkUmVzcG9uc2USRQoIR2V0UXVhbnQSGy5hbnRjbGF3LnYxLkdldFF1YW50UmVxdWVzdBocLmFudGNsYXcudjEuR2V0UXVhbnRSZXNwb25zZRI/CgZHZXRDdGESGS5hbnRjbGF3LnYxLkdldEN0YVJlcXVlc3QaGi5hbnRjbGF3LnYxLkdldEN0YVJlc3BvbnNlEk4KC0dldEJyaWVmaW5nEh4uYW50Y2xhdy52MS5HZXRCcmllZmluZ1JlcXVlc3QaHy5hbnRjbGF3LnYxLkdldEJyaWVmaW5nUmVzcG9uc2USSwoKR2V0T3V0bG9vaxIdLmFudGNsYXcudjEuR2V0T3V0bG9va1JlcXVlc3QaHi5hbnRjbGF3LnYxLkdldE91dGxvb2tSZXNwb25zZUKfAQoOY29tLmFudGNsYXcudjFCDFNpZ25hbHNQcm90b1ABWjZnaXRodWIuY29tL2FudGNsYXcvYW50Y2xhdy9nZW4vZ28vYW50Y2xhdy92MTthbnRjbGF3djGiAgNBWFiqAgpBbnRjbGF3LlYxygIKQW50Y2xhd1xWMeICFkFudGNsYXdcVjFcR1BCTWV0YWRhdGHqAgtBbnRjbGF3OjpWMWIGcHJvdG8z");
+  fileDesc("ChhhbnRjbGF3L3YxL3NpZ25hbHMucHJvdG8SCmFudGNsYXcudjEiUgoIQmlhc0RhdGESDAoEcGFpchgBIAEoCRIRCglkaXJlY3Rpb24YAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIRCgl0aW1lZnJhbWUYBCABKAkiMQoOR2V0Qmlhc1JlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkiNwoPR2V0Qmlhc1Jlc3BvbnNlEiQKBmJpYXNlcxgBIAMoCzIULmFudGNsYXcudjEuQmlhc0RhdGEiRAoIUmFua0l0ZW0SDAoEcGFpchgBIAEoCRIMCgRyYW5rGAIgASgFEg0KBXNjb3JlGAMgASgBEg0KBXRyZW5kGAQgASgJIiIKDkdldFJhbmtSZXF1ZXN0EhAKCGNhdGVnb3J5GAEgASgJIjkKD0dldFJhbmtSZXNwb25zZRImCghyYW5raW5ncxgBIAMoCzIULmFudGNsYXcudjEuUmFua0l0ZW0iTwoHWEZhY3RvchIMCgRuYW1lGAEgASgJEg4KBndlaWdodBgCIAEoARIRCglkaXJlY3Rpb24YAyABKAkSEwoLZGVzY3JpcHRpb24YBCABKAkiIgoSR2V0WEZhY3RvcnNSZXF1ZXN0EgwKBHBhaXIYASABKAkiYwoTR2V0WEZhY3RvcnNSZXNwb25zZRIMCgRwYWlyGAEgASgJEiQKB2ZhY3RvcnMYAiADKAsyEy5hbnRjbGF3LnYxLlhGYWN0b3ISGAoQY29tcG9zaXRlX3NpZ25hbBgDIAEoCSJYCg5SYWRhckRhdGFQb2ludBIMCgRwYWlyGAEgASgJEgkKAXgYAiABKAESCQoBeRgDIAEoARIQCghxdWFkcmFudBgEIAEoCRIQCghzdHJlbmd0aBgFIAEoASIjCg9HZXRSYWRhclJlcXVlc3QSEAoIY2F0ZWdvcnkYASABKAkiPgoQR2V0UmFkYXJSZXNwb25zZRIqCgZwb2ludHMYASADKAsyGi5hbnRjbGF3LnYxLlJhZGFyRGF0YVBvaW50ImAKDUludGVuc2l0eURhdGESDAoEcGFpchgBIAEoCRIRCglpbnRlbnNpdHkYAiABKAESFgoOc3RyZW5ndGhfbGFiZWwYAyABKAkSFgoOcGVyY2VudGlsZV8zMGQYBCABKAEiIwoTR2V0SW50ZW5zaXR5UmVxdWVzdBIMCgRwYWlyGAEgASgJIkQKFEdldEludGVuc2l0eVJlc3BvbnNlEiwKCWludGVuc2l0eRgBIAEoCzIZLmFudGNsYXcudjEuSW50ZW5zaXR5RGF0YSJLCg5UcmFuc2l0aW9uUHJvYhISCgpmcm9tX3N0YXRlGAEgASgJEhAKCHRvX3N0YXRlGAIgASgJEhMKC3Byb2JhYmlsaXR5GAMgASgBIjsKFEdldFRyYW5zaXRpb25SZXF1ZXN0EgwKBHBhaXIYASABKAkSFQoNY3VycmVudF9zdGF0ZRgCIAEoCSJWChVHZXRUcmFuc2l0aW9uUmVzcG9uc2USDAoEcGFpchgBIAEoCRIvCgt0cmFuc2l0aW9ucxgCIAMoCzIaLmFudGNsYXcudjEuVHJhbnNpdGlvblByb2IiXgoRQ3J5cHRvQWxwaGFTaWduYWwSDQoFYXNzZXQYASABKAkSEwoLc2lnbmFsX3R5cGUYAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIRCgl0aW1lZnJhbWUYBCABKAkiLQoVR2V0Q3J5cHRvQWxwaGFSZXF1ZXN0EhQKDGFzc2V0X2ZpbHRlchgBIAEoCSJIChZHZXRDcnlwdG9BbHBoYVJlc3BvbnNlEi4KB3NpZ25hbHMYASADKAsyHS5hbnRjbGF3LnYxLkNyeXB0b0FscGhhU2lnbmFsImIKDVVuaWZpZWRTaWduYWwSDAoEcGFpchgBIAEoCRIRCglkaXJlY3Rpb24YAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIcChRjb250cmlidXRpbmdfZmFjdG9ycxgEIAMoCSIhChFHZXRVbmlmaWVkUmVxdWVzdBIMCgRwYWlyGAEgASgJIj8KEkdldFVuaWZpZWRSZXNwb25zZRIpCgZzaWduYWwYASABKAsyGS5hbnRjbGF3LnYxLlVuaWZpZWRTaWduYWwiXwoLUXVhbnRTaWduYWwSDAoEcGFpchgBIAEoCRIQCghzdHJhdGVneRgCIAEoCRIOCgZzaWduYWwYAyABKAkSDgoGc2hhcnBlGAQgASgBEhAKCGRyYXdkb3duGAUgASgBIh8KD0dldFF1YW50UmVxdWVzdBIMCgRwYWlyGAEgASgJIjwKEEdldFF1YW50UmVzcG9uc2USKAoHc2lnbmFscxgBIAMoCzIXLmFudGNsYXcudjEuUXVhbnRTaWduYWwiSgoJQ3RhU2lnbmFsEgwKBHBhaXIYASABKAkSDQoFdHJlbmQYAiABKAkSEAoIbW9tZW50dW0YAyABKAESDgoGcmVnaW1lGAQgASgJIh0KDUdldEN0YVJlcXVlc3QSDAoEcGFpchgBIAEoCSI3Cg5HZXRDdGFSZXNwb25zZRIlCgZzaWduYWwYASABKAsyFS5hbnRjbGF3LnYxLkN0YVNpZ25hbCJDCg9CcmllZmluZ1NlY3Rpb24SDQoFdGl0bGUYASABKAkSDwoHY29udGVudBgCIAEoCRIQCghwcmlvcml0eRgDIAEoCSImChJHZXRCcmllZmluZ1JlcXVlc3QSEAoIY2F0ZWdvcnkYASABKAkiWgoTR2V0QnJpZWZpbmdSZXNwb25zZRItCghzZWN0aW9ucxgBIAMoCzIbLmFudGNsYXcudjEuQnJpZWZpbmdTZWN0aW9uEhQKDGdlbmVyYXRlZF9hdBgCIAEoCSJRCgtPdXRsb29rRGF0YRIMCgRwYWlyGAEgASgJEg8KB291dGxvb2sYAiABKAkSEgoKY29uZmlkZW5jZRgDIAEoARIPCgdob3Jpem9uGAQgASgJIjIKEUdldE91dGxvb2tSZXF1ZXN0EgwKBHBhaXIYASABKAkSDwoHaG9yaXpvbhgCIAEoCSI/ChJHZXRPdXRsb29rUmVzcG9uc2USKQoIb3V0bG9va3MYASADKAsyFy5hbnRjbGF3LnYxLk91dGxvb2tEYXRhIlkKFUZpdENhbGlicmF0aW9uUmVxdWVzdBIQCghtb2RlbF9pZBgBIAEoCRIMCgR0eXBlGAIgASgJEg4KBnNjb3JlcxgDIAMoARIQCghvdXRjb21lcxgEIAMoCCJaChZGaXRDYWxpYnJhdGlvblJlc3BvbnNlEhAKCG1vZGVsX2lkGAEgASgJEgwKBHR5cGUYAiABKAkSEQoJbl9zYW1wbGVzGAMgASgFEg0KBWJyaWVyGAQgASgBIjsKGFByZWRpY3RDYWxpYnJhdGVkUmVxdWVzdBIQCghtb2RlbF9pZBgBIAEoCRINCgVzY29yZRgCIAEoASJBChlQcmVkaWN0Q2FsaWJyYXRlZFJlc3BvbnNlEhAKCG1vZGVsX2lkGAEgASgJEhIKCmNhbGlicmF0ZWQYAiABKAEiGQoXTGlzdENhbGlicmF0aW9uc1JlcXVlc3QiaQoSQ2FsaWJyYXRpb25TdW1tYXJ5EhAKCG1vZGVsX2lkGAEgASgJEgwKBHR5cGUYAiABKAkSEQoJbl9zYW1wbGVzGAMgASgFEg0KBWJyaWVyGAQgASgBEhEKCWZpdHRlZF9hdBgFIAEoCSJJChhMaXN0Q2FsaWJyYXRpb25zUmVzcG9uc2USLQoFaXRlbXMYASADKAsyHi5hbnRjbGF3LnYxLkNhbGlicmF0aW9uU3VtbWFyeTK9CQoOU2lnbmFsc1NlcnZpY2USQgoHR2V0QmlhcxIaLmFudGNsYXcudjEuR2V0Qmlhc1JlcXVlc3QaGy5hbnRjbGF3LnYxLkdldEJpYXNSZXNwb25zZRJCCgdHZXRSYW5rEhouYW50Y2xhdy52MS5HZXRSYW5rUmVxdWVzdBobLmFudGNsYXcudjEuR2V0UmFua1Jlc3BvbnNlEk4KC0dldFhGYWN0b3JzEh4uYW50Y2xhdy52MS5HZXRYRmFjdG9yc1JlcXVlc3QaHy5hbnRjbGF3LnYxLkdldFhGYWN0b3JzUmVzcG9uc2USRQoIR2V0UmFkYXISGy5hbnRjbGF3LnYxLkdldFJhZGFyUmVxdWVzdBocLmFudGNsYXcudjEuR2V0UmFkYXJSZXNwb25zZRJRCgxHZXRJbnRlbnNpdHkSHy5hbnRjbGF3LnYxLkdldEludGVuc2l0eVJlcXVlc3QaIC5hbnRjbGF3LnYxLkdldEludGVuc2l0eVJlc3BvbnNlElQKDUdldFRyYW5zaXRpb24SIC5hbnRjbGF3LnYxLkdldFRyYW5zaXRpb25SZXF1ZXN0GiEuYW50Y2xhdy52MS5HZXRUcmFuc2l0aW9uUmVzcG9uc2USVwoOR2V0Q3J5cHRvQWxwaGESIS5hbnRjbGF3LnYxLkdldENyeXB0b0FscGhhUmVxdWVzdBoiLmFudGNsYXcudjEuR2V0Q3J5cHRvQWxwaGFSZXNwb25zZRJLCgpHZXRVbmlmaWVkEh0uYW50Y2xhdy52MS5HZXRVbmlmaWVkUmVxdWVzdBoeLmFudGNsYXcudjEuR2V0VW5pZmllZFJlc3BvbnNlEkUKCEdldFF1YW50EhsuYW50Y2xhdy52MS5HZXRRdWFudFJlcXVlc3QaHC5hbnRjbGF3LnYxLkdldFF1YW50UmVzcG9uc2USPwoGR2V0Q3RhEhkuYW50Y2xhdy52MS5HZXRDdGFSZXF1ZXN0GhouYW50Y2xhdy52MS5HZXRDdGFSZXNwb25zZRJOCgtHZXRCcmllZmluZxIeLmFudGNsYXcudjEuR2V0QnJpZWZpbmdSZXF1ZXN0Gh8uYW50Y2xhdy52MS5HZXRCcmllZmluZ1Jlc3BvbnNlEksKCkdldE91dGxvb2sSHS5hbnRjbGF3LnYxLkdldE91dGxvb2tSZXF1ZXN0Gh4uYW50Y2xhdy52MS5HZXRPdXRsb29rUmVzcG9uc2USVwoORml0Q2FsaWJyYXRpb24SIS5hbnRjbGF3LnYxLkZpdENhbGlicmF0aW9uUmVxdWVzdBoiLmFudGNsYXcudjEuRml0Q2FsaWJyYXRpb25SZXNwb25zZRJgChFQcmVkaWN0Q2FsaWJyYXRlZBIkLmFudGNsYXcudjEuUHJlZGljdENhbGlicmF0ZWRSZXF1ZXN0GiUuYW50Y2xhdy52MS5QcmVkaWN0Q2FsaWJyYXRlZFJlc3BvbnNlEl0KEExpc3RDYWxpYnJhdGlvbnMSIy5hbnRjbGF3LnYxLkxpc3RDYWxpYnJhdGlvbnNSZXF1ZXN0GiQuYW50Y2xhdy52MS5MaXN0Q2FsaWJyYXRpb25zUmVzcG9uc2VCnwEKDmNvbS5hbnRjbGF3LnYxQgxTaWduYWxzUHJvdG9QAVo2Z2l0aHViLmNvbS9hbnRjbGF3L2FudGNsYXcvZ2VuL2dvL2FudGNsYXcvdjE7YW50Y2xhd3YxogIDQVhYqgIKQW50Y2xhdy5WMcoCCkFudGNsYXdcVjHiAhZBbnRjbGF3XFYxXEdQQk1ldGFkYXRh6gILQW50Y2xhdzo6VjFiBnByb3RvMw");
 
 /**
  * Bias data
@@ -928,6 +928,185 @@ export const GetOutlookResponseSchema: GenMessage<GetOutlookResponse> = /*@__PUR
   messageDesc(file_antclaw_v1_signals, 35);
 
 /**
+ * @generated from message antclaw.v1.FitCalibrationRequest
+ */
+export type FitCalibrationRequest = Message<"antclaw.v1.FitCalibrationRequest"> & {
+  /**
+   * 自定义标识
+   *
+   * @generated from field: string model_id = 1;
+   */
+  modelId: string;
+
+  /**
+   * 'platt' / 'isotonic'
+   *
+   * @generated from field: string type = 2;
+   */
+  type: string;
+
+  /**
+   * @generated from field: repeated double scores = 3;
+   */
+  scores: number[];
+
+  /**
+   * @generated from field: repeated bool outcomes = 4;
+   */
+  outcomes: boolean[];
+};
+
+/**
+ * Describes the message antclaw.v1.FitCalibrationRequest.
+ * Use `create(FitCalibrationRequestSchema)` to create a new message.
+ */
+export const FitCalibrationRequestSchema: GenMessage<FitCalibrationRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 36);
+
+/**
+ * @generated from message antclaw.v1.FitCalibrationResponse
+ */
+export type FitCalibrationResponse = Message<"antclaw.v1.FitCalibrationResponse"> & {
+  /**
+   * @generated from field: string model_id = 1;
+   */
+  modelId: string;
+
+  /**
+   * @generated from field: string type = 2;
+   */
+  type: string;
+
+  /**
+   * @generated from field: int32 n_samples = 3;
+   */
+  nSamples: number;
+
+  /**
+   * @generated from field: double brier = 4;
+   */
+  brier: number;
+};
+
+/**
+ * Describes the message antclaw.v1.FitCalibrationResponse.
+ * Use `create(FitCalibrationResponseSchema)` to create a new message.
+ */
+export const FitCalibrationResponseSchema: GenMessage<FitCalibrationResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 37);
+
+/**
+ * @generated from message antclaw.v1.PredictCalibratedRequest
+ */
+export type PredictCalibratedRequest = Message<"antclaw.v1.PredictCalibratedRequest"> & {
+  /**
+   * @generated from field: string model_id = 1;
+   */
+  modelId: string;
+
+  /**
+   * @generated from field: double score = 2;
+   */
+  score: number;
+};
+
+/**
+ * Describes the message antclaw.v1.PredictCalibratedRequest.
+ * Use `create(PredictCalibratedRequestSchema)` to create a new message.
+ */
+export const PredictCalibratedRequestSchema: GenMessage<PredictCalibratedRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 38);
+
+/**
+ * @generated from message antclaw.v1.PredictCalibratedResponse
+ */
+export type PredictCalibratedResponse = Message<"antclaw.v1.PredictCalibratedResponse"> & {
+  /**
+   * @generated from field: string model_id = 1;
+   */
+  modelId: string;
+
+  /**
+   * @generated from field: double calibrated = 2;
+   */
+  calibrated: number;
+};
+
+/**
+ * Describes the message antclaw.v1.PredictCalibratedResponse.
+ * Use `create(PredictCalibratedResponseSchema)` to create a new message.
+ */
+export const PredictCalibratedResponseSchema: GenMessage<PredictCalibratedResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 39);
+
+/**
+ * @generated from message antclaw.v1.ListCalibrationsRequest
+ */
+export type ListCalibrationsRequest = Message<"antclaw.v1.ListCalibrationsRequest"> & {
+};
+
+/**
+ * Describes the message antclaw.v1.ListCalibrationsRequest.
+ * Use `create(ListCalibrationsRequestSchema)` to create a new message.
+ */
+export const ListCalibrationsRequestSchema: GenMessage<ListCalibrationsRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 40);
+
+/**
+ * @generated from message antclaw.v1.CalibrationSummary
+ */
+export type CalibrationSummary = Message<"antclaw.v1.CalibrationSummary"> & {
+  /**
+   * @generated from field: string model_id = 1;
+   */
+  modelId: string;
+
+  /**
+   * @generated from field: string type = 2;
+   */
+  type: string;
+
+  /**
+   * @generated from field: int32 n_samples = 3;
+   */
+  nSamples: number;
+
+  /**
+   * @generated from field: double brier = 4;
+   */
+  brier: number;
+
+  /**
+   * @generated from field: string fitted_at = 5;
+   */
+  fittedAt: string;
+};
+
+/**
+ * Describes the message antclaw.v1.CalibrationSummary.
+ * Use `create(CalibrationSummarySchema)` to create a new message.
+ */
+export const CalibrationSummarySchema: GenMessage<CalibrationSummary> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 41);
+
+/**
+ * @generated from message antclaw.v1.ListCalibrationsResponse
+ */
+export type ListCalibrationsResponse = Message<"antclaw.v1.ListCalibrationsResponse"> & {
+  /**
+   * @generated from field: repeated antclaw.v1.CalibrationSummary items = 1;
+   */
+  items: CalibrationSummary[];
+};
+
+/**
+ * Describes the message antclaw.v1.ListCalibrationsResponse.
+ * Use `create(ListCalibrationsResponseSchema)` to create a new message.
+ */
+export const ListCalibrationsResponseSchema: GenMessage<ListCalibrationsResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_signals, 42);
+
+/**
  * SignalsService provides trading signals and analysis.
  * See: AntClaw-重构解决方案.md §3.3
  *
@@ -1053,6 +1232,36 @@ export const SignalsService: GenService<{
     methodKind: "unary";
     input: typeof GetOutlookRequestSchema;
     output: typeof GetOutlookResponseSchema;
+  },
+  /**
+   * M-C: 拟合并入库 Platt / Isotonic 校准模型。
+   *
+   * @generated from rpc antclaw.v1.SignalsService.FitCalibration
+   */
+  fitCalibration: {
+    methodKind: "unary";
+    input: typeof FitCalibrationRequestSchema;
+    output: typeof FitCalibrationResponseSchema;
+  },
+  /**
+   * M-C: 把原始 raw_score 通过校准模型映射到 [0,1] 概率。
+   *
+   * @generated from rpc antclaw.v1.SignalsService.PredictCalibrated
+   */
+  predictCalibrated: {
+    methodKind: "unary";
+    input: typeof PredictCalibratedRequestSchema;
+    output: typeof PredictCalibratedResponseSchema;
+  },
+  /**
+   * M-C: 列出已入库的校准模型与 Brier。
+   *
+   * @generated from rpc antclaw.v1.SignalsService.ListCalibrations
+   */
+  listCalibrations: {
+    methodKind: "unary";
+    input: typeof ListCalibrationsRequestSchema;
+    output: typeof ListCalibrationsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_signals, 0);

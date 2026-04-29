@@ -9,41 +9,80 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countUnreadNotifications = `-- name: CountUnreadNotifications :one
+SELECT COUNT(*)::bigint AS n FROM notifications
+ WHERE user_id = $1 AND is_read = false
+`
+
+func (q *Queries) CountUnreadNotifications(ctx context.Context, userID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countUnreadNotifications, userID)
+	var n int64
+	err := row.Scan(&n)
+	return n, err
+}
+
 const createNotification = `-- name: CreateNotification :one
-INSERT INTO notifications (user_id, type, title, body, data, priority)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, user_id, type, title, body, data, priority, is_read, created_at, read_at
+INSERT INTO notifications (user_id, type, category, title, body, data, priority, severity, dedup_key)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, user_id, type, category, title, body, data, priority, severity, dedup_key, is_read, created_at, read_at
 `
 
 type CreateNotificationParams struct {
 	UserID   uuid.UUID `json:"user_id"`
 	Type     string    `json:"type"`
+	Category string    `json:"category"`
 	Title    string    `json:"title"`
 	Body     string    `json:"body"`
 	Data     []byte    `json:"data"`
 	Priority *string   `json:"priority"`
+	Severity string    `json:"severity"`
+	DedupKey *string   `json:"dedup_key"`
 }
 
-func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotificationParams) (Notification, error) {
+type CreateNotificationRow struct {
+	ID        uuid.UUID          `json:"id"`
+	UserID    uuid.UUID          `json:"user_id"`
+	Type      string             `json:"type"`
+	Category  string             `json:"category"`
+	Title     string             `json:"title"`
+	Body      string             `json:"body"`
+	Data      []byte             `json:"data"`
+	Priority  *string            `json:"priority"`
+	Severity  string             `json:"severity"`
+	DedupKey  *string            `json:"dedup_key"`
+	IsRead    *bool              `json:"is_read"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ReadAt    pgtype.Timestamptz `json:"read_at"`
+}
+
+// 注意：调用方必须负责 dedup_key 的去重（Redis SETEX）；这里只做存档。
+func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotificationParams) (CreateNotificationRow, error) {
 	row := q.db.QueryRow(ctx, createNotification,
 		arg.UserID,
 		arg.Type,
+		arg.Category,
 		arg.Title,
 		arg.Body,
 		arg.Data,
 		arg.Priority,
+		arg.Severity,
+		arg.DedupKey,
 	)
-	var i Notification
+	var i CreateNotificationRow
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
 		&i.Type,
+		&i.Category,
 		&i.Title,
 		&i.Body,
 		&i.Data,
 		&i.Priority,
+		&i.Severity,
+		&i.DedupKey,
 		&i.IsRead,
 		&i.CreatedAt,
 		&i.ReadAt,
@@ -52,7 +91,7 @@ func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotification
 }
 
 const getNotificationByID = `-- name: GetNotificationByID :one
-SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at FROM notifications WHERE id = $1
+SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at, category, dedup_key, severity FROM notifications WHERE id = $1
 `
 
 func (q *Queries) GetNotificationByID(ctx context.Context, id uuid.UUID) (Notification, error) {
@@ -69,15 +108,48 @@ func (q *Queries) GetNotificationByID(ctx context.Context, id uuid.UUID) (Notifi
 		&i.IsRead,
 		&i.CreatedAt,
 		&i.ReadAt,
+		&i.Category,
+		&i.DedupKey,
+		&i.Severity,
+	)
+	return i, err
+}
+
+const getNotificationByIDForUser = `-- name: GetNotificationByIDForUser :one
+SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at, category, dedup_key, severity FROM notifications WHERE id = $1 AND user_id = $2
+`
+
+type GetNotificationByIDForUserParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetNotificationByIDForUser(ctx context.Context, arg GetNotificationByIDForUserParams) (Notification, error) {
+	row := q.db.QueryRow(ctx, getNotificationByIDForUser, arg.ID, arg.UserID)
+	var i Notification
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.Title,
+		&i.Body,
+		&i.Data,
+		&i.Priority,
+		&i.IsRead,
+		&i.CreatedAt,
+		&i.ReadAt,
+		&i.Category,
+		&i.DedupKey,
+		&i.Severity,
 	)
 	return i, err
 }
 
 const getNotificationHistory = `-- name: GetNotificationHistory :many
-SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at FROM notifications 
-WHERE user_id = $1 
-ORDER BY created_at DESC 
-LIMIT $2
+SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at, category, dedup_key, severity FROM notifications
+ WHERE user_id = $1
+ ORDER BY created_at DESC
+ LIMIT $2
 `
 
 type GetNotificationHistoryParams struct {
@@ -105,6 +177,9 @@ func (q *Queries) GetNotificationHistory(ctx context.Context, arg GetNotificatio
 			&i.IsRead,
 			&i.CreatedAt,
 			&i.ReadAt,
+			&i.Category,
+			&i.DedupKey,
+			&i.Severity,
 		); err != nil {
 			return nil, err
 		}
@@ -117,13 +192,19 @@ func (q *Queries) GetNotificationHistory(ctx context.Context, arg GetNotificatio
 }
 
 const getUnreadNotifications = `-- name: GetUnreadNotifications :many
-SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at FROM notifications 
-WHERE user_id = $1 AND is_read = false 
-ORDER BY created_at DESC
+SELECT id, user_id, type, title, body, data, priority, is_read, created_at, read_at, category, dedup_key, severity FROM notifications
+ WHERE user_id = $1 AND is_read = false
+ ORDER BY created_at DESC
+ LIMIT $2
 `
 
-func (q *Queries) GetUnreadNotifications(ctx context.Context, userID uuid.UUID) ([]Notification, error) {
-	rows, err := q.db.Query(ctx, getUnreadNotifications, userID)
+type GetUnreadNotificationsParams struct {
+	UserID uuid.UUID `json:"user_id"`
+	Limit  int32     `json:"limit"`
+}
+
+func (q *Queries) GetUnreadNotifications(ctx context.Context, arg GetUnreadNotificationsParams) ([]Notification, error) {
+	rows, err := q.db.Query(ctx, getUnreadNotifications, arg.UserID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +223,9 @@ func (q *Queries) GetUnreadNotifications(ctx context.Context, userID uuid.UUID) 
 			&i.IsRead,
 			&i.CreatedAt,
 			&i.ReadAt,
+			&i.Category,
+			&i.DedupKey,
+			&i.Severity,
 		); err != nil {
 			return nil, err
 		}
@@ -154,8 +238,9 @@ func (q *Queries) GetUnreadNotifications(ctx context.Context, userID uuid.UUID) 
 }
 
 const markAllRead = `-- name: MarkAllRead :exec
-UPDATE notifications SET is_read = true, read_at = NOW() 
-WHERE user_id = $1 AND is_read = false
+UPDATE notifications
+   SET is_read = true, read_at = NOW()
+ WHERE user_id = $1 AND is_read = false
 `
 
 func (q *Queries) MarkAllRead(ctx context.Context, userID uuid.UUID) error {
@@ -164,10 +249,17 @@ func (q *Queries) MarkAllRead(ctx context.Context, userID uuid.UUID) error {
 }
 
 const markNotificationRead = `-- name: MarkNotificationRead :exec
-UPDATE notifications SET is_read = true, read_at = NOW() WHERE id = $1
+UPDATE notifications
+   SET is_read = true, read_at = NOW()
+ WHERE id = $1 AND user_id = $2
 `
 
-func (q *Queries) MarkNotificationRead(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, markNotificationRead, id)
+type MarkNotificationReadParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) MarkNotificationRead(ctx context.Context, arg MarkNotificationReadParams) error {
+	_, err := q.db.Exec(ctx, markNotificationRead, arg.ID, arg.UserID)
 	return err
 }

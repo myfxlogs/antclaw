@@ -9,13 +9,14 @@ import (
 
 	"github.com/antclaw/antclaw/internal/domain/shared"
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/cftc"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
 )
 
 // COTService provides COT analysis operations
 type COTService struct {
 	repo      postgres.COTRepository
-	client    *apiclient.CFTCClient
+	client    *cftc.Client
 	logger    *slog.Logger
 }
 
@@ -35,9 +36,10 @@ type COTAnalysisResult struct {
 
 // NewCOTService creates a new COT service
 func NewCOTService(repo postgres.COTRepository, apiKey string, logger *slog.Logger) *COTService {
+	src := apiclient.NewSource("cftc", apiclient.Options{Timeout: 30 * time.Second})
 	return &COTService{
 		repo:   repo,
-		client: apiclient.NewCFTCClient(apiKey),
+		client: cftc.NewClient(src, apiKey),
 		logger: logger,
 	}
 }
@@ -60,7 +62,7 @@ func (s *COTService) SyncLatest(ctx context.Context) (*SyncResult, error) {
 		// Convert to internal records
 		var records []postgres.COTRecord
 		for _, r := range reports {
-			date, _ := apiclient.ParseReportDate(r.ReportDateAsOf)
+			date, _ := cftc.ParseReportDate(r.ReportDateAsOf)
 			record := postgres.COTRecord{
 				ReportDate:       date,
 				ContractCode:     r.CftcContractMarketCode,

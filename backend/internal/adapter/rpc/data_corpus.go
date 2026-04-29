@@ -39,7 +39,7 @@ var dataSourceTables = []tableMapping{
 	{JobID: "price-weekly", Name: "周 K 线", Table: "price_weekly", TimeCol: "week"},
 	{JobID: "intraday-sync", Name: "5min K 线 (Yahoo)", Table: "price_intraday", TimeCol: "time"},
 	{JobID: "sentiment-sync", Name: "情绪快照 (CNN/AAII)", Table: "sentiment_snapshots", TimeCol: "time"},
-	{JobID: "onchain-sync", Name: "链上指标 (CoinGecko)", Table: "onchain_metrics", TimeCol: "date"},
+	{JobID: "onchain-sync", Name: "链上指标 (CoinGecko)", Table: "onchain_metrics", TimeCol: "time"},
 	{JobID: "defi-sync", Name: "DeFi TVL (DefiLlama)", Table: "defi_snapshots", TimeCol: "time"},
 	{JobID: "vix-term-sync", Name: "VIX 期限结构 (CBOE)", Table: "vix_term_structure", TimeCol: "time"},
 	{JobID: "dvol-sync", Name: "DVOL (Deribit)", Table: "dvol_snapshots", TimeCol: "time"},
@@ -151,13 +151,30 @@ func FetchDataPreview(ctx context.Context, pool *pgxpool.Pool, jobID string, lim
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
+	// 兜底：若表不存在（采集器尚未落地建表），直接返回空预览，避免前端 500。
+	var exists bool
+	if err := pool.QueryRow(ctx,
+		`SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name = $1)`,
+		mapping.Table).Scan(&exists); err == nil && !exists {
+		return &DataPreviewRows{
+			JobID:   mapping.JobID,
+			Table:   mapping.Table,
+			TimeCol: mapping.TimeCol,
+		}, nil
+	}
+
 	orderBy := quoteIdent(mapping.TimeCol)
 	if mapping.TimeCol == "" {
 		orderBy = "id"
 	}
 
-	sql := fmt.Sprintf(`SELECT * FROM %s ORDER BY %s DESC NULLS LAST LIMIT $1`,
-		quoteIdent(mapping.Table), orderBy)
+	whereClause := ""
+	if mapping.Where != "" {
+		whereClause = " WHERE " + mapping.Where
+	}
+
+	sql := fmt.Sprintf(`SELECT * FROM %s%s ORDER BY %s DESC NULLS LAST LIMIT $1`,
+		quoteIdent(mapping.Table), whereClause, orderBy)
 
 	rows, err := pool.Query(ctx, sql, limit)
 	if err != nil {

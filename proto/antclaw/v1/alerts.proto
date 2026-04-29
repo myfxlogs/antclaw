@@ -28,6 +28,13 @@ service AlertService {
   rpc UpdateAlert(UpdateAlertRequest) returns (UpdateAlertResponse);
   rpc DeleteAlert(DeleteAlertRequest) returns (DeleteAlertResponse);
   rpc ToggleAlert(ToggleAlertRequest) returns (ToggleAlertResponse);
+
+  // M-E: alert gate + 偏好 + 配额
+  rpc DecideAlert(DecideAlertRequest) returns (DecideAlertResponse);
+  rpc GetPreferences(GetPreferencesRequest) returns (GetPreferencesResponse);
+  rpc UpdatePreferences(UpdatePreferencesRequest) returns (UpdatePreferencesResponse);
+  rpc SetUserTier(SetUserTierRequest) returns (SetUserTierResponse);
+  rpc GetAlertHistory(GetAlertHistoryRequest) returns (GetAlertHistoryResponse);
 }
 
 // Alert subscription
@@ -142,3 +149,54 @@ message ToggleAlertRequest {
   bool enabled = 2;
 }
 message ToggleAlertResponse { AlertRule alert = 1; }
+
+// ============================================================
+// M-E 增量
+// ============================================================
+
+message DecideAlertRequest {
+  string user_id = 1;
+  string alert_type = 2;
+  string severity = 3;     // low / medium / high / critical
+  repeated string pairs = 4;
+}
+
+message DecideAlertResponse {
+  bool send = 1;
+  string reason = 2;       // tier_blocked / quiet_hours / cooldown / unsubscribed_pair / ok
+}
+
+message GetPreferencesRequest { string user_id = 1; }
+message GetPreferencesResponse {
+  string user_id = 1;
+  repeated string pairs = 2;
+  bool high_impact_only = 3;
+  int32 quiet_hours_start = 4;
+  int32 quiet_hours_end = 5;
+  string timezone = 6;
+}
+
+message UpdatePreferencesRequest {
+  string user_id = 1;
+  repeated string pairs = 2;
+  bool high_impact_only = 3;
+  int32 quiet_hours_start = 4;
+  int32 quiet_hours_end = 5;
+  string timezone = 6;
+}
+message UpdatePreferencesResponse { bool ok = 1; }
+
+message SetUserTierRequest { string user_id = 1; string tier = 2; int32 ai_max_per_day = 3; }
+message SetUserTierResponse { bool ok = 1; }
+
+message GetAlertHistoryRequest { string user_id = 1; int32 limit = 2; }
+message AlertLogItem {
+  int64 id = 1;
+  string user_id = 2;
+  string alert_type = 3;
+  string severity = 4;
+  bool sent = 5;
+  string reason = 6;
+  string created_at = 7;
+}
+message GetAlertHistoryResponse { repeated AlertLogItem items = 1; }

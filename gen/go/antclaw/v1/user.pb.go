@@ -134,6 +134,8 @@ type User struct {
 	EmailVerified bool                   `protobuf:"varint,8,opt,name=email_verified,json=emailVerified,proto3" json:"email_verified,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     int64                  `protobuf:"varint,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	// 数字账号 ID（5 位起，避开 4/7，不以 0 开头）。可用于登录。
+	CodeId        string `protobuf:"bytes,11,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -236,6 +238,13 @@ func (x *User) GetUpdatedAt() int64 {
 		return x.UpdatedAt
 	}
 	return 0
+}
+
+func (x *User) GetCodeId() string {
+	if x != nil {
+		return x.CodeId
+	}
+	return ""
 }
 
 // GetMe request
@@ -1504,7 +1513,7 @@ var File_antclaw_v1_user_proto protoreflect.FileDescriptor
 const file_antclaw_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"\x15antclaw/v1/user.proto\x12\n" +
-	"antclaw.v1\x1a\x17antclaw/v1/common.proto\"\xb7\x02\n" +
+	"antclaw.v1\x1a\x17antclaw/v1/common.proto\"\xd0\x02\n" +
 	"\x04User\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
@@ -1518,7 +1527,8 @@ const file_antclaw_v1_user_proto_rawDesc = "" +
 	"created_at\x18\t \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\n" +
-	" \x01(\x03R\tupdatedAt\"\x0e\n" +
+	" \x01(\x03R\tupdatedAt\x12\x17\n" +
+	"\acode_id\x18\v \x01(\tR\x06codeId\"\x0e\n" +
 	"\fGetMeRequest\"5\n" +
 	"\rGetMeResponse\x12$\n" +
 	"\x04user\x18\x01 \x01(\v2\x10.antclaw.v1.UserR\x04user\"\x82\x01\n" +

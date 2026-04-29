@@ -25,10 +25,13 @@ type AuthHandler struct {
 
 // UserStore is the persistence port required by AuthHandler.
 // Real implementation will be wired to sqlc-generated *db.Queries.
+//
+// 返回值新增 codeID（数字 ID）：登录可凭 email/code_id/username 任一身份。
 type UserStore interface {
-	CreateUser(ctx context.Context, email, displayName, passwordHash, locale, timezone string) (userID string, role string, passwordVersion int, err error)
-	GetUserByEmail(ctx context.Context, email string) (userID, passwordHash, role, locale, status string, passwordVersion int, err error)
-	GetUserByID(ctx context.Context, userID string) (role, locale string, passwordVersion int, err error)
+	CreateUser(ctx context.Context, email, displayName, passwordHash, locale, timezone string) (userID, role, codeID string, passwordVersion int, err error)
+	GetUserByEmail(ctx context.Context, email string) (userID, passwordHash, role, locale, status, codeID string, passwordVersion int, err error)
+	GetUserByCodeID(ctx context.Context, codeID string) (userID, passwordHash, role, locale, status, outCodeID string, passwordVersion int, err error)
+	GetUserByID(ctx context.Context, userID string) (role, locale, codeID string, passwordVersion int, err error)
 	CreateSession(ctx context.Context, userID, userAgent, ip string) (sessionID string, err error)
 	RevokeSession(ctx context.Context, sessionID string) error
 	RevokeUserSessions(ctx context.Context, userID string) error
@@ -67,7 +70,7 @@ func (h *AuthHandler) Register(ctx context.Context, req *connect.Request[authv1.
 		tz = "Asia/Shanghai"
 	}
 
-	userID, role, pv, err := h.users.CreateUser(ctx, email, req.Msg.DisplayName, hash, locale, tz)
+	userID, role, codeID, pv, err := h.users.CreateUser(ctx, email, req.Msg.DisplayName, hash, locale, tz)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("email taken"))
 	}
@@ -84,6 +87,7 @@ func (h *AuthHandler) Register(ctx context.Context, req *connect.Request[authv1.
 		AccessToken:  access,
 		RefreshToken: refresh,
 		ExpiresAt:    expiresAt,
+		CodeId:       codeID,
 	}), nil
 }
 
@@ -96,14 +100,29 @@ func (h *AuthHandler) Login(ctx context.Context, req *connect.Request[authv1.Log
 		}
 	}()
 
-	email := normalizeEmail(req.Msg.Email)
-	if backoff, _ := auth.LoginFailureBackoff(ctx, h.rdb, email); backoff > 0 {
+	// 智能识别 identifier：含 @ 视为邮箱；否则若全数字按 code_id 查询。
+	identifier := strings.TrimSpace(req.Msg.Email)
+	rateKey := normalizeEmail(identifier)
+	if backoff, _ := auth.LoginFailureBackoff(ctx, h.rdb, rateKey); backoff > 0 {
 		return nil, connect.NewError(connect.CodeResourceExhausted, fmt.Errorf("rate limited"))
 	}
 
-	userID, hash, role, locale, status, pv, err := h.users.GetUserByEmail(ctx, email)
+	var (
+		userID, hash, role, locale, status, codeID string
+		pv                                         int
+		err                                        error
+	)
+	switch {
+	case strings.Contains(identifier, "@"):
+		userID, hash, role, locale, status, codeID, pv, err = h.users.GetUserByEmail(ctx, normalizeEmail(identifier))
+	case auth.IsAllDigits(identifier):
+		userID, hash, role, locale, status, codeID, pv, err = h.users.GetUserByCodeID(ctx, identifier)
+	default:
+		// username 或其它形式暂未支持登录路径，统一走 GetUserByEmail（命中 username UNIQUE 失败也会 401）。
+		userID, hash, role, locale, status, codeID, pv, err = h.users.GetUserByEmail(ctx, normalizeEmail(identifier))
+	}
 	if err != nil {
-		_ = auth.RecordLoginFailure(ctx, h.rdb, email)
+		_ = auth.RecordLoginFailure(ctx, h.rdb, rateKey)
 		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid credentials"))
 	}
 	if status == "banned" {
@@ -112,12 +131,12 @@ func (h *AuthHandler) Login(ctx context.Context, req *connect.Request[authv1.Log
 
 	ok, err := auth.VerifyPassword(req.Msg.Password, hash)
 	if err != nil || !ok {
-		_ = auth.RecordLoginFailure(ctx, h.rdb, email)
+		_ = auth.RecordLoginFailure(ctx, h.rdb, rateKey)
 		h.logAudit(ctx, &userID, audit.ActionLoginFailed, "users", "invalid credentials", req.Msg.Client)
 		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid credentials"))
 	}
 
-	_ = auth.ClearLoginFailures(ctx, h.rdb, email)
+	_ = auth.ClearLoginFailures(ctx, h.rdb, rateKey)
 
 	access, refresh, expiresAt, err := h.issueTokens(ctx, userID, role, locale, pv, clientUA(req.Msg.Client), clientIP(req.Msg.Client))
 	if err != nil {
@@ -131,6 +150,7 @@ func (h *AuthHandler) Login(ctx context.Context, req *connect.Request[authv1.Log
 		AccessToken:  access,
 		RefreshToken: refresh,
 		ExpiresAt:    expiresAt,
+		CodeId:       codeID,
 	}), nil
 }
 
@@ -158,7 +178,7 @@ func (h *AuthHandler) Refresh(ctx context.Context, req *connect.Request[authv1.R
 		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("refresh reused"))
 	}
 
-	role, locale, pv, err := h.users.GetUserByID(ctx, claims.Subject)
+	role, locale, _, pv, err := h.users.GetUserByID(ctx, claims.Subject)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not found"))
 	}

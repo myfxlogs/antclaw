@@ -14,13 +14,13 @@
   "login": {
     "title": "AntClaw 管理后台",
     "subtitle": "管理员登录",
-    "email": "邮箱",
+    "email": "邮箱 / 用户ID",
     "password": "密码",
     "loginButton": "登录",
-    "emailPlaceholder": "请输入邮箱",
+    "emailPlaceholder": "邮箱（含 @）或 5 位用户ID",
     "passwordPlaceholder": "请输入密码",
-    "loginError": "登录失败，请检查邮箱和密码",
-    "requiredEmail": "请输入邮箱",
+    "loginError": "登录失败，请检查账号和密码",
+    "requiredEmail": "请输入邮箱或用户ID",
     "requiredPassword": "请输入密码"
   },
   "dashboard": {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Mail, Shield, Globe, Save } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import NotificationPrefsCard from '../components/NotificationPrefsCard'
 
 export default function Settings() {
   const { t } = useTranslation()
@@ -36,6 +37,8 @@ export default function Settings() {
       <h1 className="text-2xl font-bold text-gray-900">{t('settings.title')}</h1>
 
       <div className="grid gap-6 max-w-2xl">
+        <NotificationPrefsCard />
+
         <section className="bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <Mail className="w-5 h-5 text-blue-600" />

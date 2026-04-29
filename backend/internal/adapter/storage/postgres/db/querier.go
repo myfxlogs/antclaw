@@ -12,9 +12,11 @@ import (
 
 type Querier interface {
 	BanUser(ctx context.Context, id uuid.UUID) error
+	CountUnreadNotifications(ctx context.Context, userID uuid.UUID) (int64, error)
 	CountUsers(ctx context.Context) (int64, error)
 	CreateAuditLog(ctx context.Context, arg CreateAuditLogParams) (int64, error)
-	CreateNotification(ctx context.Context, arg CreateNotificationParams) (Notification, error)
+	// 注意：调用方必须负责 dedup_key 的去重（Redis SETEX）；这里只做存档。
+	CreateNotification(ctx context.Context, arg CreateNotificationParams) (CreateNotificationRow, error)
 	CreateOrUpdateUserAIKey(ctx context.Context, arg CreateOrUpdateUserAIKeyParams) error
 	CreatePasswordResetToken(ctx context.Context, arg CreatePasswordResetTokenParams) error
 	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (uuid.UUID, error)
@@ -24,15 +26,18 @@ type Querier interface {
 	GetAuditLogByID(ctx context.Context, id int64) (AuditLog, error)
 	GetLastAuditLog(ctx context.Context) (AuditLog, error)
 	GetNotificationByID(ctx context.Context, id uuid.UUID) (Notification, error)
+	GetNotificationByIDForUser(ctx context.Context, arg GetNotificationByIDForUserParams) (Notification, error)
 	GetNotificationHistory(ctx context.Context, arg GetNotificationHistoryParams) ([]Notification, error)
 	GetPasswordResetToken(ctx context.Context, tokenHash []byte) (PasswordReset, error)
 	GetRefreshToken(ctx context.Context, jti uuid.UUID) (RefreshToken, error)
 	GetSessionByID(ctx context.Context, id uuid.UUID) (Session, error)
-	GetUnreadNotifications(ctx context.Context, userID uuid.UUID) ([]Notification, error)
+	GetUnreadNotifications(ctx context.Context, arg GetUnreadNotificationsParams) ([]Notification, error)
 	GetUserAIKey(ctx context.Context, arg GetUserAIKeyParams) (UserAiKey, error)
+	GetUserByCodeID(ctx context.Context, codeID *string) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username *string) (User, error)
+	GetUserNotificationPrefs(ctx context.Context, userID uuid.UUID) (UserNotificationPref, error)
 	IsRefreshTokenRevoked(ctx context.Context, jti uuid.UUID) (bool, error)
 	IsSessionRevoked(ctx context.Context, id uuid.UUID) (bool, error)
 	ListActiveAIKeys(ctx context.Context) ([]UserAiKey, error)
@@ -40,7 +45,7 @@ type Querier interface {
 	ListUserSessions(ctx context.Context, userID uuid.UUID) ([]Session, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	MarkAllRead(ctx context.Context, userID uuid.UUID) error
-	MarkNotificationRead(ctx context.Context, id uuid.UUID) error
+	MarkNotificationRead(ctx context.Context, arg MarkNotificationReadParams) error
 	MarkPasswordResetTokenConsumed(ctx context.Context, tokenHash []byte) error
 	MarkRefreshTokenRotated(ctx context.Context, arg MarkRefreshTokenRotatedParams) error
 	RevokeAllUserRefreshTokens(ctx context.Context, userID uuid.UUID) error
@@ -54,8 +59,10 @@ type Querier interface {
 	UpdateEmailVerifiedAt(ctx context.Context, arg UpdateEmailVerifiedAtParams) error
 	UpdatePasswordVersion(ctx context.Context, id uuid.UUID) error
 	UpdateSessionLastSeen(ctx context.Context, arg UpdateSessionLastSeenParams) error
+	UpdateUserCodeID(ctx context.Context, arg UpdateUserCodeIDParams) error
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
 	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
+	UpsertUserNotificationPrefs(ctx context.Context, arg UpsertUserNotificationPrefsParams) (UserNotificationPref, error)
 }
 
 var _ Querier = (*Queries)(nil)

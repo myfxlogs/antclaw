@@ -55,6 +55,8 @@ message User {
   bool email_verified = 8;
   int64 created_at = 9;
   int64 updated_at = 10;
+  // 数字账号 ID（5 位起，避开 4/7，不以 0 开头）。可用于登录。
+  string code_id = 11;
 }
 
 // GetMe request

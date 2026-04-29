@@ -1,8 +1,11 @@
-// 链上数据采集器 - 使用CoinGecko免费API
+// 链上数据采集器：通过 CoinGecko 公共 API 抓取价格/市值/成交量。
+// 表 onchain_metrics 为长表 (time, asset, metric, value, source)，单点拆为多行。
+// MVRV/SOPR/active_addresses 等深度链上指标不在 CoinGecko 范围，留待 Coinmetrics 薄客户端接入。
 package main
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -11,10 +14,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// onchainAssets 要采集的加密资产列表
+// onchainAssets 要采集的加密资产（CoinGecko ID + 内部 Symbol）。
 var onchainAssets = []struct {
-	ID     string // CoinGecko ID
-	Symbol string // 内部符号
+	ID     string
+	Symbol string
 }{
 	{"bitcoin", "BTC"},
 	{"ethereum", "ETH"},
@@ -23,62 +26,87 @@ var onchainAssets = []struct {
 	{"ripple", "XRP"},
 }
 
-// cg.MarketResp CoinGecko市场数据响应
+const onchainSource = "coingecko"
 
-// collectOnchain 采集链上数据并持久化
+// collectOnchain 拉取最近 30 日数据并写入 onchain_metrics。
 func collectOnchain(ctx context.Context, dbpool *pgxpool.Pool, logger *slog.Logger) error {
 	logger.Info("Starting onchain collection from CoinGecko")
 
-	src := apiclient.NewSource("coingecko", apiclient.Options{Timeout: 30 * time.Second})
+	src := apiclient.NewSource(onchainSource, apiclient.Options{Timeout: 30 * time.Second})
 	client := cg.NewClient(src)
 	totalInserted := 0
+	var firstErr error
 
 	for _, asset := range onchainAssets {
 		data, err := client.GetMarketChart(ctx, asset.ID, "usd", 30, "daily")
 		if err != nil {
 			logger.Warn("CoinGecko fetch failed", "asset", asset.Symbol, "error", err)
+			if firstErr == nil {
+				firstErr = err
+			}
 			continue
 		}
 
-		inserted := saveOnchainMetrics(ctx, dbpool, asset.Symbol, data)
+		inserted, err := saveOnchainMetrics(ctx, dbpool, asset.Symbol, data, logger)
+		if err != nil {
+			logger.Warn("onchain insert failed", "asset", asset.Symbol, "error", err)
+			if firstErr == nil {
+				firstErr = err
+			}
+		}
 		totalInserted += inserted
 		logger.Info("Onchain synced", "asset", asset.Symbol, "records", inserted)
 
-		// API限速: CoinGecko免费版约30 calls/min
+		// CoinGecko free tier ≈ 30 req/min
 		time.Sleep(2 * time.Second)
 	}
 
 	logger.Info("Onchain collection completed", "total_inserted", totalInserted)
+	if totalInserted == 0 && firstErr != nil {
+		return firstErr
+	}
 	return nil
 }
 
-// saveOnchainMetrics 保存链上指标到数据库
-func saveOnchainMetrics(ctx context.Context, dbpool *pgxpool.Pool, symbol string, data *cg.MarketResp) int {
-	count := 0
-	// CoinGecko返回的是 [timestamp_ms, value] 数组
-	for i := 0; i < len(data.Prices); i++ {
-		if i >= len(data.TotalVolumes) || i >= len(data.MarketCaps) {
-			break
-		}
-		tsMs := int64(data.Prices[i][0])
-		date := time.Unix(tsMs/1000, 0).UTC().Truncate(24 * time.Hour)
-		volume := data.TotalVolumes[i][1]
-		marketCap := data.MarketCaps[i][1]
+// saveOnchainMetrics 把市场快照拆成长表行：每个 (time,asset) 写 price / market_cap / total_volume 三条。
+func saveOnchainMetrics(ctx context.Context, dbpool *pgxpool.Pool, symbol string, data *cg.MarketResp, logger *slog.Logger) (int, error) {
+	if data == nil || len(data.Prices) == 0 {
+		return 0, errors.New("empty market chart response")
+	}
+	const sql = `
+		INSERT INTO onchain_metrics (time, asset, metric, value, source)
+		VALUES ($1,$2,$3,$4,$5)
+		ON CONFLICT (time, asset, metric) DO UPDATE SET
+		  value = EXCLUDED.value,
+		  source = EXCLUDED.source`
 
-		// 使用交易量作为flow代理,市值作为onchain_score基础
-		_, err := dbpool.Exec(ctx, `
-			INSERT INTO onchain_metrics 
-			(date, asset, flow_in, flow_out, net_flow, onchain_score)
-			VALUES ($1, $2, $3, $4, $5, $6)
-			ON CONFLICT (date, asset) DO UPDATE SET
-			  flow_in = EXCLUDED.flow_in,
-			  flow_out = EXCLUDED.flow_out,
-			  net_flow = EXCLUDED.net_flow,
-			  onchain_score = EXCLUDED.onchain_score`,
-			date, symbol, volume*0.5, volume*0.5, 0.0, marketCap)
-		if err == nil {
+	count := 0
+	n := len(data.Prices)
+	if len(data.MarketCaps) < n {
+		n = len(data.MarketCaps)
+	}
+	if len(data.TotalVolumes) < n {
+		n = len(data.TotalVolumes)
+	}
+	for i := 0; i < n; i++ {
+		tsMs := int64(data.Prices[i][0])
+		ts := time.UnixMilli(tsMs).UTC()
+		points := []struct {
+			metric string
+			value  float64
+		}{
+			{"price_usd", data.Prices[i][1]},
+			{"market_cap_usd", data.MarketCaps[i][1]},
+			{"total_volume_usd", data.TotalVolumes[i][1]},
+		}
+		for _, p := range points {
+			if _, err := dbpool.Exec(ctx, sql, ts, symbol, p.metric, p.value, onchainSource); err != nil {
+				logger.Warn("onchain row insert failed",
+					"asset", symbol, "metric", p.metric, "time", ts, "error", err)
+				continue
+			}
 			count++
 		}
 	}
-	return count
+	return count, nil
 }

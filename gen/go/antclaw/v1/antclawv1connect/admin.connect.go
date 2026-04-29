@@ -60,6 +60,9 @@ const (
 	// AdminServiceAdminResetUserPasswordProcedure is the fully-qualified name of the AdminService's
 	// AdminResetUserPassword RPC.
 	AdminServiceAdminResetUserPasswordProcedure = "/antclaw.v1.AdminService/AdminResetUserPassword"
+	// AdminServiceSetUserCodeIDProcedure is the fully-qualified name of the AdminService's
+	// SetUserCodeID RPC.
+	AdminServiceSetUserCodeIDProcedure = "/antclaw.v1.AdminService/SetUserCodeID"
 )
 
 // AdminServiceClient is a client for the antclaw.v1.AdminService service.
@@ -86,6 +89,9 @@ type AdminServiceClient interface {
 	ForceLogout(context.Context, *connect.Request[v1.ForceLogoutRequest]) (*connect.Response[v1.ForceLogoutResponse], error)
 	// Admin sets a user's password directly（原 POST /admin/users/{id}/reset-password）。
 	AdminResetUserPassword(context.Context, *connect.Request[v1.AdminResetUserPasswordRequest]) (*connect.Response[v1.AdminResetUserPasswordResponse], error)
+	// 管理员为用户设置/修改数字 ID（5-10 位，避开 4/7，不以 0 开头）。
+	// 留空 code_id 触发系统重新随机分配；非空则直接采用并校验唯一性。
+	SetUserCodeID(context.Context, *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error)
 }
 
 // NewAdminServiceClient constructs a client for the antclaw.v1.AdminService service. By default, it
@@ -165,6 +171,12 @@ func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(adminServiceMethods.ByName("AdminResetUserPassword")),
 			connect.WithClientOptions(opts...),
 		),
+		setUserCodeID: connect.NewClient[v1.SetUserCodeIDRequest, v1.SetUserCodeIDResponse](
+			httpClient,
+			baseURL+AdminServiceSetUserCodeIDProcedure,
+			connect.WithSchema(adminServiceMethods.ByName("SetUserCodeID")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -181,6 +193,7 @@ type adminServiceClient struct {
 	listWebhookDeliveries  *connect.Client[v1.ListWebhookDeliveriesRequest, v1.ListWebhookDeliveriesResponse]
 	forceLogout            *connect.Client[v1.ForceLogoutRequest, v1.ForceLogoutResponse]
 	adminResetUserPassword *connect.Client[v1.AdminResetUserPasswordRequest, v1.AdminResetUserPasswordResponse]
+	setUserCodeID          *connect.Client[v1.SetUserCodeIDRequest, v1.SetUserCodeIDResponse]
 }
 
 // ListUsers calls antclaw.v1.AdminService.ListUsers.
@@ -238,6 +251,11 @@ func (c *adminServiceClient) AdminResetUserPassword(ctx context.Context, req *co
 	return c.adminResetUserPassword.CallUnary(ctx, req)
 }
 
+// SetUserCodeID calls antclaw.v1.AdminService.SetUserCodeID.
+func (c *adminServiceClient) SetUserCodeID(ctx context.Context, req *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error) {
+	return c.setUserCodeID.CallUnary(ctx, req)
+}
+
 // AdminServiceHandler is an implementation of the antclaw.v1.AdminService service.
 type AdminServiceHandler interface {
 	// List users with pagination
@@ -262,6 +280,9 @@ type AdminServiceHandler interface {
 	ForceLogout(context.Context, *connect.Request[v1.ForceLogoutRequest]) (*connect.Response[v1.ForceLogoutResponse], error)
 	// Admin sets a user's password directly（原 POST /admin/users/{id}/reset-password）。
 	AdminResetUserPassword(context.Context, *connect.Request[v1.AdminResetUserPasswordRequest]) (*connect.Response[v1.AdminResetUserPasswordResponse], error)
+	// 管理员为用户设置/修改数字 ID（5-10 位，避开 4/7，不以 0 开头）。
+	// 留空 code_id 触发系统重新随机分配；非空则直接采用并校验唯一性。
+	SetUserCodeID(context.Context, *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error)
 }
 
 // NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -337,6 +358,12 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(adminServiceMethods.ByName("AdminResetUserPassword")),
 		connect.WithHandlerOptions(opts...),
 	)
+	adminServiceSetUserCodeIDHandler := connect.NewUnaryHandler(
+		AdminServiceSetUserCodeIDProcedure,
+		svc.SetUserCodeID,
+		connect.WithSchema(adminServiceMethods.ByName("SetUserCodeID")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AdminServiceListUsersProcedure:
@@ -361,6 +388,8 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 			adminServiceForceLogoutHandler.ServeHTTP(w, r)
 		case AdminServiceAdminResetUserPasswordProcedure:
 			adminServiceAdminResetUserPasswordHandler.ServeHTTP(w, r)
+		case AdminServiceSetUserCodeIDProcedure:
+			adminServiceSetUserCodeIDHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -412,4 +441,8 @@ func (UnimplementedAdminServiceHandler) ForceLogout(context.Context, *connect.Re
 
 func (UnimplementedAdminServiceHandler) AdminResetUserPassword(context.Context, *connect.Request[v1.AdminResetUserPasswordRequest]) (*connect.Response[v1.AdminResetUserPasswordResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AdminService.AdminResetUserPassword is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) SetUserCodeID(context.Context, *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AdminService.SetUserCodeID is not implemented"))
 }

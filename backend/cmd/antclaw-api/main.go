@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"connectrpc.com/connect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -20,13 +21,18 @@ import (
 	"github.com/antclaw/antclaw/internal/auth"
 	cryptopkg "github.com/antclaw/antclaw/internal/crypto"
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/firecrawl"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/fred"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/mql5"
 	infrapq "github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/infra/redis"
+	"github.com/antclaw/antclaw/internal/notify"
 	"github.com/antclaw/antclaw/internal/service/admin"
 	"github.com/antclaw/antclaw/internal/service/ai"
 	"github.com/antclaw/antclaw/internal/service/alerts"
 	"github.com/antclaw/antclaw/internal/service/audit"
 	"github.com/antclaw/antclaw/internal/service/backtest"
+	"github.com/antclaw/antclaw/internal/service/calibration"
 	"github.com/antclaw/antclaw/internal/service/calendar"
 	"github.com/antclaw/antclaw/internal/service/cot"
 	"github.com/antclaw/antclaw/internal/service/datasource"
@@ -55,7 +61,11 @@ boot := time.Now()
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	defer pgPool.Close()
-	// 启动自检：确保审计等 Admin 相关表存在（幂等）
+	// 启动自检：先跑嵌入式 SQL 迁移（建表 / 索引 / Hypertable），再确保 Admin 相关 seed 数据。
+	// 两步都是幂等的，可重复启动。
+	if err := postgres.RunMigrations(context.Background(), pgPool); err != nil {
+		log.Fatalf("failed to run migrations: %v", err)
+	}
 	if err := postgres.EnsureAdminSchema(context.Background(), pgPool); err != nil {
 		log.Fatalf("failed to ensure admin schema: %v", err)
 	}
@@ -87,19 +97,23 @@ boot := time.Now()
 		log.Printf("warn: warm-up credentials failed: %v", err)
 	}
 	fredKey := resolver.GetSecret("fred")
-	fredClient := apiclient.NewFredClient(fredKey)
-	mql5Fetcher := apiclient.NewMQL5Fetcher()
+	fredClient := fred.NewClient(fredKey)
+	mql5Fetcher := mql5.NewFetcher()
 
 	// Initialize storage layer
 	userStore := postgres.NewUserStore(queries)
 	auditSvc := audit.NewAuditService(queries, redisClient)
 
 	// Initialize all services with real data sources
-	priceSvc := price.NewService()
-	volSvc := vol.NewService()
+	priceSvc := price.NewServiceWithPool(pgPool)
+	// Vol 服务挂上 firecrawl client（注入数据库 firecrawl 密钥），用于 GetMove 抓 yardeni MOVE。
+	fcKey := resolver.GetSecret("firecrawl")
+	fcSrc := apiclient.NewSource("firecrawl", apiclient.Options{Timeout: 60 * time.Second})
+	fcClient := firecrawl.NewClientWithKey(fcSrc, fcKey)
+	volSvc := vol.NewService().WithFirecrawl(fcClient)
 	macroSvc := macro.NewServiceWithFRED(fredClient)
-	taSvc := ta.NewService()
-	sentimentSvc := sentiment.NewService()
+	taSvc := ta.NewServiceWithPool(pgPool)
+	sentimentSvc := sentiment.NewServiceWithPool(pgPool)
 	systemAISvc := systemaisvc.NewService(pgPool, secretBox)
 	aiSvc := ai.NewService(systemAISvc, pgPool)
 	alertsSvc := alerts.NewService(pgPool)
@@ -108,7 +122,7 @@ boot := time.Now()
 	calendarSvc := calendar.NewServiceWithFetcher(mql5Fetcher)
 	cotSvc := cot.NewService()
 	backtestSvc := backtest.NewService(pgPool)
-	strategySvc := strategysvc.NewService(pgPool, strategysvc.NewMockRunner())
+	strategySvc := strategysvc.NewService(pgPool, strategysvc.NewBaselineRunner(pgPool))
 
 	priceProv := postgres.NewPricePgProvider(pgPool)
 	cotProv := postgres.NewCOTPgProvider(pgPool)
@@ -131,12 +145,14 @@ boot := time.Now()
 	// Initialize all handlers with dependency injection
 	priceHandler := rpc.NewPriceHandler(priceSvc)
 	volHandler := rpc.NewVolHandler(volSvc)
-	signalsHandler := rpc.NewSignalsHandler(signalsService)
+	calibStore := calibration.NewStore(pgPool)
+	signalsHandler := rpc.NewSignalsHandler(signalsService).WithCalibration(calibStore)
 	macroHandler := rpc.NewMacroHandler(macroSvc)
 	taHandler := rpc.NewTAHandler(taSvc)
 	sentimentHandler := rpc.NewSentimentHandler(sentimentSvc)
 	aiHandler := rpc.NewAIHandler(aiSvc)
-	alertsHandler := rpc.NewAlertsHandler(alertsSvc)
+	alertGate := alerts.NewGate(pgPool)
+	alertsHandler := rpc.NewAlertsHandler(alertsSvc).WithGate(alertGate)
 	userHandler := rpc.NewUserHandler(userSvc)
 	adminHandler := rpc.NewAdminHandler(adminSvc)
 	calendarHandler := rpc.NewCalendarHandler(calendarSvc)
@@ -190,11 +206,17 @@ boot := time.Now()
 	mux.Handle(antclawv1connect.NewOnchainServiceHandler(rpc.NewOnchainHandler(pgPool)))
 	mux.Handle(antclawv1connect.NewDeFiServiceHandler(rpc.NewDeFiHandler()))
 	mux.Handle(antclawv1connect.NewSECServiceHandler(rpc.NewSECHandler()))
-	mux.Handle(antclawv1connect.NewFedWatchServiceHandler(rpc.NewFedWatchHandler()))
+	mux.Handle(antclawv1connect.NewFedWatchServiceHandler(rpc.NewFedWatchHandlerWithResolver(resolver)))
 	mux.Handle(antclawv1connect.NewMacroExtrasServiceHandler(rpc.NewMacroExtrasHandler()))
 	mux.Handle(antclawv1connect.NewTreasuryServiceHandler(rpc.NewTreasuryHandler()))
-	mux.Handle(antclawv1connect.NewSentimentExtrasServiceHandler(rpc.NewSentimentExtrasHandler()))
+	mux.Handle(antclawv1connect.NewSentimentExtrasServiceHandler(rpc.NewSentimentExtrasHandlerWithResolver(resolver)))
 	mux.Handle(antclawv1connect.NewRegimeServiceHandler(rpc.NewRegimeHandler(regime.NewService(pgPool))))
+
+	// Notification service —— 持久化 + 实时推送（SSE）。要求登录态。
+	notifySvc := notify.NewService(queries, redisClient.Raw())
+	notificationHandler := rpc.NewNotificationHandler(notifySvc, queries)
+	authInterceptor := connect.WithInterceptors(auth.AuthInterceptor(true))
+	mux.Handle(antclawv1connect.NewNotificationServiceHandler(notificationHandler, authInterceptor))
 
 	// CORS middleware
 	corsHandler := func(h http.Handler) http.Handler {
@@ -215,6 +237,13 @@ boot := time.Now()
 	// SSE endpoints for real-time jobs & audit logs
 	mux.HandleFunc("/sse/jobs", jobsEventsHandler(redisClient.Raw()))
 	mux.HandleFunc("/sse/audit", auditEventsHandler(redisClient.Raw()))
+	// 告警类 SSE：当上游 worker / signals 订阅了对应 Redis Stream 时推送。
+	// 这些 channel 在前端 useSSE 中订阅，缺少 handler 会导致 404 → ERR。
+	mux.HandleFunc("/sse/macro_alerts", alertsEventsHandler(redisClient.Raw(), "stream:macro_alerts"))
+	mux.HandleFunc("/sse/options_alerts", alertsEventsHandler(redisClient.Raw(), "stream:options_alerts"))
+	mux.HandleFunc("/sse/signals_alerts", alertsEventsHandler(redisClient.Raw(), "stream:signals_alerts"))
+	// 个人通知 SSE：从 JWT cookie/Bearer 解析 user_id，订阅 user:{userID}:notifications。
+	mux.HandleFunc("/sse/notifications", userNotificationsSSE(redisClient.Raw()))
 
 	// Create HTTP server with h2c (HTTP/2 without TLS)
 	server := &http.Server{

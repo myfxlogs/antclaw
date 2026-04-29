@@ -4,14 +4,16 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 
 	tav1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Service implements Technical Analysis business logic.
+// Service 技术分析服务，所有 K 线均来自 price_daily / price_intraday，无随机模拟。
 type Service struct {
-	priceCache map[string][]PriceBar
+	pool *pgxpool.Pool
 }
 
 // PriceBar represents a price bar for TA calculations.
@@ -24,54 +26,67 @@ type PriceBar struct {
 	Volume    int64
 }
 
-// NewService creates a new TAService.
-func NewService() *Service {
-	svc := &Service{
-		priceCache: make(map[string][]PriceBar),
+// NewService 兼容旧调用，pool=nil；推荐 NewServiceWithPool。
+func NewService() *Service { return &Service{} }
+
+// NewServiceWithPool 注入 pgxpool 以拉真实 K 线。
+func NewServiceWithPool(pool *pgxpool.Pool) *Service { return &Service{pool: pool} }
+
+// loadBars 从 price_daily（默认）或 price_intraday 拉最近 limit 根 K 线，时间升序。
+func (s *Service) loadBars(ctx context.Context, pair, timeframe string, limit int) ([]PriceBar, error) {
+	if s.pool == nil {
+		return nil, fmt.Errorf("ta: postgres pool not configured")
 	}
-	// Generate sample data for major pairs
-	svc.generateSampleData("EURUSD", 1.0850, 200)
-	svc.generateSampleData("GBPUSD", 1.2650, 200)
-	svc.generateSampleData("USDJPY", 150.20, 200)
-	return svc
-}
-
-func (s *Service) generateSampleData(pair string, basePrice float64, count int) {
-	bars := make([]PriceBar, count)
-	now := time.Now()
-	price := basePrice
-
-	for i := 0; i < count; i++ {
-		ts := now.Add(-time.Duration(count-i) * time.Hour)
-		// Random walk with slight upward bias
-		change := (randFloat() - 0.48) * 0.002 * price
-		open := price
-		close := price + change
-		high := math.Max(open, close) + math.Abs(change)*randFloat()
-		low := math.Min(open, close) - math.Abs(change)*randFloat()
-
-		bars[i] = PriceBar{
-			Timestamp: ts,
-			Open:      open,
-			High:      high,
-			Low:       low,
-			Close:     close,
-			Volume:    int64(1000000 + randFloat()*5000000),
+	if limit <= 0 || limit > 5000 {
+		limit = 200
+	}
+	tf := strings.ToLower(strings.TrimSpace(timeframe))
+	var bars []PriceBar
+	if tf == "" || tf == "1d" || tf == "d" || tf == "daily" {
+		rows, err := s.pool.Query(ctx, `
+			SELECT time, open, high, low, close, COALESCE(volume,0) FROM price_daily
+			 WHERE symbol=$1 AND close > 0 ORDER BY time DESC LIMIT $2`, pair, limit)
+		if err != nil {
+			return nil, err
 		}
-		price = close
+		defer rows.Close()
+		for rows.Next() {
+			var b PriceBar
+			if err := rows.Scan(&b.Timestamp, &b.Open, &b.High, &b.Low, &b.Close, &b.Volume); err != nil {
+				return nil, err
+			}
+			bars = append(bars, b)
+		}
+	} else {
+		rows, err := s.pool.Query(ctx, `
+			SELECT time, open, high, low, close, COALESCE(volume,0) FROM price_intraday
+			 WHERE symbol=$1 AND interval=$2 AND close > 0 ORDER BY time DESC LIMIT $3`, pair, tf, limit)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var b PriceBar
+			if err := rows.Scan(&b.Timestamp, &b.Open, &b.High, &b.Low, &b.Close, &b.Volume); err != nil {
+				return nil, err
+			}
+			bars = append(bars, b)
+		}
 	}
-	s.priceCache[pair] = bars
-}
-
-func randFloat() float64 {
-	return 0.5
+	for i, j := 0, len(bars)-1; i < j; i, j = i+1, j-1 {
+		bars[i], bars[j] = bars[j], bars[i]
+	}
+	return bars, nil
 }
 
 // GetIndicators calculates technical indicators.
 func (s *Service) GetIndicators(ctx context.Context, pair, timeframe string, indicators []string) (*tav1.GetIndicatorsResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	bars, err := s.loadBars(ctx, pair, timeframe, 200)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s/%s", pair, timeframe)
 	}
 
 	if len(indicators) == 0 {
@@ -115,9 +130,12 @@ func (s *Service) GetIndicators(ctx context.Context, pair, timeframe string, ind
 
 // GetElliott performs Elliott Wave analysis.
 func (s *Service) GetElliott(ctx context.Context, pair, timeframe string) (*tav1.GetElliottResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	bars, err := s.loadBars(ctx, pair, timeframe, 200)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s", pair)
 	}
 
 	// Simplified Elliott Wave detection
@@ -133,9 +151,12 @@ func (s *Service) GetElliott(ctx context.Context, pair, timeframe string) (*tav1
 
 // GetWyckoff performs Wyckoff analysis.
 func (s *Service) GetWyckoff(ctx context.Context, pair string) (*tav1.GetWyckoffResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	bars, err := s.loadBars(ctx, pair, "1d", 200)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s", pair)
 	}
 
 	phase := detectWyckoffPhase(bars)
@@ -154,9 +175,12 @@ func (s *Service) GetWyckoff(ctx context.Context, pair string) (*tav1.GetWyckoff
 
 // GetIct performs ICT/SMC analysis.
 func (s *Service) GetIct(ctx context.Context, pair, timeframe string) (*tav1.GetIctResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	bars, err := s.loadBars(ctx, pair, timeframe, 200)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s", pair)
 	}
 
 	levels := detectIctLevels(bars)
@@ -170,9 +194,16 @@ func (s *Service) GetIct(ctx context.Context, pair, timeframe string) (*tav1.Get
 
 // GetAmt performs Auction Market Theory analysis.
 func (s *Service) GetAmt(ctx context.Context, pair string, lookbackDays int32) (*tav1.GetAmtResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	days := int(lookbackDays)
+	if days <= 0 {
+		days = 30
+	}
+	bars, err := s.loadBars(ctx, pair, "1d", days)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s", pair)
 	}
 
 	if lookbackDays == 0 {
@@ -190,9 +221,12 @@ func (s *Service) GetAmt(ctx context.Context, pair string, lookbackDays int32) (
 
 // GetOrderflow performs order flow analysis.
 func (s *Service) GetOrderflow(ctx context.Context, pair, timeframe string) (*tav1.GetOrderflowResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	bars, err := s.loadBars(ctx, pair, timeframe, 200)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s", pair)
 	}
 
 	imbalances := detectOrderflowImbalances(bars)
@@ -205,9 +239,12 @@ func (s *Service) GetOrderflow(ctx context.Context, pair, timeframe string) (*ta
 
 // GetVolumeProfile calculates volume profile.
 func (s *Service) GetVolumeProfile(ctx context.Context, pair string) (*tav1.GetVolumeProfileResponse, error) {
-	bars, ok := s.priceCache[pair]
-	if !ok {
-		return nil, fmt.Errorf("pair not found: %s", pair)
+	bars, err := s.loadBars(ctx, pair, "1d", 200)
+	if err != nil {
+		return nil, err
+	}
+	if len(bars) == 0 {
+		return nil, fmt.Errorf("ta: no bars for %s", pair)
 	}
 
 	zones := calculateVolumeProfile(bars, len(bars))

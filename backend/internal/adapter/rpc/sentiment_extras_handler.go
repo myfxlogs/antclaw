@@ -32,6 +32,20 @@ func NewSentimentExtrasHandler() *SentimentExtrasHandler {
 	}
 }
 
+// NewSentimentExtrasHandlerWithResolver 优先用数据库中的 firecrawl 密钥构造。
+func NewSentimentExtrasHandlerWithResolver(r SecretReader) *SentimentExtrasHandler {
+	cboeSrc := apiclient.NewSource("cboe", apiclient.Options{Timeout: 30 * time.Second})
+	fcSrc := apiclient.NewSource("firecrawl", apiclient.Options{Timeout: 60 * time.Second})
+	key := ""
+	if r != nil {
+		key = r.GetSecret("firecrawl")
+	}
+	return &SentimentExtrasHandler{
+		cboe: cboe.NewClient(cboeSrc),
+		fc:   firecrawl.NewClientWithKey(fcSrc, key),
+	}
+}
+
 func (h *SentimentExtrasHandler) GetCBOEPutCall(ctx context.Context, req *connect.Request[v1.GetCBOEPutCallRequest]) (*connect.Response[v1.GetCBOEPutCallResponse], error) {
 	d, err := h.cboe.FetchLatest(ctx)
 	if err != nil {
@@ -69,12 +83,46 @@ func (h *SentimentExtrasHandler) GetMyFXBookPositions(ctx context.Context, req *
 	return connect.NewResponse(resp), nil
 }
 
+// GetInsiderTrades 通过 firecrawl 抓取 OpenInsider 公开数据；未配置 Key 时优雅降级返回空。
 func (h *SentimentExtrasHandler) GetInsiderTrades(ctx context.Context, req *connect.Request[v1.GetInsiderTradesRequest]) (*connect.Response[v1.GetInsiderTradesResponse], error) {
-	return connect.NewResponse(&v1.GetInsiderTradesResponse{}), nil
+	resp := &v1.GetInsiderTradesResponse{}
+	if !h.fc.IsAvailable() {
+		return connect.NewResponse(resp), nil
+	}
+	limit := int(req.Msg.Limit)
+	trades, err := h.fc.FetchOpenInsiderTrades(ctx, req.Msg.Ticker, limit)
+	if err != nil {
+		return connect.NewResponse(resp), nil
+	}
+	for _, t := range trades {
+		resp.Items = append(resp.Items, &v1.InsiderTrade{
+			Ticker:   t.Ticker,
+			Insider:  t.Insider,
+			Title:    t.Title,
+			Action:   t.Action,
+			Date:     timestamppb.New(t.Date),
+			Price:    t.Price,
+			Quantity: t.Quantity,
+		})
+	}
+	return connect.NewResponse(resp), nil
 }
 
+// GetCryptoSocial 通过 firecrawl 抓 LunarCrush 公开页面。
 func (h *SentimentExtrasHandler) GetCryptoSocial(ctx context.Context, req *connect.Request[v1.GetCryptoSocialRequest]) (*connect.Response[v1.GetCryptoSocialResponse], error) {
-	return connect.NewResponse(&v1.GetCryptoSocialResponse{}), nil
+	resp := &v1.GetCryptoSocialResponse{}
+	if !h.fc.IsAvailable() {
+		return connect.NewResponse(resp), nil
+	}
+	snap, err := h.fc.FetchCryptoSocial(ctx, req.Msg.Asset)
+	if err != nil {
+		return connect.NewResponse(resp), nil
+	}
+	resp.Date = timestamppb.New(snap.Date)
+	resp.TwitterFollowersGrowth = snap.TwitterFollowersGrowth
+	resp.RedditSubscribersGrowth = snap.RedditSubscribersGrowth
+	resp.SentimentScore = snap.SentimentScore
+	return connect.NewResponse(resp), nil
 }
 
 func (h *SentimentExtrasHandler) GetFinvizMetrics(ctx context.Context, req *connect.Request[v1.GetFinvizMetricsRequest]) (*connect.Response[v1.GetFinvizMetricsResponse], error) {

@@ -1985,6 +1985,402 @@ func (x *GetOutlookResponse) GetOutlooks() []*OutlookData {
 	return nil
 }
 
+type FitCalibrationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelId       string                 `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"` // 自定义标识
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`                      // 'platt' / 'isotonic'
+	Scores        []float64              `protobuf:"fixed64,3,rep,packed,name=scores,proto3" json:"scores,omitempty"`
+	Outcomes      []bool                 `protobuf:"varint,4,rep,packed,name=outcomes,proto3" json:"outcomes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitCalibrationRequest) Reset() {
+	*x = FitCalibrationRequest{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitCalibrationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitCalibrationRequest) ProtoMessage() {}
+
+func (x *FitCalibrationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitCalibrationRequest.ProtoReflect.Descriptor instead.
+func (*FitCalibrationRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *FitCalibrationRequest) GetModelId() string {
+	if x != nil {
+		return x.ModelId
+	}
+	return ""
+}
+
+func (x *FitCalibrationRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *FitCalibrationRequest) GetScores() []float64 {
+	if x != nil {
+		return x.Scores
+	}
+	return nil
+}
+
+func (x *FitCalibrationRequest) GetOutcomes() []bool {
+	if x != nil {
+		return x.Outcomes
+	}
+	return nil
+}
+
+type FitCalibrationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelId       string                 `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	NSamples      int32                  `protobuf:"varint,3,opt,name=n_samples,json=nSamples,proto3" json:"n_samples,omitempty"`
+	Brier         float64                `protobuf:"fixed64,4,opt,name=brier,proto3" json:"brier,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitCalibrationResponse) Reset() {
+	*x = FitCalibrationResponse{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitCalibrationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitCalibrationResponse) ProtoMessage() {}
+
+func (x *FitCalibrationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitCalibrationResponse.ProtoReflect.Descriptor instead.
+func (*FitCalibrationResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *FitCalibrationResponse) GetModelId() string {
+	if x != nil {
+		return x.ModelId
+	}
+	return ""
+}
+
+func (x *FitCalibrationResponse) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *FitCalibrationResponse) GetNSamples() int32 {
+	if x != nil {
+		return x.NSamples
+	}
+	return 0
+}
+
+func (x *FitCalibrationResponse) GetBrier() float64 {
+	if x != nil {
+		return x.Brier
+	}
+	return 0
+}
+
+type PredictCalibratedRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelId       string                 `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	Score         float64                `protobuf:"fixed64,2,opt,name=score,proto3" json:"score,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PredictCalibratedRequest) Reset() {
+	*x = PredictCalibratedRequest{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PredictCalibratedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PredictCalibratedRequest) ProtoMessage() {}
+
+func (x *PredictCalibratedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PredictCalibratedRequest.ProtoReflect.Descriptor instead.
+func (*PredictCalibratedRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *PredictCalibratedRequest) GetModelId() string {
+	if x != nil {
+		return x.ModelId
+	}
+	return ""
+}
+
+func (x *PredictCalibratedRequest) GetScore() float64 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+type PredictCalibratedResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelId       string                 `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	Calibrated    float64                `protobuf:"fixed64,2,opt,name=calibrated,proto3" json:"calibrated,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PredictCalibratedResponse) Reset() {
+	*x = PredictCalibratedResponse{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PredictCalibratedResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PredictCalibratedResponse) ProtoMessage() {}
+
+func (x *PredictCalibratedResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PredictCalibratedResponse.ProtoReflect.Descriptor instead.
+func (*PredictCalibratedResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *PredictCalibratedResponse) GetModelId() string {
+	if x != nil {
+		return x.ModelId
+	}
+	return ""
+}
+
+func (x *PredictCalibratedResponse) GetCalibrated() float64 {
+	if x != nil {
+		return x.Calibrated
+	}
+	return 0
+}
+
+type ListCalibrationsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCalibrationsRequest) Reset() {
+	*x = ListCalibrationsRequest{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCalibrationsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCalibrationsRequest) ProtoMessage() {}
+
+func (x *ListCalibrationsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCalibrationsRequest.ProtoReflect.Descriptor instead.
+func (*ListCalibrationsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{40}
+}
+
+type CalibrationSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelId       string                 `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	NSamples      int32                  `protobuf:"varint,3,opt,name=n_samples,json=nSamples,proto3" json:"n_samples,omitempty"`
+	Brier         float64                `protobuf:"fixed64,4,opt,name=brier,proto3" json:"brier,omitempty"`
+	FittedAt      string                 `protobuf:"bytes,5,opt,name=fitted_at,json=fittedAt,proto3" json:"fitted_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CalibrationSummary) Reset() {
+	*x = CalibrationSummary{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CalibrationSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CalibrationSummary) ProtoMessage() {}
+
+func (x *CalibrationSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CalibrationSummary.ProtoReflect.Descriptor instead.
+func (*CalibrationSummary) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *CalibrationSummary) GetModelId() string {
+	if x != nil {
+		return x.ModelId
+	}
+	return ""
+}
+
+func (x *CalibrationSummary) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *CalibrationSummary) GetNSamples() int32 {
+	if x != nil {
+		return x.NSamples
+	}
+	return 0
+}
+
+func (x *CalibrationSummary) GetBrier() float64 {
+	if x != nil {
+		return x.Brier
+	}
+	return 0
+}
+
+func (x *CalibrationSummary) GetFittedAt() string {
+	if x != nil {
+		return x.FittedAt
+	}
+	return ""
+}
+
+type ListCalibrationsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*CalibrationSummary  `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCalibrationsResponse) Reset() {
+	*x = ListCalibrationsResponse{}
+	mi := &file_antclaw_v1_signals_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCalibrationsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCalibrationsResponse) ProtoMessage() {}
+
+func (x *ListCalibrationsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_signals_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCalibrationsResponse.ProtoReflect.Descriptor instead.
+func (*ListCalibrationsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_signals_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *ListCalibrationsResponse) GetItems() []*CalibrationSummary {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_antclaw_v1_signals_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_signals_proto_rawDesc = "" +
@@ -2115,7 +2511,34 @@ const file_antclaw_v1_signals_proto_rawDesc = "" +
 	"\x04pair\x18\x01 \x01(\tR\x04pair\x12\x18\n" +
 	"\ahorizon\x18\x02 \x01(\tR\ahorizon\"I\n" +
 	"\x12GetOutlookResponse\x123\n" +
-	"\boutlooks\x18\x01 \x03(\v2\x17.antclaw.v1.OutlookDataR\boutlooks2\xa3\a\n" +
+	"\boutlooks\x18\x01 \x03(\v2\x17.antclaw.v1.OutlookDataR\boutlooks\"z\n" +
+	"\x15FitCalibrationRequest\x12\x19\n" +
+	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x12\x16\n" +
+	"\x06scores\x18\x03 \x03(\x01R\x06scores\x12\x1a\n" +
+	"\boutcomes\x18\x04 \x03(\bR\boutcomes\"z\n" +
+	"\x16FitCalibrationResponse\x12\x19\n" +
+	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x12\x1b\n" +
+	"\tn_samples\x18\x03 \x01(\x05R\bnSamples\x12\x14\n" +
+	"\x05brier\x18\x04 \x01(\x01R\x05brier\"K\n" +
+	"\x18PredictCalibratedRequest\x12\x19\n" +
+	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x14\n" +
+	"\x05score\x18\x02 \x01(\x01R\x05score\"V\n" +
+	"\x19PredictCalibratedResponse\x12\x19\n" +
+	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x1e\n" +
+	"\n" +
+	"calibrated\x18\x02 \x01(\x01R\n" +
+	"calibrated\"\x19\n" +
+	"\x17ListCalibrationsRequest\"\x93\x01\n" +
+	"\x12CalibrationSummary\x12\x19\n" +
+	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x12\x1b\n" +
+	"\tn_samples\x18\x03 \x01(\x05R\bnSamples\x12\x14\n" +
+	"\x05brier\x18\x04 \x01(\x01R\x05brier\x12\x1b\n" +
+	"\tfitted_at\x18\x05 \x01(\tR\bfittedAt\"P\n" +
+	"\x18ListCalibrationsResponse\x124\n" +
+	"\x05items\x18\x01 \x03(\v2\x1e.antclaw.v1.CalibrationSummaryR\x05items2\xbd\t\n" +
 	"\x0eSignalsService\x12B\n" +
 	"\aGetBias\x12\x1a.antclaw.v1.GetBiasRequest\x1a\x1b.antclaw.v1.GetBiasResponse\x12B\n" +
 	"\aGetRank\x12\x1a.antclaw.v1.GetRankRequest\x1a\x1b.antclaw.v1.GetRankResponse\x12N\n" +
@@ -2130,7 +2553,10 @@ const file_antclaw_v1_signals_proto_rawDesc = "" +
 	"\x06GetCta\x12\x19.antclaw.v1.GetCtaRequest\x1a\x1a.antclaw.v1.GetCtaResponse\x12N\n" +
 	"\vGetBriefing\x12\x1e.antclaw.v1.GetBriefingRequest\x1a\x1f.antclaw.v1.GetBriefingResponse\x12K\n" +
 	"\n" +
-	"GetOutlook\x12\x1d.antclaw.v1.GetOutlookRequest\x1a\x1e.antclaw.v1.GetOutlookResponseB\x9f\x01\n" +
+	"GetOutlook\x12\x1d.antclaw.v1.GetOutlookRequest\x1a\x1e.antclaw.v1.GetOutlookResponse\x12W\n" +
+	"\x0eFitCalibration\x12!.antclaw.v1.FitCalibrationRequest\x1a\".antclaw.v1.FitCalibrationResponse\x12`\n" +
+	"\x11PredictCalibrated\x12$.antclaw.v1.PredictCalibratedRequest\x1a%.antclaw.v1.PredictCalibratedResponse\x12]\n" +
+	"\x10ListCalibrations\x12#.antclaw.v1.ListCalibrationsRequest\x1a$.antclaw.v1.ListCalibrationsResponseB\x9f\x01\n" +
 	"\x0ecom.antclaw.v1B\fSignalsProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -2147,44 +2573,51 @@ func file_antclaw_v1_signals_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_signals_proto_rawDescData
 }
 
-var file_antclaw_v1_signals_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
+var file_antclaw_v1_signals_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_antclaw_v1_signals_proto_goTypes = []any{
-	(*BiasData)(nil),               // 0: antclaw.v1.BiasData
-	(*GetBiasRequest)(nil),         // 1: antclaw.v1.GetBiasRequest
-	(*GetBiasResponse)(nil),        // 2: antclaw.v1.GetBiasResponse
-	(*RankItem)(nil),               // 3: antclaw.v1.RankItem
-	(*GetRankRequest)(nil),         // 4: antclaw.v1.GetRankRequest
-	(*GetRankResponse)(nil),        // 5: antclaw.v1.GetRankResponse
-	(*XFactor)(nil),                // 6: antclaw.v1.XFactor
-	(*GetXFactorsRequest)(nil),     // 7: antclaw.v1.GetXFactorsRequest
-	(*GetXFactorsResponse)(nil),    // 8: antclaw.v1.GetXFactorsResponse
-	(*RadarDataPoint)(nil),         // 9: antclaw.v1.RadarDataPoint
-	(*GetRadarRequest)(nil),        // 10: antclaw.v1.GetRadarRequest
-	(*GetRadarResponse)(nil),       // 11: antclaw.v1.GetRadarResponse
-	(*IntensityData)(nil),          // 12: antclaw.v1.IntensityData
-	(*GetIntensityRequest)(nil),    // 13: antclaw.v1.GetIntensityRequest
-	(*GetIntensityResponse)(nil),   // 14: antclaw.v1.GetIntensityResponse
-	(*TransitionProb)(nil),         // 15: antclaw.v1.TransitionProb
-	(*GetTransitionRequest)(nil),   // 16: antclaw.v1.GetTransitionRequest
-	(*GetTransitionResponse)(nil),  // 17: antclaw.v1.GetTransitionResponse
-	(*CryptoAlphaSignal)(nil),      // 18: antclaw.v1.CryptoAlphaSignal
-	(*GetCryptoAlphaRequest)(nil),  // 19: antclaw.v1.GetCryptoAlphaRequest
-	(*GetCryptoAlphaResponse)(nil), // 20: antclaw.v1.GetCryptoAlphaResponse
-	(*UnifiedSignal)(nil),          // 21: antclaw.v1.UnifiedSignal
-	(*GetUnifiedRequest)(nil),      // 22: antclaw.v1.GetUnifiedRequest
-	(*GetUnifiedResponse)(nil),     // 23: antclaw.v1.GetUnifiedResponse
-	(*QuantSignal)(nil),            // 24: antclaw.v1.QuantSignal
-	(*GetQuantRequest)(nil),        // 25: antclaw.v1.GetQuantRequest
-	(*GetQuantResponse)(nil),       // 26: antclaw.v1.GetQuantResponse
-	(*CtaSignal)(nil),              // 27: antclaw.v1.CtaSignal
-	(*GetCtaRequest)(nil),          // 28: antclaw.v1.GetCtaRequest
-	(*GetCtaResponse)(nil),         // 29: antclaw.v1.GetCtaResponse
-	(*BriefingSection)(nil),        // 30: antclaw.v1.BriefingSection
-	(*GetBriefingRequest)(nil),     // 31: antclaw.v1.GetBriefingRequest
-	(*GetBriefingResponse)(nil),    // 32: antclaw.v1.GetBriefingResponse
-	(*OutlookData)(nil),            // 33: antclaw.v1.OutlookData
-	(*GetOutlookRequest)(nil),      // 34: antclaw.v1.GetOutlookRequest
-	(*GetOutlookResponse)(nil),     // 35: antclaw.v1.GetOutlookResponse
+	(*BiasData)(nil),                  // 0: antclaw.v1.BiasData
+	(*GetBiasRequest)(nil),            // 1: antclaw.v1.GetBiasRequest
+	(*GetBiasResponse)(nil),           // 2: antclaw.v1.GetBiasResponse
+	(*RankItem)(nil),                  // 3: antclaw.v1.RankItem
+	(*GetRankRequest)(nil),            // 4: antclaw.v1.GetRankRequest
+	(*GetRankResponse)(nil),           // 5: antclaw.v1.GetRankResponse
+	(*XFactor)(nil),                   // 6: antclaw.v1.XFactor
+	(*GetXFactorsRequest)(nil),        // 7: antclaw.v1.GetXFactorsRequest
+	(*GetXFactorsResponse)(nil),       // 8: antclaw.v1.GetXFactorsResponse
+	(*RadarDataPoint)(nil),            // 9: antclaw.v1.RadarDataPoint
+	(*GetRadarRequest)(nil),           // 10: antclaw.v1.GetRadarRequest
+	(*GetRadarResponse)(nil),          // 11: antclaw.v1.GetRadarResponse
+	(*IntensityData)(nil),             // 12: antclaw.v1.IntensityData
+	(*GetIntensityRequest)(nil),       // 13: antclaw.v1.GetIntensityRequest
+	(*GetIntensityResponse)(nil),      // 14: antclaw.v1.GetIntensityResponse
+	(*TransitionProb)(nil),            // 15: antclaw.v1.TransitionProb
+	(*GetTransitionRequest)(nil),      // 16: antclaw.v1.GetTransitionRequest
+	(*GetTransitionResponse)(nil),     // 17: antclaw.v1.GetTransitionResponse
+	(*CryptoAlphaSignal)(nil),         // 18: antclaw.v1.CryptoAlphaSignal
+	(*GetCryptoAlphaRequest)(nil),     // 19: antclaw.v1.GetCryptoAlphaRequest
+	(*GetCryptoAlphaResponse)(nil),    // 20: antclaw.v1.GetCryptoAlphaResponse
+	(*UnifiedSignal)(nil),             // 21: antclaw.v1.UnifiedSignal
+	(*GetUnifiedRequest)(nil),         // 22: antclaw.v1.GetUnifiedRequest
+	(*GetUnifiedResponse)(nil),        // 23: antclaw.v1.GetUnifiedResponse
+	(*QuantSignal)(nil),               // 24: antclaw.v1.QuantSignal
+	(*GetQuantRequest)(nil),           // 25: antclaw.v1.GetQuantRequest
+	(*GetQuantResponse)(nil),          // 26: antclaw.v1.GetQuantResponse
+	(*CtaSignal)(nil),                 // 27: antclaw.v1.CtaSignal
+	(*GetCtaRequest)(nil),             // 28: antclaw.v1.GetCtaRequest
+	(*GetCtaResponse)(nil),            // 29: antclaw.v1.GetCtaResponse
+	(*BriefingSection)(nil),           // 30: antclaw.v1.BriefingSection
+	(*GetBriefingRequest)(nil),        // 31: antclaw.v1.GetBriefingRequest
+	(*GetBriefingResponse)(nil),       // 32: antclaw.v1.GetBriefingResponse
+	(*OutlookData)(nil),               // 33: antclaw.v1.OutlookData
+	(*GetOutlookRequest)(nil),         // 34: antclaw.v1.GetOutlookRequest
+	(*GetOutlookResponse)(nil),        // 35: antclaw.v1.GetOutlookResponse
+	(*FitCalibrationRequest)(nil),     // 36: antclaw.v1.FitCalibrationRequest
+	(*FitCalibrationResponse)(nil),    // 37: antclaw.v1.FitCalibrationResponse
+	(*PredictCalibratedRequest)(nil),  // 38: antclaw.v1.PredictCalibratedRequest
+	(*PredictCalibratedResponse)(nil), // 39: antclaw.v1.PredictCalibratedResponse
+	(*ListCalibrationsRequest)(nil),   // 40: antclaw.v1.ListCalibrationsRequest
+	(*CalibrationSummary)(nil),        // 41: antclaw.v1.CalibrationSummary
+	(*ListCalibrationsResponse)(nil),  // 42: antclaw.v1.ListCalibrationsResponse
 }
 var file_antclaw_v1_signals_proto_depIdxs = []int32{
 	0,  // 0: antclaw.v1.GetBiasResponse.biases:type_name -> antclaw.v1.BiasData
@@ -2199,35 +2632,42 @@ var file_antclaw_v1_signals_proto_depIdxs = []int32{
 	27, // 9: antclaw.v1.GetCtaResponse.signal:type_name -> antclaw.v1.CtaSignal
 	30, // 10: antclaw.v1.GetBriefingResponse.sections:type_name -> antclaw.v1.BriefingSection
 	33, // 11: antclaw.v1.GetOutlookResponse.outlooks:type_name -> antclaw.v1.OutlookData
-	1,  // 12: antclaw.v1.SignalsService.GetBias:input_type -> antclaw.v1.GetBiasRequest
-	4,  // 13: antclaw.v1.SignalsService.GetRank:input_type -> antclaw.v1.GetRankRequest
-	7,  // 14: antclaw.v1.SignalsService.GetXFactors:input_type -> antclaw.v1.GetXFactorsRequest
-	10, // 15: antclaw.v1.SignalsService.GetRadar:input_type -> antclaw.v1.GetRadarRequest
-	13, // 16: antclaw.v1.SignalsService.GetIntensity:input_type -> antclaw.v1.GetIntensityRequest
-	16, // 17: antclaw.v1.SignalsService.GetTransition:input_type -> antclaw.v1.GetTransitionRequest
-	19, // 18: antclaw.v1.SignalsService.GetCryptoAlpha:input_type -> antclaw.v1.GetCryptoAlphaRequest
-	22, // 19: antclaw.v1.SignalsService.GetUnified:input_type -> antclaw.v1.GetUnifiedRequest
-	25, // 20: antclaw.v1.SignalsService.GetQuant:input_type -> antclaw.v1.GetQuantRequest
-	28, // 21: antclaw.v1.SignalsService.GetCta:input_type -> antclaw.v1.GetCtaRequest
-	31, // 22: antclaw.v1.SignalsService.GetBriefing:input_type -> antclaw.v1.GetBriefingRequest
-	34, // 23: antclaw.v1.SignalsService.GetOutlook:input_type -> antclaw.v1.GetOutlookRequest
-	2,  // 24: antclaw.v1.SignalsService.GetBias:output_type -> antclaw.v1.GetBiasResponse
-	5,  // 25: antclaw.v1.SignalsService.GetRank:output_type -> antclaw.v1.GetRankResponse
-	8,  // 26: antclaw.v1.SignalsService.GetXFactors:output_type -> antclaw.v1.GetXFactorsResponse
-	11, // 27: antclaw.v1.SignalsService.GetRadar:output_type -> antclaw.v1.GetRadarResponse
-	14, // 28: antclaw.v1.SignalsService.GetIntensity:output_type -> antclaw.v1.GetIntensityResponse
-	17, // 29: antclaw.v1.SignalsService.GetTransition:output_type -> antclaw.v1.GetTransitionResponse
-	20, // 30: antclaw.v1.SignalsService.GetCryptoAlpha:output_type -> antclaw.v1.GetCryptoAlphaResponse
-	23, // 31: antclaw.v1.SignalsService.GetUnified:output_type -> antclaw.v1.GetUnifiedResponse
-	26, // 32: antclaw.v1.SignalsService.GetQuant:output_type -> antclaw.v1.GetQuantResponse
-	29, // 33: antclaw.v1.SignalsService.GetCta:output_type -> antclaw.v1.GetCtaResponse
-	32, // 34: antclaw.v1.SignalsService.GetBriefing:output_type -> antclaw.v1.GetBriefingResponse
-	35, // 35: antclaw.v1.SignalsService.GetOutlook:output_type -> antclaw.v1.GetOutlookResponse
-	24, // [24:36] is the sub-list for method output_type
-	12, // [12:24] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	41, // 12: antclaw.v1.ListCalibrationsResponse.items:type_name -> antclaw.v1.CalibrationSummary
+	1,  // 13: antclaw.v1.SignalsService.GetBias:input_type -> antclaw.v1.GetBiasRequest
+	4,  // 14: antclaw.v1.SignalsService.GetRank:input_type -> antclaw.v1.GetRankRequest
+	7,  // 15: antclaw.v1.SignalsService.GetXFactors:input_type -> antclaw.v1.GetXFactorsRequest
+	10, // 16: antclaw.v1.SignalsService.GetRadar:input_type -> antclaw.v1.GetRadarRequest
+	13, // 17: antclaw.v1.SignalsService.GetIntensity:input_type -> antclaw.v1.GetIntensityRequest
+	16, // 18: antclaw.v1.SignalsService.GetTransition:input_type -> antclaw.v1.GetTransitionRequest
+	19, // 19: antclaw.v1.SignalsService.GetCryptoAlpha:input_type -> antclaw.v1.GetCryptoAlphaRequest
+	22, // 20: antclaw.v1.SignalsService.GetUnified:input_type -> antclaw.v1.GetUnifiedRequest
+	25, // 21: antclaw.v1.SignalsService.GetQuant:input_type -> antclaw.v1.GetQuantRequest
+	28, // 22: antclaw.v1.SignalsService.GetCta:input_type -> antclaw.v1.GetCtaRequest
+	31, // 23: antclaw.v1.SignalsService.GetBriefing:input_type -> antclaw.v1.GetBriefingRequest
+	34, // 24: antclaw.v1.SignalsService.GetOutlook:input_type -> antclaw.v1.GetOutlookRequest
+	36, // 25: antclaw.v1.SignalsService.FitCalibration:input_type -> antclaw.v1.FitCalibrationRequest
+	38, // 26: antclaw.v1.SignalsService.PredictCalibrated:input_type -> antclaw.v1.PredictCalibratedRequest
+	40, // 27: antclaw.v1.SignalsService.ListCalibrations:input_type -> antclaw.v1.ListCalibrationsRequest
+	2,  // 28: antclaw.v1.SignalsService.GetBias:output_type -> antclaw.v1.GetBiasResponse
+	5,  // 29: antclaw.v1.SignalsService.GetRank:output_type -> antclaw.v1.GetRankResponse
+	8,  // 30: antclaw.v1.SignalsService.GetXFactors:output_type -> antclaw.v1.GetXFactorsResponse
+	11, // 31: antclaw.v1.SignalsService.GetRadar:output_type -> antclaw.v1.GetRadarResponse
+	14, // 32: antclaw.v1.SignalsService.GetIntensity:output_type -> antclaw.v1.GetIntensityResponse
+	17, // 33: antclaw.v1.SignalsService.GetTransition:output_type -> antclaw.v1.GetTransitionResponse
+	20, // 34: antclaw.v1.SignalsService.GetCryptoAlpha:output_type -> antclaw.v1.GetCryptoAlphaResponse
+	23, // 35: antclaw.v1.SignalsService.GetUnified:output_type -> antclaw.v1.GetUnifiedResponse
+	26, // 36: antclaw.v1.SignalsService.GetQuant:output_type -> antclaw.v1.GetQuantResponse
+	29, // 37: antclaw.v1.SignalsService.GetCta:output_type -> antclaw.v1.GetCtaResponse
+	32, // 38: antclaw.v1.SignalsService.GetBriefing:output_type -> antclaw.v1.GetBriefingResponse
+	35, // 39: antclaw.v1.SignalsService.GetOutlook:output_type -> antclaw.v1.GetOutlookResponse
+	37, // 40: antclaw.v1.SignalsService.FitCalibration:output_type -> antclaw.v1.FitCalibrationResponse
+	39, // 41: antclaw.v1.SignalsService.PredictCalibrated:output_type -> antclaw.v1.PredictCalibratedResponse
+	42, // 42: antclaw.v1.SignalsService.ListCalibrations:output_type -> antclaw.v1.ListCalibrationsResponse
+	28, // [28:43] is the sub-list for method output_type
+	13, // [13:28] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_signals_proto_init() }
@@ -2241,7 +2681,7 @@ func file_antclaw_v1_signals_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_signals_proto_rawDesc), len(file_antclaw_v1_signals_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   36,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

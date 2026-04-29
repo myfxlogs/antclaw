@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/price.proto.
  */
 export const file_antclaw_v1_price: GenFile = /*@__PURE__*/
-  fileDesc("ChZhbnRjbGF3L3YxL3ByaWNlLnByb3RvEgphbnRjbGF3LnYxImUKCFByaWNlQmFyEhEKCXRpbWVzdGFtcBgBIAEoCRIMCgRvcGVuGAIgASgJEgwKBGhpZ2gYAyABKAkSCwoDbG93GAQgASgJEg0KBWNsb3NlGAUgASgJEg4KBnZvbHVtZRgGIAEoAyJBCg9HZXRQcmljZVJlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkSDQoFY291bnQYAyABKAUigQEKEEdldFByaWNlUmVzcG9uc2USDAoEcGFpchgBIAEoCRIPCgdjdXJyZW50GAIgASgJEhIKCmNoYW5nZV8yNGgYAyABKAkSFgoOY2hhbmdlX3BjdF8yNGgYBCABKAkSIgoEYmFycxgFIAMoCzIULmFudGNsYXcudjEuUHJpY2VCYXIiOwoKUHJpY2VMZXZlbBINCgVwcmljZRgBIAEoCRIMCgR0eXBlGAIgASgJEhAKCHN0cmVuZ3RoGAMgASgBIjMKEEdldExldmVsc1JlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkiSQoRR2V0TGV2ZWxzUmVzcG9uc2USDAoEcGFpchgBIAEoCRImCgZsZXZlbHMYAiADKAsyFi5hbnRjbGF3LnYxLlByaWNlTGV2ZWwiVAoSTWFya2V0T3ZlcnZpZXdJdGVtEgwKBHBhaXIYASABKAkSDQoFcHJpY2UYAiABKAkSEgoKY2hhbmdlXzI0aBgDIAEoCRINCgV0cmVuZBgEIAEoCSIsChhHZXRNYXJrZXRPdmVydmlld1JlcXVlc3QSEAoIY2F0ZWdvcnkYASABKAkiSgoZR2V0TWFya2V0T3ZlcnZpZXdSZXNwb25zZRItCgVpdGVtcxgBIAMoCzIeLmFudGNsYXcudjEuTWFya2V0T3ZlcnZpZXdJdGVtIm4KC1Nlc3Npb25JbmZvEg8KB3Nlc3Npb24YASABKAkSDwoHaXNfb3BlbhgCIAEoCBIQCghvcGVuc19hdBgDIAEoCRIRCgljbG9zZXNfYXQYBCABKAkSGAoQdm9sYXRpbGl0eV9pbmRleBgFIAEoASIhChFHZXRTZXNzaW9uUmVxdWVzdBIMCgRwYWlyGAEgASgJImYKEkdldFNlc3Npb25SZXNwb25zZRIMCgRwYWlyGAEgASgJEikKCHNlc3Npb25zGAIgAygLMhcuYW50Y2xhdy52MS5TZXNzaW9uSW5mbxIXCg9jdXJyZW50X3Nlc3Npb24YAyABKAkiTQoOU2NlbmFyaW9SZXN1bHQSFQoNc2NlbmFyaW9fbmFtZRgBIAEoCRIPCgdvdXRjb21lGAIgASgJEhMKC3Byb2JhYmlsaXR5GAMgASgBIqEBChJSdW5TY2VuYXJpb1JlcXVlc3QSDAoEcGFpchgBIAEoCRISCgpldmVudF90eXBlGAIgASgJEjoKBnBhcmFtcxgDIAMoCzIqLmFudGNsYXcudjEuUnVuU2NlbmFyaW9SZXF1ZXN0LlBhcmFtc0VudHJ5Gi0KC1BhcmFtc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiQgoTUnVuU2NlbmFyaW9SZXNwb25zZRIrCgdyZXN1bHRzGAEgAygLMhouYW50Y2xhdy52MS5TY2VuYXJpb1Jlc3VsdCJBCgxNYXJrZXRSZWdpbWUSDgoGcmVnaW1lGAEgASgJEhIKCmNvbmZpZGVuY2UYAiABKAESDQoFc2luY2UYAyABKAkiMwoQR2V0UmVnaW1lUmVxdWVzdBIMCgRwYWlyGAEgASgJEhEKCXRpbWVmcmFtZRgCIAEoCSJVChFHZXRSZWdpbWVSZXNwb25zZRIoCgZyZWdpbWUYASABKAsyGC5hbnRjbGF3LnYxLk1hcmtldFJlZ2ltZRIWCg5yZWNlbnRfcmVnaW1lcxgCIAMoCSJIChFTZWFzb25hbERhdGFQb2ludBINCgVtb250aBgBIAEoCRISCgphdmdfcmV0dXJuGAIgASgBEhAKCHdpbl9yYXRlGAMgASgBIjEKEkdldFNlYXNvbmFsUmVxdWVzdBIMCgRwYWlyGAEgASgJEg0KBXllYXJzGAIgASgFIlAKE0dldFNlYXNvbmFsUmVzcG9uc2USDAoEcGFpchgBIAEoCRIrCgRkYXRhGAIgAygLMh0uYW50Y2xhdy52MS5TZWFzb25hbERhdGFQb2ludDK4BAoMUHJpY2VTZXJ2aWNlEkUKCEdldFByaWNlEhsuYW50Y2xhdy52MS5HZXRQcmljZVJlcXVlc3QaHC5hbnRjbGF3LnYxLkdldFByaWNlUmVzcG9uc2USSAoJR2V0TGV2ZWxzEhwuYW50Y2xhdy52MS5HZXRMZXZlbHNSZXF1ZXN0Gh0uYW50Y2xhdy52MS5HZXRMZXZlbHNSZXNwb25zZRJgChFHZXRNYXJrZXRPdmVydmlldxIkLmFudGNsYXcudjEuR2V0TWFya2V0T3ZlcnZpZXdSZXF1ZXN0GiUuYW50Y2xhdy52MS5HZXRNYXJrZXRPdmVydmlld1Jlc3BvbnNlEksKCkdldFNlc3Npb24SHS5hbnRjbGF3LnYxLkdldFNlc3Npb25SZXF1ZXN0Gh4uYW50Y2xhdy52MS5HZXRTZXNzaW9uUmVzcG9uc2USTgoLUnVuU2NlbmFyaW8SHi5hbnRjbGF3LnYxLlJ1blNjZW5hcmlvUmVxdWVzdBofLmFudGNsYXcudjEuUnVuU2NlbmFyaW9SZXNwb25zZRJICglHZXRSZWdpbWUSHC5hbnRjbGF3LnYxLkdldFJlZ2ltZVJlcXVlc3QaHS5hbnRjbGF3LnYxLkdldFJlZ2ltZVJlc3BvbnNlEk4KC0dldFNlYXNvbmFsEh4uYW50Y2xhdy52MS5HZXRTZWFzb25hbFJlcXVlc3QaHy5hbnRjbGF3LnYxLkdldFNlYXNvbmFsUmVzcG9uc2VCnQEKDmNvbS5hbnRjbGF3LnYxQgpQcmljZVByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM");
+  fileDesc("ChZhbnRjbGF3L3YxL3ByaWNlLnByb3RvEgphbnRjbGF3LnYxImUKCFByaWNlQmFyEhEKCXRpbWVzdGFtcBgBIAEoCRIMCgRvcGVuGAIgASgJEgwKBGhpZ2gYAyABKAkSCwoDbG93GAQgASgJEg0KBWNsb3NlGAUgASgJEg4KBnZvbHVtZRgGIAEoAyJBCg9HZXRQcmljZVJlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkSDQoFY291bnQYAyABKAUigQEKEEdldFByaWNlUmVzcG9uc2USDAoEcGFpchgBIAEoCRIPCgdjdXJyZW50GAIgASgJEhIKCmNoYW5nZV8yNGgYAyABKAkSFgoOY2hhbmdlX3BjdF8yNGgYBCABKAkSIgoEYmFycxgFIAMoCzIULmFudGNsYXcudjEuUHJpY2VCYXIiOwoKUHJpY2VMZXZlbBINCgVwcmljZRgBIAEoCRIMCgR0eXBlGAIgASgJEhAKCHN0cmVuZ3RoGAMgASgBIjMKEEdldExldmVsc1JlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkiSQoRR2V0TGV2ZWxzUmVzcG9uc2USDAoEcGFpchgBIAEoCRImCgZsZXZlbHMYAiADKAsyFi5hbnRjbGF3LnYxLlByaWNlTGV2ZWwiVAoSTWFya2V0T3ZlcnZpZXdJdGVtEgwKBHBhaXIYASABKAkSDQoFcHJpY2UYAiABKAkSEgoKY2hhbmdlXzI0aBgDIAEoCRINCgV0cmVuZBgEIAEoCSIsChhHZXRNYXJrZXRPdmVydmlld1JlcXVlc3QSEAoIY2F0ZWdvcnkYASABKAkiSgoZR2V0TWFya2V0T3ZlcnZpZXdSZXNwb25zZRItCgVpdGVtcxgBIAMoCzIeLmFudGNsYXcudjEuTWFya2V0T3ZlcnZpZXdJdGVtIm4KC1Nlc3Npb25JbmZvEg8KB3Nlc3Npb24YASABKAkSDwoHaXNfb3BlbhgCIAEoCBIQCghvcGVuc19hdBgDIAEoCRIRCgljbG9zZXNfYXQYBCABKAkSGAoQdm9sYXRpbGl0eV9pbmRleBgFIAEoASIhChFHZXRTZXNzaW9uUmVxdWVzdBIMCgRwYWlyGAEgASgJImYKEkdldFNlc3Npb25SZXNwb25zZRIMCgRwYWlyGAEgASgJEikKCHNlc3Npb25zGAIgAygLMhcuYW50Y2xhdy52MS5TZXNzaW9uSW5mbxIXCg9jdXJyZW50X3Nlc3Npb24YAyABKAkiTQoOU2NlbmFyaW9SZXN1bHQSFQoNc2NlbmFyaW9fbmFtZRgBIAEoCRIPCgdvdXRjb21lGAIgASgJEhMKC3Byb2JhYmlsaXR5GAMgASgBIqEBChJSdW5TY2VuYXJpb1JlcXVlc3QSDAoEcGFpchgBIAEoCRISCgpldmVudF90eXBlGAIgASgJEjoKBnBhcmFtcxgDIAMoCzIqLmFudGNsYXcudjEuUnVuU2NlbmFyaW9SZXF1ZXN0LlBhcmFtc0VudHJ5Gi0KC1BhcmFtc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiQgoTUnVuU2NlbmFyaW9SZXNwb25zZRIrCgdyZXN1bHRzGAEgAygLMhouYW50Y2xhdy52MS5TY2VuYXJpb1Jlc3VsdCJBCgxNYXJrZXRSZWdpbWUSDgoGcmVnaW1lGAEgASgJEhIKCmNvbmZpZGVuY2UYAiABKAESDQoFc2luY2UYAyABKAkiVQoQR2V0UmVnaW1lUmVxdWVzdBIMCgRwYWlyGAEgASgJEhEKCXRpbWVmcmFtZRgCIAEoCRIOCgZlbmdpbmUYAyABKAkSEAoIbl9zdGF0ZXMYBCABKAUiagoRR2V0UmVnaW1lUmVzcG9uc2USKAoGcmVnaW1lGAEgASgLMhguYW50Y2xhdy52MS5NYXJrZXRSZWdpbWUSFgoOcmVjZW50X3JlZ2ltZXMYAiADKAkSEwoLZW5naW5lX3VzZWQYAyABKAkiSAoRU2Vhc29uYWxEYXRhUG9pbnQSDQoFbW9udGgYASABKAkSEgoKYXZnX3JldHVybhgCIAEoARIQCgh3aW5fcmF0ZRgDIAEoASIxChJHZXRTZWFzb25hbFJlcXVlc3QSDAoEcGFpchgBIAEoCRINCgV5ZWFycxgCIAEoBSJQChNHZXRTZWFzb25hbFJlc3BvbnNlEgwKBHBhaXIYASABKAkSKwoEZGF0YRgCIAMoCzIdLmFudGNsYXcudjEuU2Vhc29uYWxEYXRhUG9pbnQiSQoUR2V0Vm9sYXRpbGl0eVJlcXVlc3QSDAoEcGFpchgBIAEoCRIRCgl0aW1lZnJhbWUYAiABKAkSEAoIbG9va2JhY2sYAyABKAUiPQoPVm9sYXRpbGl0eVBvaW50EhEKCXRpbWVzdGFtcBgBIAEoCRIXCg9jb25kaXRpb25hbF92b2wYAiABKAEiygEKFUdldFZvbGF0aWxpdHlSZXNwb25zZRIMCgRwYWlyGAEgASgJEg0KBW9tZWdhGAIgASgBEg0KBWFscGhhGAMgASgBEgwKBGJldGEYBCABKAESEwoLcGVyc2lzdGVuY2UYBSABKAESGQoRdW5jb25kaXRpb25hbF92b2wYBiABKAESGgoSbmV4dF9zdGVwX2ZvcmVjYXN0GAcgASgBEisKBnNlcmllcxgIIAMoCzIbLmFudGNsYXcudjEuVm9sYXRpbGl0eVBvaW50IkQKD0dldEh1cnN0UmVxdWVzdBIMCgRwYWlyGAEgASgJEhEKCXRpbWVmcmFtZRgCIAEoCRIQCghsb29rYmFjaxgDIAEoBSJcChBHZXRIdXJzdFJlc3BvbnNlEgwKBHBhaXIYASABKAkSDQoFaHVyc3QYAiABKAESFgoOaW50ZXJwcmV0YXRpb24YAyABKAkSEwoLc2FtcGxlX3NpemUYBCABKAUiSwoWR2V0Q29ycmVsYXRpb25zUmVxdWVzdBIOCgZhc3NldHMYASADKAkSEQoJdGltZWZyYW1lGAIgASgJEg4KBndpbmRvdxgDIAEoBSJCCg9Db3JyZWxhdGlvbkNlbGwSDwoHYXNzZXRfYRgBIAEoCRIPCgdhc3NldF9iGAIgASgJEg0KBXZhbHVlGAMgASgBImYKF0dldENvcnJlbGF0aW9uc1Jlc3BvbnNlEg4KBmFzc2V0cxgBIAMoCRIOCgZ3aW5kb3cYAiABKAUSKwoGbWF0cml4GAMgAygLMhsuYW50Y2xhdy52MS5Db3JyZWxhdGlvbkNlbGwiXgoVR2V0RGl2ZXJnZW5jZXNSZXF1ZXN0EgwKBHBhaXIYASABKAkSEQoJdGltZWZyYW1lGAIgASgJEhAKCGxvb2tiYWNrGAMgASgFEhIKCmluZGljYXRvcnMYBCADKAkigwEKD0RpdmVyZ2VuY2VFdmVudBIRCglpbmRpY2F0b3IYASABKAkSDAoEa2luZBgCIAEoCRITCgtkZXRlY3RlZF9hdBgDIAEoCRITCgtwcmljZV9waXZvdBgEIAEoARIXCg9pbmRpY2F0b3JfcGl2b3QYBSABKAESDAoEbm90ZRgGIAEoCSJTChZHZXREaXZlcmdlbmNlc1Jlc3BvbnNlEgwKBHBhaXIYASABKAkSKwoGZXZlbnRzGAIgAygLMhsuYW50Y2xhdy52MS5EaXZlcmdlbmNlRXZlbnQyigcKDFByaWNlU2VydmljZRJFCghHZXRQcmljZRIbLmFudGNsYXcudjEuR2V0UHJpY2VSZXF1ZXN0GhwuYW50Y2xhdy52MS5HZXRQcmljZVJlc3BvbnNlEkgKCUdldExldmVscxIcLmFudGNsYXcudjEuR2V0TGV2ZWxzUmVxdWVzdBodLmFudGNsYXcudjEuR2V0TGV2ZWxzUmVzcG9uc2USYAoRR2V0TWFya2V0T3ZlcnZpZXcSJC5hbnRjbGF3LnYxLkdldE1hcmtldE92ZXJ2aWV3UmVxdWVzdBolLmFudGNsYXcudjEuR2V0TWFya2V0T3ZlcnZpZXdSZXNwb25zZRJLCgpHZXRTZXNzaW9uEh0uYW50Y2xhdy52MS5HZXRTZXNzaW9uUmVxdWVzdBoeLmFudGNsYXcudjEuR2V0U2Vzc2lvblJlc3BvbnNlEk4KC1J1blNjZW5hcmlvEh4uYW50Y2xhdy52MS5SdW5TY2VuYXJpb1JlcXVlc3QaHy5hbnRjbGF3LnYxLlJ1blNjZW5hcmlvUmVzcG9uc2USSAoJR2V0UmVnaW1lEhwuYW50Y2xhdy52MS5HZXRSZWdpbWVSZXF1ZXN0Gh0uYW50Y2xhdy52MS5HZXRSZWdpbWVSZXNwb25zZRJOCgtHZXRTZWFzb25hbBIeLmFudGNsYXcudjEuR2V0U2Vhc29uYWxSZXF1ZXN0Gh8uYW50Y2xhdy52MS5HZXRTZWFzb25hbFJlc3BvbnNlElQKDUdldFZvbGF0aWxpdHkSIC5hbnRjbGF3LnYxLkdldFZvbGF0aWxpdHlSZXF1ZXN0GiEuYW50Y2xhdy52MS5HZXRWb2xhdGlsaXR5UmVzcG9uc2USRQoIR2V0SHVyc3QSGy5hbnRjbGF3LnYxLkdldEh1cnN0UmVxdWVzdBocLmFudGNsYXcudjEuR2V0SHVyc3RSZXNwb25zZRJaCg9HZXRDb3JyZWxhdGlvbnMSIi5hbnRjbGF3LnYxLkdldENvcnJlbGF0aW9uc1JlcXVlc3QaIy5hbnRjbGF3LnYxLkdldENvcnJlbGF0aW9uc1Jlc3BvbnNlElcKDkdldERpdmVyZ2VuY2VzEiEuYW50Y2xhdy52MS5HZXREaXZlcmdlbmNlc1JlcXVlc3QaIi5hbnRjbGF3LnYxLkdldERpdmVyZ2VuY2VzUmVzcG9uc2VCnQEKDmNvbS5hbnRjbGF3LnYxQgpQcmljZVByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM");
 
 /**
  * Price bar
@@ -493,6 +493,20 @@ export type GetRegimeRequest = Message<"antclaw.v1.GetRegimeRequest"> & {
    * @generated from field: string timeframe = 2;
    */
   timeframe: string;
+
+  /**
+   * M-A: classifier engine: "adx" (default, simple) or "hmm" (Gaussian HMM).
+   *
+   * @generated from field: string engine = 3;
+   */
+  engine: string;
+
+  /**
+   * Optional: number of HMM states (2 or 3); defaults 2 when engine=hmm.
+   *
+   * @generated from field: int32 n_states = 4;
+   */
+  nStates: number;
 };
 
 /**
@@ -517,6 +531,13 @@ export type GetRegimeResponse = Message<"antclaw.v1.GetRegimeResponse"> & {
    * @generated from field: repeated string recent_regimes = 2;
    */
   recentRegimes: string[];
+
+  /**
+   * M-A: which engine actually produced the result (may differ on fallback).
+   *
+   * @generated from field: string engine_used = 3;
+   */
+  engineUsed: string;
 };
 
 /**
@@ -604,6 +625,389 @@ export const GetSeasonalResponseSchema: GenMessage<GetSeasonalResponse> = /*@__P
   messageDesc(file_antclaw_v1_price, 20);
 
 /**
+ * GetVolatility request: 计算 GARCH(1,1) 条件波动率。
+ *
+ * @generated from message antclaw.v1.GetVolatilityRequest
+ */
+export type GetVolatilityRequest = Message<"antclaw.v1.GetVolatilityRequest"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * 默认 1d
+   *
+   * @generated from field: string timeframe = 2;
+   */
+  timeframe: string;
+
+  /**
+   * 用最近 N 根 K 线，默认 500，最大 5000
+   *
+   * @generated from field: int32 lookback = 3;
+   */
+  lookback: number;
+};
+
+/**
+ * Describes the message antclaw.v1.GetVolatilityRequest.
+ * Use `create(GetVolatilityRequestSchema)` to create a new message.
+ */
+export const GetVolatilityRequestSchema: GenMessage<GetVolatilityRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 21);
+
+/**
+ * 单个时间点的条件波动率。
+ *
+ * @generated from message antclaw.v1.VolatilityPoint
+ */
+export type VolatilityPoint = Message<"antclaw.v1.VolatilityPoint"> & {
+  /**
+   * @generated from field: string timestamp = 1;
+   */
+  timestamp: string;
+
+  /**
+   * 年化标准差（小数，例如 0.18 = 18%）
+   *
+   * @generated from field: double conditional_vol = 2;
+   */
+  conditionalVol: number;
+};
+
+/**
+ * Describes the message antclaw.v1.VolatilityPoint.
+ * Use `create(VolatilityPointSchema)` to create a new message.
+ */
+export const VolatilityPointSchema: GenMessage<VolatilityPoint> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 22);
+
+/**
+ * @generated from message antclaw.v1.GetVolatilityResponse
+ */
+export type GetVolatilityResponse = Message<"antclaw.v1.GetVolatilityResponse"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * GARCH 拟合参数：sigma^2_t = omega + alpha*r^2_{t-1} + beta*sigma^2_{t-1}
+   *
+   * @generated from field: double omega = 2;
+   */
+  omega: number;
+
+  /**
+   * @generated from field: double alpha = 3;
+   */
+  alpha: number;
+
+  /**
+   * @generated from field: double beta = 4;
+   */
+  beta: number;
+
+  /**
+   * alpha + beta
+   *
+   * @generated from field: double persistence = 5;
+   */
+  persistence: number;
+
+  /**
+   * sqrt(omega/(1-alpha-beta)) 年化
+   *
+   * @generated from field: double unconditional_vol = 6;
+   */
+  unconditionalVol: number;
+
+  /**
+   * 1 步预测，年化标准差
+   *
+   * @generated from field: double next_step_forecast = 7;
+   */
+  nextStepForecast: number;
+
+  /**
+   * @generated from field: repeated antclaw.v1.VolatilityPoint series = 8;
+   */
+  series: VolatilityPoint[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetVolatilityResponse.
+ * Use `create(GetVolatilityResponseSchema)` to create a new message.
+ */
+export const GetVolatilityResponseSchema: GenMessage<GetVolatilityResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 23);
+
+/**
+ * GetHurst request
+ *
+ * @generated from message antclaw.v1.GetHurstRequest
+ */
+export type GetHurstRequest = Message<"antclaw.v1.GetHurstRequest"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * @generated from field: string timeframe = 2;
+   */
+  timeframe: string;
+
+  /**
+   * 默认 500
+   *
+   * @generated from field: int32 lookback = 3;
+   */
+  lookback: number;
+};
+
+/**
+ * Describes the message antclaw.v1.GetHurstRequest.
+ * Use `create(GetHurstRequestSchema)` to create a new message.
+ */
+export const GetHurstRequestSchema: GenMessage<GetHurstRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 24);
+
+/**
+ * @generated from message antclaw.v1.GetHurstResponse
+ */
+export type GetHurstResponse = Message<"antclaw.v1.GetHurstResponse"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * [0, 1]
+   *
+   * @generated from field: double hurst = 2;
+   */
+  hurst: number;
+
+  /**
+   * "trending" / "mean_reverting" / "random_walk"
+   *
+   * @generated from field: string interpretation = 3;
+   */
+  interpretation: string;
+
+  /**
+   * @generated from field: int32 sample_size = 4;
+   */
+  sampleSize: number;
+};
+
+/**
+ * Describes the message antclaw.v1.GetHurstResponse.
+ * Use `create(GetHurstResponseSchema)` to create a new message.
+ */
+export const GetHurstResponseSchema: GenMessage<GetHurstResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 25);
+
+/**
+ * GetCorrelations request
+ *
+ * @generated from message antclaw.v1.GetCorrelationsRequest
+ */
+export type GetCorrelationsRequest = Message<"antclaw.v1.GetCorrelationsRequest"> & {
+  /**
+   * 资产列表；空时使用默认 8 主流货币对
+   *
+   * @generated from field: repeated string assets = 1;
+   */
+  assets: string[];
+
+  /**
+   * @generated from field: string timeframe = 2;
+   */
+  timeframe: string;
+
+  /**
+   * 滚动窗 K 线数；默认 30
+   *
+   * @generated from field: int32 window = 3;
+   */
+  window: number;
+};
+
+/**
+ * Describes the message antclaw.v1.GetCorrelationsRequest.
+ * Use `create(GetCorrelationsRequestSchema)` to create a new message.
+ */
+export const GetCorrelationsRequestSchema: GenMessage<GetCorrelationsRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 26);
+
+/**
+ * @generated from message antclaw.v1.CorrelationCell
+ */
+export type CorrelationCell = Message<"antclaw.v1.CorrelationCell"> & {
+  /**
+   * @generated from field: string asset_a = 1;
+   */
+  assetA: string;
+
+  /**
+   * @generated from field: string asset_b = 2;
+   */
+  assetB: string;
+
+  /**
+   * @generated from field: double value = 3;
+   */
+  value: number;
+};
+
+/**
+ * Describes the message antclaw.v1.CorrelationCell.
+ * Use `create(CorrelationCellSchema)` to create a new message.
+ */
+export const CorrelationCellSchema: GenMessage<CorrelationCell> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 27);
+
+/**
+ * @generated from message antclaw.v1.GetCorrelationsResponse
+ */
+export type GetCorrelationsResponse = Message<"antclaw.v1.GetCorrelationsResponse"> & {
+  /**
+   * @generated from field: repeated string assets = 1;
+   */
+  assets: string[];
+
+  /**
+   * @generated from field: int32 window = 2;
+   */
+  window: number;
+
+  /**
+   * 完整 N*N 矩阵（按 assets 顺序），便于前端直接渲染。
+   *
+   * @generated from field: repeated antclaw.v1.CorrelationCell matrix = 3;
+   */
+  matrix: CorrelationCell[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetCorrelationsResponse.
+ * Use `create(GetCorrelationsResponseSchema)` to create a new message.
+ */
+export const GetCorrelationsResponseSchema: GenMessage<GetCorrelationsResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 28);
+
+/**
+ * GetDivergences request
+ *
+ * @generated from message antclaw.v1.GetDivergencesRequest
+ */
+export type GetDivergencesRequest = Message<"antclaw.v1.GetDivergencesRequest"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * @generated from field: string timeframe = 2;
+   */
+  timeframe: string;
+
+  /**
+   * 默认 200
+   *
+   * @generated from field: int32 lookback = 3;
+   */
+  lookback: number;
+
+  /**
+   * 留空 = 全部启用：rsi / obv / macd
+   *
+   * @generated from field: repeated string indicators = 4;
+   */
+  indicators: string[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetDivergencesRequest.
+ * Use `create(GetDivergencesRequestSchema)` to create a new message.
+ */
+export const GetDivergencesRequestSchema: GenMessage<GetDivergencesRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 29);
+
+/**
+ * @generated from message antclaw.v1.DivergenceEvent
+ */
+export type DivergenceEvent = Message<"antclaw.v1.DivergenceEvent"> & {
+  /**
+   * rsi / obv / macd
+   *
+   * @generated from field: string indicator = 1;
+   */
+  indicator: string;
+
+  /**
+   * bullish / bearish
+   *
+   * @generated from field: string kind = 2;
+   */
+  kind: string;
+
+  /**
+   * RFC3339
+   *
+   * @generated from field: string detected_at = 3;
+   */
+  detectedAt: string;
+
+  /**
+   * @generated from field: double price_pivot = 4;
+   */
+  pricePivot: number;
+
+  /**
+   * @generated from field: double indicator_pivot = 5;
+   */
+  indicatorPivot: number;
+
+  /**
+   * @generated from field: string note = 6;
+   */
+  note: string;
+};
+
+/**
+ * Describes the message antclaw.v1.DivergenceEvent.
+ * Use `create(DivergenceEventSchema)` to create a new message.
+ */
+export const DivergenceEventSchema: GenMessage<DivergenceEvent> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 30);
+
+/**
+ * @generated from message antclaw.v1.GetDivergencesResponse
+ */
+export type GetDivergencesResponse = Message<"antclaw.v1.GetDivergencesResponse"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * @generated from field: repeated antclaw.v1.DivergenceEvent events = 2;
+   */
+  events: DivergenceEvent[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetDivergencesResponse.
+ * Use `create(GetDivergencesResponseSchema)` to create a new message.
+ */
+export const GetDivergencesResponseSchema: GenMessage<GetDivergencesResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_price, 31);
+
+/**
  * PriceService provides price and market data.
  * See: AntClaw-重构解决方案.md §3.3
  *
@@ -679,6 +1083,46 @@ export const PriceService: GenService<{
     methodKind: "unary";
     input: typeof GetSeasonalRequestSchema;
     output: typeof GetSeasonalResponseSchema;
+  },
+  /**
+   * M-A: Conditional volatility (GARCH(1,1)).
+   *
+   * @generated from rpc antclaw.v1.PriceService.GetVolatility
+   */
+  getVolatility: {
+    methodKind: "unary";
+    input: typeof GetVolatilityRequestSchema;
+    output: typeof GetVolatilityResponseSchema;
+  },
+  /**
+   * M-A: Hurst exponent (R/S method).
+   *
+   * @generated from rpc antclaw.v1.PriceService.GetHurst
+   */
+  getHurst: {
+    methodKind: "unary";
+    input: typeof GetHurstRequestSchema;
+    output: typeof GetHurstResponseSchema;
+  },
+  /**
+   * M-A: Rolling correlation matrix among major assets.
+   *
+   * @generated from rpc antclaw.v1.PriceService.GetCorrelations
+   */
+  getCorrelations: {
+    methodKind: "unary";
+    input: typeof GetCorrelationsRequestSchema;
+    output: typeof GetCorrelationsResponseSchema;
+  },
+  /**
+   * M-A: Price-vs-indicator divergences.
+   *
+   * @generated from rpc antclaw.v1.PriceService.GetDivergences
+   */
+  getDivergences: {
+    methodKind: "unary";
+    input: typeof GetDivergencesRequestSchema;
+    output: typeof GetDivergencesResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_price, 0);

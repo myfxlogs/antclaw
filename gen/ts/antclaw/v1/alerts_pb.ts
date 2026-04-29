@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/alerts.proto.
  */
 export const file_antclaw_v1_alerts: GenFile = /*@__PURE__*/
-  fileDesc("ChdhbnRjbGF3L3YxL2FsZXJ0cy5wcm90bxIKYW50Y2xhdy52MSK1AQoRQWxlcnRTdWJzY3JpcHRpb24SFwoPc3Vic2NyaXB0aW9uX2lkGAEgASgJEhIKCmFsZXJ0X3R5cGUYAiABKAkSDAoEcGFpchgDIAEoCRIRCgljb25kaXRpb24YBCABKAkSEQoJdGhyZXNob2xkGAUgASgJEhsKE25vdGlmaWNhdGlvbl9tZXRob2QYBiABKAkSDgoGYWN0aXZlGAcgASgIEhIKCmNyZWF0ZWRfYXQYCCABKAMiSgoYTGlzdFN1YnNjcmlwdGlvbnNSZXF1ZXN0EhkKEWFsZXJ0X3R5cGVfZmlsdGVyGAEgASgJEhMKC2FjdGl2ZV9vbmx5GAIgASgIIlEKGUxpc3RTdWJzY3JpcHRpb25zUmVzcG9uc2USNAoNc3Vic2NyaXB0aW9ucxgBIAMoCzIdLmFudGNsYXcudjEuQWxlcnRTdWJzY3JpcHRpb24idwoQU3Vic2NyaWJlUmVxdWVzdBISCgphbGVydF90eXBlGAEgASgJEgwKBHBhaXIYAiABKAkSEQoJY29uZGl0aW9uGAMgASgJEhEKCXRocmVzaG9sZBgEIAEoCRIbChNub3RpZmljYXRpb25fbWV0aG9kGAUgASgJIkgKEVN1YnNjcmliZVJlc3BvbnNlEjMKDHN1YnNjcmlwdGlvbhgBIAEoCzIdLmFudGNsYXcudjEuQWxlcnRTdWJzY3JpcHRpb24iLQoSVW5zdWJzY3JpYmVSZXF1ZXN0EhcKD3N1YnNjcmlwdGlvbl9pZBgBIAEoCSIVChNVbnN1YnNjcmliZVJlc3BvbnNlInkKDVdlYmhvb2tDb25maWcSEgoKd2ViaG9va19pZBgBIAEoCRILCgN1cmwYAiABKAkSDgoGc2VjcmV0GAMgASgJEhMKC2V2ZW50X3R5cGVzGAQgAygJEg4KBmFjdGl2ZRgFIAEoCBISCgpjcmVhdGVkX2F0GAYgASgDIkoKFlJlZ2lzdGVyV2ViaG9va1JlcXVlc3QSCwoDdXJsGAEgASgJEg4KBnNlY3JldBgCIAEoCRITCgtldmVudF90eXBlcxgDIAMoCSJFChdSZWdpc3RlcldlYmhvb2tSZXNwb25zZRIqCgd3ZWJob29rGAEgASgLMhkuYW50Y2xhdy52MS5XZWJob29rQ29uZmlnIhUKE0xpc3RXZWJob29rc1JlcXVlc3QiQwoUTGlzdFdlYmhvb2tzUmVzcG9uc2USKwoId2ViaG9va3MYASADKAsyGS5hbnRjbGF3LnYxLldlYmhvb2tDb25maWciowEKCUFsZXJ0UnVsZRIKCgJpZBgBIAEoAxIPCgd1c2VyX2lkGAIgASgJEhIKCmFsZXJ0X3R5cGUYAyABKAkSDgoGc3ltYm9sGAQgASgJEhMKC3BhcmFtc19qc29uGAUgASgJEg8KB2VuYWJsZWQYBiABKAgSFQoNbGFzdF9maXJlZF9hdBgHIAEoAxIYChBjb29sZG93bl9zZWNvbmRzGAggASgFImcKEkNyZWF0ZUFsZXJ0UmVxdWVzdBISCgphbGVydF90eXBlGAEgASgJEg4KBnN5bWJvbBgCIAEoCRITCgtwYXJhbXNfanNvbhgDIAEoCRIYChBjb29sZG93bl9zZWNvbmRzGAQgASgFIjsKE0NyZWF0ZUFsZXJ0UmVzcG9uc2USJAoFYWxlcnQYASABKAsyFS5hbnRjbGF3LnYxLkFsZXJ0UnVsZSInChFMaXN0QWxlcnRzUmVxdWVzdBISCgphbGVydF90eXBlGAEgASgJIjsKEkxpc3RBbGVydHNSZXNwb25zZRIlCgZhbGVydHMYASADKAsyFS5hbnRjbGF3LnYxLkFsZXJ0UnVsZSJPChJVcGRhdGVBbGVydFJlcXVlc3QSCgoCaWQYASABKAMSEwoLcGFyYW1zX2pzb24YAiABKAkSGAoQY29vbGRvd25fc2Vjb25kcxgDIAEoBSI7ChNVcGRhdGVBbGVydFJlc3BvbnNlEiQKBWFsZXJ0GAEgASgLMhUuYW50Y2xhdy52MS5BbGVydFJ1bGUiIAoSRGVsZXRlQWxlcnRSZXF1ZXN0EgoKAmlkGAEgASgDIiEKE0RlbGV0ZUFsZXJ0UmVzcG9uc2USCgoCb2sYASABKAgiMQoSVG9nZ2xlQWxlcnRSZXF1ZXN0EgoKAmlkGAEgASgDEg8KB2VuYWJsZWQYAiABKAgiOwoTVG9nZ2xlQWxlcnRSZXNwb25zZRIkCgVhbGVydBgBIAEoCzIVLmFudGNsYXcudjEuQWxlcnRSdWxlMsYGCgxBbGVydFNlcnZpY2USYAoRTGlzdFN1YnNjcmlwdGlvbnMSJC5hbnRjbGF3LnYxLkxpc3RTdWJzY3JpcHRpb25zUmVxdWVzdBolLmFudGNsYXcudjEuTGlzdFN1YnNjcmlwdGlvbnNSZXNwb25zZRJICglTdWJzY3JpYmUSHC5hbnRjbGF3LnYxLlN1YnNjcmliZVJlcXVlc3QaHS5hbnRjbGF3LnYxLlN1YnNjcmliZVJlc3BvbnNlEk4KC1Vuc3Vic2NyaWJlEh4uYW50Y2xhdy52MS5VbnN1YnNjcmliZVJlcXVlc3QaHy5hbnRjbGF3LnYxLlVuc3Vic2NyaWJlUmVzcG9uc2USWgoPUmVnaXN0ZXJXZWJob29rEiIuYW50Y2xhdy52MS5SZWdpc3RlcldlYmhvb2tSZXF1ZXN0GiMuYW50Y2xhdy52MS5SZWdpc3RlcldlYmhvb2tSZXNwb25zZRJRCgxMaXN0V2ViaG9va3MSHy5hbnRjbGF3LnYxLkxpc3RXZWJob29rc1JlcXVlc3QaIC5hbnRjbGF3LnYxLkxpc3RXZWJob29rc1Jlc3BvbnNlEk4KC0NyZWF0ZUFsZXJ0Eh4uYW50Y2xhdy52MS5DcmVhdGVBbGVydFJlcXVlc3QaHy5hbnRjbGF3LnYxLkNyZWF0ZUFsZXJ0UmVzcG9uc2USSwoKTGlzdEFsZXJ0cxIdLmFudGNsYXcudjEuTGlzdEFsZXJ0c1JlcXVlc3QaHi5hbnRjbGF3LnYxLkxpc3RBbGVydHNSZXNwb25zZRJOCgtVcGRhdGVBbGVydBIeLmFudGNsYXcudjEuVXBkYXRlQWxlcnRSZXF1ZXN0Gh8uYW50Y2xhdy52MS5VcGRhdGVBbGVydFJlc3BvbnNlEk4KC0RlbGV0ZUFsZXJ0Eh4uYW50Y2xhdy52MS5EZWxldGVBbGVydFJlcXVlc3QaHy5hbnRjbGF3LnYxLkRlbGV0ZUFsZXJ0UmVzcG9uc2USTgoLVG9nZ2xlQWxlcnQSHi5hbnRjbGF3LnYxLlRvZ2dsZUFsZXJ0UmVxdWVzdBofLmFudGNsYXcudjEuVG9nZ2xlQWxlcnRSZXNwb25zZUKeAQoOY29tLmFudGNsYXcudjFCC0FsZXJ0c1Byb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM");
+  fileDesc("ChdhbnRjbGF3L3YxL2FsZXJ0cy5wcm90bxIKYW50Y2xhdy52MSK1AQoRQWxlcnRTdWJzY3JpcHRpb24SFwoPc3Vic2NyaXB0aW9uX2lkGAEgASgJEhIKCmFsZXJ0X3R5cGUYAiABKAkSDAoEcGFpchgDIAEoCRIRCgljb25kaXRpb24YBCABKAkSEQoJdGhyZXNob2xkGAUgASgJEhsKE25vdGlmaWNhdGlvbl9tZXRob2QYBiABKAkSDgoGYWN0aXZlGAcgASgIEhIKCmNyZWF0ZWRfYXQYCCABKAMiSgoYTGlzdFN1YnNjcmlwdGlvbnNSZXF1ZXN0EhkKEWFsZXJ0X3R5cGVfZmlsdGVyGAEgASgJEhMKC2FjdGl2ZV9vbmx5GAIgASgIIlEKGUxpc3RTdWJzY3JpcHRpb25zUmVzcG9uc2USNAoNc3Vic2NyaXB0aW9ucxgBIAMoCzIdLmFudGNsYXcudjEuQWxlcnRTdWJzY3JpcHRpb24idwoQU3Vic2NyaWJlUmVxdWVzdBISCgphbGVydF90eXBlGAEgASgJEgwKBHBhaXIYAiABKAkSEQoJY29uZGl0aW9uGAMgASgJEhEKCXRocmVzaG9sZBgEIAEoCRIbChNub3RpZmljYXRpb25fbWV0aG9kGAUgASgJIkgKEVN1YnNjcmliZVJlc3BvbnNlEjMKDHN1YnNjcmlwdGlvbhgBIAEoCzIdLmFudGNsYXcudjEuQWxlcnRTdWJzY3JpcHRpb24iLQoSVW5zdWJzY3JpYmVSZXF1ZXN0EhcKD3N1YnNjcmlwdGlvbl9pZBgBIAEoCSIVChNVbnN1YnNjcmliZVJlc3BvbnNlInkKDVdlYmhvb2tDb25maWcSEgoKd2ViaG9va19pZBgBIAEoCRILCgN1cmwYAiABKAkSDgoGc2VjcmV0GAMgASgJEhMKC2V2ZW50X3R5cGVzGAQgAygJEg4KBmFjdGl2ZRgFIAEoCBISCgpjcmVhdGVkX2F0GAYgASgDIkoKFlJlZ2lzdGVyV2ViaG9va1JlcXVlc3QSCwoDdXJsGAEgASgJEg4KBnNlY3JldBgCIAEoCRITCgtldmVudF90eXBlcxgDIAMoCSJFChdSZWdpc3RlcldlYmhvb2tSZXNwb25zZRIqCgd3ZWJob29rGAEgASgLMhkuYW50Y2xhdy52MS5XZWJob29rQ29uZmlnIhUKE0xpc3RXZWJob29rc1JlcXVlc3QiQwoUTGlzdFdlYmhvb2tzUmVzcG9uc2USKwoId2ViaG9va3MYASADKAsyGS5hbnRjbGF3LnYxLldlYmhvb2tDb25maWciowEKCUFsZXJ0UnVsZRIKCgJpZBgBIAEoAxIPCgd1c2VyX2lkGAIgASgJEhIKCmFsZXJ0X3R5cGUYAyABKAkSDgoGc3ltYm9sGAQgASgJEhMKC3BhcmFtc19qc29uGAUgASgJEg8KB2VuYWJsZWQYBiABKAgSFQoNbGFzdF9maXJlZF9hdBgHIAEoAxIYChBjb29sZG93bl9zZWNvbmRzGAggASgFImcKEkNyZWF0ZUFsZXJ0UmVxdWVzdBISCgphbGVydF90eXBlGAEgASgJEg4KBnN5bWJvbBgCIAEoCRITCgtwYXJhbXNfanNvbhgDIAEoCRIYChBjb29sZG93bl9zZWNvbmRzGAQgASgFIjsKE0NyZWF0ZUFsZXJ0UmVzcG9uc2USJAoFYWxlcnQYASABKAsyFS5hbnRjbGF3LnYxLkFsZXJ0UnVsZSInChFMaXN0QWxlcnRzUmVxdWVzdBISCgphbGVydF90eXBlGAEgASgJIjsKEkxpc3RBbGVydHNSZXNwb25zZRIlCgZhbGVydHMYASADKAsyFS5hbnRjbGF3LnYxLkFsZXJ0UnVsZSJPChJVcGRhdGVBbGVydFJlcXVlc3QSCgoCaWQYASABKAMSEwoLcGFyYW1zX2pzb24YAiABKAkSGAoQY29vbGRvd25fc2Vjb25kcxgDIAEoBSI7ChNVcGRhdGVBbGVydFJlc3BvbnNlEiQKBWFsZXJ0GAEgASgLMhUuYW50Y2xhdy52MS5BbGVydFJ1bGUiIAoSRGVsZXRlQWxlcnRSZXF1ZXN0EgoKAmlkGAEgASgDIiEKE0RlbGV0ZUFsZXJ0UmVzcG9uc2USCgoCb2sYASABKAgiMQoSVG9nZ2xlQWxlcnRSZXF1ZXN0EgoKAmlkGAEgASgDEg8KB2VuYWJsZWQYAiABKAgiOwoTVG9nZ2xlQWxlcnRSZXNwb25zZRIkCgVhbGVydBgBIAEoCzIVLmFudGNsYXcudjEuQWxlcnRSdWxlIloKEkRlY2lkZUFsZXJ0UmVxdWVzdBIPCgd1c2VyX2lkGAEgASgJEhIKCmFsZXJ0X3R5cGUYAiABKAkSEAoIc2V2ZXJpdHkYAyABKAkSDQoFcGFpcnMYBCADKAkiMwoTRGVjaWRlQWxlcnRSZXNwb25zZRIMCgRzZW5kGAEgASgIEg4KBnJlYXNvbhgCIAEoCSIoChVHZXRQcmVmZXJlbmNlc1JlcXVlc3QSDwoHdXNlcl9pZBgBIAEoCSKYAQoWR2V0UHJlZmVyZW5jZXNSZXNwb25zZRIPCgd1c2VyX2lkGAEgASgJEg0KBXBhaXJzGAIgAygJEhgKEGhpZ2hfaW1wYWN0X29ubHkYAyABKAgSGQoRcXVpZXRfaG91cnNfc3RhcnQYBCABKAUSFwoPcXVpZXRfaG91cnNfZW5kGAUgASgFEhAKCHRpbWV6b25lGAYgASgJIpoBChhVcGRhdGVQcmVmZXJlbmNlc1JlcXVlc3QSDwoHdXNlcl9pZBgBIAEoCRINCgVwYWlycxgCIAMoCRIYChBoaWdoX2ltcGFjdF9vbmx5GAMgASgIEhkKEXF1aWV0X2hvdXJzX3N0YXJ0GAQgASgFEhcKD3F1aWV0X2hvdXJzX2VuZBgFIAEoBRIQCgh0aW1lem9uZRgGIAEoCSInChlVcGRhdGVQcmVmZXJlbmNlc1Jlc3BvbnNlEgoKAm9rGAEgASgIIksKElNldFVzZXJUaWVyUmVxdWVzdBIPCgd1c2VyX2lkGAEgASgJEgwKBHRpZXIYAiABKAkSFgoOYWlfbWF4X3Blcl9kYXkYAyABKAUiIQoTU2V0VXNlclRpZXJSZXNwb25zZRIKCgJvaxgBIAEoCCI4ChZHZXRBbGVydEhpc3RvcnlSZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkSDQoFbGltaXQYAiABKAUigwEKDEFsZXJ0TG9nSXRlbRIKCgJpZBgBIAEoAxIPCgd1c2VyX2lkGAIgASgJEhIKCmFsZXJ0X3R5cGUYAyABKAkSEAoIc2V2ZXJpdHkYBCABKAkSDAoEc2VudBgFIAEoCBIOCgZyZWFzb24YBiABKAkSEgoKY3JlYXRlZF9hdBgHIAEoCSJCChdHZXRBbGVydEhpc3RvcnlSZXNwb25zZRInCgVpdGVtcxgBIAMoCzIYLmFudGNsYXcudjEuQWxlcnRMb2dJdGVtMv0JCgxBbGVydFNlcnZpY2USYAoRTGlzdFN1YnNjcmlwdGlvbnMSJC5hbnRjbGF3LnYxLkxpc3RTdWJzY3JpcHRpb25zUmVxdWVzdBolLmFudGNsYXcudjEuTGlzdFN1YnNjcmlwdGlvbnNSZXNwb25zZRJICglTdWJzY3JpYmUSHC5hbnRjbGF3LnYxLlN1YnNjcmliZVJlcXVlc3QaHS5hbnRjbGF3LnYxLlN1YnNjcmliZVJlc3BvbnNlEk4KC1Vuc3Vic2NyaWJlEh4uYW50Y2xhdy52MS5VbnN1YnNjcmliZVJlcXVlc3QaHy5hbnRjbGF3LnYxLlVuc3Vic2NyaWJlUmVzcG9uc2USWgoPUmVnaXN0ZXJXZWJob29rEiIuYW50Y2xhdy52MS5SZWdpc3RlcldlYmhvb2tSZXF1ZXN0GiMuYW50Y2xhdy52MS5SZWdpc3RlcldlYmhvb2tSZXNwb25zZRJRCgxMaXN0V2ViaG9va3MSHy5hbnRjbGF3LnYxLkxpc3RXZWJob29rc1JlcXVlc3QaIC5hbnRjbGF3LnYxLkxpc3RXZWJob29rc1Jlc3BvbnNlEk4KC0NyZWF0ZUFsZXJ0Eh4uYW50Y2xhdy52MS5DcmVhdGVBbGVydFJlcXVlc3QaHy5hbnRjbGF3LnYxLkNyZWF0ZUFsZXJ0UmVzcG9uc2USSwoKTGlzdEFsZXJ0cxIdLmFudGNsYXcudjEuTGlzdEFsZXJ0c1JlcXVlc3QaHi5hbnRjbGF3LnYxLkxpc3RBbGVydHNSZXNwb25zZRJOCgtVcGRhdGVBbGVydBIeLmFudGNsYXcudjEuVXBkYXRlQWxlcnRSZXF1ZXN0Gh8uYW50Y2xhdy52MS5VcGRhdGVBbGVydFJlc3BvbnNlEk4KC0RlbGV0ZUFsZXJ0Eh4uYW50Y2xhdy52MS5EZWxldGVBbGVydFJlcXVlc3QaHy5hbnRjbGF3LnYxLkRlbGV0ZUFsZXJ0UmVzcG9uc2USTgoLVG9nZ2xlQWxlcnQSHi5hbnRjbGF3LnYxLlRvZ2dsZUFsZXJ0UmVxdWVzdBofLmFudGNsYXcudjEuVG9nZ2xlQWxlcnRSZXNwb25zZRJOCgtEZWNpZGVBbGVydBIeLmFudGNsYXcudjEuRGVjaWRlQWxlcnRSZXF1ZXN0Gh8uYW50Y2xhdy52MS5EZWNpZGVBbGVydFJlc3BvbnNlElcKDkdldFByZWZlcmVuY2VzEiEuYW50Y2xhdy52MS5HZXRQcmVmZXJlbmNlc1JlcXVlc3QaIi5hbnRjbGF3LnYxLkdldFByZWZlcmVuY2VzUmVzcG9uc2USYAoRVXBkYXRlUHJlZmVyZW5jZXMSJC5hbnRjbGF3LnYxLlVwZGF0ZVByZWZlcmVuY2VzUmVxdWVzdBolLmFudGNsYXcudjEuVXBkYXRlUHJlZmVyZW5jZXNSZXNwb25zZRJOCgtTZXRVc2VyVGllchIeLmFudGNsYXcudjEuU2V0VXNlclRpZXJSZXF1ZXN0Gh8uYW50Y2xhdy52MS5TZXRVc2VyVGllclJlc3BvbnNlEloKD0dldEFsZXJ0SGlzdG9yeRIiLmFudGNsYXcudjEuR2V0QWxlcnRIaXN0b3J5UmVxdWVzdBojLmFudGNsYXcudjEuR2V0QWxlcnRIaXN0b3J5UmVzcG9uc2VCngEKDmNvbS5hbnRjbGF3LnYxQgtBbGVydHNQcm90b1ABWjZnaXRodWIuY29tL2FudGNsYXcvYW50Y2xhdy9nZW4vZ28vYW50Y2xhdy92MTthbnRjbGF3djGiAgNBWFiqAgpBbnRjbGF3LlYxygIKQW50Y2xhd1xWMeICFkFudGNsYXdcVjFcR1BCTWV0YWRhdGHqAgtBbnRjbGF3OjpWMWIGcHJvdG8z");
 
 /**
  * Alert subscription
@@ -586,6 +586,312 @@ export const ToggleAlertResponseSchema: GenMessage<ToggleAlertResponse> = /*@__P
   messageDesc(file_antclaw_v1_alerts, 22);
 
 /**
+ * @generated from message antclaw.v1.DecideAlertRequest
+ */
+export type DecideAlertRequest = Message<"antclaw.v1.DecideAlertRequest"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string alert_type = 2;
+   */
+  alertType: string;
+
+  /**
+   * low / medium / high / critical
+   *
+   * @generated from field: string severity = 3;
+   */
+  severity: string;
+
+  /**
+   * @generated from field: repeated string pairs = 4;
+   */
+  pairs: string[];
+};
+
+/**
+ * Describes the message antclaw.v1.DecideAlertRequest.
+ * Use `create(DecideAlertRequestSchema)` to create a new message.
+ */
+export const DecideAlertRequestSchema: GenMessage<DecideAlertRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 23);
+
+/**
+ * @generated from message antclaw.v1.DecideAlertResponse
+ */
+export type DecideAlertResponse = Message<"antclaw.v1.DecideAlertResponse"> & {
+  /**
+   * @generated from field: bool send = 1;
+   */
+  send: boolean;
+
+  /**
+   * tier_blocked / quiet_hours / cooldown / unsubscribed_pair / ok
+   *
+   * @generated from field: string reason = 2;
+   */
+  reason: string;
+};
+
+/**
+ * Describes the message antclaw.v1.DecideAlertResponse.
+ * Use `create(DecideAlertResponseSchema)` to create a new message.
+ */
+export const DecideAlertResponseSchema: GenMessage<DecideAlertResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 24);
+
+/**
+ * @generated from message antclaw.v1.GetPreferencesRequest
+ */
+export type GetPreferencesRequest = Message<"antclaw.v1.GetPreferencesRequest"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetPreferencesRequest.
+ * Use `create(GetPreferencesRequestSchema)` to create a new message.
+ */
+export const GetPreferencesRequestSchema: GenMessage<GetPreferencesRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 25);
+
+/**
+ * @generated from message antclaw.v1.GetPreferencesResponse
+ */
+export type GetPreferencesResponse = Message<"antclaw.v1.GetPreferencesResponse"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: repeated string pairs = 2;
+   */
+  pairs: string[];
+
+  /**
+   * @generated from field: bool high_impact_only = 3;
+   */
+  highImpactOnly: boolean;
+
+  /**
+   * @generated from field: int32 quiet_hours_start = 4;
+   */
+  quietHoursStart: number;
+
+  /**
+   * @generated from field: int32 quiet_hours_end = 5;
+   */
+  quietHoursEnd: number;
+
+  /**
+   * @generated from field: string timezone = 6;
+   */
+  timezone: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetPreferencesResponse.
+ * Use `create(GetPreferencesResponseSchema)` to create a new message.
+ */
+export const GetPreferencesResponseSchema: GenMessage<GetPreferencesResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 26);
+
+/**
+ * @generated from message antclaw.v1.UpdatePreferencesRequest
+ */
+export type UpdatePreferencesRequest = Message<"antclaw.v1.UpdatePreferencesRequest"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: repeated string pairs = 2;
+   */
+  pairs: string[];
+
+  /**
+   * @generated from field: bool high_impact_only = 3;
+   */
+  highImpactOnly: boolean;
+
+  /**
+   * @generated from field: int32 quiet_hours_start = 4;
+   */
+  quietHoursStart: number;
+
+  /**
+   * @generated from field: int32 quiet_hours_end = 5;
+   */
+  quietHoursEnd: number;
+
+  /**
+   * @generated from field: string timezone = 6;
+   */
+  timezone: string;
+};
+
+/**
+ * Describes the message antclaw.v1.UpdatePreferencesRequest.
+ * Use `create(UpdatePreferencesRequestSchema)` to create a new message.
+ */
+export const UpdatePreferencesRequestSchema: GenMessage<UpdatePreferencesRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 27);
+
+/**
+ * @generated from message antclaw.v1.UpdatePreferencesResponse
+ */
+export type UpdatePreferencesResponse = Message<"antclaw.v1.UpdatePreferencesResponse"> & {
+  /**
+   * @generated from field: bool ok = 1;
+   */
+  ok: boolean;
+};
+
+/**
+ * Describes the message antclaw.v1.UpdatePreferencesResponse.
+ * Use `create(UpdatePreferencesResponseSchema)` to create a new message.
+ */
+export const UpdatePreferencesResponseSchema: GenMessage<UpdatePreferencesResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 28);
+
+/**
+ * @generated from message antclaw.v1.SetUserTierRequest
+ */
+export type SetUserTierRequest = Message<"antclaw.v1.SetUserTierRequest"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string tier = 2;
+   */
+  tier: string;
+
+  /**
+   * @generated from field: int32 ai_max_per_day = 3;
+   */
+  aiMaxPerDay: number;
+};
+
+/**
+ * Describes the message antclaw.v1.SetUserTierRequest.
+ * Use `create(SetUserTierRequestSchema)` to create a new message.
+ */
+export const SetUserTierRequestSchema: GenMessage<SetUserTierRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 29);
+
+/**
+ * @generated from message antclaw.v1.SetUserTierResponse
+ */
+export type SetUserTierResponse = Message<"antclaw.v1.SetUserTierResponse"> & {
+  /**
+   * @generated from field: bool ok = 1;
+   */
+  ok: boolean;
+};
+
+/**
+ * Describes the message antclaw.v1.SetUserTierResponse.
+ * Use `create(SetUserTierResponseSchema)` to create a new message.
+ */
+export const SetUserTierResponseSchema: GenMessage<SetUserTierResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 30);
+
+/**
+ * @generated from message antclaw.v1.GetAlertHistoryRequest
+ */
+export type GetAlertHistoryRequest = Message<"antclaw.v1.GetAlertHistoryRequest"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: int32 limit = 2;
+   */
+  limit: number;
+};
+
+/**
+ * Describes the message antclaw.v1.GetAlertHistoryRequest.
+ * Use `create(GetAlertHistoryRequestSchema)` to create a new message.
+ */
+export const GetAlertHistoryRequestSchema: GenMessage<GetAlertHistoryRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 31);
+
+/**
+ * @generated from message antclaw.v1.AlertLogItem
+ */
+export type AlertLogItem = Message<"antclaw.v1.AlertLogItem"> & {
+  /**
+   * @generated from field: int64 id = 1;
+   */
+  id: bigint;
+
+  /**
+   * @generated from field: string user_id = 2;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string alert_type = 3;
+   */
+  alertType: string;
+
+  /**
+   * @generated from field: string severity = 4;
+   */
+  severity: string;
+
+  /**
+   * @generated from field: bool sent = 5;
+   */
+  sent: boolean;
+
+  /**
+   * @generated from field: string reason = 6;
+   */
+  reason: string;
+
+  /**
+   * @generated from field: string created_at = 7;
+   */
+  createdAt: string;
+};
+
+/**
+ * Describes the message antclaw.v1.AlertLogItem.
+ * Use `create(AlertLogItemSchema)` to create a new message.
+ */
+export const AlertLogItemSchema: GenMessage<AlertLogItem> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 32);
+
+/**
+ * @generated from message antclaw.v1.GetAlertHistoryResponse
+ */
+export type GetAlertHistoryResponse = Message<"antclaw.v1.GetAlertHistoryResponse"> & {
+  /**
+   * @generated from field: repeated antclaw.v1.AlertLogItem items = 1;
+   */
+  items: AlertLogItem[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetAlertHistoryResponse.
+ * Use `create(GetAlertHistoryResponseSchema)` to create a new message.
+ */
+export const GetAlertHistoryResponseSchema: GenMessage<GetAlertHistoryResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_alerts, 33);
+
+/**
  * AlertService provides alert and notification management.
  * See: AntClaw-重构解决方案.md §3.3
  *
@@ -683,6 +989,48 @@ export const AlertService: GenService<{
     methodKind: "unary";
     input: typeof ToggleAlertRequestSchema;
     output: typeof ToggleAlertResponseSchema;
+  },
+  /**
+   * M-E: alert gate + 偏好 + 配额
+   *
+   * @generated from rpc antclaw.v1.AlertService.DecideAlert
+   */
+  decideAlert: {
+    methodKind: "unary";
+    input: typeof DecideAlertRequestSchema;
+    output: typeof DecideAlertResponseSchema;
+  },
+  /**
+   * @generated from rpc antclaw.v1.AlertService.GetPreferences
+   */
+  getPreferences: {
+    methodKind: "unary";
+    input: typeof GetPreferencesRequestSchema;
+    output: typeof GetPreferencesResponseSchema;
+  },
+  /**
+   * @generated from rpc antclaw.v1.AlertService.UpdatePreferences
+   */
+  updatePreferences: {
+    methodKind: "unary";
+    input: typeof UpdatePreferencesRequestSchema;
+    output: typeof UpdatePreferencesResponseSchema;
+  },
+  /**
+   * @generated from rpc antclaw.v1.AlertService.SetUserTier
+   */
+  setUserTier: {
+    methodKind: "unary";
+    input: typeof SetUserTierRequestSchema;
+    output: typeof SetUserTierResponseSchema;
+  },
+  /**
+   * @generated from rpc antclaw.v1.AlertService.GetAlertHistory
+   */
+  getAlertHistory: {
+    methodKind: "unary";
+    input: typeof GetAlertHistoryRequestSchema;
+    output: typeof GetAlertHistoryResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_alerts, 0);

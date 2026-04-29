@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Search, Ban, Unlock, Shield, Key } from 'lucide-react'
+import { Search, Ban, Unlock, Shield, Key, Hash } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { listUsers, banUser, unbanUser, adminResetPassword } from '../lib/api'
+import { listUsers, banUser, unbanUser, adminResetPassword, setUserCodeID } from '../lib/api'
 
 interface User {
   user_id: string
@@ -9,6 +9,7 @@ interface User {
   roles: string[]
   banned: boolean
   created_at: string
+  code_id: string
 }
 
 export default function Users() {
@@ -19,6 +20,9 @@ export default function Users() {
   const [showResetModal, setShowResetModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [newPassword, setNewPassword] = useState('')
+  const [showCodeIDModal, setShowCodeIDModal] = useState(false)
+  const [newCodeID, setNewCodeID] = useState('')
+  const [codeIDError, setCodeIDError] = useState('')
 
   useEffect(() => {
     loadUsers()
@@ -33,6 +37,7 @@ export default function Users() {
         roles: u.roles && u.roles.length > 0 ? u.roles : ['user'],
         banned: Boolean(u.banned),
         created_at: u.created_at ? new Date(u.created_at * 1000).toISOString().split('T')[0] : '-',
+        code_id: u.code_id || '',
       })))
     } catch (err) {
       console.error('Failed to load users:', err)
@@ -41,9 +46,45 @@ export default function Users() {
     }
   }
 
-  const filteredUsers = users.filter(u => 
-    u.email.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredUsers = users.filter(u => {
+    const q = search.toLowerCase()
+    return u.email.toLowerCase().includes(q) || (u.code_id || '').includes(q)
+  })
+
+  // 前端预校验（后端会再校）：5-10 位、避开 4/7、首位非 0。
+  const codeIDRegex = /^[1235689][01235689]{4,9}$/
+
+  const openCodeIDModal = (user: User) => {
+    setSelectedUser(user)
+    setNewCodeID(user.code_id || '')
+    setCodeIDError('')
+    setShowCodeIDModal(true)
+  }
+
+  const handleSetCodeID = async (autoGenerate: boolean) => {
+    if (!selectedUser) return
+    const value = autoGenerate ? '' : newCodeID.trim()
+    if (value !== '' && !codeIDRegex.test(value)) {
+      setCodeIDError('格式错误：5-10 位数字，不含 4/7，首位不能为 0')
+      return
+    }
+    try {
+      const r = await setUserCodeID(selectedUser.user_id, value)
+      alert(`用户 ${selectedUser.email} 的账号已设为 ${r.code_id}`)
+      setShowCodeIDModal(false)
+      setSelectedUser(null)
+      await loadUsers()
+    } catch (err: any) {
+      const msg = err?.message || String(err)
+      if (msg.includes('already_exists') || msg.includes('already in use')) {
+        setCodeIDError('该账号已被其他用户占用')
+      } else if (msg.includes('invalid')) {
+        setCodeIDError('格式不合法')
+      } else {
+        setCodeIDError(msg)
+      }
+    }
+  }
 
   const handleBan = async (userId: string) => {
     try {
@@ -107,6 +148,7 @@ export default function Users() {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">用户ID</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('users.email')}</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('users.role')}</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('users.status')}</th>
@@ -117,6 +159,13 @@ export default function Users() {
           <tbody className="divide-y">
             {filteredUsers.map((user) => (
               <tr key={user.user_id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  {user.code_id ? (
+                    <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{user.code_id}</span>
+                  ) : (
+                    <span className="text-xs text-gray-400">未分配</span>
+                  )}
+                </td>
                 <td className="px-6 py-4">
                   <p className="font-medium">{user.email}</p>
                 </td>
@@ -138,6 +187,9 @@ export default function Users() {
                 <td className="px-6 py-4 text-sm text-gray-500">{user.created_at}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
+                    <button onClick={() => openCodeIDModal(user)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded" title="设置/重置用户ID">
+                      <Hash className="w-4 h-4" />
+                    </button>
                     <button onClick={() => openResetModal(user)} className="p-2 text-blue-600 hover:bg-blue-50 rounded" title="Reset Password">
                       <Key className="w-4 h-4" />
                     </button>
@@ -157,6 +209,62 @@ export default function Users() {
           </tbody>
         </table>
       </div>
+
+      {/* CodeID Modal — 设置/重置用户数字账号 */}
+      {showCodeIDModal && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[28rem] shadow-xl">
+            <h2 className="text-xl font-bold mb-2">设置用户ID</h2>
+            <p className="text-gray-600 mb-3 text-sm">
+              用户：<span className="font-mono">{selectedUser.email}</span><br/>
+              当前账号：<span className="font-mono">{selectedUser.code_id || '未分配'}</span>
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  新账号（5-10 位数字，不含 4/7，首位不为 0）
+                </label>
+                <input
+                  type="text"
+                  value={newCodeID}
+                  onChange={(e) => {
+                    setNewCodeID(e.target.value.replace(/[^0-9]/g, ''))
+                    setCodeIDError('')
+                  }}
+                  className="w-full px-4 py-2 border rounded-lg font-mono"
+                  placeholder="例如 12356"
+                  maxLength={10}
+                />
+                {codeIDError && <p className="text-red-600 text-xs mt-1">{codeIDError}</p>}
+              </div>
+              <div className="flex gap-2 justify-between items-center">
+                <button
+                  onClick={() => handleSetCodeID(true)}
+                  className="px-3 py-2 text-sm border rounded-lg hover:bg-gray-50"
+                  title="忽略输入，由系统随机分配一个新账号"
+                >
+                  随机分配
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowCodeIDModal(false)}
+                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={() => handleSetCodeID(false)}
+                    disabled={!newCodeID}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                  >
+                    确定
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Reset Password Modal */}
       {showResetModal && selectedUser && (

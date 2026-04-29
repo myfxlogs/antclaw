@@ -95,4 +95,29 @@ func (h *BacktestHandler) RunBootstrap(ctx context.Context, req *connect.Request
 	return connect.NewResponse(resp), nil
 }
 
+// M-B 增量
+func (h *BacktestHandler) RunMonteCarlo(ctx context.Context, req *connect.Request[backtestv1.RunMonteCarloRequest]) (*connect.Response[backtestv1.RunMonteCarloResponse], error) {
+	resp, err := h.svc.RunMonteCarlo(ctx, req.Msg)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (h *BacktestHandler) GetTrades(ctx context.Context, req *connect.Request[backtestv1.GetTradesRequest]) (*connect.Response[backtestv1.GetTradesResponse], error) {
+	resp, err := h.svc.GetTrades(ctx, req.Msg)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (h *BacktestHandler) GetMetricsByRegime(ctx context.Context, req *connect.Request[backtestv1.GetMetricsByRegimeRequest]) (*connect.Response[backtestv1.GetMetricsByRegimeResponse], error) {
+	resp, err := h.svc.GetMetricsByRegime(ctx, req.Msg)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(resp), nil
+}
+
 var _ antclawv1connect.BacktestServiceHandler = (*BacktestHandler)(nil)

@@ -244,7 +244,7 @@ export const OverlaySnapshotSchema: GenMessage<OverlaySnapshot> = /*@__PURE__*/
 
 /**
  * RegimeService 提供 HMM/GARCH/ADX/COT 多模型融合的统一市场状态评分。
- * 设计参考：ARK 替代实施方案 §3.2 Regime Overlay 多模型融合。
+ * 设计参考：docs/替代实施方案 §3.2 Regime Overlay 多模型融合。
  *
  * @generated from service antclaw.v1.RegimeService
  */

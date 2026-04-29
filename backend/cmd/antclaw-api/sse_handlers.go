@@ -101,3 +101,60 @@ func auditEventsHandler(rdb *redisv9.Client) http.HandlerFunc {
 		streamSSE(w, r, rdb, "stream:audit_events")
 	}
 }
+
+// alertsEventsHandler 通用告警 SSE：把任意 Redis Stream 转推给浏览器。
+// 当上游尚未发布告警时，连接保持打开，前端显示 "等待事件..."；这是预期行为，避免 404。
+func alertsEventsHandler(rdb *redisv9.Client, stream string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		streamSSE(w, r, rdb, stream)
+	}
+}
+
+// userNotificationsSSE 个人通知 SSE：用 Redis Pub/Sub 实时推送 user:{userID}:notifications。
+//
+// 鉴权：从 Authorization: Bearer 或 Cookie antclaw_at= 提取 access_token，校验后取 sub 作为 userID。
+// 失败 → 401，避免泄露推送频道。
+func userNotificationsSSE(rdb *redisv9.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, err := extractUserIDFromRequest(r)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			http.Error(w, "streaming unsupported", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Connection", "keep-alive")
+		w.Header().Set("X-Accel-Buffering", "no")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, ": connected user=%s ts=%d\n\n", userID, time.Now().Unix())
+		flusher.Flush()
+
+		channel := "user:" + userID + ":notifications"
+		ctx := r.Context()
+		pubsub := rdb.Subscribe(ctx, channel)
+		defer pubsub.Close()
+		ch := pubsub.Channel()
+		heartbeat := time.NewTicker(15 * time.Second)
+		defer heartbeat.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-heartbeat.C:
+				fmt.Fprintf(w, ": ping %d\n\n", time.Now().Unix())
+				flusher.Flush()
+			case m, ok := <-ch:
+				if !ok {
+					return
+				}
+				fmt.Fprintf(w, "event: notification\ndata: %s\n\n", m.Payload)
+				flusher.Flush()
+			}
+		}
+	}
+}

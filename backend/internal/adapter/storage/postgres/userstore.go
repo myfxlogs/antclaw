@@ -3,14 +3,21 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/netip"
+	"strings"
 	"time"
 
 	"github.com/antclaw/antclaw/internal/adapter/storage/postgres/db"
+	"github.com/antclaw/antclaw/internal/auth"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+// codeIDAllocAttempts CreateUser 时为新用户分配 code_id 的最大重试次数。
+// 5 位空间 28k；当占用率较低时几乎不会冲突，留 8 次重试足够。
+const codeIDAllocAttempts = 8
 
 // UserStore implements rpc.UserStore interface using sqlc queries
 type UserStore struct {
@@ -22,52 +29,104 @@ func NewUserStore(queries *db.Queries) *UserStore {
 	return &UserStore{queries: queries}
 }
 
-// CreateUser implements rpc.UserStore
-func (s *UserStore) CreateUser(ctx context.Context, email, displayName, passwordHash, locale, timezone string) (userID string, role string, passwordVersion int, err error) {
+// CreateUser implements rpc.UserStore.
+// 注册时立即分配 5 位 code_id；唯一冲突自动重试至 codeIDAllocAttempts 次。
+func (s *UserStore) CreateUser(ctx context.Context, email, displayName, passwordHash, locale, timezone string) (userID, role, codeID string, passwordVersion int, err error) {
 	var username *string
 	var displayNamePtr *string
 	if displayName != "" {
 		displayNamePtr = &displayName
 	}
 
-	user, err := s.queries.CreateUser(ctx, db.CreateUserParams{
-		Email:        email,
-		Username:     username,
-		DisplayName:  displayNamePtr,
-		PasswordHash: passwordHash,
-		Locale:       locale,
-		Timezone:     timezone,
-	})
-	if err != nil {
-		return "", "", 0, err
-	}
+	for attempt := 0; attempt < codeIDAllocAttempts; attempt++ {
+		cid, gerr := auth.GenerateCodeID(auth.CodeIDDefaultDigits)
+		if gerr != nil {
+			return "", "", "", 0, fmt.Errorf("generate code_id: %w", gerr)
+		}
+		cidPtr := cid
 
-	return user.ID.String(), user.Role, int(user.PasswordVersion), nil
+		user, ierr := s.queries.CreateUser(ctx, db.CreateUserParams{
+			Email:        email,
+			Username:     username,
+			DisplayName:  displayNamePtr,
+			PasswordHash: passwordHash,
+			Locale:       locale,
+			Timezone:     timezone,
+			CodeID:       &cidPtr,
+		})
+		if ierr == nil {
+			cidOut := ""
+			if user.CodeID != nil {
+				cidOut = *user.CodeID
+			}
+			return user.ID.String(), user.Role, cidOut, int(user.PasswordVersion), nil
+		}
+		// 唯一冲突 → email 重复或 code_id 重复；email 冲突直接返回，code_id 重试。
+		if !isUniqueViolationOnCodeID(ierr) {
+			return "", "", "", 0, ierr
+		}
+	}
+	return "", "", "", 0, errors.New("failed to allocate unique code_id after retries")
 }
 
-// GetUserByEmail implements rpc.UserStore
-func (s *UserStore) GetUserByEmail(ctx context.Context, email string) (userID, passwordHash, role, locale, status string, passwordVersion int, err error) {
+// GetUserByEmail implements rpc.UserStore.
+func (s *UserStore) GetUserByEmail(ctx context.Context, email string) (userID, passwordHash, role, locale, status, codeID string, passwordVersion int, err error) {
 	user, err := s.queries.GetUserByEmail(ctx, email)
 	if err != nil {
-		return "", "", "", "", "", 0, err
+		return "", "", "", "", "", "", 0, err
 	}
-
-	return user.ID.String(), user.PasswordHash, user.Role, user.Locale, user.Status, int(user.PasswordVersion), nil
+	return user.ID.String(), user.PasswordHash, user.Role, user.Locale, user.Status, derefStr(user.CodeID), int(user.PasswordVersion), nil
 }
 
-// GetUserByID implements rpc.UserStore
-func (s *UserStore) GetUserByID(ctx context.Context, userID string) (role, locale string, passwordVersion int, err error) {
+// GetUserByCodeID 通过 code_id 查询，签名与 GetUserByEmail 一致便于 Login 复用。
+func (s *UserStore) GetUserByCodeID(ctx context.Context, codeID string) (userID, passwordHash, role, locale, status, outCodeID string, passwordVersion int, err error) {
+	cid := codeID
+	user, err := s.queries.GetUserByCodeID(ctx, &cid)
+	if err != nil {
+		return "", "", "", "", "", "", 0, err
+	}
+	return user.ID.String(), user.PasswordHash, user.Role, user.Locale, user.Status, derefStr(user.CodeID), int(user.PasswordVersion), nil
+}
+
+// GetUserByID implements rpc.UserStore.
+func (s *UserStore) GetUserByID(ctx context.Context, userID string) (role, locale, codeID string, passwordVersion int, err error) {
 	id, err := uuid.Parse(userID)
 	if err != nil {
-		return "", "", 0, fmt.Errorf("invalid user id: %w", err)
+		return "", "", "", 0, fmt.Errorf("invalid user id: %w", err)
 	}
-
 	user, err := s.queries.GetUserByID(ctx, id)
 	if err != nil {
-		return "", "", 0, err
+		return "", "", "", 0, err
 	}
+	return user.Role, user.Locale, derefStr(user.CodeID), int(user.PasswordVersion), nil
+}
 
-	return user.Role, user.Locale, int(user.PasswordVersion), nil
+// UpdateUserCodeID 由管理员调用，将 user_id 对应的 code_id 改为指定值。
+// 调用方须保证 codeID 已通过 auth.ValidateCodeID 校验。
+func (s *UserStore) UpdateUserCodeID(ctx context.Context, userID, codeID string) error {
+	id, err := uuid.Parse(userID)
+	if err != nil {
+		return fmt.Errorf("invalid user id: %w", err)
+	}
+	cid := codeID
+	return s.queries.UpdateUserCodeID(ctx, db.UpdateUserCodeIDParams{ID: id, CodeID: &cid})
+}
+
+func derefStr(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
+}
+
+// isUniqueViolationOnCodeID 检测错误是否是 code_id 唯一索引冲突。
+// pgx 报文形如：`ERROR: duplicate key value violates unique constraint "users_code_id_uq"`。
+func isUniqueViolationOnCodeID(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := err.Error()
+	return strings.Contains(msg, "users_code_id_uq")
 }
 
 // CreateSession implements rpc.UserStore

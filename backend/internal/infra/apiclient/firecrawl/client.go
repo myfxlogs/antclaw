@@ -29,6 +29,19 @@ func NewClient(src apiclient.Source) *Client {
 	}
 }
 
+// NewClientWithKey 允许调用方直接注入 API Key，便于从 datasource.CredentialResolver
+// 取密后构造（生产路径，密钥存数据库而非环境变量）。
+func NewClientWithKey(src apiclient.Source, apiKey string) *Client {
+	return &Client{
+		src:    src,
+		base:   "https://api.firecrawl.dev/v1/scrape",
+		apiKey: apiKey,
+	}
+}
+
+// SetAPIKey 允许在凭据热重载（onChange）时原子替换 Key。调用方需保证并发安全。
+func (c *Client) SetAPIKey(key string) { c.apiKey = key }
+
 // IsAvailable 报告是否已配置 API Key。调用方可据此跳过抓取分支。
 func (c *Client) IsAvailable() bool { return c.apiKey != "" }
 

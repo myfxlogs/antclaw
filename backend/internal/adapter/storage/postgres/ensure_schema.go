@@ -162,6 +162,19 @@ func EnsureAdminSchema(ctx context.Context, pool *pgxpool.Pool) error {
 			updated_by         TEXT NOT NULL DEFAULT ''
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_system_ai_enabled ON system_ai_configs(enabled)`,
+		// 兼容旧库：增量补齐 docs_url / apply_url 列。
+		`ALTER TABLE system_ai_configs ADD COLUMN IF NOT EXISTS docs_url  TEXT NOT NULL DEFAULT ''`,
+		`ALTER TABLE system_ai_configs ADD COLUMN IF NOT EXISTS apply_url TEXT NOT NULL DEFAULT ''`,
+		// AI 调用结果缓存（fingerprint 主键）。
+		`CREATE TABLE IF NOT EXISTS ai_cache (
+			fingerprint TEXT PRIMARY KEY,
+			operation   TEXT NOT NULL,
+			model       TEXT,
+			result      TEXT NOT NULL,
+			created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+			expires_at  TIMESTAMPTZ
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_ai_cache_expires ON ai_cache(expires_at)`,
 
 		`CREATE TABLE IF NOT EXISTS regime_transition_matrix (
 			asof_date DATE NOT NULL,
@@ -220,6 +233,69 @@ func EnsureAdminSchema(ctx context.Context, pool *pgxpool.Pool) error {
 			sample_size INT,
 			updated_at TIMESTAMPTZ,
 			PRIMARY KEY (signal_type, bucket_idx)
+		)`,
+		// M-B / M-C / M-E / M-F 增量
+		`CREATE TABLE IF NOT EXISTS backtest_trades (
+			job_id TEXT NOT NULL, seq INT NOT NULL,
+			opened_at TIMESTAMPTZ, closed_at TIMESTAMPTZ,
+			side TEXT NOT NULL, entry DOUBLE PRECISION, exit DOUBLE PRECISION,
+			pnl DOUBLE PRECISION, pnl_pct DOUBLE PRECISION,
+			mfe DOUBLE PRECISION, mae DOUBLE PRECISION,
+			cost DOUBLE PRECISION, regime TEXT,
+			PRIMARY KEY (job_id, seq)
+		)`,
+		`CREATE TABLE IF NOT EXISTS backtest_metrics_by_regime (
+			job_id TEXT NOT NULL, regime TEXT NOT NULL,
+			n_trades INT, sharpe DOUBLE PRECISION, sortino DOUBLE PRECISION,
+			max_drawdown DOUBLE PRECISION, win_rate DOUBLE PRECISION,
+			PRIMARY KEY (job_id, regime)
+		)`,
+		`CREATE TABLE IF NOT EXISTS signal_calibrations (
+			model_id TEXT PRIMARY KEY,
+			type TEXT NOT NULL,
+			params JSONB NOT NULL,
+			n_samples INT,
+			brier DOUBLE PRECISION,
+			fitted_at TIMESTAMPTZ DEFAULT NOW()
+		)`,
+		`CREATE TABLE IF NOT EXISTS user_preferences (
+			user_id TEXT PRIMARY KEY,
+			pairs TEXT[] DEFAULT '{}',
+			high_impact_only BOOLEAN DEFAULT FALSE,
+			quiet_hours_start INT,
+			quiet_hours_end INT,
+			timezone TEXT DEFAULT 'UTC'
+		)`,
+		`CREATE TABLE IF NOT EXISTS user_quotas (
+			user_id TEXT PRIMARY KEY,
+			tier TEXT NOT NULL DEFAULT 'free',
+			ai_calls_today INT DEFAULT 0,
+			ai_max_per_day INT DEFAULT 20,
+			reset_at TIMESTAMPTZ
+		)`,
+		`CREATE TABLE IF NOT EXISTS alert_log (
+			id BIGSERIAL PRIMARY KEY,
+			user_id TEXT, alert_type TEXT, severity TEXT,
+			payload JSONB, sent BOOLEAN, reason TEXT,
+			created_at TIMESTAMPTZ DEFAULT NOW()
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_alert_log_user_time ON alert_log(user_id, created_at DESC)`,
+		`CREATE TABLE IF NOT EXISTS ai_memories (
+			id TEXT PRIMARY KEY,
+			user_id TEXT, scope TEXT, key TEXT, value TEXT,
+			expires_at TIMESTAMPTZ, created_at TIMESTAMPTZ DEFAULT NOW()
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_ai_memories_user_scope_key ON ai_memories(user_id, scope, key)`,
+		`CREATE TABLE IF NOT EXISTS ai_conversations (
+			thread_id TEXT PRIMARY KEY, user_id TEXT,
+			started_at TIMESTAMPTZ DEFAULT NOW(),
+			last_at TIMESTAMPTZ DEFAULT NOW()
+		)`,
+		`CREATE TABLE IF NOT EXISTS ai_messages (
+			thread_id TEXT REFERENCES ai_conversations(thread_id) ON DELETE CASCADE,
+			seq INT, role TEXT, content TEXT,
+			created_at TIMESTAMPTZ DEFAULT NOW(),
+			PRIMARY KEY (thread_id, seq)
 		)`,
 	}
 	for _, s := range stmts {

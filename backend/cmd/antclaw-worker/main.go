@@ -17,6 +17,8 @@ import (
 
 	cryptopkg "github.com/antclaw/antclaw/internal/crypto"
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/fred"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/mql5"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/infra/redis"
 	"github.com/antclaw/antclaw/internal/service/calendar"
@@ -74,8 +76,8 @@ func main() {
 	}
 
 	// 构造 client（先用默认 URL）
-	fredClient := apiclient.NewFredClient("")
-	mql5Fetcher := apiclient.NewMQL5Fetcher()
+	fredClient := fred.NewClient("")
+	mql5Fetcher := mql5.NewFetcher()
 
 	// 注册 OnChange 回调：key/endpoint 变更时热更新 client
 	resolver.OnChange("fred", func(sourceID, secret, endpoint string) {

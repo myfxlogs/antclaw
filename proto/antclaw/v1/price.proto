@@ -27,6 +27,18 @@ service PriceService {
 
   // Get seasonal analysis
   rpc GetSeasonal(GetSeasonalRequest) returns (GetSeasonalResponse);
+
+  // M-A: Conditional volatility (GARCH(1,1)).
+  rpc GetVolatility(GetVolatilityRequest) returns (GetVolatilityResponse);
+
+  // M-A: Hurst exponent (R/S method).
+  rpc GetHurst(GetHurstRequest) returns (GetHurstResponse);
+
+  // M-A: Rolling correlation matrix among major assets.
+  rpc GetCorrelations(GetCorrelationsRequest) returns (GetCorrelationsResponse);
+
+  // M-A: Price-vs-indicator divergences.
+  rpc GetDivergences(GetDivergencesRequest) returns (GetDivergencesResponse);
 }
 
 // Price bar
@@ -143,12 +155,18 @@ message MarketRegime {
 message GetRegimeRequest {
   string pair = 1;
   string timeframe = 2;
+  // M-A: classifier engine: "adx" (default, simple) or "hmm" (Gaussian HMM).
+  string engine = 3;
+  // Optional: number of HMM states (2 or 3); defaults 2 when engine=hmm.
+  int32 n_states = 4;
 }
 
 // GetRegime response
 message GetRegimeResponse {
   MarketRegime regime = 1;
   repeated string recent_regimes = 2;
+  // M-A: which engine actually produced the result (may differ on fallback).
+  string engine_used = 3;
 }
 
 // Seasonal data point
@@ -168,4 +186,90 @@ message GetSeasonalRequest {
 message GetSeasonalResponse {
   string pair = 1;
   repeated SeasonalDataPoint data = 2;
+}
+
+// ============================================================
+// M-A 增量：GARCH 波动率 / Hurst / 相关矩阵 / 背离
+// ============================================================
+
+// GetVolatility request: 计算 GARCH(1,1) 条件波动率。
+message GetVolatilityRequest {
+  string pair = 1;
+  string timeframe = 2; // 默认 1d
+  int32 lookback = 3;   // 用最近 N 根 K 线，默认 500，最大 5000
+}
+
+// 单个时间点的条件波动率。
+message VolatilityPoint {
+  string timestamp = 1;
+  double conditional_vol = 2;  // 年化标准差（小数，例如 0.18 = 18%）
+}
+
+message GetVolatilityResponse {
+  string pair = 1;
+  // GARCH 拟合参数：sigma^2_t = omega + alpha*r^2_{t-1} + beta*sigma^2_{t-1}
+  double omega = 2;
+  double alpha = 3;
+  double beta = 4;
+  double persistence = 5;            // alpha + beta
+  double unconditional_vol = 6;       // sqrt(omega/(1-alpha-beta)) 年化
+  double next_step_forecast = 7;      // 1 步预测，年化标准差
+  repeated VolatilityPoint series = 8;
+}
+
+// GetHurst request
+message GetHurstRequest {
+  string pair = 1;
+  string timeframe = 2;
+  int32 lookback = 3; // 默认 500
+}
+
+message GetHurstResponse {
+  string pair = 1;
+  double hurst = 2;          // [0, 1]
+  string interpretation = 3; // "trending" / "mean_reverting" / "random_walk"
+  int32 sample_size = 4;
+}
+
+// GetCorrelations request
+message GetCorrelationsRequest {
+  repeated string assets = 1;  // 资产列表；空时使用默认 8 主流货币对
+  string timeframe = 2;
+  int32 window = 3;            // 滚动窗 K 线数；默认 30
+}
+
+message CorrelationCell {
+  string asset_a = 1;
+  string asset_b = 2;
+  double value = 3;
+}
+
+message GetCorrelationsResponse {
+  repeated string assets = 1;
+  int32 window = 2;
+  // 完整 N*N 矩阵（按 assets 顺序），便于前端直接渲染。
+  repeated CorrelationCell matrix = 3;
+}
+
+// GetDivergences request
+message GetDivergencesRequest {
+  string pair = 1;
+  string timeframe = 2;
+  int32 lookback = 3; // 默认 200
+  // 留空 = 全部启用：rsi / obv / macd
+  repeated string indicators = 4;
+}
+
+message DivergenceEvent {
+  string indicator = 1;     // rsi / obv / macd
+  string kind = 2;          // bullish / bearish
+  string detected_at = 3;   // RFC3339
+  double price_pivot = 4;
+  double indicator_pivot = 5;
+  string note = 6;
+}
+
+message GetDivergencesResponse {
+  string pair = 1;
+  repeated DivergenceEvent events = 2;
 }

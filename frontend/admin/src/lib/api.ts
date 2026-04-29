@@ -13,6 +13,7 @@ import {
   SetJobEnabledRequestSchema,
   ListAuditLogsRequestSchema,
   AdminResetUserPasswordRequestSchema,
+  SetUserCodeIDRequestSchema,
 } from '@antclaw/proto/antclaw/v1/admin_pb'
 import {
   ResetPasswordRequestSchema,
@@ -45,6 +46,16 @@ import {
 } from '@antclaw/proto/antclaw/v1/admin_data_pb'
 import { CryptoService, GetCryptoPublicKeyRequestSchema } from '@antclaw/proto/antclaw/v1/crypto_pb'
 import { SystemService, HealthzRequestSchema } from '@antclaw/proto/antclaw/v1/system_pb'
+import {
+  NotificationService,
+  ListUnreadRequestSchema,
+  ListHistoryRequestSchema,
+  UnreadCountRequestSchema,
+  MarkReadRequestSchema,
+  MarkAllReadRequestSchema,
+  GetPrefsRequestSchema,
+  NotificationPrefsSchema,
+} from '@antclaw/proto/antclaw/v1/notification_pb'
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8082'
 
@@ -71,6 +82,7 @@ const dataSourceClient = createClient(DataSourceService, transport)
 const adminDataClient = createClient(AdminDataService, transport)
 const cryptoClient = createClient(CryptoService, transport)
 const systemClient = createClient(SystemService, transport)
+const notificationClient = createClient(NotificationService, transport)
 
 function normalizeMetrics(input: unknown): Record<string, number> {
   if (!input || typeof input !== 'object') return {}
@@ -185,9 +197,18 @@ export async function listUsers(params?: {
       display_name: u.displayName,
       roles: u.roles || [],
       created_at: Number(u.createdAt),
+      code_id: u.codeId || '',
     })),
     next_cursor: response.nextCursor,
   }
+}
+
+// 管理员设置/重置用户的数字 ID。codeId 留空则后端自动重新随机分配。
+export async function setUserCodeID(userId: string, codeId: string) {
+  const response = await adminClient.setUserCodeID(
+    create(SetUserCodeIDRequestSchema, { userId, codeId }),
+  )
+  return { code_id: response.codeId }
 }
 
 export async function banUser(userId: string, reason: string, expiresAt?: number) {
@@ -500,4 +521,129 @@ export async function getDataPreview(jobId: string, limit = 50) {
     rows,
     total_sampled: response.totalSampled,
   }
+}
+
+// ============================================================================
+// 通知推送（NotificationService）
+// 实时通道：GET /sse/notifications?access_token=...
+// ============================================================================
+
+export interface NotificationItem {
+  id: string
+  type: string
+  category: string
+  severity: string
+  title: string
+  body: string
+  data: Record<string, string>
+  is_read: boolean
+  created_at: number
+  read_at: number
+}
+
+function notifFromProto(n: any): NotificationItem {
+  return {
+    id: String(n.id || ''),
+    type: String(n.type || 'in_app'),
+    category: String(n.category || 'system'),
+    severity: String(n.severity || 'normal'),
+    title: String(n.title || ''),
+    body: String(n.body || ''),
+    data: (n.data && typeof n.data === 'object') ? n.data : {},
+    is_read: Boolean(n.isRead),
+    created_at: Number(n.createdAt || 0),
+    read_at: Number(n.readAt || 0),
+  }
+}
+
+export async function listUnreadNotifications(limit = 50): Promise<NotificationItem[]> {
+  const r = await notificationClient.listUnread(create(ListUnreadRequestSchema, { limit }))
+  return (r.items || []).map(notifFromProto)
+}
+
+export async function listNotificationHistory(limit = 50): Promise<NotificationItem[]> {
+  const r = await notificationClient.listHistory(create(ListHistoryRequestSchema, { limit }))
+  return (r.items || []).map(notifFromProto)
+}
+
+export async function getUnreadNotificationCount(): Promise<number> {
+  const r = await notificationClient.unreadCount(create(UnreadCountRequestSchema, {}))
+  return Number(r.count || 0)
+}
+
+export async function markNotificationRead(id: string): Promise<void> {
+  await notificationClient.markRead(create(MarkReadRequestSchema, { id }))
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  await notificationClient.markAllRead(create(MarkAllReadRequestSchema, {}))
+}
+
+export interface NotificationPrefsItem {
+  enabled_types: string[]
+  min_severity: string
+  quiet_start: string
+  quiet_end: string
+  timezone: string
+  push_enabled: boolean
+  email_enabled: boolean
+}
+
+export async function getNotificationPrefs(): Promise<NotificationPrefsItem> {
+  const r = await notificationClient.getPrefs(create(GetPrefsRequestSchema, {}))
+  return {
+    enabled_types: r.enabledTypes || [],
+    min_severity: r.minSeverity || 'low',
+    quiet_start: r.quietStart || '00:00',
+    quiet_end: r.quietEnd || '00:00',
+    timezone: r.timezone || 'UTC',
+    push_enabled: Boolean(r.pushEnabled),
+    email_enabled: Boolean(r.emailEnabled),
+  }
+}
+
+export async function updateNotificationPrefs(p: NotificationPrefsItem): Promise<NotificationPrefsItem> {
+  const r = await notificationClient.updatePrefs(create(NotificationPrefsSchema, {
+    enabledTypes: p.enabled_types,
+    minSeverity: p.min_severity,
+    quietStart: p.quiet_start,
+    quietEnd: p.quiet_end,
+    timezone: p.timezone,
+    pushEnabled: p.push_enabled,
+    emailEnabled: p.email_enabled,
+  }))
+  return {
+    enabled_types: r.enabledTypes || [],
+    min_severity: r.minSeverity || 'low',
+    quiet_start: r.quietStart || '00:00',
+    quiet_end: r.quietEnd || '00:00',
+    timezone: r.timezone || 'UTC',
+    push_enabled: Boolean(r.pushEnabled),
+    email_enabled: Boolean(r.emailEnabled),
+  }
+}
+
+// 个人通知 SSE：返回 EventSource，调用方负责绑定 onmessage / 关闭。
+export function openNotificationsSSE(onEvent: (n: NotificationItem) => void): () => void {
+  const token = localStorage.getItem('token') || ''
+  const url = `${API_BASE_URL}/sse/notifications?access_token=${encodeURIComponent(token)}`
+  const es = new EventSource(url)
+  es.addEventListener('notification', (ev: MessageEvent) => {
+    try {
+      const raw = JSON.parse(ev.data)
+      onEvent({
+        id: '',
+        type: String(raw.type || 'in_app'),
+        category: String(raw.category || 'system'),
+        severity: String(raw.severity || 'normal'),
+        title: String(raw.title || ''),
+        body: String(raw.body || ''),
+        data: raw.data || {},
+        is_read: false,
+        created_at: Math.floor(Date.now() / 1000),
+        read_at: 0,
+      })
+    } catch {}
+  })
+  return () => es.close()
 }

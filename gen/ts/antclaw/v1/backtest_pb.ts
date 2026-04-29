@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/backtest.proto.
  */
 export const file_antclaw_v1_backtest: GenFile = /*@__PURE__*/
-  fileDesc("ChlhbnRjbGF3L3YxL2JhY2t0ZXN0LnByb3RvEgphbnRjbGF3LnYxIuQBCg5CYWNrdGVzdENvbmZpZxITCgtzdHJhdGVneV9pZBgBIAEoCRIMCgRwYWlyGAIgASgJEiUKBnBlcmlvZBgDIAEoCzIVLmFudGNsYXcudjEuVGltZVJhbmdlEhEKCXRpbWVmcmFtZRgEIAEoCRIqCg9pbml0aWFsX2JhbGFuY2UYBSABKAsyES5hbnRjbGF3LnYxLk1vbmV5EhkKEW1heF9wb3NpdGlvbl9zaXplGAYgASgBEhUKDXN0b3BfbG9zc19wY3QYByABKAESFwoPdGFrZV9wcm9maXRfcGN0GAggASgBIlkKElJ1bkJhY2t0ZXN0UmVxdWVzdBIqCgZjb25maWcYASABKAsyGi5hbnRjbGF3LnYxLkJhY2t0ZXN0Q29uZmlnEhcKD2lkZW1wb3RlbmN5X2tleRgCIAEoCSI2ChNSdW5CYWNrdGVzdFJlc3BvbnNlEg8KB3Rhc2tfaWQYASABKAkSDgoGc3RhdHVzGAIgASgJIiUKEkdldEJhY2t0ZXN0UmVxdWVzdBIPCgd0YXNrX2lkGAEgASgJIqABCgtUcmFkZVJlY29yZBIQCgh0cmFkZV9pZBgBIAEoCRISCgplbnRyeV90aW1lGAIgASgJEhEKCWV4aXRfdGltZRgDIAEoCRIRCglkaXJlY3Rpb24YBCABKAkSEwoLZW50cnlfcHJpY2UYBSABKAkSEgoKZXhpdF9wcmljZRgGIAEoCRILCgNwbmwYByABKAkSDwoHcG5sX3BjdBgIIAEoCSKsAQoPQmFja3Rlc3RNZXRyaWNzEhQKDHRvdGFsX3JldHVybhgBIAEoCRIYChB0b3RhbF9yZXR1cm5fcGN0GAIgASgJEhQKDHNoYXJwZV9yYXRpbxgDIAEoARIUCgxtYXhfZHJhd2Rvd24YBCABKAESEAoId2luX3JhdGUYBSABKAESFAoMdG90YWxfdHJhZGVzGAYgASgFEhUKDXByb2ZpdF9mYWN0b3IYByABKAEiuQEKE0dldEJhY2t0ZXN0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkSKgoGY29uZmlnGAMgASgLMhouYW50Y2xhdy52MS5CYWNrdGVzdENvbmZpZxIsCgdtZXRyaWNzGAQgASgLMhsuYW50Y2xhdy52MS5CYWNrdGVzdE1ldHJpY3MSJwoGdHJhZGVzGAUgAygLMhcuYW50Y2xhdy52MS5UcmFkZVJlY29yZCJQChJHZXRBY2N1cmFjeVJlcXVlc3QSEwoLc3RyYXRlZ3lfaWQYASABKAkSJQoGcGVyaW9kGAIgASgLMhUuYW50Y2xhdy52MS5UaW1lUmFuZ2UinAEKD0FjY3VyYWN5TWV0cmljcxIcChRkaXJlY3Rpb25hbF9hY2N1cmFjeRgBIAEoARISCgphdmdfcmV0dXJuGAIgASgBEhAKCGhpdF9yYXRlGAMgASgBEg4KBnNoYXJwZRgEIAEoARIPCgdzb3J0aW5vGAUgASgBEhMKC3NhbXBsZV9zaXplGAYgASgFEg8KB3N0ZF9kZXYYByABKAEiWAoTR2V0QWNjdXJhY3lSZXNwb25zZRITCgtzdHJhdGVneV9pZBgBIAEoCRIsCgdtZXRyaWNzGAIgASgLMhsuYW50Y2xhdy52MS5BY2N1cmFjeU1ldHJpY3MiwQEKDVF1YW50QnRDb25maWcSDAoEcGFpchgBIAEoCRIVCg1zdHJhdGVneV9uYW1lGAIgASgJEiUKBnBlcmlvZBgDIAEoCzIVLmFudGNsYXcudjEuVGltZVJhbmdlEjUKBnBhcmFtcxgEIAMoCzIlLmFudGNsYXcudjEuUXVhbnRCdENvbmZpZy5QYXJhbXNFbnRyeRotCgtQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIj4KEVJ1blF1YW50QnRSZXF1ZXN0EikKBmNvbmZpZxgBIAEoCzIZLmFudGNsYXcudjEuUXVhbnRCdENvbmZpZyI1ChJSdW5RdWFudEJ0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkiUwoKVnBCdENvbmZpZxIMCgRwYWlyGAEgASgJEiUKBnBlcmlvZBgCIAEoCzIVLmFudGNsYXcudjEuVGltZVJhbmdlEhAKCG51bV9iaW5zGAMgASgFIjgKDlJ1blZwQnRSZXF1ZXN0EiYKBmNvbmZpZxgBIAEoCzIWLmFudGNsYXcudjEuVnBCdENvbmZpZyIyCg9SdW5WcEJ0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkiuwEKC0N0YUJ0Q29uZmlnEgwKBHBhaXIYASABKAkSJQoGcGVyaW9kGAIgASgLMhUuYW50Y2xhdy52MS5UaW1lUmFuZ2USEAoIbG9va2JhY2sYAyABKAUSEAoIc3RyYXRlZ3kYBCABKAkSDwoHc3ltYm9scxgFIAMoCRIRCgl0aW1lZnJhbWUYBiABKAkSGwoTc2Vjb25kYXJ5X3RpbWVmcmFtZRgHIAEoCRISCgp0YXJnZXRfdm9sGAggASgBIjoKD1J1bkN0YUJ0UmVxdWVzdBInCgZjb25maWcYASABKAsyFy5hbnRjbGF3LnYxLkN0YUJ0Q29uZmlnIjMKEFJ1bkN0YUJ0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkiNAoKUGFyYW1SYW5nZRILCgNtaW4YASABKAESCwoDbWF4GAIgASgBEgwKBHN0ZXAYAyABKAEikgIKFVJ1bldhbGtmb3J3YXJkUmVxdWVzdBIQCghzdHJhdGVneRgBIAEoCRIPCgdzeW1ib2xzGAIgAygJEhEKCWZyb21fZGF0ZRgDIAEoCRIPCgd0b19kYXRlGAQgASgJEg0KBWZvbGRzGAUgASgFEhMKC3RyYWluX3JhdGlvGAYgASgBEkQKCnBhcmFtX2dyaWQYByADKAsyMC5hbnRjbGF3LnYxLlJ1bldhbGtmb3J3YXJkUmVxdWVzdC5QYXJhbUdyaWRFbnRyeRpICg5QYXJhbUdyaWRFbnRyeRILCgNrZXkYASABKAkSJQoFdmFsdWUYAiABKAsyFi5hbnRjbGF3LnYxLlBhcmFtUmFuZ2U6AjgBIjgKFlJ1bldhbGtmb3J3YXJkUmVzcG9uc2USDgoGam9iX2lkGAEgASgJEg4KBnN0YXR1cxgCIAEoCSKbAQoPV2Fsa2ZvcndhcmRGb2xkEhAKCGZvbGRfaWR4GAEgASgFEhIKCnRyYWluX2Zyb20YAiABKAkSEAoIdHJhaW5fdG8YAyABKAkSEQoJdGVzdF9mcm9tGAQgASgJEg8KB3Rlc3RfdG8YBSABKAkSGAoQaW5fc2FtcGxlX3NoYXJwZRgGIAEoARISCgpvb3Nfc2hhcnBlGAcgASgBIi0KG0dldFdhbGtmb3J3YXJkUmVzdWx0UmVxdWVzdBIOCgZqb2JfaWQYASABKAkiWgocR2V0V2Fsa2ZvcndhcmRSZXN1bHRSZXNwb25zZRIOCgZqb2JfaWQYASABKAkSKgoFZm9sZHMYAiADKAsyGy5hbnRjbGF3LnYxLldhbGtmb3J3YXJkRm9sZCJTChNSdW5Cb290c3RyYXBSZXF1ZXN0EhMKC2Jhc2Vfam9iX2lkGAEgASgJEhIKCml0ZXJhdGlvbnMYAiABKAUSEwoLcmFuZG9tX3NlZWQYAyABKAQinQEKFFJ1bkJvb3RzdHJhcFJlc3BvbnNlEhEKCXNoYXJwZV9wNRgBIAEoARISCgpzaGFycGVfcDUwGAIgASgBEhIKCnNoYXJwZV9wOTUYAyABKAESEAoIbWF4ZGRfcDUYBCABKAESEQoJbWF4ZGRfcDUwGAUgASgBEhEKCW1heGRkX3A5NRgGIAEoARISCgppdGVyYXRpb25zGAcgASgFMvAFCg9CYWNrdGVzdFNlcnZpY2USTgoLUnVuQmFja3Rlc3QSHi5hbnRjbGF3LnYxLlJ1bkJhY2t0ZXN0UmVxdWVzdBofLmFudGNsYXcudjEuUnVuQmFja3Rlc3RSZXNwb25zZRJOCgtHZXRCYWNrdGVzdBIeLmFudGNsYXcudjEuR2V0QmFja3Rlc3RSZXF1ZXN0Gh8uYW50Y2xhdy52MS5HZXRCYWNrdGVzdFJlc3BvbnNlEk4KC0dldEFjY3VyYWN5Eh4uYW50Y2xhdy52MS5HZXRBY2N1cmFjeVJlcXVlc3QaHy5hbnRjbGF3LnYxLkdldEFjY3VyYWN5UmVzcG9uc2USSwoKUnVuUXVhbnRCdBIdLmFudGNsYXcudjEuUnVuUXVhbnRCdFJlcXVlc3QaHi5hbnRjbGF3LnYxLlJ1blF1YW50QnRSZXNwb25zZRJCCgdSdW5WcEJ0EhouYW50Y2xhdy52MS5SdW5WcEJ0UmVxdWVzdBobLmFudGNsYXcudjEuUnVuVnBCdFJlc3BvbnNlEkUKCFJ1bkN0YUJ0EhsuYW50Y2xhdy52MS5SdW5DdGFCdFJlcXVlc3QaHC5hbnRjbGF3LnYxLlJ1bkN0YUJ0UmVzcG9uc2USVwoOUnVuV2Fsa2ZvcndhcmQSIS5hbnRjbGF3LnYxLlJ1bldhbGtmb3J3YXJkUmVxdWVzdBoiLmFudGNsYXcudjEuUnVuV2Fsa2ZvcndhcmRSZXNwb25zZRJpChRHZXRXYWxrZm9yd2FyZFJlc3VsdBInLmFudGNsYXcudjEuR2V0V2Fsa2ZvcndhcmRSZXN1bHRSZXF1ZXN0GiguYW50Y2xhdy52MS5HZXRXYWxrZm9yd2FyZFJlc3VsdFJlc3BvbnNlElEKDFJ1bkJvb3RzdHJhcBIfLmFudGNsYXcudjEuUnVuQm9vdHN0cmFwUmVxdWVzdBogLmFudGNsYXcudjEuUnVuQm9vdHN0cmFwUmVzcG9uc2VCoAEKDmNvbS5hbnRjbGF3LnYxQg1CYWNrdGVzdFByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM", [file_antclaw_v1_common]);
+  fileDesc("ChlhbnRjbGF3L3YxL2JhY2t0ZXN0LnByb3RvEgphbnRjbGF3LnYxIuQBCg5CYWNrdGVzdENvbmZpZxITCgtzdHJhdGVneV9pZBgBIAEoCRIMCgRwYWlyGAIgASgJEiUKBnBlcmlvZBgDIAEoCzIVLmFudGNsYXcudjEuVGltZVJhbmdlEhEKCXRpbWVmcmFtZRgEIAEoCRIqCg9pbml0aWFsX2JhbGFuY2UYBSABKAsyES5hbnRjbGF3LnYxLk1vbmV5EhkKEW1heF9wb3NpdGlvbl9zaXplGAYgASgBEhUKDXN0b3BfbG9zc19wY3QYByABKAESFwoPdGFrZV9wcm9maXRfcGN0GAggASgBIlkKElJ1bkJhY2t0ZXN0UmVxdWVzdBIqCgZjb25maWcYASABKAsyGi5hbnRjbGF3LnYxLkJhY2t0ZXN0Q29uZmlnEhcKD2lkZW1wb3RlbmN5X2tleRgCIAEoCSI2ChNSdW5CYWNrdGVzdFJlc3BvbnNlEg8KB3Rhc2tfaWQYASABKAkSDgoGc3RhdHVzGAIgASgJIiUKEkdldEJhY2t0ZXN0UmVxdWVzdBIPCgd0YXNrX2lkGAEgASgJIqABCgtUcmFkZVJlY29yZBIQCgh0cmFkZV9pZBgBIAEoCRISCgplbnRyeV90aW1lGAIgASgJEhEKCWV4aXRfdGltZRgDIAEoCRIRCglkaXJlY3Rpb24YBCABKAkSEwoLZW50cnlfcHJpY2UYBSABKAkSEgoKZXhpdF9wcmljZRgGIAEoCRILCgNwbmwYByABKAkSDwoHcG5sX3BjdBgIIAEoCSKsAQoPQmFja3Rlc3RNZXRyaWNzEhQKDHRvdGFsX3JldHVybhgBIAEoCRIYChB0b3RhbF9yZXR1cm5fcGN0GAIgASgJEhQKDHNoYXJwZV9yYXRpbxgDIAEoARIUCgxtYXhfZHJhd2Rvd24YBCABKAESEAoId2luX3JhdGUYBSABKAESFAoMdG90YWxfdHJhZGVzGAYgASgFEhUKDXByb2ZpdF9mYWN0b3IYByABKAEiuQEKE0dldEJhY2t0ZXN0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkSKgoGY29uZmlnGAMgASgLMhouYW50Y2xhdy52MS5CYWNrdGVzdENvbmZpZxIsCgdtZXRyaWNzGAQgASgLMhsuYW50Y2xhdy52MS5CYWNrdGVzdE1ldHJpY3MSJwoGdHJhZGVzGAUgAygLMhcuYW50Y2xhdy52MS5UcmFkZVJlY29yZCJQChJHZXRBY2N1cmFjeVJlcXVlc3QSEwoLc3RyYXRlZ3lfaWQYASABKAkSJQoGcGVyaW9kGAIgASgLMhUuYW50Y2xhdy52MS5UaW1lUmFuZ2UinAEKD0FjY3VyYWN5TWV0cmljcxIcChRkaXJlY3Rpb25hbF9hY2N1cmFjeRgBIAEoARISCgphdmdfcmV0dXJuGAIgASgBEhAKCGhpdF9yYXRlGAMgASgBEg4KBnNoYXJwZRgEIAEoARIPCgdzb3J0aW5vGAUgASgBEhMKC3NhbXBsZV9zaXplGAYgASgFEg8KB3N0ZF9kZXYYByABKAEiWAoTR2V0QWNjdXJhY3lSZXNwb25zZRITCgtzdHJhdGVneV9pZBgBIAEoCRIsCgdtZXRyaWNzGAIgASgLMhsuYW50Y2xhdy52MS5BY2N1cmFjeU1ldHJpY3MiwQEKDVF1YW50QnRDb25maWcSDAoEcGFpchgBIAEoCRIVCg1zdHJhdGVneV9uYW1lGAIgASgJEiUKBnBlcmlvZBgDIAEoCzIVLmFudGNsYXcudjEuVGltZVJhbmdlEjUKBnBhcmFtcxgEIAMoCzIlLmFudGNsYXcudjEuUXVhbnRCdENvbmZpZy5QYXJhbXNFbnRyeRotCgtQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIj4KEVJ1blF1YW50QnRSZXF1ZXN0EikKBmNvbmZpZxgBIAEoCzIZLmFudGNsYXcudjEuUXVhbnRCdENvbmZpZyI1ChJSdW5RdWFudEJ0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkiUwoKVnBCdENvbmZpZxIMCgRwYWlyGAEgASgJEiUKBnBlcmlvZBgCIAEoCzIVLmFudGNsYXcudjEuVGltZVJhbmdlEhAKCG51bV9iaW5zGAMgASgFIjgKDlJ1blZwQnRSZXF1ZXN0EiYKBmNvbmZpZxgBIAEoCzIWLmFudGNsYXcudjEuVnBCdENvbmZpZyIyCg9SdW5WcEJ0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkiuwEKC0N0YUJ0Q29uZmlnEgwKBHBhaXIYASABKAkSJQoGcGVyaW9kGAIgASgLMhUuYW50Y2xhdy52MS5UaW1lUmFuZ2USEAoIbG9va2JhY2sYAyABKAUSEAoIc3RyYXRlZ3kYBCABKAkSDwoHc3ltYm9scxgFIAMoCRIRCgl0aW1lZnJhbWUYBiABKAkSGwoTc2Vjb25kYXJ5X3RpbWVmcmFtZRgHIAEoCRISCgp0YXJnZXRfdm9sGAggASgBIjoKD1J1bkN0YUJ0UmVxdWVzdBInCgZjb25maWcYASABKAsyFy5hbnRjbGF3LnYxLkN0YUJ0Q29uZmlnIjMKEFJ1bkN0YUJ0UmVzcG9uc2USDwoHdGFza19pZBgBIAEoCRIOCgZzdGF0dXMYAiABKAkiNAoKUGFyYW1SYW5nZRILCgNtaW4YASABKAESCwoDbWF4GAIgASgBEgwKBHN0ZXAYAyABKAEikgIKFVJ1bldhbGtmb3J3YXJkUmVxdWVzdBIQCghzdHJhdGVneRgBIAEoCRIPCgdzeW1ib2xzGAIgAygJEhEKCWZyb21fZGF0ZRgDIAEoCRIPCgd0b19kYXRlGAQgASgJEg0KBWZvbGRzGAUgASgFEhMKC3RyYWluX3JhdGlvGAYgASgBEkQKCnBhcmFtX2dyaWQYByADKAsyMC5hbnRjbGF3LnYxLlJ1bldhbGtmb3J3YXJkUmVxdWVzdC5QYXJhbUdyaWRFbnRyeRpICg5QYXJhbUdyaWRFbnRyeRILCgNrZXkYASABKAkSJQoFdmFsdWUYAiABKAsyFi5hbnRjbGF3LnYxLlBhcmFtUmFuZ2U6AjgBIjgKFlJ1bldhbGtmb3J3YXJkUmVzcG9uc2USDgoGam9iX2lkGAEgASgJEg4KBnN0YXR1cxgCIAEoCSKbAQoPV2Fsa2ZvcndhcmRGb2xkEhAKCGZvbGRfaWR4GAEgASgFEhIKCnRyYWluX2Zyb20YAiABKAkSEAoIdHJhaW5fdG8YAyABKAkSEQoJdGVzdF9mcm9tGAQgASgJEg8KB3Rlc3RfdG8YBSABKAkSGAoQaW5fc2FtcGxlX3NoYXJwZRgGIAEoARISCgpvb3Nfc2hhcnBlGAcgASgBIi0KG0dldFdhbGtmb3J3YXJkUmVzdWx0UmVxdWVzdBIOCgZqb2JfaWQYASABKAkiWgocR2V0V2Fsa2ZvcndhcmRSZXN1bHRSZXNwb25zZRIOCgZqb2JfaWQYASABKAkSKgoFZm9sZHMYAiADKAsyGy5hbnRjbGF3LnYxLldhbGtmb3J3YXJkRm9sZCJTChNSdW5Cb290c3RyYXBSZXF1ZXN0EhMKC2Jhc2Vfam9iX2lkGAEgASgJEhIKCml0ZXJhdGlvbnMYAiABKAUSEwoLcmFuZG9tX3NlZWQYAyABKAQinQEKFFJ1bkJvb3RzdHJhcFJlc3BvbnNlEhEKCXNoYXJwZV9wNRgBIAEoARISCgpzaGFycGVfcDUwGAIgASgBEhIKCnNoYXJwZV9wOTUYAyABKAESEAoIbWF4ZGRfcDUYBCABKAESEQoJbWF4ZGRfcDUwGAUgASgBEhEKCW1heGRkX3A5NRgGIAEoARISCgppdGVyYXRpb25zGAcgASgFIoMBChRSdW5Nb250ZUNhcmxvUmVxdWVzdBIMCgRwYWlyGAEgASgJEhEKCXRpbWVmcmFtZRgCIAEoCRINCgVwYXRocxgDIAEoBRIUCgxob3Jpem9uX2JhcnMYBCABKAUSEwoLcmFuZG9tX3NlZWQYBSABKAQSEAoIbG9va2JhY2sYBiABKAUiJwoGTUNQYXRoEg0KBWxhYmVsGAEgASgJEg4KBnZhbHVlcxgCIAMoASL2AQoVUnVuTW9udGVDYXJsb1Jlc3BvbnNlEgwKBHBhaXIYASABKAkSDQoFcGF0aHMYAiABKAUSFAoMaG9yaXpvbl9iYXJzGAMgASgFEhQKDHRlcm1pbmFsX3AwNRgEIAEoARIUCgx0ZXJtaW5hbF9wNTAYBSABKAESFAoMdGVybWluYWxfcDk1GAYgASgBEioKDnF1YW50aWxlX3BhdGhzGAcgAygLMhIuYW50Y2xhdy52MS5NQ1BhdGgSEwoLZ2FyY2hfb21lZ2EYCCABKAESEwoLZ2FyY2hfYWxwaGEYCSABKAESEgoKZ2FyY2hfYmV0YRgKIAEoASIiChBHZXRUcmFkZXNSZXF1ZXN0Eg4KBmpvYl9pZBgBIAEoCSLBAQoLVHJhZGVEZXRhaWwSCwoDc2VxGAEgASgFEhEKCW9wZW5lZF9hdBgCIAEoCRIRCgljbG9zZWRfYXQYAyABKAkSDAoEc2lkZRgEIAEoCRINCgVlbnRyeRgFIAEoARIMCgRleGl0GAYgASgBEgsKA3BubBgHIAEoARIPCgdwbmxfcGN0GAggASgBEgsKA21mZRgJIAEoARILCgNtYWUYCiABKAESDAoEY29zdBgLIAEoARIOCgZyZWdpbWUYDCABKAkiTAoRR2V0VHJhZGVzUmVzcG9uc2USDgoGam9iX2lkGAEgASgJEicKBnRyYWRlcxgCIAMoCzIXLmFudGNsYXcudjEuVHJhZGVEZXRhaWwiKwoZR2V0TWV0cmljc0J5UmVnaW1lUmVxdWVzdBIOCgZqb2JfaWQYASABKAkiegoNUmVnaW1lTWV0cmljcxIOCgZyZWdpbWUYASABKAkSEAoIbl90cmFkZXMYAiABKAUSDgoGc2hhcnBlGAMgASgBEg8KB3NvcnRpbm8YBCABKAESFAoMbWF4X2RyYXdkb3duGAUgASgBEhAKCHdpbl9yYXRlGAYgASgBIlgKGkdldE1ldHJpY3NCeVJlZ2ltZVJlc3BvbnNlEg4KBmpvYl9pZBgBIAEoCRIqCgdtZXRyaWNzGAIgAygLMhkuYW50Y2xhdy52MS5SZWdpbWVNZXRyaWNzMvUHCg9CYWNrdGVzdFNlcnZpY2USTgoLUnVuQmFja3Rlc3QSHi5hbnRjbGF3LnYxLlJ1bkJhY2t0ZXN0UmVxdWVzdBofLmFudGNsYXcudjEuUnVuQmFja3Rlc3RSZXNwb25zZRJOCgtHZXRCYWNrdGVzdBIeLmFudGNsYXcudjEuR2V0QmFja3Rlc3RSZXF1ZXN0Gh8uYW50Y2xhdy52MS5HZXRCYWNrdGVzdFJlc3BvbnNlEk4KC0dldEFjY3VyYWN5Eh4uYW50Y2xhdy52MS5HZXRBY2N1cmFjeVJlcXVlc3QaHy5hbnRjbGF3LnYxLkdldEFjY3VyYWN5UmVzcG9uc2USSwoKUnVuUXVhbnRCdBIdLmFudGNsYXcudjEuUnVuUXVhbnRCdFJlcXVlc3QaHi5hbnRjbGF3LnYxLlJ1blF1YW50QnRSZXNwb25zZRJCCgdSdW5WcEJ0EhouYW50Y2xhdy52MS5SdW5WcEJ0UmVxdWVzdBobLmFudGNsYXcudjEuUnVuVnBCdFJlc3BvbnNlEkUKCFJ1bkN0YUJ0EhsuYW50Y2xhdy52MS5SdW5DdGFCdFJlcXVlc3QaHC5hbnRjbGF3LnYxLlJ1bkN0YUJ0UmVzcG9uc2USVwoOUnVuV2Fsa2ZvcndhcmQSIS5hbnRjbGF3LnYxLlJ1bldhbGtmb3J3YXJkUmVxdWVzdBoiLmFudGNsYXcudjEuUnVuV2Fsa2ZvcndhcmRSZXNwb25zZRJpChRHZXRXYWxrZm9yd2FyZFJlc3VsdBInLmFudGNsYXcudjEuR2V0V2Fsa2ZvcndhcmRSZXN1bHRSZXF1ZXN0GiguYW50Y2xhdy52MS5HZXRXYWxrZm9yd2FyZFJlc3VsdFJlc3BvbnNlElEKDFJ1bkJvb3RzdHJhcBIfLmFudGNsYXcudjEuUnVuQm9vdHN0cmFwUmVxdWVzdBogLmFudGNsYXcudjEuUnVuQm9vdHN0cmFwUmVzcG9uc2USVAoNUnVuTW9udGVDYXJsbxIgLmFudGNsYXcudjEuUnVuTW9udGVDYXJsb1JlcXVlc3QaIS5hbnRjbGF3LnYxLlJ1bk1vbnRlQ2FybG9SZXNwb25zZRJICglHZXRUcmFkZXMSHC5hbnRjbGF3LnYxLkdldFRyYWRlc1JlcXVlc3QaHS5hbnRjbGF3LnYxLkdldFRyYWRlc1Jlc3BvbnNlEmMKEkdldE1ldHJpY3NCeVJlZ2ltZRIlLmFudGNsYXcudjEuR2V0TWV0cmljc0J5UmVnaW1lUmVxdWVzdBomLmFudGNsYXcudjEuR2V0TWV0cmljc0J5UmVnaW1lUmVzcG9uc2VCoAEKDmNvbS5hbnRjbGF3LnYxQg1CYWNrdGVzdFByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM", [file_antclaw_v1_common]);
 
 /**
  * Backtest configuration
@@ -881,6 +881,346 @@ export const RunBootstrapResponseSchema: GenMessage<RunBootstrapResponse> = /*@_
   messageDesc(file_antclaw_v1_backtest, 26);
 
 /**
+ * @generated from message antclaw.v1.RunMonteCarloRequest
+ */
+export type RunMonteCarloRequest = Message<"antclaw.v1.RunMonteCarloRequest"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * @generated from field: string timeframe = 2;
+   */
+  timeframe: string;
+
+  /**
+   * 默认 1000；上限 10000
+   *
+   * @generated from field: int32 paths = 3;
+   */
+  paths: number;
+
+  /**
+   * 默认 20
+   *
+   * @generated from field: int32 horizon_bars = 4;
+   */
+  horizonBars: number;
+
+  /**
+   * @generated from field: uint64 random_seed = 5;
+   */
+  randomSeed: bigint;
+
+  /**
+   * 用于 GARCH 拟合的历史长度，默认 500
+   *
+   * @generated from field: int32 lookback = 6;
+   */
+  lookback: number;
+};
+
+/**
+ * Describes the message antclaw.v1.RunMonteCarloRequest.
+ * Use `create(RunMonteCarloRequestSchema)` to create a new message.
+ */
+export const RunMonteCarloRequestSchema: GenMessage<RunMonteCarloRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 27);
+
+/**
+ * @generated from message antclaw.v1.MCPath
+ */
+export type MCPath = Message<"antclaw.v1.MCPath"> & {
+  /**
+   * 中位数路径 / 上下分位数路径（为减小 payload 不返回所有路径）。
+   *
+   * p05 / p50 / p95
+   *
+   * @generated from field: string label = 1;
+   */
+  label: string;
+
+  /**
+   * @generated from field: repeated double values = 2;
+   */
+  values: number[];
+};
+
+/**
+ * Describes the message antclaw.v1.MCPath.
+ * Use `create(MCPathSchema)` to create a new message.
+ */
+export const MCPathSchema: GenMessage<MCPath> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 28);
+
+/**
+ * @generated from message antclaw.v1.RunMonteCarloResponse
+ */
+export type RunMonteCarloResponse = Message<"antclaw.v1.RunMonteCarloResponse"> & {
+  /**
+   * @generated from field: string pair = 1;
+   */
+  pair: string;
+
+  /**
+   * @generated from field: int32 paths = 2;
+   */
+  paths: number;
+
+  /**
+   * @generated from field: int32 horizon_bars = 3;
+   */
+  horizonBars: number;
+
+  /**
+   * @generated from field: double terminal_p05 = 4;
+   */
+  terminalP05: number;
+
+  /**
+   * @generated from field: double terminal_p50 = 5;
+   */
+  terminalP50: number;
+
+  /**
+   * @generated from field: double terminal_p95 = 6;
+   */
+  terminalP95: number;
+
+  /**
+   * @generated from field: repeated antclaw.v1.MCPath quantile_paths = 7;
+   */
+  quantilePaths: MCPath[];
+
+  /**
+   * GARCH 拟合参数（透明可审）
+   *
+   * @generated from field: double garch_omega = 8;
+   */
+  garchOmega: number;
+
+  /**
+   * @generated from field: double garch_alpha = 9;
+   */
+  garchAlpha: number;
+
+  /**
+   * @generated from field: double garch_beta = 10;
+   */
+  garchBeta: number;
+};
+
+/**
+ * Describes the message antclaw.v1.RunMonteCarloResponse.
+ * Use `create(RunMonteCarloResponseSchema)` to create a new message.
+ */
+export const RunMonteCarloResponseSchema: GenMessage<RunMonteCarloResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 29);
+
+/**
+ * @generated from message antclaw.v1.GetTradesRequest
+ */
+export type GetTradesRequest = Message<"antclaw.v1.GetTradesRequest"> & {
+  /**
+   * @generated from field: string job_id = 1;
+   */
+  jobId: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetTradesRequest.
+ * Use `create(GetTradesRequestSchema)` to create a new message.
+ */
+export const GetTradesRequestSchema: GenMessage<GetTradesRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 30);
+
+/**
+ * @generated from message antclaw.v1.TradeDetail
+ */
+export type TradeDetail = Message<"antclaw.v1.TradeDetail"> & {
+  /**
+   * @generated from field: int32 seq = 1;
+   */
+  seq: number;
+
+  /**
+   * @generated from field: string opened_at = 2;
+   */
+  openedAt: string;
+
+  /**
+   * @generated from field: string closed_at = 3;
+   */
+  closedAt: string;
+
+  /**
+   * long / short
+   *
+   * @generated from field: string side = 4;
+   */
+  side: string;
+
+  /**
+   * @generated from field: double entry = 5;
+   */
+  entry: number;
+
+  /**
+   * @generated from field: double exit = 6;
+   */
+  exit: number;
+
+  /**
+   * @generated from field: double pnl = 7;
+   */
+  pnl: number;
+
+  /**
+   * @generated from field: double pnl_pct = 8;
+   */
+  pnlPct: number;
+
+  /**
+   * max favorable excursion
+   *
+   * @generated from field: double mfe = 9;
+   */
+  mfe: number;
+
+  /**
+   * max adverse excursion
+   *
+   * @generated from field: double mae = 10;
+   */
+  mae: number;
+
+  /**
+   * total transaction cost
+   *
+   * @generated from field: double cost = 11;
+   */
+  cost: number;
+
+  /**
+   * 当时所处状态（可空）
+   *
+   * @generated from field: string regime = 12;
+   */
+  regime: string;
+};
+
+/**
+ * Describes the message antclaw.v1.TradeDetail.
+ * Use `create(TradeDetailSchema)` to create a new message.
+ */
+export const TradeDetailSchema: GenMessage<TradeDetail> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 31);
+
+/**
+ * @generated from message antclaw.v1.GetTradesResponse
+ */
+export type GetTradesResponse = Message<"antclaw.v1.GetTradesResponse"> & {
+  /**
+   * @generated from field: string job_id = 1;
+   */
+  jobId: string;
+
+  /**
+   * @generated from field: repeated antclaw.v1.TradeDetail trades = 2;
+   */
+  trades: TradeDetail[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetTradesResponse.
+ * Use `create(GetTradesResponseSchema)` to create a new message.
+ */
+export const GetTradesResponseSchema: GenMessage<GetTradesResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 32);
+
+/**
+ * @generated from message antclaw.v1.GetMetricsByRegimeRequest
+ */
+export type GetMetricsByRegimeRequest = Message<"antclaw.v1.GetMetricsByRegimeRequest"> & {
+  /**
+   * @generated from field: string job_id = 1;
+   */
+  jobId: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetMetricsByRegimeRequest.
+ * Use `create(GetMetricsByRegimeRequestSchema)` to create a new message.
+ */
+export const GetMetricsByRegimeRequestSchema: GenMessage<GetMetricsByRegimeRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 33);
+
+/**
+ * @generated from message antclaw.v1.RegimeMetrics
+ */
+export type RegimeMetrics = Message<"antclaw.v1.RegimeMetrics"> & {
+  /**
+   * @generated from field: string regime = 1;
+   */
+  regime: string;
+
+  /**
+   * @generated from field: int32 n_trades = 2;
+   */
+  nTrades: number;
+
+  /**
+   * @generated from field: double sharpe = 3;
+   */
+  sharpe: number;
+
+  /**
+   * @generated from field: double sortino = 4;
+   */
+  sortino: number;
+
+  /**
+   * @generated from field: double max_drawdown = 5;
+   */
+  maxDrawdown: number;
+
+  /**
+   * @generated from field: double win_rate = 6;
+   */
+  winRate: number;
+};
+
+/**
+ * Describes the message antclaw.v1.RegimeMetrics.
+ * Use `create(RegimeMetricsSchema)` to create a new message.
+ */
+export const RegimeMetricsSchema: GenMessage<RegimeMetrics> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 34);
+
+/**
+ * @generated from message antclaw.v1.GetMetricsByRegimeResponse
+ */
+export type GetMetricsByRegimeResponse = Message<"antclaw.v1.GetMetricsByRegimeResponse"> & {
+  /**
+   * @generated from field: string job_id = 1;
+   */
+  jobId: string;
+
+  /**
+   * @generated from field: repeated antclaw.v1.RegimeMetrics metrics = 2;
+   */
+  metrics: RegimeMetrics[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetMetricsByRegimeResponse.
+ * Use `create(GetMetricsByRegimeResponseSchema)` to create a new message.
+ */
+export const GetMetricsByRegimeResponseSchema: GenMessage<GetMetricsByRegimeResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_backtest, 35);
+
+/**
  * BacktestService provides backtesting functionality.
  * See: AntClaw-重构解决方案.md §3.3
  * MVP: All RPCs return UNIMPLEMENTED per P6c (sandbox reserved for later phase)
@@ -973,6 +1313,36 @@ export const BacktestService: GenService<{
     methodKind: "unary";
     input: typeof RunBootstrapRequestSchema;
     output: typeof RunBootstrapResponseSchema;
+  },
+  /**
+   * M-B: Monte Carlo path simulation using GARCH residuals.
+   *
+   * @generated from rpc antclaw.v1.BacktestService.RunMonteCarlo
+   */
+  runMonteCarlo: {
+    methodKind: "unary";
+    input: typeof RunMonteCarloRequestSchema;
+    output: typeof RunMonteCarloResponseSchema;
+  },
+  /**
+   * M-B: trade-level breakdown with MFE/MAE/cost.
+   *
+   * @generated from rpc antclaw.v1.BacktestService.GetTrades
+   */
+  getTrades: {
+    methodKind: "unary";
+    input: typeof GetTradesRequestSchema;
+    output: typeof GetTradesResponseSchema;
+  },
+  /**
+   * M-B: regime-stratified metrics.
+   *
+   * @generated from rpc antclaw.v1.BacktestService.GetMetricsByRegime
+   */
+  getMetricsByRegime: {
+    methodKind: "unary";
+    input: typeof GetMetricsByRegimeRequestSchema;
+    output: typeof GetMetricsByRegimeResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_backtest, 0);

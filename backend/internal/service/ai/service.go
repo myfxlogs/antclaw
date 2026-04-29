@@ -168,6 +168,133 @@ func (s *Service) AddMessage(sessionID string, role, content string) *aiv1.ChatM
 	return msg
 }
 
+// ChatOnce 处理单轮 ChatRequest：把 history+message 拼为 OpenAI 兼容消息，调用 chat 端点，返回完整 reply。
+// 不做缓存（chat 上下文敏感），但会把回复加进 sessions 用于后续轮次。
+func (s *Service) ChatOnce(ctx context.Context, req *aiv1.ChatRequest) (*aiv1.ChatResponse, error) {
+	if req == nil || strings.TrimSpace(req.Message) == "" {
+		return nil, fmt.Errorf("ai chat: empty message")
+	}
+	cfg, secret, err := s.sysAI.GetPrimaryForPurpose(ctx, "chat")
+	if err != nil || cfg == nil || secret == "" {
+		return nil, fmt.Errorf("ai chat: no provider configured: %w", err)
+	}
+	model := cfg.DefaultModel
+	if model == "" && len(cfg.Models) > 0 {
+		model = cfg.Models[0]
+	}
+	msgs := []map[string]string{
+		{"role": "system", "content": "You are AntClaw, a professional financial analyst. Reply concisely in the user's locale."},
+	}
+	for _, h := range req.History {
+		role := h.Role
+		if role == "" {
+			role = "user"
+		}
+		msgs = append(msgs, map[string]string{"role": role, "content": h.Content})
+	}
+	msgs = append(msgs, map[string]string{"role": "user", "content": req.Message})
+
+	reply, _, err := s.chatCompletion(ctx, cfg, secret, model, msgs)
+	if err != nil {
+		return nil, err
+	}
+	if req.SessionId != "" {
+		s.AddMessage(req.SessionId, "user", req.Message)
+		s.AddMessage(req.SessionId, "assistant", reply)
+	}
+	return &aiv1.ChatResponse{
+		SessionId: req.SessionId,
+		Chunk:     reply,
+		Done:      true,
+		FullMessage: &aiv1.ChatMessage{
+			Role:      "assistant",
+			Content:   reply,
+			Timestamp: time.Now().Unix(),
+		},
+	}, nil
+}
+
+// ChatUsage 记录单次 LLM 调用的 token 使用，便于上游回传给前端。
+type ChatUsage struct {
+	Model            string
+	PromptTokens     int32
+	CompletionTokens int32
+	TotalTokens      int32
+}
+
+// chatCompletion 与 callAI 共享 OpenAI 兼容 POST 协议，但消息列表由调用方控制。
+// 返回 (回复文本, usage, error)；usage.Model 为实际生效的模型（含默认兜底）。
+func (s *Service) chatCompletion(ctx context.Context, cfg *systemai.Config, secret, model string, msgs []map[string]string) (string, ChatUsage, error) {
+	usage := ChatUsage{}
+	if cfg.BaseURL == "" {
+		return "", usage, fmt.Errorf("ai provider base_url is empty")
+	}
+	if model == "" {
+		model = "gpt-4"
+	}
+	usage.Model = model
+	reqBody := map[string]any{
+		"model":       model,
+		"messages":    msgs,
+		"temperature": cfg.Temperature,
+	}
+	if cfg.MaxTokens > 0 {
+		reqBody["max_tokens"] = cfg.MaxTokens
+	}
+	body, _ := json.Marshal(reqBody)
+	baseURL := strings.TrimRight(cfg.BaseURL, "/")
+	if !strings.HasSuffix(baseURL, "/v1") && !strings.HasSuffix(baseURL, "/v1/") &&
+		!strings.HasSuffix(baseURL, "/paas/v4") && !strings.HasSuffix(baseURL, "/paas/v4/") {
+		baseURL += "/v1"
+	}
+	url := baseURL + "/chat/completions"
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return "", usage, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+secret)
+	timeout := time.Duration(cfg.TimeoutSeconds) * time.Second
+	if timeout == 0 {
+		timeout = 30 * time.Second
+	}
+	resp, err := (&http.Client{Timeout: timeout}).Do(req)
+	if err != nil {
+		return "", usage, fmt.Errorf("ai request: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		bs, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
+		return "", usage, fmt.Errorf("ai api %d: %s", resp.StatusCode, string(bs))
+	}
+	var out struct {
+		Model   string `json:"model"`
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+		Usage struct {
+			PromptTokens     int32 `json:"prompt_tokens"`
+			CompletionTokens int32 `json:"completion_tokens"`
+			TotalTokens      int32 `json:"total_tokens"`
+		} `json:"usage"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return "", usage, fmt.Errorf("ai decode: %w", err)
+	}
+	if len(out.Choices) == 0 || out.Choices[0].Message.Content == "" {
+		return "", usage, fmt.Errorf("ai empty response")
+	}
+	if out.Model != "" {
+		usage.Model = out.Model
+	}
+	usage.PromptTokens = out.Usage.PromptTokens
+	usage.CompletionTokens = out.Usage.CompletionTokens
+	usage.TotalTokens = out.Usage.TotalTokens
+	return out.Choices[0].Message.Content, usage, nil
+}
+
 // callAI 调用配置的 AI 提供商（OpenAI 兼容格式）
 func (s *Service) callAI(ctx context.Context, prompt, purpose string) (string, error) {
 	// 1. 获取配置
@@ -205,9 +332,10 @@ func (s *Service) callAI(ctx context.Context, prompt, purpose string) (string, e
 
 	body, _ := json.Marshal(reqBody)
 
-	// 3. 发送请求
+	// 3. 发送请求；兼容 OpenAI（/v1）与 zhipu glm（/paas/v4）等路径。
 	baseURL := strings.TrimRight(cfg.BaseURL, "/")
-	if !strings.HasSuffix(baseURL, "/v1") && !strings.HasSuffix(baseURL, "/v1/") {
+	if !strings.HasSuffix(baseURL, "/v1") && !strings.HasSuffix(baseURL, "/v1/") &&
+		!strings.HasSuffix(baseURL, "/paas/v4") && !strings.HasSuffix(baseURL, "/paas/v4/") {
 		baseURL = baseURL + "/v1"
 	}
 	url := baseURL + "/chat/completions"

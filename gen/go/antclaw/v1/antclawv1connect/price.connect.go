@@ -50,6 +50,17 @@ const (
 	// PriceServiceGetSeasonalProcedure is the fully-qualified name of the PriceService's GetSeasonal
 	// RPC.
 	PriceServiceGetSeasonalProcedure = "/antclaw.v1.PriceService/GetSeasonal"
+	// PriceServiceGetVolatilityProcedure is the fully-qualified name of the PriceService's
+	// GetVolatility RPC.
+	PriceServiceGetVolatilityProcedure = "/antclaw.v1.PriceService/GetVolatility"
+	// PriceServiceGetHurstProcedure is the fully-qualified name of the PriceService's GetHurst RPC.
+	PriceServiceGetHurstProcedure = "/antclaw.v1.PriceService/GetHurst"
+	// PriceServiceGetCorrelationsProcedure is the fully-qualified name of the PriceService's
+	// GetCorrelations RPC.
+	PriceServiceGetCorrelationsProcedure = "/antclaw.v1.PriceService/GetCorrelations"
+	// PriceServiceGetDivergencesProcedure is the fully-qualified name of the PriceService's
+	// GetDivergences RPC.
+	PriceServiceGetDivergencesProcedure = "/antclaw.v1.PriceService/GetDivergences"
 )
 
 // PriceServiceClient is a client for the antclaw.v1.PriceService service.
@@ -68,6 +79,14 @@ type PriceServiceClient interface {
 	GetRegime(context.Context, *connect.Request[v1.GetRegimeRequest]) (*connect.Response[v1.GetRegimeResponse], error)
 	// Get seasonal analysis
 	GetSeasonal(context.Context, *connect.Request[v1.GetSeasonalRequest]) (*connect.Response[v1.GetSeasonalResponse], error)
+	// M-A: Conditional volatility (GARCH(1,1)).
+	GetVolatility(context.Context, *connect.Request[v1.GetVolatilityRequest]) (*connect.Response[v1.GetVolatilityResponse], error)
+	// M-A: Hurst exponent (R/S method).
+	GetHurst(context.Context, *connect.Request[v1.GetHurstRequest]) (*connect.Response[v1.GetHurstResponse], error)
+	// M-A: Rolling correlation matrix among major assets.
+	GetCorrelations(context.Context, *connect.Request[v1.GetCorrelationsRequest]) (*connect.Response[v1.GetCorrelationsResponse], error)
+	// M-A: Price-vs-indicator divergences.
+	GetDivergences(context.Context, *connect.Request[v1.GetDivergencesRequest]) (*connect.Response[v1.GetDivergencesResponse], error)
 }
 
 // NewPriceServiceClient constructs a client for the antclaw.v1.PriceService service. By default, it
@@ -123,6 +142,30 @@ func NewPriceServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(priceServiceMethods.ByName("GetSeasonal")),
 			connect.WithClientOptions(opts...),
 		),
+		getVolatility: connect.NewClient[v1.GetVolatilityRequest, v1.GetVolatilityResponse](
+			httpClient,
+			baseURL+PriceServiceGetVolatilityProcedure,
+			connect.WithSchema(priceServiceMethods.ByName("GetVolatility")),
+			connect.WithClientOptions(opts...),
+		),
+		getHurst: connect.NewClient[v1.GetHurstRequest, v1.GetHurstResponse](
+			httpClient,
+			baseURL+PriceServiceGetHurstProcedure,
+			connect.WithSchema(priceServiceMethods.ByName("GetHurst")),
+			connect.WithClientOptions(opts...),
+		),
+		getCorrelations: connect.NewClient[v1.GetCorrelationsRequest, v1.GetCorrelationsResponse](
+			httpClient,
+			baseURL+PriceServiceGetCorrelationsProcedure,
+			connect.WithSchema(priceServiceMethods.ByName("GetCorrelations")),
+			connect.WithClientOptions(opts...),
+		),
+		getDivergences: connect.NewClient[v1.GetDivergencesRequest, v1.GetDivergencesResponse](
+			httpClient,
+			baseURL+PriceServiceGetDivergencesProcedure,
+			connect.WithSchema(priceServiceMethods.ByName("GetDivergences")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -135,6 +178,10 @@ type priceServiceClient struct {
 	runScenario       *connect.Client[v1.RunScenarioRequest, v1.RunScenarioResponse]
 	getRegime         *connect.Client[v1.GetRegimeRequest, v1.GetRegimeResponse]
 	getSeasonal       *connect.Client[v1.GetSeasonalRequest, v1.GetSeasonalResponse]
+	getVolatility     *connect.Client[v1.GetVolatilityRequest, v1.GetVolatilityResponse]
+	getHurst          *connect.Client[v1.GetHurstRequest, v1.GetHurstResponse]
+	getCorrelations   *connect.Client[v1.GetCorrelationsRequest, v1.GetCorrelationsResponse]
+	getDivergences    *connect.Client[v1.GetDivergencesRequest, v1.GetDivergencesResponse]
 }
 
 // GetPrice calls antclaw.v1.PriceService.GetPrice.
@@ -172,6 +219,26 @@ func (c *priceServiceClient) GetSeasonal(ctx context.Context, req *connect.Reque
 	return c.getSeasonal.CallUnary(ctx, req)
 }
 
+// GetVolatility calls antclaw.v1.PriceService.GetVolatility.
+func (c *priceServiceClient) GetVolatility(ctx context.Context, req *connect.Request[v1.GetVolatilityRequest]) (*connect.Response[v1.GetVolatilityResponse], error) {
+	return c.getVolatility.CallUnary(ctx, req)
+}
+
+// GetHurst calls antclaw.v1.PriceService.GetHurst.
+func (c *priceServiceClient) GetHurst(ctx context.Context, req *connect.Request[v1.GetHurstRequest]) (*connect.Response[v1.GetHurstResponse], error) {
+	return c.getHurst.CallUnary(ctx, req)
+}
+
+// GetCorrelations calls antclaw.v1.PriceService.GetCorrelations.
+func (c *priceServiceClient) GetCorrelations(ctx context.Context, req *connect.Request[v1.GetCorrelationsRequest]) (*connect.Response[v1.GetCorrelationsResponse], error) {
+	return c.getCorrelations.CallUnary(ctx, req)
+}
+
+// GetDivergences calls antclaw.v1.PriceService.GetDivergences.
+func (c *priceServiceClient) GetDivergences(ctx context.Context, req *connect.Request[v1.GetDivergencesRequest]) (*connect.Response[v1.GetDivergencesResponse], error) {
+	return c.getDivergences.CallUnary(ctx, req)
+}
+
 // PriceServiceHandler is an implementation of the antclaw.v1.PriceService service.
 type PriceServiceHandler interface {
 	// Get current price for a pair
@@ -188,6 +255,14 @@ type PriceServiceHandler interface {
 	GetRegime(context.Context, *connect.Request[v1.GetRegimeRequest]) (*connect.Response[v1.GetRegimeResponse], error)
 	// Get seasonal analysis
 	GetSeasonal(context.Context, *connect.Request[v1.GetSeasonalRequest]) (*connect.Response[v1.GetSeasonalResponse], error)
+	// M-A: Conditional volatility (GARCH(1,1)).
+	GetVolatility(context.Context, *connect.Request[v1.GetVolatilityRequest]) (*connect.Response[v1.GetVolatilityResponse], error)
+	// M-A: Hurst exponent (R/S method).
+	GetHurst(context.Context, *connect.Request[v1.GetHurstRequest]) (*connect.Response[v1.GetHurstResponse], error)
+	// M-A: Rolling correlation matrix among major assets.
+	GetCorrelations(context.Context, *connect.Request[v1.GetCorrelationsRequest]) (*connect.Response[v1.GetCorrelationsResponse], error)
+	// M-A: Price-vs-indicator divergences.
+	GetDivergences(context.Context, *connect.Request[v1.GetDivergencesRequest]) (*connect.Response[v1.GetDivergencesResponse], error)
 }
 
 // NewPriceServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -239,6 +314,30 @@ func NewPriceServiceHandler(svc PriceServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(priceServiceMethods.ByName("GetSeasonal")),
 		connect.WithHandlerOptions(opts...),
 	)
+	priceServiceGetVolatilityHandler := connect.NewUnaryHandler(
+		PriceServiceGetVolatilityProcedure,
+		svc.GetVolatility,
+		connect.WithSchema(priceServiceMethods.ByName("GetVolatility")),
+		connect.WithHandlerOptions(opts...),
+	)
+	priceServiceGetHurstHandler := connect.NewUnaryHandler(
+		PriceServiceGetHurstProcedure,
+		svc.GetHurst,
+		connect.WithSchema(priceServiceMethods.ByName("GetHurst")),
+		connect.WithHandlerOptions(opts...),
+	)
+	priceServiceGetCorrelationsHandler := connect.NewUnaryHandler(
+		PriceServiceGetCorrelationsProcedure,
+		svc.GetCorrelations,
+		connect.WithSchema(priceServiceMethods.ByName("GetCorrelations")),
+		connect.WithHandlerOptions(opts...),
+	)
+	priceServiceGetDivergencesHandler := connect.NewUnaryHandler(
+		PriceServiceGetDivergencesProcedure,
+		svc.GetDivergences,
+		connect.WithSchema(priceServiceMethods.ByName("GetDivergences")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.PriceService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case PriceServiceGetPriceProcedure:
@@ -255,6 +354,14 @@ func NewPriceServiceHandler(svc PriceServiceHandler, opts ...connect.HandlerOpti
 			priceServiceGetRegimeHandler.ServeHTTP(w, r)
 		case PriceServiceGetSeasonalProcedure:
 			priceServiceGetSeasonalHandler.ServeHTTP(w, r)
+		case PriceServiceGetVolatilityProcedure:
+			priceServiceGetVolatilityHandler.ServeHTTP(w, r)
+		case PriceServiceGetHurstProcedure:
+			priceServiceGetHurstHandler.ServeHTTP(w, r)
+		case PriceServiceGetCorrelationsProcedure:
+			priceServiceGetCorrelationsHandler.ServeHTTP(w, r)
+		case PriceServiceGetDivergencesProcedure:
+			priceServiceGetDivergencesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -290,4 +397,20 @@ func (UnimplementedPriceServiceHandler) GetRegime(context.Context, *connect.Requ
 
 func (UnimplementedPriceServiceHandler) GetSeasonal(context.Context, *connect.Request[v1.GetSeasonalRequest]) (*connect.Response[v1.GetSeasonalResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.PriceService.GetSeasonal is not implemented"))
+}
+
+func (UnimplementedPriceServiceHandler) GetVolatility(context.Context, *connect.Request[v1.GetVolatilityRequest]) (*connect.Response[v1.GetVolatilityResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.PriceService.GetVolatility is not implemented"))
+}
+
+func (UnimplementedPriceServiceHandler) GetHurst(context.Context, *connect.Request[v1.GetHurstRequest]) (*connect.Response[v1.GetHurstResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.PriceService.GetHurst is not implemented"))
+}
+
+func (UnimplementedPriceServiceHandler) GetCorrelations(context.Context, *connect.Request[v1.GetCorrelationsRequest]) (*connect.Response[v1.GetCorrelationsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.PriceService.GetCorrelations is not implemented"))
+}
+
+func (UnimplementedPriceServiceHandler) GetDivergences(context.Context, *connect.Request[v1.GetDivergencesRequest]) (*connect.Response[v1.GetDivergencesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.PriceService.GetDivergences is not implemented"))
 }

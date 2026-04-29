@@ -10,7 +10,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/antclaw/antclaw/internal/infra/apiclient"
+	"github.com/antclaw/antclaw/internal/infra/apiclient/fred"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/service/macro"
 )
@@ -31,7 +31,7 @@ func main() {
 
 	// Create FRED client
 	fredKey := os.Getenv("ANTCLAW_FRED_API_KEY")
-	fredClient := apiclient.NewFredClient(fredKey)
+	fredClient := fred.NewClient(fredKey)
 
 	// 创建Repository和Service
 	macroRepo := postgres.NewMacroRepository(dbpool)

@@ -410,13 +410,28 @@ type Notification struct {
 	ID        uuid.UUID          `json:"id"`
 	UserID    uuid.UUID          `json:"user_id"`
 	Type      string             `json:"type"`
+	Category  string             `json:"category"`
 	Title     string             `json:"title"`
 	Body      string             `json:"body"`
 	Data      []byte             `json:"data"`
 	Priority  *string            `json:"priority"`
+	Severity  string             `json:"severity"`
+	DedupKey  *string            `json:"dedup_key"`
 	IsRead    *bool              `json:"is_read"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	ReadAt    pgtype.Timestamptz `json:"read_at"`
+}
+
+type UserNotificationPref struct {
+	UserID       uuid.UUID          `json:"user_id"`
+	EnabledTypes []string           `json:"enabled_types"`
+	MinSeverity  string             `json:"min_severity"`
+	QuietStart   pgtype.Time        `json:"quiet_start"`
+	QuietEnd     pgtype.Time        `json:"quiet_end"`
+	Timezone     string             `json:"timezone"`
+	PushEnabled  bool               `json:"push_enabled"`
+	EmailEnabled bool               `json:"email_enabled"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
 }
 
 type OnchainMetric struct {
@@ -654,6 +669,7 @@ type User struct {
 	Timezone        string             `json:"timezone"`
 	TotpSecretEnc   []byte             `json:"totp_secret_enc"`
 	TotpEnabled     *bool              `json:"totp_enabled"`
+	CodeID          *string            `json:"code_id"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt       pgtype.Timestamptz `json:"deleted_at"`

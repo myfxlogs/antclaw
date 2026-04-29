@@ -15,6 +15,7 @@ import (
 
 
 	apiclient "github.com/antclaw/antclaw/internal/infra/apiclient"
+	cftcclient "github.com/antclaw/antclaw/internal/infra/apiclient/cftc"
 )
 
 const cftcTFFEndpoint = "https://publicreporting.cftc.gov/resource/gpe5-46if.json"
@@ -58,8 +59,9 @@ func collectCOT(ctx context.Context, dbpool *pgxpool.Pool, logger *slog.Logger) 
 	logger.Info("COT: collecting from CFTC Socrata")
 
 	client := &http.Client{Timeout: 30 * time.Second}
-	// 优先使用 CFTC v1（legacy），失败回退 Socrata
-	cftc := apiclient.NewCFTCClient("")
+	// 优先使用 CFTC Socrata legacy（薄客户端），失败回退手写 Socrata 调用
+	cftcSrc := apiclient.NewSource("cftc", apiclient.Options{Timeout: 30 * time.Second})
+	cftc := cftcclient.NewClient(cftcSrc, "")
 	totalInserted := 0
 
 	for _, contract := range cotContracts {
@@ -167,7 +169,7 @@ func saveCOTRecords(ctx context.Context, dbpool *pgxpool.Pool, records []socrata
 
 
 // saveLegacyReports: 落地 CFTC v1 legacy 报表至 cot_records（细分项缺失置 0）
-func saveLegacyReports(ctx context.Context, dbpool *pgxpool.Pool, records []apiclient.COTReport, currency string, logger *slog.Logger) int {
+func saveLegacyReports(ctx context.Context, dbpool *pgxpool.Pool, records []cftcclient.COTReport, currency string, logger *slog.Logger) int {
 	count := 0
 	for _, r := range records {
 		reportDate, err := time.Parse("2006-01-02", r.ReportDateAsOf)

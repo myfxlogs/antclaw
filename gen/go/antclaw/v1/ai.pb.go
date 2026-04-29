@@ -698,6 +698,810 @@ func (x *ContextSection) GetNotes() []string {
 	return nil
 }
 
+type RememberFactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Scope         string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"` // 'global' / 'thread'
+	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	Value         string                 `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
+	TtlSeconds    int64                  `protobuf:"varint,5,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"` // 0 = 永久
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RememberFactRequest) Reset() {
+	*x = RememberFactRequest{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RememberFactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RememberFactRequest) ProtoMessage() {}
+
+func (x *RememberFactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RememberFactRequest.ProtoReflect.Descriptor instead.
+func (*RememberFactRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *RememberFactRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *RememberFactRequest) GetScope() string {
+	if x != nil {
+		return x.Scope
+	}
+	return ""
+}
+
+func (x *RememberFactRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *RememberFactRequest) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *RememberFactRequest) GetTtlSeconds() int64 {
+	if x != nil {
+		return x.TtlSeconds
+	}
+	return 0
+}
+
+type RememberFactResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RememberFactResponse) Reset() {
+	*x = RememberFactResponse{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RememberFactResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RememberFactResponse) ProtoMessage() {}
+
+func (x *RememberFactResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RememberFactResponse.ProtoReflect.Descriptor instead.
+func (*RememberFactResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *RememberFactResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type RecallFactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Scope         string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
+	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecallFactRequest) Reset() {
+	*x = RecallFactRequest{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecallFactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecallFactRequest) ProtoMessage() {}
+
+func (x *RecallFactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecallFactRequest.ProtoReflect.Descriptor instead.
+func (*RecallFactRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *RecallFactRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *RecallFactRequest) GetScope() string {
+	if x != nil {
+		return x.Scope
+	}
+	return ""
+}
+
+func (x *RecallFactRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+type RecallFactResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecallFactResponse) Reset() {
+	*x = RecallFactResponse{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecallFactResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecallFactResponse) ProtoMessage() {}
+
+func (x *RecallFactResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecallFactResponse.ProtoReflect.Descriptor instead.
+func (*RecallFactResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *RecallFactResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *RecallFactResponse) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *RecallFactResponse) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type SearchMemoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Query         string                 `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchMemoryRequest) Reset() {
+	*x = SearchMemoryRequest{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchMemoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchMemoryRequest) ProtoMessage() {}
+
+func (x *SearchMemoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchMemoryRequest.ProtoReflect.Descriptor instead.
+func (*SearchMemoryRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SearchMemoryRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SearchMemoryRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *SearchMemoryRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type MemoryHit struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Scope         string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
+	Key           string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	Value         string                 `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MemoryHit) Reset() {
+	*x = MemoryHit{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MemoryHit) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MemoryHit) ProtoMessage() {}
+
+func (x *MemoryHit) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MemoryHit.ProtoReflect.Descriptor instead.
+func (*MemoryHit) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *MemoryHit) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *MemoryHit) GetScope() string {
+	if x != nil {
+		return x.Scope
+	}
+	return ""
+}
+
+func (x *MemoryHit) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MemoryHit) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+type SearchMemoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hits          []*MemoryHit           `protobuf:"bytes,1,rep,name=hits,proto3" json:"hits,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchMemoryResponse) Reset() {
+	*x = SearchMemoryResponse{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchMemoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchMemoryResponse) ProtoMessage() {}
+
+func (x *SearchMemoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchMemoryResponse.ProtoReflect.Descriptor instead.
+func (*SearchMemoryResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *SearchMemoryResponse) GetHits() []*MemoryHit {
+	if x != nil {
+		return x.Hits
+	}
+	return nil
+}
+
+type CheckRateLimitRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Provider      string                 `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"` // 留空表示总配额
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRateLimitRequest) Reset() {
+	*x = CheckRateLimitRequest{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRateLimitRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRateLimitRequest) ProtoMessage() {}
+
+func (x *CheckRateLimitRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRateLimitRequest.ProtoReflect.Descriptor instead.
+func (*CheckRateLimitRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CheckRateLimitRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CheckRateLimitRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+type CheckRateLimitResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UsedToday     int32                  `protobuf:"varint,1,opt,name=used_today,json=usedToday,proto3" json:"used_today,omitempty"`
+	MaxPerDay     int32                  `protobuf:"varint,2,opt,name=max_per_day,json=maxPerDay,proto3" json:"max_per_day,omitempty"`
+	Remaining     int32                  `protobuf:"varint,3,opt,name=remaining,proto3" json:"remaining,omitempty"`
+	Allowed       bool                   `protobuf:"varint,4,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRateLimitResponse) Reset() {
+	*x = CheckRateLimitResponse{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRateLimitResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRateLimitResponse) ProtoMessage() {}
+
+func (x *CheckRateLimitResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRateLimitResponse.ProtoReflect.Descriptor instead.
+func (*CheckRateLimitResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CheckRateLimitResponse) GetUsedToday() int32 {
+	if x != nil {
+		return x.UsedToday
+	}
+	return 0
+}
+
+func (x *CheckRateLimitResponse) GetMaxPerDay() int32 {
+	if x != nil {
+		return x.MaxPerDay
+	}
+	return 0
+}
+
+func (x *CheckRateLimitResponse) GetRemaining() int32 {
+	if x != nil {
+		return x.Remaining
+	}
+	return 0
+}
+
+func (x *CheckRateLimitResponse) GetAllowed() bool {
+	if x != nil {
+		return x.Allowed
+	}
+	return false
+}
+
+type ToolCall struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ArgsJson      string                 `protobuf:"bytes,2,opt,name=args_json,json=argsJson,proto3" json:"args_json,omitempty"`       // JSON 序列化的参数
+	ResultJson    string                 `protobuf:"bytes,3,opt,name=result_json,json=resultJson,proto3" json:"result_json,omitempty"` // 工具返回 JSON
+	Error         string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolCall) Reset() {
+	*x = ToolCall{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolCall) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolCall) ProtoMessage() {}
+
+func (x *ToolCall) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolCall.ProtoReflect.Descriptor instead.
+func (*ToolCall) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ToolCall) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ToolCall) GetArgsJson() string {
+	if x != nil {
+		return x.ArgsJson
+	}
+	return ""
+}
+
+func (x *ToolCall) GetResultJson() string {
+	if x != nil {
+		return x.ResultJson
+	}
+	return ""
+}
+
+func (x *ToolCall) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type RunWithToolsRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	UserId   string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ThreadId string                 `protobuf:"bytes,2,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"` // 可空，自动创建
+	Message  string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	// 期望调用的工具白名单；空表示全部内置工具。
+	Tools   []string `protobuf:"bytes,4,rep,name=tools,proto3" json:"tools,omitempty"`
+	MaxHops int32    `protobuf:"varint,5,opt,name=max_hops,json=maxHops,proto3" json:"max_hops,omitempty"` // 默认 5
+	// 可选：覆盖默认 LLM 模型；空则用 SystemAI 配置的 default_model。
+	Model string `protobuf:"bytes,6,opt,name=model,proto3" json:"model,omitempty"`
+	// 可选：覆盖 provider_id（多个 provider 共存时切换）。
+	ProviderId    string `protobuf:"bytes,7,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RunWithToolsRequest) Reset() {
+	*x = RunWithToolsRequest{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RunWithToolsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RunWithToolsRequest) ProtoMessage() {}
+
+func (x *RunWithToolsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RunWithToolsRequest.ProtoReflect.Descriptor instead.
+func (*RunWithToolsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *RunWithToolsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *RunWithToolsRequest) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
+}
+
+func (x *RunWithToolsRequest) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *RunWithToolsRequest) GetTools() []string {
+	if x != nil {
+		return x.Tools
+	}
+	return nil
+}
+
+func (x *RunWithToolsRequest) GetMaxHops() int32 {
+	if x != nil {
+		return x.MaxHops
+	}
+	return 0
+}
+
+func (x *RunWithToolsRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *RunWithToolsRequest) GetProviderId() string {
+	if x != nil {
+		return x.ProviderId
+	}
+	return ""
+}
+
+type RunWithToolsResponse struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
+	Answer   string                 `protobuf:"bytes,2,opt,name=answer,proto3" json:"answer,omitempty"`
+	Calls    []*ToolCall            `protobuf:"bytes,3,rep,name=calls,proto3" json:"calls,omitempty"`
+	CacheHit bool                   `protobuf:"varint,4,opt,name=cache_hit,json=cacheHit,proto3" json:"cache_hit,omitempty"`
+	// 实际生效的模型与 token 使用量（无 LLM 调用时为空 / 0）。
+	Model            string `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
+	ProviderId       string `protobuf:"bytes,6,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
+	PromptTokens     int32  `protobuf:"varint,7,opt,name=prompt_tokens,json=promptTokens,proto3" json:"prompt_tokens,omitempty"`
+	CompletionTokens int32  `protobuf:"varint,8,opt,name=completion_tokens,json=completionTokens,proto3" json:"completion_tokens,omitempty"`
+	TotalTokens      int32  `protobuf:"varint,9,opt,name=total_tokens,json=totalTokens,proto3" json:"total_tokens,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *RunWithToolsResponse) Reset() {
+	*x = RunWithToolsResponse{}
+	mi := &file_antclaw_v1_ai_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RunWithToolsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RunWithToolsResponse) ProtoMessage() {}
+
+func (x *RunWithToolsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_ai_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RunWithToolsResponse.ProtoReflect.Descriptor instead.
+func (*RunWithToolsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_ai_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *RunWithToolsResponse) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
+}
+
+func (x *RunWithToolsResponse) GetAnswer() string {
+	if x != nil {
+		return x.Answer
+	}
+	return ""
+}
+
+func (x *RunWithToolsResponse) GetCalls() []*ToolCall {
+	if x != nil {
+		return x.Calls
+	}
+	return nil
+}
+
+func (x *RunWithToolsResponse) GetCacheHit() bool {
+	if x != nil {
+		return x.CacheHit
+	}
+	return false
+}
+
+func (x *RunWithToolsResponse) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *RunWithToolsResponse) GetProviderId() string {
+	if x != nil {
+		return x.ProviderId
+	}
+	return ""
+}
+
+func (x *RunWithToolsResponse) GetPromptTokens() int32 {
+	if x != nil {
+		return x.PromptTokens
+	}
+	return 0
+}
+
+func (x *RunWithToolsResponse) GetCompletionTokens() int32 {
+	if x != nil {
+		return x.CompletionTokens
+	}
+	return 0
+}
+
+func (x *RunWithToolsResponse) GetTotalTokens() int32 {
+	if x != nil {
+		return x.TotalTokens
+	}
+	return 0
+}
+
 var File_antclaw_v1_ai_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_ai_proto_rawDesc = "" +
@@ -765,12 +1569,82 @@ const file_antclaw_v1_ai_proto_rawDesc = "" +
 	"\x05notes\x18\x03 \x03(\tR\x05notes\x1a=\n" +
 	"\x0fIndicatorsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xab\x02\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8d\x01\n" +
+	"\x13RememberFactRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05scope\x18\x02 \x01(\tR\x05scope\x12\x10\n" +
+	"\x03key\x18\x03 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x04 \x01(\tR\x05value\x12\x1f\n" +
+	"\vttl_seconds\x18\x05 \x01(\x03R\n" +
+	"ttlSeconds\"&\n" +
+	"\x14RememberFactResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"T\n" +
+	"\x11RecallFactRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05scope\x18\x02 \x01(\tR\x05scope\x12\x10\n" +
+	"\x03key\x18\x03 \x01(\tR\x03key\"Y\n" +
+	"\x12RecallFactResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\tR\tcreatedAt\"Z\n" +
+	"\x13SearchMemoryRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05query\x18\x02 \x01(\tR\x05query\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\"Y\n" +
+	"\tMemoryHit\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05scope\x18\x02 \x01(\tR\x05scope\x12\x10\n" +
+	"\x03key\x18\x03 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x04 \x01(\tR\x05value\"A\n" +
+	"\x14SearchMemoryResponse\x12)\n" +
+	"\x04hits\x18\x01 \x03(\v2\x15.antclaw.v1.MemoryHitR\x04hits\"L\n" +
+	"\x15CheckRateLimitRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1a\n" +
+	"\bprovider\x18\x02 \x01(\tR\bprovider\"\x8f\x01\n" +
+	"\x16CheckRateLimitResponse\x12\x1d\n" +
+	"\n" +
+	"used_today\x18\x01 \x01(\x05R\tusedToday\x12\x1e\n" +
+	"\vmax_per_day\x18\x02 \x01(\x05R\tmaxPerDay\x12\x1c\n" +
+	"\tremaining\x18\x03 \x01(\x05R\tremaining\x12\x18\n" +
+	"\aallowed\x18\x04 \x01(\bR\aallowed\"r\n" +
+	"\bToolCall\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
+	"\targs_json\x18\x02 \x01(\tR\bargsJson\x12\x1f\n" +
+	"\vresult_json\x18\x03 \x01(\tR\n" +
+	"resultJson\x12\x14\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\"\xcd\x01\n" +
+	"\x13RunWithToolsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tthread_id\x18\x02 \x01(\tR\bthreadId\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12\x14\n" +
+	"\x05tools\x18\x04 \x03(\tR\x05tools\x12\x19\n" +
+	"\bmax_hops\x18\x05 \x01(\x05R\amaxHops\x12\x14\n" +
+	"\x05model\x18\x06 \x01(\tR\x05model\x12\x1f\n" +
+	"\vprovider_id\x18\a \x01(\tR\n" +
+	"providerId\"\xc0\x02\n" +
+	"\x14RunWithToolsResponse\x12\x1b\n" +
+	"\tthread_id\x18\x01 \x01(\tR\bthreadId\x12\x16\n" +
+	"\x06answer\x18\x02 \x01(\tR\x06answer\x12*\n" +
+	"\x05calls\x18\x03 \x03(\v2\x14.antclaw.v1.ToolCallR\x05calls\x12\x1b\n" +
+	"\tcache_hit\x18\x04 \x01(\bR\bcacheHit\x12\x14\n" +
+	"\x05model\x18\x05 \x01(\tR\x05model\x12\x1f\n" +
+	"\vprovider_id\x18\x06 \x01(\tR\n" +
+	"providerId\x12#\n" +
+	"\rprompt_tokens\x18\a \x01(\x05R\fpromptTokens\x12+\n" +
+	"\x11completion_tokens\x18\b \x01(\x05R\x10completionTokens\x12!\n" +
+	"\ftotal_tokens\x18\t \x01(\x05R\vtotalTokens2\xca\x05\n" +
 	"\tAIService\x12=\n" +
 	"\x04Chat\x12\x17.antclaw.v1.ChatRequest\x1a\x18.antclaw.v1.ChatResponse(\x010\x01\x12H\n" +
 	"\tInterpret\x12\x1c.antclaw.v1.InterpretRequest\x1a\x1d.antclaw.v1.InterpretResponse\x12B\n" +
 	"\aOutlook\x12\x1a.antclaw.v1.OutlookRequest\x1a\x1b.antclaw.v1.OutlookResponse\x12Q\n" +
-	"\fBuildContext\x12\x1f.antclaw.v1.BuildContextRequest\x1a .antclaw.v1.BuildContextResponseB\x9a\x01\n" +
+	"\fBuildContext\x12\x1f.antclaw.v1.BuildContextRequest\x1a .antclaw.v1.BuildContextResponse\x12Q\n" +
+	"\fRememberFact\x12\x1f.antclaw.v1.RememberFactRequest\x1a .antclaw.v1.RememberFactResponse\x12K\n" +
+	"\n" +
+	"RecallFact\x12\x1d.antclaw.v1.RecallFactRequest\x1a\x1e.antclaw.v1.RecallFactResponse\x12Q\n" +
+	"\fSearchMemory\x12\x1f.antclaw.v1.SearchMemoryRequest\x1a .antclaw.v1.SearchMemoryResponse\x12W\n" +
+	"\x0eCheckRateLimit\x12!.antclaw.v1.CheckRateLimitRequest\x1a\".antclaw.v1.CheckRateLimitResponse\x12Q\n" +
+	"\fRunWithTools\x12\x1f.antclaw.v1.RunWithToolsRequest\x1a .antclaw.v1.RunWithToolsResponseB\x9a\x01\n" +
 	"\x0ecom.antclaw.v1B\aAiProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -787,40 +1661,64 @@ func file_antclaw_v1_ai_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_ai_proto_rawDescData
 }
 
-var file_antclaw_v1_ai_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_antclaw_v1_ai_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_antclaw_v1_ai_proto_goTypes = []any{
-	(*ChatMessage)(nil),          // 0: antclaw.v1.ChatMessage
-	(*ChatRequest)(nil),          // 1: antclaw.v1.ChatRequest
-	(*ChatResponse)(nil),         // 2: antclaw.v1.ChatResponse
-	(*InterpretRequest)(nil),     // 3: antclaw.v1.InterpretRequest
-	(*InterpretResponse)(nil),    // 4: antclaw.v1.InterpretResponse
-	(*OutlookRequest)(nil),       // 5: antclaw.v1.OutlookRequest
-	(*OutlookResponse)(nil),      // 6: antclaw.v1.OutlookResponse
-	(*BuildContextRequest)(nil),  // 7: antclaw.v1.BuildContextRequest
-	(*BuildContextResponse)(nil), // 8: antclaw.v1.BuildContextResponse
-	(*ContextSection)(nil),       // 9: antclaw.v1.ContextSection
-	nil,                          // 10: antclaw.v1.BuildContextResponse.SectionsEntry
-	nil,                          // 11: antclaw.v1.ContextSection.IndicatorsEntry
+	(*ChatMessage)(nil),            // 0: antclaw.v1.ChatMessage
+	(*ChatRequest)(nil),            // 1: antclaw.v1.ChatRequest
+	(*ChatResponse)(nil),           // 2: antclaw.v1.ChatResponse
+	(*InterpretRequest)(nil),       // 3: antclaw.v1.InterpretRequest
+	(*InterpretResponse)(nil),      // 4: antclaw.v1.InterpretResponse
+	(*OutlookRequest)(nil),         // 5: antclaw.v1.OutlookRequest
+	(*OutlookResponse)(nil),        // 6: antclaw.v1.OutlookResponse
+	(*BuildContextRequest)(nil),    // 7: antclaw.v1.BuildContextRequest
+	(*BuildContextResponse)(nil),   // 8: antclaw.v1.BuildContextResponse
+	(*ContextSection)(nil),         // 9: antclaw.v1.ContextSection
+	(*RememberFactRequest)(nil),    // 10: antclaw.v1.RememberFactRequest
+	(*RememberFactResponse)(nil),   // 11: antclaw.v1.RememberFactResponse
+	(*RecallFactRequest)(nil),      // 12: antclaw.v1.RecallFactRequest
+	(*RecallFactResponse)(nil),     // 13: antclaw.v1.RecallFactResponse
+	(*SearchMemoryRequest)(nil),    // 14: antclaw.v1.SearchMemoryRequest
+	(*MemoryHit)(nil),              // 15: antclaw.v1.MemoryHit
+	(*SearchMemoryResponse)(nil),   // 16: antclaw.v1.SearchMemoryResponse
+	(*CheckRateLimitRequest)(nil),  // 17: antclaw.v1.CheckRateLimitRequest
+	(*CheckRateLimitResponse)(nil), // 18: antclaw.v1.CheckRateLimitResponse
+	(*ToolCall)(nil),               // 19: antclaw.v1.ToolCall
+	(*RunWithToolsRequest)(nil),    // 20: antclaw.v1.RunWithToolsRequest
+	(*RunWithToolsResponse)(nil),   // 21: antclaw.v1.RunWithToolsResponse
+	nil,                            // 22: antclaw.v1.BuildContextResponse.SectionsEntry
+	nil,                            // 23: antclaw.v1.ContextSection.IndicatorsEntry
 }
 var file_antclaw_v1_ai_proto_depIdxs = []int32{
 	0,  // 0: antclaw.v1.ChatRequest.history:type_name -> antclaw.v1.ChatMessage
 	0,  // 1: antclaw.v1.ChatResponse.full_message:type_name -> antclaw.v1.ChatMessage
-	10, // 2: antclaw.v1.BuildContextResponse.sections:type_name -> antclaw.v1.BuildContextResponse.SectionsEntry
-	11, // 3: antclaw.v1.ContextSection.indicators:type_name -> antclaw.v1.ContextSection.IndicatorsEntry
-	9,  // 4: antclaw.v1.BuildContextResponse.SectionsEntry.value:type_name -> antclaw.v1.ContextSection
-	1,  // 5: antclaw.v1.AIService.Chat:input_type -> antclaw.v1.ChatRequest
-	3,  // 6: antclaw.v1.AIService.Interpret:input_type -> antclaw.v1.InterpretRequest
-	5,  // 7: antclaw.v1.AIService.Outlook:input_type -> antclaw.v1.OutlookRequest
-	7,  // 8: antclaw.v1.AIService.BuildContext:input_type -> antclaw.v1.BuildContextRequest
-	2,  // 9: antclaw.v1.AIService.Chat:output_type -> antclaw.v1.ChatResponse
-	4,  // 10: antclaw.v1.AIService.Interpret:output_type -> antclaw.v1.InterpretResponse
-	6,  // 11: antclaw.v1.AIService.Outlook:output_type -> antclaw.v1.OutlookResponse
-	8,  // 12: antclaw.v1.AIService.BuildContext:output_type -> antclaw.v1.BuildContextResponse
-	9,  // [9:13] is the sub-list for method output_type
-	5,  // [5:9] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	22, // 2: antclaw.v1.BuildContextResponse.sections:type_name -> antclaw.v1.BuildContextResponse.SectionsEntry
+	23, // 3: antclaw.v1.ContextSection.indicators:type_name -> antclaw.v1.ContextSection.IndicatorsEntry
+	15, // 4: antclaw.v1.SearchMemoryResponse.hits:type_name -> antclaw.v1.MemoryHit
+	19, // 5: antclaw.v1.RunWithToolsResponse.calls:type_name -> antclaw.v1.ToolCall
+	9,  // 6: antclaw.v1.BuildContextResponse.SectionsEntry.value:type_name -> antclaw.v1.ContextSection
+	1,  // 7: antclaw.v1.AIService.Chat:input_type -> antclaw.v1.ChatRequest
+	3,  // 8: antclaw.v1.AIService.Interpret:input_type -> antclaw.v1.InterpretRequest
+	5,  // 9: antclaw.v1.AIService.Outlook:input_type -> antclaw.v1.OutlookRequest
+	7,  // 10: antclaw.v1.AIService.BuildContext:input_type -> antclaw.v1.BuildContextRequest
+	10, // 11: antclaw.v1.AIService.RememberFact:input_type -> antclaw.v1.RememberFactRequest
+	12, // 12: antclaw.v1.AIService.RecallFact:input_type -> antclaw.v1.RecallFactRequest
+	14, // 13: antclaw.v1.AIService.SearchMemory:input_type -> antclaw.v1.SearchMemoryRequest
+	17, // 14: antclaw.v1.AIService.CheckRateLimit:input_type -> antclaw.v1.CheckRateLimitRequest
+	20, // 15: antclaw.v1.AIService.RunWithTools:input_type -> antclaw.v1.RunWithToolsRequest
+	2,  // 16: antclaw.v1.AIService.Chat:output_type -> antclaw.v1.ChatResponse
+	4,  // 17: antclaw.v1.AIService.Interpret:output_type -> antclaw.v1.InterpretResponse
+	6,  // 18: antclaw.v1.AIService.Outlook:output_type -> antclaw.v1.OutlookResponse
+	8,  // 19: antclaw.v1.AIService.BuildContext:output_type -> antclaw.v1.BuildContextResponse
+	11, // 20: antclaw.v1.AIService.RememberFact:output_type -> antclaw.v1.RememberFactResponse
+	13, // 21: antclaw.v1.AIService.RecallFact:output_type -> antclaw.v1.RecallFactResponse
+	16, // 22: antclaw.v1.AIService.SearchMemory:output_type -> antclaw.v1.SearchMemoryResponse
+	18, // 23: antclaw.v1.AIService.CheckRateLimit:output_type -> antclaw.v1.CheckRateLimitResponse
+	21, // 24: antclaw.v1.AIService.RunWithTools:output_type -> antclaw.v1.RunWithToolsResponse
+	16, // [16:25] is the sub-list for method output_type
+	7,  // [7:16] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_ai_proto_init() }
@@ -834,7 +1732,7 @@ func file_antclaw_v1_ai_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_ai_proto_rawDesc), len(file_antclaw_v1_ai_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

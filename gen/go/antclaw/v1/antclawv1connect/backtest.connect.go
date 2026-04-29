@@ -59,6 +59,15 @@ const (
 	// BacktestServiceRunBootstrapProcedure is the fully-qualified name of the BacktestService's
 	// RunBootstrap RPC.
 	BacktestServiceRunBootstrapProcedure = "/antclaw.v1.BacktestService/RunBootstrap"
+	// BacktestServiceRunMonteCarloProcedure is the fully-qualified name of the BacktestService's
+	// RunMonteCarlo RPC.
+	BacktestServiceRunMonteCarloProcedure = "/antclaw.v1.BacktestService/RunMonteCarlo"
+	// BacktestServiceGetTradesProcedure is the fully-qualified name of the BacktestService's GetTrades
+	// RPC.
+	BacktestServiceGetTradesProcedure = "/antclaw.v1.BacktestService/GetTrades"
+	// BacktestServiceGetMetricsByRegimeProcedure is the fully-qualified name of the BacktestService's
+	// GetMetricsByRegime RPC.
+	BacktestServiceGetMetricsByRegimeProcedure = "/antclaw.v1.BacktestService/GetMetricsByRegime"
 )
 
 // BacktestServiceClient is a client for the antclaw.v1.BacktestService service.
@@ -79,6 +88,12 @@ type BacktestServiceClient interface {
 	RunWalkforward(context.Context, *connect.Request[v1.RunWalkforwardRequest]) (*connect.Response[v1.RunWalkforwardResponse], error)
 	GetWalkforwardResult(context.Context, *connect.Request[v1.GetWalkforwardResultRequest]) (*connect.Response[v1.GetWalkforwardResultResponse], error)
 	RunBootstrap(context.Context, *connect.Request[v1.RunBootstrapRequest]) (*connect.Response[v1.RunBootstrapResponse], error)
+	// M-B: Monte Carlo path simulation using GARCH residuals.
+	RunMonteCarlo(context.Context, *connect.Request[v1.RunMonteCarloRequest]) (*connect.Response[v1.RunMonteCarloResponse], error)
+	// M-B: trade-level breakdown with MFE/MAE/cost.
+	GetTrades(context.Context, *connect.Request[v1.GetTradesRequest]) (*connect.Response[v1.GetTradesResponse], error)
+	// M-B: regime-stratified metrics.
+	GetMetricsByRegime(context.Context, *connect.Request[v1.GetMetricsByRegimeRequest]) (*connect.Response[v1.GetMetricsByRegimeResponse], error)
 }
 
 // NewBacktestServiceClient constructs a client for the antclaw.v1.BacktestService service. By
@@ -146,6 +161,24 @@ func NewBacktestServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(backtestServiceMethods.ByName("RunBootstrap")),
 			connect.WithClientOptions(opts...),
 		),
+		runMonteCarlo: connect.NewClient[v1.RunMonteCarloRequest, v1.RunMonteCarloResponse](
+			httpClient,
+			baseURL+BacktestServiceRunMonteCarloProcedure,
+			connect.WithSchema(backtestServiceMethods.ByName("RunMonteCarlo")),
+			connect.WithClientOptions(opts...),
+		),
+		getTrades: connect.NewClient[v1.GetTradesRequest, v1.GetTradesResponse](
+			httpClient,
+			baseURL+BacktestServiceGetTradesProcedure,
+			connect.WithSchema(backtestServiceMethods.ByName("GetTrades")),
+			connect.WithClientOptions(opts...),
+		),
+		getMetricsByRegime: connect.NewClient[v1.GetMetricsByRegimeRequest, v1.GetMetricsByRegimeResponse](
+			httpClient,
+			baseURL+BacktestServiceGetMetricsByRegimeProcedure,
+			connect.WithSchema(backtestServiceMethods.ByName("GetMetricsByRegime")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -160,6 +193,9 @@ type backtestServiceClient struct {
 	runWalkforward       *connect.Client[v1.RunWalkforwardRequest, v1.RunWalkforwardResponse]
 	getWalkforwardResult *connect.Client[v1.GetWalkforwardResultRequest, v1.GetWalkforwardResultResponse]
 	runBootstrap         *connect.Client[v1.RunBootstrapRequest, v1.RunBootstrapResponse]
+	runMonteCarlo        *connect.Client[v1.RunMonteCarloRequest, v1.RunMonteCarloResponse]
+	getTrades            *connect.Client[v1.GetTradesRequest, v1.GetTradesResponse]
+	getMetricsByRegime   *connect.Client[v1.GetMetricsByRegimeRequest, v1.GetMetricsByRegimeResponse]
 }
 
 // RunBacktest calls antclaw.v1.BacktestService.RunBacktest.
@@ -207,6 +243,21 @@ func (c *backtestServiceClient) RunBootstrap(ctx context.Context, req *connect.R
 	return c.runBootstrap.CallUnary(ctx, req)
 }
 
+// RunMonteCarlo calls antclaw.v1.BacktestService.RunMonteCarlo.
+func (c *backtestServiceClient) RunMonteCarlo(ctx context.Context, req *connect.Request[v1.RunMonteCarloRequest]) (*connect.Response[v1.RunMonteCarloResponse], error) {
+	return c.runMonteCarlo.CallUnary(ctx, req)
+}
+
+// GetTrades calls antclaw.v1.BacktestService.GetTrades.
+func (c *backtestServiceClient) GetTrades(ctx context.Context, req *connect.Request[v1.GetTradesRequest]) (*connect.Response[v1.GetTradesResponse], error) {
+	return c.getTrades.CallUnary(ctx, req)
+}
+
+// GetMetricsByRegime calls antclaw.v1.BacktestService.GetMetricsByRegime.
+func (c *backtestServiceClient) GetMetricsByRegime(ctx context.Context, req *connect.Request[v1.GetMetricsByRegimeRequest]) (*connect.Response[v1.GetMetricsByRegimeResponse], error) {
+	return c.getMetricsByRegime.CallUnary(ctx, req)
+}
+
 // BacktestServiceHandler is an implementation of the antclaw.v1.BacktestService service.
 type BacktestServiceHandler interface {
 	// Run a backtest
@@ -225,6 +276,12 @@ type BacktestServiceHandler interface {
 	RunWalkforward(context.Context, *connect.Request[v1.RunWalkforwardRequest]) (*connect.Response[v1.RunWalkforwardResponse], error)
 	GetWalkforwardResult(context.Context, *connect.Request[v1.GetWalkforwardResultRequest]) (*connect.Response[v1.GetWalkforwardResultResponse], error)
 	RunBootstrap(context.Context, *connect.Request[v1.RunBootstrapRequest]) (*connect.Response[v1.RunBootstrapResponse], error)
+	// M-B: Monte Carlo path simulation using GARCH residuals.
+	RunMonteCarlo(context.Context, *connect.Request[v1.RunMonteCarloRequest]) (*connect.Response[v1.RunMonteCarloResponse], error)
+	// M-B: trade-level breakdown with MFE/MAE/cost.
+	GetTrades(context.Context, *connect.Request[v1.GetTradesRequest]) (*connect.Response[v1.GetTradesResponse], error)
+	// M-B: regime-stratified metrics.
+	GetMetricsByRegime(context.Context, *connect.Request[v1.GetMetricsByRegimeRequest]) (*connect.Response[v1.GetMetricsByRegimeResponse], error)
 }
 
 // NewBacktestServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -288,6 +345,24 @@ func NewBacktestServiceHandler(svc BacktestServiceHandler, opts ...connect.Handl
 		connect.WithSchema(backtestServiceMethods.ByName("RunBootstrap")),
 		connect.WithHandlerOptions(opts...),
 	)
+	backtestServiceRunMonteCarloHandler := connect.NewUnaryHandler(
+		BacktestServiceRunMonteCarloProcedure,
+		svc.RunMonteCarlo,
+		connect.WithSchema(backtestServiceMethods.ByName("RunMonteCarlo")),
+		connect.WithHandlerOptions(opts...),
+	)
+	backtestServiceGetTradesHandler := connect.NewUnaryHandler(
+		BacktestServiceGetTradesProcedure,
+		svc.GetTrades,
+		connect.WithSchema(backtestServiceMethods.ByName("GetTrades")),
+		connect.WithHandlerOptions(opts...),
+	)
+	backtestServiceGetMetricsByRegimeHandler := connect.NewUnaryHandler(
+		BacktestServiceGetMetricsByRegimeProcedure,
+		svc.GetMetricsByRegime,
+		connect.WithSchema(backtestServiceMethods.ByName("GetMetricsByRegime")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.BacktestService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BacktestServiceRunBacktestProcedure:
@@ -308,6 +383,12 @@ func NewBacktestServiceHandler(svc BacktestServiceHandler, opts ...connect.Handl
 			backtestServiceGetWalkforwardResultHandler.ServeHTTP(w, r)
 		case BacktestServiceRunBootstrapProcedure:
 			backtestServiceRunBootstrapHandler.ServeHTTP(w, r)
+		case BacktestServiceRunMonteCarloProcedure:
+			backtestServiceRunMonteCarloHandler.ServeHTTP(w, r)
+		case BacktestServiceGetTradesProcedure:
+			backtestServiceGetTradesHandler.ServeHTTP(w, r)
+		case BacktestServiceGetMetricsByRegimeProcedure:
+			backtestServiceGetMetricsByRegimeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -351,4 +432,16 @@ func (UnimplementedBacktestServiceHandler) GetWalkforwardResult(context.Context,
 
 func (UnimplementedBacktestServiceHandler) RunBootstrap(context.Context, *connect.Request[v1.RunBootstrapRequest]) (*connect.Response[v1.RunBootstrapResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.BacktestService.RunBootstrap is not implemented"))
+}
+
+func (UnimplementedBacktestServiceHandler) RunMonteCarlo(context.Context, *connect.Request[v1.RunMonteCarloRequest]) (*connect.Response[v1.RunMonteCarloResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.BacktestService.RunMonteCarlo is not implemented"))
+}
+
+func (UnimplementedBacktestServiceHandler) GetTrades(context.Context, *connect.Request[v1.GetTradesRequest]) (*connect.Response[v1.GetTradesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.BacktestService.GetTrades is not implemented"))
+}
+
+func (UnimplementedBacktestServiceHandler) GetMetricsByRegime(context.Context, *connect.Request[v1.GetMetricsByRegimeRequest]) (*connect.Response[v1.GetMetricsByRegimeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.BacktestService.GetMetricsByRegime is not implemented"))
 }

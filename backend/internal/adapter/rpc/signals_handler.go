@@ -7,15 +7,23 @@ import (
 	"connectrpc.com/connect"
 	signalsv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/gen/go/antclaw/v1/antclawv1connect"
+	"github.com/antclaw/antclaw/internal/service/calibration"
 	signalssvc "github.com/antclaw/antclaw/internal/service/signals"
 )
 
 type SignalsHandler struct {
-	svc *signalssvc.Service
+	svc   *signalssvc.Service
+	calib *calibration.Store // M-C: 校准模型存储；nil 时校准 RPC 返错。
 }
 
 func NewSignalsHandler(svc *signalssvc.Service) *SignalsHandler {
 	return &SignalsHandler{svc: svc}
+}
+
+// WithCalibration 注入校准模型存储。
+func (h *SignalsHandler) WithCalibration(s *calibration.Store) *SignalsHandler {
+	h.calib = s
+	return h
 }
 
 func asConnectErr(err error) error {
@@ -186,6 +194,73 @@ func (h *SignalsHandler) GetOutlook(ctx context.Context, req *connect.Request[si
 		})
 	}
 	return connect.NewResponse(&signalsv1.GetOutlookResponse{Outlooks: outlooks}), nil
+}
+
+// =====================================================
+// M-C 校准 RPC
+// =====================================================
+
+func (h *SignalsHandler) FitCalibration(ctx context.Context, req *connect.Request[signalsv1.FitCalibrationRequest]) (*connect.Response[signalsv1.FitCalibrationResponse], error) {
+	if h.calib == nil {
+		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("calibration store not initialized"))
+	}
+	if req.Msg.ModelId == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("model_id required"))
+	}
+	if len(req.Msg.Scores) != len(req.Msg.Outcomes) || len(req.Msg.Scores) < 5 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("need >=5 paired scores/outcomes"))
+	}
+	var c calibration.Calibrator
+	switch req.Msg.Type {
+	case "platt":
+		c = calibration.NewPlatt()
+	case "isotonic":
+		c = calibration.NewIsotonic()
+	default:
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("type must be platt or isotonic"))
+	}
+	if err := c.Fit(req.Msg.Scores, req.Msg.Outcomes); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	br := c.Brier(req.Msg.Scores, req.Msg.Outcomes)
+	if err := h.calib.Save(ctx, req.Msg.ModelId, c, len(req.Msg.Scores), br); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(&signalsv1.FitCalibrationResponse{
+		ModelId: req.Msg.ModelId, Type: c.Type(),
+		NSamples: int32(len(req.Msg.Scores)), Brier: br,
+	}), nil
+}
+
+func (h *SignalsHandler) PredictCalibrated(ctx context.Context, req *connect.Request[signalsv1.PredictCalibratedRequest]) (*connect.Response[signalsv1.PredictCalibratedResponse], error) {
+	if h.calib == nil {
+		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("calibration store not initialized"))
+	}
+	c, err := h.calib.Load(ctx, req.Msg.ModelId)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeNotFound, err)
+	}
+	return connect.NewResponse(&signalsv1.PredictCalibratedResponse{
+		ModelId: req.Msg.ModelId, Calibrated: c.Predict(req.Msg.Score),
+	}), nil
+}
+
+func (h *SignalsHandler) ListCalibrations(ctx context.Context, req *connect.Request[signalsv1.ListCalibrationsRequest]) (*connect.Response[signalsv1.ListCalibrationsResponse], error) {
+	if h.calib == nil {
+		return connect.NewResponse(&signalsv1.ListCalibrationsResponse{}), nil
+	}
+	rows, err := h.calib.List(ctx)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	out := &signalsv1.ListCalibrationsResponse{}
+	for _, s := range rows {
+		out.Items = append(out.Items, &signalsv1.CalibrationSummary{
+			ModelId: s.ModelID, Type: s.Type, NSamples: int32(s.NSamples),
+			Brier: s.Brier, FittedAt: s.FittedAt.Format("2006-01-02T15:04:05Z"),
+		})
+	}
+	return connect.NewResponse(out), nil
 }
 
 var _ antclawv1connect.SignalsServiceHandler = (*SignalsHandler)(nil)
