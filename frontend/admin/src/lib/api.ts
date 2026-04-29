@@ -54,6 +54,7 @@ import {
   MarkReadRequestSchema,
   MarkAllReadRequestSchema,
   GetPrefsRequestSchema,
+  UpdatePrefsRequestSchema,
   NotificationPrefsSchema,
 } from '@antclaw/proto/antclaw/v1/notification_pb'
 
@@ -590,20 +591,21 @@ export interface NotificationPrefsItem {
 }
 
 export async function getNotificationPrefs(): Promise<NotificationPrefsItem> {
-  const r = await notificationClient.getPrefs(create(GetPrefsRequestSchema, {}))
+  const resp = await notificationClient.getPrefs(create(GetPrefsRequestSchema, {}))
+  const r = resp.prefs
   return {
-    enabled_types: r.enabledTypes || [],
-    min_severity: r.minSeverity || 'low',
-    quiet_start: r.quietStart || '00:00',
-    quiet_end: r.quietEnd || '00:00',
-    timezone: r.timezone || 'UTC',
-    push_enabled: Boolean(r.pushEnabled),
-    email_enabled: Boolean(r.emailEnabled),
+    enabled_types: r?.enabledTypes || [],
+    min_severity: r?.minSeverity || 'low',
+    quiet_start: r?.quietStart || '00:00',
+    quiet_end: r?.quietEnd || '00:00',
+    timezone: r?.timezone || 'UTC',
+    push_enabled: Boolean(r?.pushEnabled),
+    email_enabled: Boolean(r?.emailEnabled),
   }
 }
 
 export async function updateNotificationPrefs(p: NotificationPrefsItem): Promise<NotificationPrefsItem> {
-  const r = await notificationClient.updatePrefs(create(NotificationPrefsSchema, {
+  const prefs = create(NotificationPrefsSchema, {
     enabledTypes: p.enabled_types,
     minSeverity: p.min_severity,
     quietStart: p.quiet_start,
@@ -611,15 +613,17 @@ export async function updateNotificationPrefs(p: NotificationPrefsItem): Promise
     timezone: p.timezone,
     pushEnabled: p.push_enabled,
     emailEnabled: p.email_enabled,
-  }))
+  })
+  const resp = await notificationClient.updatePrefs(create(UpdatePrefsRequestSchema, { prefs }))
+  const r = resp.prefs
   return {
-    enabled_types: r.enabledTypes || [],
-    min_severity: r.minSeverity || 'low',
-    quiet_start: r.quietStart || '00:00',
-    quiet_end: r.quietEnd || '00:00',
-    timezone: r.timezone || 'UTC',
-    push_enabled: Boolean(r.pushEnabled),
-    email_enabled: Boolean(r.emailEnabled),
+    enabled_types: r?.enabledTypes || [],
+    min_severity: r?.minSeverity || 'low',
+    quiet_start: r?.quietStart || '00:00',
+    quiet_end: r?.quietEnd || '00:00',
+    timezone: r?.timezone || 'UTC',
+    push_enabled: Boolean(r?.pushEnabled),
+    email_enabled: Boolean(r?.emailEnabled),
   }
 }
 

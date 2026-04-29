@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/notification.proto.
  */
 export const file_antclaw_v1_notification: GenFile = /*@__PURE__*/
-  fileDesc("Ch1hbnRjbGF3L3YxL25vdGlmaWNhdGlvbi5wcm90bxIKYW50Y2xhdy52MSKPAgoMTm90aWZpY2F0aW9uEgoKAmlkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkSDAoEdHlwZRgDIAEoCRIQCghjYXRlZ29yeRgEIAEoCRIQCghzZXZlcml0eRgFIAEoCRINCgV0aXRsZRgGIAEoCRIMCgRib2R5GAcgASgJEjAKBGRhdGEYCCADKAsyIi5hbnRjbGF3LnYxLk5vdGlmaWNhdGlvbi5EYXRhRW50cnkSDwoHaXNfcmVhZBgJIAEoCBISCgpjcmVhdGVkX2F0GAogASgDEg8KB3JlYWRfYXQYCyABKAMaKwoJRGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEipwEKEU5vdGlmaWNhdGlvblByZWZzEhUKDWVuYWJsZWRfdHlwZXMYASADKAkSFAoMbWluX3NldmVyaXR5GAIgASgJEhMKC3F1aWV0X3N0YXJ0GAMgASgJEhEKCXF1aWV0X2VuZBgEIAEoCRIQCgh0aW1lem9uZRgFIAEoCRIUCgxwdXNoX2VuYWJsZWQYBiABKAgSFQoNZW1haWxfZW5hYmxlZBgHIAEoCCIiChFMaXN0VW5yZWFkUmVxdWVzdBINCgVsaW1pdBgBIAEoBSI9ChJMaXN0VW5yZWFkUmVzcG9uc2USJwoFaXRlbXMYASADKAsyGC5hbnRjbGF3LnYxLk5vdGlmaWNhdGlvbiIjChJMaXN0SGlzdG9yeVJlcXVlc3QSDQoFbGltaXQYASABKAUiPgoTTGlzdEhpc3RvcnlSZXNwb25zZRInCgVpdGVtcxgBIAMoCzIYLmFudGNsYXcudjEuTm90aWZpY2F0aW9uIhQKElVucmVhZENvdW50UmVxdWVzdCIkChNVbnJlYWRDb3VudFJlc3BvbnNlEg0KBWNvdW50GAEgASgDIh0KD01hcmtSZWFkUmVxdWVzdBIKCgJpZBgBIAEoCSISChBNYXJrUmVhZFJlc3BvbnNlIhQKEk1hcmtBbGxSZWFkUmVxdWVzdCIlChNNYXJrQWxsUmVhZFJlc3BvbnNlEg4KBm1hcmtlZBgBIAEoAyIRCg9HZXRQcmVmc1JlcXVlc3QyrgQKE05vdGlmaWNhdGlvblNlcnZpY2USSwoKTGlzdFVucmVhZBIdLmFudGNsYXcudjEuTGlzdFVucmVhZFJlcXVlc3QaHi5hbnRjbGF3LnYxLkxpc3RVbnJlYWRSZXNwb25zZRJOCgtMaXN0SGlzdG9yeRIeLmFudGNsYXcudjEuTGlzdEhpc3RvcnlSZXF1ZXN0Gh8uYW50Y2xhdy52MS5MaXN0SGlzdG9yeVJlc3BvbnNlEk4KC1VucmVhZENvdW50Eh4uYW50Y2xhdy52MS5VbnJlYWRDb3VudFJlcXVlc3QaHy5hbnRjbGF3LnYxLlVucmVhZENvdW50UmVzcG9uc2USRQoITWFya1JlYWQSGy5hbnRjbGF3LnYxLk1hcmtSZWFkUmVxdWVzdBocLmFudGNsYXcudjEuTWFya1JlYWRSZXNwb25zZRJOCgtNYXJrQWxsUmVhZBIeLmFudGNsYXcudjEuTWFya0FsbFJlYWRSZXF1ZXN0Gh8uYW50Y2xhdy52MS5NYXJrQWxsUmVhZFJlc3BvbnNlEkYKCEdldFByZWZzEhsuYW50Y2xhdy52MS5HZXRQcmVmc1JlcXVlc3QaHS5hbnRjbGF3LnYxLk5vdGlmaWNhdGlvblByZWZzEksKC1VwZGF0ZVByZWZzEh0uYW50Y2xhdy52MS5Ob3RpZmljYXRpb25QcmVmcxodLmFudGNsYXcudjEuTm90aWZpY2F0aW9uUHJlZnNCpAEKDmNvbS5hbnRjbGF3LnYxQhFOb3RpZmljYXRpb25Qcm90b1ABWjZnaXRodWIuY29tL2FudGNsYXcvYW50Y2xhdy9nZW4vZ28vYW50Y2xhdy92MTthbnRjbGF3djGiAgNBWFiqAgpBbnRjbGF3LlYxygIKQW50Y2xhd1xWMeICFkFudGNsYXdcVjFcR1BCTWV0YWRhdGHqAgtBbnRjbGF3OjpWMWIGcHJvdG8z");
+  fileDesc("Ch1hbnRjbGF3L3YxL25vdGlmaWNhdGlvbi5wcm90bxIKYW50Y2xhdy52MSKPAgoMTm90aWZpY2F0aW9uEgoKAmlkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkSDAoEdHlwZRgDIAEoCRIQCghjYXRlZ29yeRgEIAEoCRIQCghzZXZlcml0eRgFIAEoCRINCgV0aXRsZRgGIAEoCRIMCgRib2R5GAcgASgJEjAKBGRhdGEYCCADKAsyIi5hbnRjbGF3LnYxLk5vdGlmaWNhdGlvbi5EYXRhRW50cnkSDwoHaXNfcmVhZBgJIAEoCBISCgpjcmVhdGVkX2F0GAogASgDEg8KB3JlYWRfYXQYCyABKAMaKwoJRGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEipwEKEU5vdGlmaWNhdGlvblByZWZzEhUKDWVuYWJsZWRfdHlwZXMYASADKAkSFAoMbWluX3NldmVyaXR5GAIgASgJEhMKC3F1aWV0X3N0YXJ0GAMgASgJEhEKCXF1aWV0X2VuZBgEIAEoCRIQCgh0aW1lem9uZRgFIAEoCRIUCgxwdXNoX2VuYWJsZWQYBiABKAgSFQoNZW1haWxfZW5hYmxlZBgHIAEoCCIiChFMaXN0VW5yZWFkUmVxdWVzdBINCgVsaW1pdBgBIAEoBSI9ChJMaXN0VW5yZWFkUmVzcG9uc2USJwoFaXRlbXMYASADKAsyGC5hbnRjbGF3LnYxLk5vdGlmaWNhdGlvbiIjChJMaXN0SGlzdG9yeVJlcXVlc3QSDQoFbGltaXQYASABKAUiPgoTTGlzdEhpc3RvcnlSZXNwb25zZRInCgVpdGVtcxgBIAMoCzIYLmFudGNsYXcudjEuTm90aWZpY2F0aW9uIhQKElVucmVhZENvdW50UmVxdWVzdCIkChNVbnJlYWRDb3VudFJlc3BvbnNlEg0KBWNvdW50GAEgASgDIh0KD01hcmtSZWFkUmVxdWVzdBIKCgJpZBgBIAEoCSISChBNYXJrUmVhZFJlc3BvbnNlIhQKEk1hcmtBbGxSZWFkUmVxdWVzdCIlChNNYXJrQWxsUmVhZFJlc3BvbnNlEg4KBm1hcmtlZBgBIAEoAyIRCg9HZXRQcmVmc1JlcXVlc3QiQAoQR2V0UHJlZnNSZXNwb25zZRIsCgVwcmVmcxgBIAEoCzIdLmFudGNsYXcudjEuTm90aWZpY2F0aW9uUHJlZnMiQgoSVXBkYXRlUHJlZnNSZXF1ZXN0EiwKBXByZWZzGAEgASgLMh0uYW50Y2xhdy52MS5Ob3RpZmljYXRpb25QcmVmcyJDChNVcGRhdGVQcmVmc1Jlc3BvbnNlEiwKBXByZWZzGAEgASgLMh0uYW50Y2xhdy52MS5Ob3RpZmljYXRpb25QcmVmczKwBAoTTm90aWZpY2F0aW9uU2VydmljZRJLCgpMaXN0VW5yZWFkEh0uYW50Y2xhdy52MS5MaXN0VW5yZWFkUmVxdWVzdBoeLmFudGNsYXcudjEuTGlzdFVucmVhZFJlc3BvbnNlEk4KC0xpc3RIaXN0b3J5Eh4uYW50Y2xhdy52MS5MaXN0SGlzdG9yeVJlcXVlc3QaHy5hbnRjbGF3LnYxLkxpc3RIaXN0b3J5UmVzcG9uc2USTgoLVW5yZWFkQ291bnQSHi5hbnRjbGF3LnYxLlVucmVhZENvdW50UmVxdWVzdBofLmFudGNsYXcudjEuVW5yZWFkQ291bnRSZXNwb25zZRJFCghNYXJrUmVhZBIbLmFudGNsYXcudjEuTWFya1JlYWRSZXF1ZXN0GhwuYW50Y2xhdy52MS5NYXJrUmVhZFJlc3BvbnNlEk4KC01hcmtBbGxSZWFkEh4uYW50Y2xhdy52MS5NYXJrQWxsUmVhZFJlcXVlc3QaHy5hbnRjbGF3LnYxLk1hcmtBbGxSZWFkUmVzcG9uc2USRQoIR2V0UHJlZnMSGy5hbnRjbGF3LnYxLkdldFByZWZzUmVxdWVzdBocLmFudGNsYXcudjEuR2V0UHJlZnNSZXNwb25zZRJOCgtVcGRhdGVQcmVmcxIeLmFudGNsYXcudjEuVXBkYXRlUHJlZnNSZXF1ZXN0Gh8uYW50Y2xhdy52MS5VcGRhdGVQcmVmc1Jlc3BvbnNlQqQBCg5jb20uYW50Y2xhdy52MUIRTm90aWZpY2F0aW9uUHJvdG9QAVo2Z2l0aHViLmNvbS9hbnRjbGF3L2FudGNsYXcvZ2VuL2dvL2FudGNsYXcvdjE7YW50Y2xhd3YxogIDQVhYqgIKQW50Y2xhdy5WMcoCCkFudGNsYXdcVjHiAhZBbnRjbGF3XFYxXEdQQk1ldGFkYXRh6gILQW50Y2xhdzo6VjFiBnByb3RvMw");
 
 /**
  * @generated from message antclaw.v1.Notification
@@ -314,6 +314,57 @@ export const GetPrefsRequestSchema: GenMessage<GetPrefsRequest> = /*@__PURE__*/
   messageDesc(file_antclaw_v1_notification, 12);
 
 /**
+ * @generated from message antclaw.v1.GetPrefsResponse
+ */
+export type GetPrefsResponse = Message<"antclaw.v1.GetPrefsResponse"> & {
+  /**
+   * @generated from field: antclaw.v1.NotificationPrefs prefs = 1;
+   */
+  prefs?: NotificationPrefs | undefined;
+};
+
+/**
+ * Describes the message antclaw.v1.GetPrefsResponse.
+ * Use `create(GetPrefsResponseSchema)` to create a new message.
+ */
+export const GetPrefsResponseSchema: GenMessage<GetPrefsResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_notification, 13);
+
+/**
+ * @generated from message antclaw.v1.UpdatePrefsRequest
+ */
+export type UpdatePrefsRequest = Message<"antclaw.v1.UpdatePrefsRequest"> & {
+  /**
+   * @generated from field: antclaw.v1.NotificationPrefs prefs = 1;
+   */
+  prefs?: NotificationPrefs | undefined;
+};
+
+/**
+ * Describes the message antclaw.v1.UpdatePrefsRequest.
+ * Use `create(UpdatePrefsRequestSchema)` to create a new message.
+ */
+export const UpdatePrefsRequestSchema: GenMessage<UpdatePrefsRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_notification, 14);
+
+/**
+ * @generated from message antclaw.v1.UpdatePrefsResponse
+ */
+export type UpdatePrefsResponse = Message<"antclaw.v1.UpdatePrefsResponse"> & {
+  /**
+   * @generated from field: antclaw.v1.NotificationPrefs prefs = 1;
+   */
+  prefs?: NotificationPrefs | undefined;
+};
+
+/**
+ * Describes the message antclaw.v1.UpdatePrefsResponse.
+ * Use `create(UpdatePrefsResponseSchema)` to create a new message.
+ */
+export const UpdatePrefsResponseSchema: GenMessage<UpdatePrefsResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_notification, 15);
+
+/**
  * NotificationService —— 用户面通知 RPC：
  *   - 列表（未读 / 历史）/ 计数 / 标记已读
  *   - 偏好设置（类型白名单、最低严重度、静默时段）
@@ -369,15 +420,15 @@ export const NotificationService: GenService<{
   getPrefs: {
     methodKind: "unary";
     input: typeof GetPrefsRequestSchema;
-    output: typeof NotificationPrefsSchema;
+    output: typeof GetPrefsResponseSchema;
   },
   /**
    * @generated from rpc antclaw.v1.NotificationService.UpdatePrefs
    */
   updatePrefs: {
     methodKind: "unary";
-    input: typeof NotificationPrefsSchema;
-    output: typeof NotificationPrefsSchema;
+    input: typeof UpdatePrefsRequestSchema;
+    output: typeof UpdatePrefsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_notification, 0);

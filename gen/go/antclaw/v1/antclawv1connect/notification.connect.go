@@ -63,8 +63,8 @@ type NotificationServiceClient interface {
 	UnreadCount(context.Context, *connect.Request[v1.UnreadCountRequest]) (*connect.Response[v1.UnreadCountResponse], error)
 	MarkRead(context.Context, *connect.Request[v1.MarkReadRequest]) (*connect.Response[v1.MarkReadResponse], error)
 	MarkAllRead(context.Context, *connect.Request[v1.MarkAllReadRequest]) (*connect.Response[v1.MarkAllReadResponse], error)
-	GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.NotificationPrefs], error)
-	UpdatePrefs(context.Context, *connect.Request[v1.NotificationPrefs]) (*connect.Response[v1.NotificationPrefs], error)
+	GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error)
+	UpdatePrefs(context.Context, *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error)
 }
 
 // NewNotificationServiceClient constructs a client for the antclaw.v1.NotificationService service.
@@ -108,13 +108,13 @@ func NewNotificationServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(notificationServiceMethods.ByName("MarkAllRead")),
 			connect.WithClientOptions(opts...),
 		),
-		getPrefs: connect.NewClient[v1.GetPrefsRequest, v1.NotificationPrefs](
+		getPrefs: connect.NewClient[v1.GetPrefsRequest, v1.GetPrefsResponse](
 			httpClient,
 			baseURL+NotificationServiceGetPrefsProcedure,
 			connect.WithSchema(notificationServiceMethods.ByName("GetPrefs")),
 			connect.WithClientOptions(opts...),
 		),
-		updatePrefs: connect.NewClient[v1.NotificationPrefs, v1.NotificationPrefs](
+		updatePrefs: connect.NewClient[v1.UpdatePrefsRequest, v1.UpdatePrefsResponse](
 			httpClient,
 			baseURL+NotificationServiceUpdatePrefsProcedure,
 			connect.WithSchema(notificationServiceMethods.ByName("UpdatePrefs")),
@@ -130,8 +130,8 @@ type notificationServiceClient struct {
 	unreadCount *connect.Client[v1.UnreadCountRequest, v1.UnreadCountResponse]
 	markRead    *connect.Client[v1.MarkReadRequest, v1.MarkReadResponse]
 	markAllRead *connect.Client[v1.MarkAllReadRequest, v1.MarkAllReadResponse]
-	getPrefs    *connect.Client[v1.GetPrefsRequest, v1.NotificationPrefs]
-	updatePrefs *connect.Client[v1.NotificationPrefs, v1.NotificationPrefs]
+	getPrefs    *connect.Client[v1.GetPrefsRequest, v1.GetPrefsResponse]
+	updatePrefs *connect.Client[v1.UpdatePrefsRequest, v1.UpdatePrefsResponse]
 }
 
 // ListUnread calls antclaw.v1.NotificationService.ListUnread.
@@ -160,12 +160,12 @@ func (c *notificationServiceClient) MarkAllRead(ctx context.Context, req *connec
 }
 
 // GetPrefs calls antclaw.v1.NotificationService.GetPrefs.
-func (c *notificationServiceClient) GetPrefs(ctx context.Context, req *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.NotificationPrefs], error) {
+func (c *notificationServiceClient) GetPrefs(ctx context.Context, req *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error) {
 	return c.getPrefs.CallUnary(ctx, req)
 }
 
 // UpdatePrefs calls antclaw.v1.NotificationService.UpdatePrefs.
-func (c *notificationServiceClient) UpdatePrefs(ctx context.Context, req *connect.Request[v1.NotificationPrefs]) (*connect.Response[v1.NotificationPrefs], error) {
+func (c *notificationServiceClient) UpdatePrefs(ctx context.Context, req *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error) {
 	return c.updatePrefs.CallUnary(ctx, req)
 }
 
@@ -176,8 +176,8 @@ type NotificationServiceHandler interface {
 	UnreadCount(context.Context, *connect.Request[v1.UnreadCountRequest]) (*connect.Response[v1.UnreadCountResponse], error)
 	MarkRead(context.Context, *connect.Request[v1.MarkReadRequest]) (*connect.Response[v1.MarkReadResponse], error)
 	MarkAllRead(context.Context, *connect.Request[v1.MarkAllReadRequest]) (*connect.Response[v1.MarkAllReadResponse], error)
-	GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.NotificationPrefs], error)
-	UpdatePrefs(context.Context, *connect.Request[v1.NotificationPrefs]) (*connect.Response[v1.NotificationPrefs], error)
+	GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error)
+	UpdatePrefs(context.Context, *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error)
 }
 
 // NewNotificationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -274,10 +274,10 @@ func (UnimplementedNotificationServiceHandler) MarkAllRead(context.Context, *con
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.NotificationService.MarkAllRead is not implemented"))
 }
 
-func (UnimplementedNotificationServiceHandler) GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.NotificationPrefs], error) {
+func (UnimplementedNotificationServiceHandler) GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.NotificationService.GetPrefs is not implemented"))
 }
 
-func (UnimplementedNotificationServiceHandler) UpdatePrefs(context.Context, *connect.Request[v1.NotificationPrefs]) (*connect.Response[v1.NotificationPrefs], error) {
+func (UnimplementedNotificationServiceHandler) UpdatePrefs(context.Context, *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.NotificationService.UpdatePrefs is not implemented"))
 }

@@ -1,7 +1,6 @@
 -- +goose Up
 -- 通知推送系统：扩展字段 + 用户偏好表
--- 设计：参考 Emulator/ark-intelligent 的 Telegram 推送模型，落地为 antclaw 的
---       "持久化 + 实时 SSE + 用户偏好 + 去重" 模式。
+-- 设计：antclaw 的"持久化 + 实时 SSE + 用户偏好 + 去重"通知模型。
 
 ALTER TABLE notifications
     ADD COLUMN IF NOT EXISTS category   TEXT NOT NULL DEFAULT 'system',

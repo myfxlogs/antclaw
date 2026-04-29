@@ -16,8 +16,8 @@ service NotificationService {
   rpc MarkRead(MarkReadRequest) returns (MarkReadResponse);
   rpc MarkAllRead(MarkAllReadRequest) returns (MarkAllReadResponse);
 
-  rpc GetPrefs(GetPrefsRequest) returns (NotificationPrefs);
-  rpc UpdatePrefs(NotificationPrefs) returns (NotificationPrefs);
+  rpc GetPrefs(GetPrefsRequest) returns (GetPrefsResponse);
+  rpc UpdatePrefs(UpdatePrefsRequest) returns (UpdatePrefsResponse);
 }
 
 message Notification {
@@ -60,3 +60,7 @@ message MarkAllReadRequest {}
 message MarkAllReadResponse { int64 marked = 1; }
 
 message GetPrefsRequest    {}
+message GetPrefsResponse   { NotificationPrefs prefs = 1; }
+
+message UpdatePrefsRequest  { NotificationPrefs prefs = 1; }
+message UpdatePrefsResponse { NotificationPrefs prefs = 1; }

@@ -16,8 +16,7 @@ import (
 
 // evaluateAlerts 扫描用户告警，命中即通过 notify.Service 统一投递（持久化 + 实时 SSE）。
 //
-// 与 ark-intelligent 的 Telegram 推送对照：等价于 news/scheduler 的"逐用户匹配 → 发送"链路；
-// 此处的传输层是 SSE，分发由 Redis Pub/Sub 完成。
+// 推送链路："逐用户匹配 → 发送"——传输层是 SSE，分发由 Redis Pub/Sub 完成。
 func evaluateAlerts(ctx context.Context, pool *pgxpool.Pool, logger *slog.Logger) error {
 	rows, err := pool.Query(ctx, `SELECT id,user_id,alert_type,symbol,params::text,COALESCE(last_fired_at,'1970-01-01'::timestamptz),cooldown_seconds
 FROM user_signal_alerts WHERE enabled=true AND deleted_at IS NULL`)

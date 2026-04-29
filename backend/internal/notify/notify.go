@@ -1,6 +1,6 @@
 // Package notify 是 antclaw 的统一通知发送中枢。
 //
-// 推送链路（参考 Emulator/ark-intelligent 的 Telegram 主动推送模式）：
+// 推送链路（业务侧 → Service.Send → 去重/偏好/落库 → Redis Pub/Sub → SSE）：
 //
 //   业务侧 ──→ Service.Send
 //                 │

@@ -689,6 +689,138 @@ func (*GetPrefsRequest) Descriptor() ([]byte, []int) {
 	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{12}
 }
 
+type GetPrefsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prefs         *NotificationPrefs     `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPrefsResponse) Reset() {
+	*x = GetPrefsResponse{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPrefsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPrefsResponse) ProtoMessage() {}
+
+func (x *GetPrefsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPrefsResponse.ProtoReflect.Descriptor instead.
+func (*GetPrefsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetPrefsResponse) GetPrefs() *NotificationPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
+type UpdatePrefsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prefs         *NotificationPrefs     `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePrefsRequest) Reset() {
+	*x = UpdatePrefsRequest{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePrefsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePrefsRequest) ProtoMessage() {}
+
+func (x *UpdatePrefsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePrefsRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePrefsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *UpdatePrefsRequest) GetPrefs() *NotificationPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
+type UpdatePrefsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prefs         *NotificationPrefs     `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePrefsResponse) Reset() {
+	*x = UpdatePrefsResponse{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePrefsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePrefsResponse) ProtoMessage() {}
+
+func (x *UpdatePrefsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePrefsResponse.ProtoReflect.Descriptor instead.
+func (*UpdatePrefsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UpdatePrefsResponse) GetPrefs() *NotificationPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
 var File_antclaw_v1_notification_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_notification_proto_rawDesc = "" +
@@ -738,16 +870,22 @@ const file_antclaw_v1_notification_proto_rawDesc = "" +
 	"\x12MarkAllReadRequest\"-\n" +
 	"\x13MarkAllReadResponse\x12\x16\n" +
 	"\x06marked\x18\x01 \x01(\x03R\x06marked\"\x11\n" +
-	"\x0fGetPrefsRequest2\xae\x04\n" +
+	"\x0fGetPrefsRequest\"G\n" +
+	"\x10GetPrefsResponse\x123\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x1d.antclaw.v1.NotificationPrefsR\x05prefs\"I\n" +
+	"\x12UpdatePrefsRequest\x123\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x1d.antclaw.v1.NotificationPrefsR\x05prefs\"J\n" +
+	"\x13UpdatePrefsResponse\x123\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x1d.antclaw.v1.NotificationPrefsR\x05prefs2\xb0\x04\n" +
 	"\x13NotificationService\x12K\n" +
 	"\n" +
 	"ListUnread\x12\x1d.antclaw.v1.ListUnreadRequest\x1a\x1e.antclaw.v1.ListUnreadResponse\x12N\n" +
 	"\vListHistory\x12\x1e.antclaw.v1.ListHistoryRequest\x1a\x1f.antclaw.v1.ListHistoryResponse\x12N\n" +
 	"\vUnreadCount\x12\x1e.antclaw.v1.UnreadCountRequest\x1a\x1f.antclaw.v1.UnreadCountResponse\x12E\n" +
 	"\bMarkRead\x12\x1b.antclaw.v1.MarkReadRequest\x1a\x1c.antclaw.v1.MarkReadResponse\x12N\n" +
-	"\vMarkAllRead\x12\x1e.antclaw.v1.MarkAllReadRequest\x1a\x1f.antclaw.v1.MarkAllReadResponse\x12F\n" +
-	"\bGetPrefs\x12\x1b.antclaw.v1.GetPrefsRequest\x1a\x1d.antclaw.v1.NotificationPrefs\x12K\n" +
-	"\vUpdatePrefs\x12\x1d.antclaw.v1.NotificationPrefs\x1a\x1d.antclaw.v1.NotificationPrefsB\xa4\x01\n" +
+	"\vMarkAllRead\x12\x1e.antclaw.v1.MarkAllReadRequest\x1a\x1f.antclaw.v1.MarkAllReadResponse\x12E\n" +
+	"\bGetPrefs\x12\x1b.antclaw.v1.GetPrefsRequest\x1a\x1c.antclaw.v1.GetPrefsResponse\x12N\n" +
+	"\vUpdatePrefs\x12\x1e.antclaw.v1.UpdatePrefsRequest\x1a\x1f.antclaw.v1.UpdatePrefsResponseB\xa4\x01\n" +
 	"\x0ecom.antclaw.v1B\x11NotificationProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -764,7 +902,7 @@ func file_antclaw_v1_notification_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_notification_proto_rawDescData
 }
 
-var file_antclaw_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_antclaw_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_antclaw_v1_notification_proto_goTypes = []any{
 	(*Notification)(nil),        // 0: antclaw.v1.Notification
 	(*NotificationPrefs)(nil),   // 1: antclaw.v1.NotificationPrefs
@@ -779,31 +917,37 @@ var file_antclaw_v1_notification_proto_goTypes = []any{
 	(*MarkAllReadRequest)(nil),  // 10: antclaw.v1.MarkAllReadRequest
 	(*MarkAllReadResponse)(nil), // 11: antclaw.v1.MarkAllReadResponse
 	(*GetPrefsRequest)(nil),     // 12: antclaw.v1.GetPrefsRequest
-	nil,                         // 13: antclaw.v1.Notification.DataEntry
+	(*GetPrefsResponse)(nil),    // 13: antclaw.v1.GetPrefsResponse
+	(*UpdatePrefsRequest)(nil),  // 14: antclaw.v1.UpdatePrefsRequest
+	(*UpdatePrefsResponse)(nil), // 15: antclaw.v1.UpdatePrefsResponse
+	nil,                         // 16: antclaw.v1.Notification.DataEntry
 }
 var file_antclaw_v1_notification_proto_depIdxs = []int32{
-	13, // 0: antclaw.v1.Notification.data:type_name -> antclaw.v1.Notification.DataEntry
+	16, // 0: antclaw.v1.Notification.data:type_name -> antclaw.v1.Notification.DataEntry
 	0,  // 1: antclaw.v1.ListUnreadResponse.items:type_name -> antclaw.v1.Notification
 	0,  // 2: antclaw.v1.ListHistoryResponse.items:type_name -> antclaw.v1.Notification
-	2,  // 3: antclaw.v1.NotificationService.ListUnread:input_type -> antclaw.v1.ListUnreadRequest
-	4,  // 4: antclaw.v1.NotificationService.ListHistory:input_type -> antclaw.v1.ListHistoryRequest
-	6,  // 5: antclaw.v1.NotificationService.UnreadCount:input_type -> antclaw.v1.UnreadCountRequest
-	8,  // 6: antclaw.v1.NotificationService.MarkRead:input_type -> antclaw.v1.MarkReadRequest
-	10, // 7: antclaw.v1.NotificationService.MarkAllRead:input_type -> antclaw.v1.MarkAllReadRequest
-	12, // 8: antclaw.v1.NotificationService.GetPrefs:input_type -> antclaw.v1.GetPrefsRequest
-	1,  // 9: antclaw.v1.NotificationService.UpdatePrefs:input_type -> antclaw.v1.NotificationPrefs
-	3,  // 10: antclaw.v1.NotificationService.ListUnread:output_type -> antclaw.v1.ListUnreadResponse
-	5,  // 11: antclaw.v1.NotificationService.ListHistory:output_type -> antclaw.v1.ListHistoryResponse
-	7,  // 12: antclaw.v1.NotificationService.UnreadCount:output_type -> antclaw.v1.UnreadCountResponse
-	9,  // 13: antclaw.v1.NotificationService.MarkRead:output_type -> antclaw.v1.MarkReadResponse
-	11, // 14: antclaw.v1.NotificationService.MarkAllRead:output_type -> antclaw.v1.MarkAllReadResponse
-	1,  // 15: antclaw.v1.NotificationService.GetPrefs:output_type -> antclaw.v1.NotificationPrefs
-	1,  // 16: antclaw.v1.NotificationService.UpdatePrefs:output_type -> antclaw.v1.NotificationPrefs
-	10, // [10:17] is the sub-list for method output_type
-	3,  // [3:10] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	1,  // 3: antclaw.v1.GetPrefsResponse.prefs:type_name -> antclaw.v1.NotificationPrefs
+	1,  // 4: antclaw.v1.UpdatePrefsRequest.prefs:type_name -> antclaw.v1.NotificationPrefs
+	1,  // 5: antclaw.v1.UpdatePrefsResponse.prefs:type_name -> antclaw.v1.NotificationPrefs
+	2,  // 6: antclaw.v1.NotificationService.ListUnread:input_type -> antclaw.v1.ListUnreadRequest
+	4,  // 7: antclaw.v1.NotificationService.ListHistory:input_type -> antclaw.v1.ListHistoryRequest
+	6,  // 8: antclaw.v1.NotificationService.UnreadCount:input_type -> antclaw.v1.UnreadCountRequest
+	8,  // 9: antclaw.v1.NotificationService.MarkRead:input_type -> antclaw.v1.MarkReadRequest
+	10, // 10: antclaw.v1.NotificationService.MarkAllRead:input_type -> antclaw.v1.MarkAllReadRequest
+	12, // 11: antclaw.v1.NotificationService.GetPrefs:input_type -> antclaw.v1.GetPrefsRequest
+	14, // 12: antclaw.v1.NotificationService.UpdatePrefs:input_type -> antclaw.v1.UpdatePrefsRequest
+	3,  // 13: antclaw.v1.NotificationService.ListUnread:output_type -> antclaw.v1.ListUnreadResponse
+	5,  // 14: antclaw.v1.NotificationService.ListHistory:output_type -> antclaw.v1.ListHistoryResponse
+	7,  // 15: antclaw.v1.NotificationService.UnreadCount:output_type -> antclaw.v1.UnreadCountResponse
+	9,  // 16: antclaw.v1.NotificationService.MarkRead:output_type -> antclaw.v1.MarkReadResponse
+	11, // 17: antclaw.v1.NotificationService.MarkAllRead:output_type -> antclaw.v1.MarkAllReadResponse
+	13, // 18: antclaw.v1.NotificationService.GetPrefs:output_type -> antclaw.v1.GetPrefsResponse
+	15, // 19: antclaw.v1.NotificationService.UpdatePrefs:output_type -> antclaw.v1.UpdatePrefsResponse
+	13, // [13:20] is the sub-list for method output_type
+	6,  // [6:13] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_notification_proto_init() }
@@ -817,7 +961,7 @@ func file_antclaw_v1_notification_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_notification_proto_rawDesc), len(file_antclaw_v1_notification_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

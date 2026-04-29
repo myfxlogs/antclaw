@@ -103,7 +103,7 @@ func (h *NotificationHandler) MarkAllRead(ctx context.Context, _ *connect.Reques
 	return connect.NewResponse(&v1.MarkAllReadResponse{}), nil
 }
 
-func (h *NotificationHandler) GetPrefs(ctx context.Context, _ *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.NotificationPrefs], error) {
+func (h *NotificationHandler) GetPrefs(ctx context.Context, _ *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error) {
 	uid, err := h.currentUser(ctx)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (h *NotificationHandler) GetPrefs(ctx context.Context, _ *connect.Request[v
 	p, err := h.q.GetUserNotificationPrefs(ctx, uid)
 	if err != nil {
 		// 未配置 → 返回内置默认。
-		return connect.NewResponse(&v1.NotificationPrefs{
+		return connect.NewResponse(&v1.GetPrefsResponse{Prefs: &v1.NotificationPrefs{
 			EnabledTypes: []string{"alert", "signal", "system", "digest"},
 			MinSeverity:  "low",
 			QuietStart:   "00:00",
@@ -119,17 +119,20 @@ func (h *NotificationHandler) GetPrefs(ctx context.Context, _ *connect.Request[v
 			Timezone:     "UTC",
 			PushEnabled:  true,
 			EmailEnabled: false,
-		}), nil
+		}}), nil
 	}
-	return connect.NewResponse(prefsToProto(p)), nil
+	return connect.NewResponse(&v1.GetPrefsResponse{Prefs: prefsToProto(p)}), nil
 }
 
-func (h *NotificationHandler) UpdatePrefs(ctx context.Context, req *connect.Request[v1.NotificationPrefs]) (*connect.Response[v1.NotificationPrefs], error) {
+func (h *NotificationHandler) UpdatePrefs(ctx context.Context, req *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error) {
 	uid, err := h.currentUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	in := req.Msg
+	in := req.Msg.GetPrefs()
+	if in == nil {
+		in = &v1.NotificationPrefs{}
+	}
 	qStart, err := parseHHMM(in.GetQuietStart())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("quiet_start: %w", err))
@@ -163,7 +166,7 @@ func (h *NotificationHandler) UpdatePrefs(ctx context.Context, req *connect.Requ
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	return connect.NewResponse(prefsToProto(out)), nil
+	return connect.NewResponse(&v1.UpdatePrefsResponse{Prefs: prefsToProto(out)}), nil
 }
 
 // ---------- 转换 ----------
