@@ -43,8 +43,9 @@ CREATE TABLE IF NOT EXISTS event_impact_records (
     price_before DOUBLE PRECISION,
     price_after DOUBLE PRECISION,
     pct_change DOUBLE PRECISION,
-    recorded_at TIMESTAMPTZ,
-    PRIMARY KEY (event_id, "window", symbol)
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    -- TimescaleDB 要求分区列必须出现在 UNIQUE/PRIMARY KEY 中。
+    PRIMARY KEY (event_id, "window", symbol, recorded_at)
 );
 
 SELECT create_hypertable('event_impact_records', 'recorded_at', chunk_time_interval => INTERVAL '90 days', if_not_exists => TRUE);
