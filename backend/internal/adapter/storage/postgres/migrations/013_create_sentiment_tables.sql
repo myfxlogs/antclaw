@@ -13,20 +13,20 @@ CREATE TABLE IF NOT EXISTS sentiment_snapshots (
 
 SELECT create_hypertable('sentiment_snapshots', 'time', chunk_time_interval => INTERVAL '30 days', if_not_exists => TRUE);
 
--- 链上指标
+-- 链上指标（长表：单点拆为多行，便于扩展指标维度）
+-- 与 worker collector_onchain 及 OnchainHandler 的实际读写对齐。
 CREATE TABLE IF NOT EXISTS onchain_metrics (
-    date DATE NOT NULL,
-    asset VARCHAR(8) NOT NULL,             -- 'BTC','ETH'
-    flow_in DOUBLE PRECISION,
-    flow_out DOUBLE PRECISION,
-    net_flow DOUBLE PRECISION,
-    active_addr BIGINT,
-    tx_count BIGINT,
-    onchain_score DOUBLE PRECISION,
-    PRIMARY KEY (date, asset)
+    time   TIMESTAMPTZ        NOT NULL,
+    asset  VARCHAR(16)        NOT NULL,    -- 'BTC','ETH'
+    metric VARCHAR(32)        NOT NULL,    -- 'active_addresses','tx_count','net_flow','mvrv','sopr','onchain_score',...
+    value  DOUBLE PRECISION   NOT NULL,
+    source VARCHAR(32),                    -- 'coingecko','coinmetrics',...
+    PRIMARY KEY (time, asset, metric)
 );
 
-SELECT create_hypertable('onchain_metrics', 'date', chunk_time_interval => INTERVAL '180 days', if_not_exists => TRUE);
+SELECT create_hypertable('onchain_metrics', 'time', chunk_time_interval => INTERVAL '30 days', if_not_exists => TRUE);
+
+CREATE INDEX IF NOT EXISTS idx_onchain_asset_metric ON onchain_metrics (asset, metric, time DESC);
 
 -- DeFi 快照
 CREATE TABLE IF NOT EXISTS defi_snapshots (

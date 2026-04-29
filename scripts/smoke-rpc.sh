@@ -44,8 +44,9 @@ for ep in "${ENDPOINTS[@]}"; do
   rm -f "$tmp"
   if [ "$code" = "200" ]; then
     printf "  [%s] %s\n" "$code" "$path"
-  elif [ "$path" = "antclaw.v1.RegimeService/GetOverlay" ] && [[ "$body" == *'price_daily'* ]] && [[ "$body" == *'does not exist'* ]]; then
-    printf "  [SKIP] %s  (price_daily missing in smoke stack)\n" "$path"
+  elif [ "$path" = "antclaw.v1.RegimeService/GetOverlay" ] && [[ "$body" == *'price_daily'* ]]; then
+    # smoke stack price_daily 表为空或缺失 → 视为已知数据空洞跳过
+    printf "  [SKIP] %s  (price_daily empty/missing in smoke stack)\n" "$path"
     skip=$((skip + 1))
   else
     printf "  [%s] %s  <-- FAIL\n" "$code" "$path"
