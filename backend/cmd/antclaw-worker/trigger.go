@@ -136,6 +136,14 @@ func buildJobRunners(
 			runWithEvent(ctx, logger, "regime-overlay", "regime-overlay",
 				func() error { return computeRegimeOverlay(ctx, dbpool, logger) })
 		},
+		"cot-signal-outcomes": func() {
+			runWithEvent(ctx, logger, "cot-signal-outcomes", "cot-signal-outcomes",
+				func() error { return collectCOTSignalOutcomes(ctx, dbpool, logger) })
+		},
+		"data-snapshot": func() {
+			runWithEvent(ctx, logger, "data-snapshot", "data-snapshot",
+				func() error { return snapshotCOTIndexToDataSnapshots(ctx, dbpool, logger) })
+		},
 	}
 }
 

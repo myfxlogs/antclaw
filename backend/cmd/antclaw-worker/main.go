@@ -224,6 +224,8 @@ func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 			runWithEvent(ctx, logger, "walkforward", "walkforward", func() error { return runWalkforward(ctx, dbpool, logger) })
 			runWithEvent(ctx, logger, "regime-overlay", "regime-overlay", func() error { return computeRegimeOverlay(ctx, dbpool, logger) })
 			runWithEvent(ctx, logger, "transition-matrix", "transition-matrix", func() error { return buildTransitionMatrix(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "cot-signal-outcomes", "cot-signal-outcomes", func() error { return collectCOTSignalOutcomes(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "data-snapshot", "data-snapshot", func() error { return snapshotCOTIndexToDataSnapshots(ctx, dbpool, logger) })
 		}
 	}
 }
@@ -260,6 +262,8 @@ func runAllCollections(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 	runWithEvent(ctx, logger, "iv-skew", "iv-skew", func() error { return collectIVSkew(ctx, dbpool, logger) })
 	runWithEvent(ctx, logger, "micro-snapshot", "micro-snapshot", func() error { return collectMicroSnapshots(ctx, dbpool, logger) })
 	runWithEvent(ctx, logger, "regime-overlay", "regime-overlay", func() error { return computeRegimeOverlay(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "cot-signal-outcomes", "cot-signal-outcomes", func() error { return collectCOTSignalOutcomes(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "data-snapshot", "data-snapshot", func() error { return snapshotCOTIndexToDataSnapshots(ctx, dbpool, logger) })
 }
 
 // runWithEvent 包装一个任务执行：先检查启用状态，已禁用则跳过；
