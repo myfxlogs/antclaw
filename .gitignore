@@ -56,3 +56,7 @@ Emulator/
 /backend/antclaw-api
 /backend/antclaw-cli
 /backend/antclaw-worker
+# 在 cmd/* 子目录直接 `go build` 时生成的同名二进制
+/backend/cmd/antclaw-api/antclaw-api
+/backend/cmd/antclaw-cli/antclaw-cli
+/backend/cmd/antclaw-worker/antclaw-worker
