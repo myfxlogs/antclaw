@@ -12,6 +12,7 @@ package regime
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math"
 	"strings"
@@ -342,6 +343,7 @@ func (s *Service) persist(ctx context.Context, r *Result) error {
 	if s.pool == nil {
 		return nil
 	}
+	models, _ := json.Marshal(r.AvailableModels)
 	_, err := s.pool.Exec(ctx, `
 		INSERT INTO regime_overlay_history(
 			time, symbol, timeframe,
@@ -350,7 +352,7 @@ func (s *Service) persist(ctx context.Context, r *Result) error {
 			garch_regime, garch_score,
 			adx_strength, adx_score,
 			cot_score, available_models)
-		VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+		VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb)
 		ON CONFLICT (time, symbol, timeframe) DO UPDATE SET
 			unified_score = EXCLUDED.unified_score,
 			unified_label = EXCLUDED.unified_label`,
@@ -359,7 +361,7 @@ func (s *Service) persist(ctx context.Context, r *Result) error {
 		r.HMM.State, r.HMM.Confidence, r.HMM.Score,
 		r.GARCH.State, r.GARCH.Score,
 		r.ADX.State, r.ADX.Score,
-		r.COT.Score, strings.Join(r.AvailableModels, ","))
+		r.COT.Score, string(models))
 	return err
 }
 

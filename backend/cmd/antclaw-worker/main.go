@@ -117,6 +117,11 @@ func main() {
 	// 构建 jobID → 执行函数 map（供定时器与手动触发共享）
 	jobRunners := buildJobRunners(ctx, dbpool, calendarSvc, macroSvc, logger)
 
+	// 一次性 regime 历史回填（仅在 regime_transitions 为空时生效）
+	if err := backfillRegimeHistory(ctx, dbpool, logger); err != nil {
+		logger.Warn("regime backfill failed", "error", err)
+	}
+
 	// 数据采集循环 - 启用所有数据源
 	go runCollectionLoop(ctx, dbpool, calendarSvc, macroSvc, mql5Fetcher, fredClient, logger)
 
@@ -156,6 +161,8 @@ func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 	priceTicker := time.NewTicker(6 * time.Hour)      // 每6小时采集价格
 	sentimentTicker := time.NewTicker(1 * time.Hour)  // 每小时采集情绪
 	onchainTicker := time.NewTicker(1 * time.Hour)    // 每小时采集链上
+	extrasTicker := time.NewTicker(30 * time.Minute)  // Phase 2: 派生与期权数据
+	heavyTicker := time.NewTicker(6 * time.Hour)      // Phase 2 重计算: regime/wyckoff/walkforward/calibration
 
 	defer calendarTicker.Stop()
 	defer macroTicker.Stop()
@@ -164,6 +171,8 @@ func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 	defer priceTicker.Stop()
 	defer sentimentTicker.Stop()
 	defer onchainTicker.Stop()
+	defer extrasTicker.Stop()
+	defer heavyTicker.Stop()
 
 	logger.Info("Entering scheduled collection mode")
 	logger.Info("Collection frequencies:")
@@ -200,6 +209,21 @@ func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 		case <-onchainTicker.C:
 			logger.Info("Scheduled trigger: onchain data")
 			runWithEvent(ctx, logger, "onchain-sync", "onchain-sync", func() error { return collectOnchain(ctx, dbpool, logger) })
+		case <-extrasTicker.C:
+			logger.Info("Scheduled trigger: derived & options extras")
+			runWithEvent(ctx, logger, "calendar-titles", "calendar-titles", func() error { return collectCalendarTitles(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "calendar-surprise", "calendar-surprise", func() error { return collectCalendarSurprise(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "event-impact", "event-impact", func() error { return collectEventImpact(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "micro-snapshot", "micro-snapshot", func() error { return collectMicroSnapshots(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "gex-snapshot", "gex-snapshot", func() error { return collectGEX(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "iv-skew", "iv-skew", func() error { return collectIVSkew(ctx, dbpool, logger) })
+		case <-heavyTicker.C:
+			logger.Info("Scheduled trigger: heavy recompute (regime/wyckoff/walkforward/cot-calibration)")
+			runWithEvent(ctx, logger, "cot-calibration", "cot-calibration", func() error { return calibrateCOT(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "wyckoff-events", "wyckoff-events", func() error { return detectWyckoff(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "walkforward", "walkforward", func() error { return runWalkforward(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "regime-overlay", "regime-overlay", func() error { return computeRegimeOverlay(ctx, dbpool, logger) })
+			runWithEvent(ctx, logger, "transition-matrix", "transition-matrix", func() error { return buildTransitionMatrix(ctx, dbpool, logger) })
 		}
 	}
 }
@@ -224,6 +248,18 @@ func runAllCollections(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 	runWithEvent(ctx, logger, "outcome-evaluator", "outcome-evaluator", func() error { return evaluateSignalOutcomes(ctx, dbpool, logger) })
 	runWithEvent(ctx, logger, "transition-matrix", "transition-matrix", func() error { return buildTransitionMatrix(ctx, dbpool, logger) })
 	runWithEvent(ctx, logger, "alert-evaluator", "alert-evaluator", func() error { return evaluateAlerts(ctx, dbpool, logger) })
+
+	// === Phase 2: 派生与外部期权数据采集 ===
+	runWithEvent(ctx, logger, "calendar-titles", "calendar-titles", func() error { return collectCalendarTitles(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "calendar-surprise", "calendar-surprise", func() error { return collectCalendarSurprise(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "event-impact", "event-impact", func() error { return collectEventImpact(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "cot-calibration", "cot-calibration", func() error { return calibrateCOT(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "wyckoff-events", "wyckoff-events", func() error { return detectWyckoff(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "walkforward", "walkforward", func() error { return runWalkforward(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "gex-snapshot", "gex-snapshot", func() error { return collectGEX(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "iv-skew", "iv-skew", func() error { return collectIVSkew(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "micro-snapshot", "micro-snapshot", func() error { return collectMicroSnapshots(ctx, dbpool, logger) })
+	runWithEvent(ctx, logger, "regime-overlay", "regime-overlay", func() error { return computeRegimeOverlay(ctx, dbpool, logger) })
 }
 
 // runWithEvent 包装一个任务执行：先检查启用状态，已禁用则跳过；

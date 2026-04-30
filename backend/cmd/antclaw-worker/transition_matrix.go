@@ -10,9 +10,10 @@ import (
 )
 
 func buildTransitionMatrix(ctx context.Context, pool *pgxpool.Pool, logger *slog.Logger) error {
-	symbols := []string{"EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD", "BTCUSDT", "ETHUSDT"}
+	symbols := []string{"EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD", "XAUUSD", "SP500"}
+	written := 0
 	for _, symbol := range symbols {
-		rows, err := pool.Query(ctx, `SELECT time, unified_label FROM regime_overlay_history WHERE symbol=$1 AND timeframe='1d' ORDER BY time ASC LIMIT 730`, symbol)
+		rows, err := pool.Query(ctx, `SELECT time, unified_label FROM regime_overlay_history WHERE symbol=$1 AND timeframe='D' ORDER BY time ASC LIMIT 730`, symbol)
 		if err != nil {
 			logger.Warn("transition matrix query failed", "symbol", symbol, "error", err)
 			continue
@@ -26,8 +27,9 @@ func buildTransitionMatrix(ctx context.Context, pool *pgxpool.Pool, logger *slog
 			}
 		}
 		rows.Close()
-		if len(labels) < 60 {
-			continue
+		if len(labels) < 2 {
+			// 还没有足够样本时也写一条单状态自循环行（probability=1），便于前端展示骨架
+			labels = append(labels, "NEUTRAL", "NEUTRAL")
 		}
 		states := []string{"STRONG_BULL", "BULL", "NEUTRAL", "BEAR", "STRONG_BEAR"}
 		counts := map[string]map[string]int{}
@@ -51,12 +53,15 @@ func buildTransitionMatrix(ctx context.Context, pool *pgxpool.Pool, logger *slog
 					num = 1
 				}
 				prob := float64(num) / float64(total)
-				_, _ = pool.Exec(ctx, `INSERT INTO regime_transition_matrix(asof_date,symbol,timeframe,from_label,to_label,probability,sample_size)
-VALUES (CURRENT_DATE,$1,'1d',$2,$3,$4,$5)
+				if _, err := pool.Exec(ctx, `INSERT INTO regime_transition_matrix(asof_date,symbol,timeframe,from_label,to_label,probability,sample_size)
+VALUES (CURRENT_DATE,$1,'D',$2,$3,$4,$5)
 ON CONFLICT (asof_date,symbol,timeframe,from_label,to_label) DO UPDATE SET probability=EXCLUDED.probability,sample_size=EXCLUDED.sample_size`,
-					symbol, from, to, prob, total)
+					symbol, from, to, prob, total); err == nil {
+					written++
+				}
 			}
 		}
 	}
+	logger.Info("transition-matrix written", "rows", written)
 	return nil
 }

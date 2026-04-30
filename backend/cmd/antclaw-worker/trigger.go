@@ -96,6 +96,46 @@ func buildJobRunners(
 			runWithEvent(ctx, logger, "alert-evaluator", "alert-evaluator",
 				func() error { return evaluateAlerts(ctx, dbpool, logger) })
 		},
+		"calendar-titles": func() {
+			runWithEvent(ctx, logger, "calendar-titles", "calendar-titles",
+				func() error { return collectCalendarTitles(ctx, dbpool, logger) })
+		},
+		"calendar-surprise": func() {
+			runWithEvent(ctx, logger, "calendar-surprise", "calendar-surprise",
+				func() error { return collectCalendarSurprise(ctx, dbpool, logger) })
+		},
+		"event-impact": func() {
+			runWithEvent(ctx, logger, "event-impact", "event-impact",
+				func() error { return collectEventImpact(ctx, dbpool, logger) })
+		},
+		"cot-calibration": func() {
+			runWithEvent(ctx, logger, "cot-calibration", "cot-calibration",
+				func() error { return calibrateCOT(ctx, dbpool, logger) })
+		},
+		"wyckoff-events": func() {
+			runWithEvent(ctx, logger, "wyckoff-events", "wyckoff-events",
+				func() error { return detectWyckoff(ctx, dbpool, logger) })
+		},
+		"walkforward": func() {
+			runWithEvent(ctx, logger, "walkforward", "walkforward",
+				func() error { return runWalkforward(ctx, dbpool, logger) })
+		},
+		"gex-snapshot": func() {
+			runWithEvent(ctx, logger, "gex-snapshot", "gex-snapshot",
+				func() error { return collectGEX(ctx, dbpool, logger) })
+		},
+		"iv-skew": func() {
+			runWithEvent(ctx, logger, "iv-skew", "iv-skew",
+				func() error { return collectIVSkew(ctx, dbpool, logger) })
+		},
+		"micro-snapshot": func() {
+			runWithEvent(ctx, logger, "micro-snapshot", "micro-snapshot",
+				func() error { return collectMicroSnapshots(ctx, dbpool, logger) })
+		},
+		"regime-overlay": func() {
+			runWithEvent(ctx, logger, "regime-overlay", "regime-overlay",
+				func() error { return computeRegimeOverlay(ctx, dbpool, logger) })
+		},
 	}
 }
 
