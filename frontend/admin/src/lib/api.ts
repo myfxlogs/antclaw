@@ -630,7 +630,9 @@ export async function updateNotificationPrefs(p: NotificationPrefsItem): Promise
 // 个人通知 SSE：返回 EventSource，调用方负责绑定 onmessage / 关闭。
 export function openNotificationsSSE(onEvent: (n: NotificationItem) => void): () => void {
   const token = localStorage.getItem('token') || ''
-  const url = `${API_BASE_URL}/sse/notifications?access_token=${encodeURIComponent(token)}`
+  // 去掉末尾斜杠，避免 API_BASE_URL='/' 时拼出 '//sse/...'，被浏览器解析为 host='sse' (ERR_NAME_NOT_RESOLVED)。
+  const base = API_BASE_URL.replace(/\/+$/, '')
+  const url = `${base}/sse/notifications?access_token=${encodeURIComponent(token)}`
   const es = new EventSource(url)
   es.addEventListener('notification', (ev: MessageEvent) => {
     try {
