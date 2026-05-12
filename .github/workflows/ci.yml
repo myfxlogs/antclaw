@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v2
+      - uses: bufbuild/buf-setup-action@v1.50.0
         with:
           version: 1.46.0
           github_token: ${{ secrets.GITHUB_TOKEN }}
