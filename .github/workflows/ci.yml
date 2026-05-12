@@ -70,15 +70,22 @@ jobs:
         if: always()
         run: docker compose -f deploy/docker-compose.yaml down -v
 
-  buf:
+  buf-lint:
     name: Protobuf Lint & Breaking
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: bufbuild/buf-action@v1
         with:
+          setup_only: true
           version: 1.46.0
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Buf lint
+        run: buf lint
+      - name: Buf breaking
+        # main 推送时跳过；PR 和 feature 分支对 main 做兼容检查
+        if: github.ref != 'refs/heads/main'
+        run: buf breaking --against '.git#branch=main'
 
   frontend-lint:
     name: Frontend Lint
