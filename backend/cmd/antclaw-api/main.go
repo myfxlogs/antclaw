@@ -50,7 +50,7 @@ import (
 )
 
 func main() {
-_ = time.Now()
+boot := time.Now()
 	if err := auth.LoadKeys(); err != nil {
 		log.Fatalf("failed to load JWT keys: %v", err)
 	}
