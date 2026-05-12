@@ -5,24 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	redisv9 "github.com/redis/go-redis/v9"
 )
-
-// getRedisAddr mirrors worker configuration for API server.
-func getRedisAddr() string {
-	host := os.Getenv("ANTCLAW_REDIS_HOST")
-	if host == "" {
-		host = "redis"
-	}
-	port := os.Getenv("ANTCLAW_REDIS_PORT")
-	if port == "" {
-		port = "6379"
-	}
-	return fmt.Sprintf("%s:%s", host, port)
-}
 
 // streamSSE 封装 Redis Streams 到 SSE 的通用推送逻辑：
 //   - 连接后立即发送一条推送注释路由头，避免代理/curl --max-time 错误超时

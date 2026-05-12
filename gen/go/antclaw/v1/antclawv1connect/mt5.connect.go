@@ -6,8 +6,11 @@ package antclawv1connect
 
 import (
 	connect "connectrpc.com/connect"
-	_ "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	context "context"
+	errors "errors"
+	v1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	http "net/http"
+	strings "strings"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
@@ -22,8 +25,40 @@ const (
 	MT5ServiceName = "antclaw.v1.MT5Service"
 )
 
+// These constants are the fully-qualified names of the RPCs defined in this package. They're
+// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+//
+// Note that these are different from the fully-qualified method names used by
+// google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
+// reflection-formatted method names, remove the leading slash and convert the remaining slash to a
+// period.
+const (
+	// MT5ServiceAddAccountProcedure is the fully-qualified name of the MT5Service's AddAccount RPC.
+	MT5ServiceAddAccountProcedure = "/antclaw.v1.MT5Service/AddAccount"
+	// MT5ServiceRemoveAccountProcedure is the fully-qualified name of the MT5Service's RemoveAccount
+	// RPC.
+	MT5ServiceRemoveAccountProcedure = "/antclaw.v1.MT5Service/RemoveAccount"
+	// MT5ServiceGetAccountInfoProcedure is the fully-qualified name of the MT5Service's GetAccountInfo
+	// RPC.
+	MT5ServiceGetAccountInfoProcedure = "/antclaw.v1.MT5Service/GetAccountInfo"
+	// MT5ServiceGetPositionsProcedure is the fully-qualified name of the MT5Service's GetPositions RPC.
+	MT5ServiceGetPositionsProcedure = "/antclaw.v1.MT5Service/GetPositions"
+	// MT5ServiceGetHistoryProcedure is the fully-qualified name of the MT5Service's GetHistory RPC.
+	MT5ServiceGetHistoryProcedure = "/antclaw.v1.MT5Service/GetHistory"
+)
+
 // MT5ServiceClient is a client for the antclaw.v1.MT5Service service.
 type MT5ServiceClient interface {
+	// 添加 MT5 账号（server + account + investor_password → 连接验证）
+	AddAccount(context.Context, *connect.Request[v1.AddMT5AccountRequest]) (*connect.Response[v1.MT5Account], error)
+	// 删除已绑定账号
+	RemoveAccount(context.Context, *connect.Request[v1.RemoveMT5AccountRequest]) (*connect.Response[v1.RemoveMT5AccountResponse], error)
+	// 查询账号概览（余额/净值/保证金）
+	GetAccountInfo(context.Context, *connect.Request[v1.GetMT5AccountInfoRequest]) (*connect.Response[v1.MT5AccountInfo], error)
+	// 查询当前持仓
+	GetPositions(context.Context, *connect.Request[v1.GetMT5PositionsRequest]) (*connect.Response[v1.MT5PositionsResponse], error)
+	// 查询历史订单（用于战绩计算）
+	GetHistory(context.Context, *connect.Request[v1.GetMT5HistoryRequest]) (*connect.Response[v1.MT5HistoryResponse], error)
 }
 
 // NewMT5ServiceClient constructs a client for the antclaw.v1.MT5Service service. By default, it
@@ -34,15 +69,88 @@ type MT5ServiceClient interface {
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
 func NewMT5ServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) MT5ServiceClient {
-	return &mT5ServiceClient{}
+	baseURL = strings.TrimRight(baseURL, "/")
+	mT5ServiceMethods := v1.File_antclaw_v1_mt5_proto.Services().ByName("MT5Service").Methods()
+	return &mT5ServiceClient{
+		addAccount: connect.NewClient[v1.AddMT5AccountRequest, v1.MT5Account](
+			httpClient,
+			baseURL+MT5ServiceAddAccountProcedure,
+			connect.WithSchema(mT5ServiceMethods.ByName("AddAccount")),
+			connect.WithClientOptions(opts...),
+		),
+		removeAccount: connect.NewClient[v1.RemoveMT5AccountRequest, v1.RemoveMT5AccountResponse](
+			httpClient,
+			baseURL+MT5ServiceRemoveAccountProcedure,
+			connect.WithSchema(mT5ServiceMethods.ByName("RemoveAccount")),
+			connect.WithClientOptions(opts...),
+		),
+		getAccountInfo: connect.NewClient[v1.GetMT5AccountInfoRequest, v1.MT5AccountInfo](
+			httpClient,
+			baseURL+MT5ServiceGetAccountInfoProcedure,
+			connect.WithSchema(mT5ServiceMethods.ByName("GetAccountInfo")),
+			connect.WithClientOptions(opts...),
+		),
+		getPositions: connect.NewClient[v1.GetMT5PositionsRequest, v1.MT5PositionsResponse](
+			httpClient,
+			baseURL+MT5ServiceGetPositionsProcedure,
+			connect.WithSchema(mT5ServiceMethods.ByName("GetPositions")),
+			connect.WithClientOptions(opts...),
+		),
+		getHistory: connect.NewClient[v1.GetMT5HistoryRequest, v1.MT5HistoryResponse](
+			httpClient,
+			baseURL+MT5ServiceGetHistoryProcedure,
+			connect.WithSchema(mT5ServiceMethods.ByName("GetHistory")),
+			connect.WithClientOptions(opts...),
+		),
+	}
 }
 
 // mT5ServiceClient implements MT5ServiceClient.
 type mT5ServiceClient struct {
+	addAccount     *connect.Client[v1.AddMT5AccountRequest, v1.MT5Account]
+	removeAccount  *connect.Client[v1.RemoveMT5AccountRequest, v1.RemoveMT5AccountResponse]
+	getAccountInfo *connect.Client[v1.GetMT5AccountInfoRequest, v1.MT5AccountInfo]
+	getPositions   *connect.Client[v1.GetMT5PositionsRequest, v1.MT5PositionsResponse]
+	getHistory     *connect.Client[v1.GetMT5HistoryRequest, v1.MT5HistoryResponse]
+}
+
+// AddAccount calls antclaw.v1.MT5Service.AddAccount.
+func (c *mT5ServiceClient) AddAccount(ctx context.Context, req *connect.Request[v1.AddMT5AccountRequest]) (*connect.Response[v1.MT5Account], error) {
+	return c.addAccount.CallUnary(ctx, req)
+}
+
+// RemoveAccount calls antclaw.v1.MT5Service.RemoveAccount.
+func (c *mT5ServiceClient) RemoveAccount(ctx context.Context, req *connect.Request[v1.RemoveMT5AccountRequest]) (*connect.Response[v1.RemoveMT5AccountResponse], error) {
+	return c.removeAccount.CallUnary(ctx, req)
+}
+
+// GetAccountInfo calls antclaw.v1.MT5Service.GetAccountInfo.
+func (c *mT5ServiceClient) GetAccountInfo(ctx context.Context, req *connect.Request[v1.GetMT5AccountInfoRequest]) (*connect.Response[v1.MT5AccountInfo], error) {
+	return c.getAccountInfo.CallUnary(ctx, req)
+}
+
+// GetPositions calls antclaw.v1.MT5Service.GetPositions.
+func (c *mT5ServiceClient) GetPositions(ctx context.Context, req *connect.Request[v1.GetMT5PositionsRequest]) (*connect.Response[v1.MT5PositionsResponse], error) {
+	return c.getPositions.CallUnary(ctx, req)
+}
+
+// GetHistory calls antclaw.v1.MT5Service.GetHistory.
+func (c *mT5ServiceClient) GetHistory(ctx context.Context, req *connect.Request[v1.GetMT5HistoryRequest]) (*connect.Response[v1.MT5HistoryResponse], error) {
+	return c.getHistory.CallUnary(ctx, req)
 }
 
 // MT5ServiceHandler is an implementation of the antclaw.v1.MT5Service service.
 type MT5ServiceHandler interface {
+	// 添加 MT5 账号（server + account + investor_password → 连接验证）
+	AddAccount(context.Context, *connect.Request[v1.AddMT5AccountRequest]) (*connect.Response[v1.MT5Account], error)
+	// 删除已绑定账号
+	RemoveAccount(context.Context, *connect.Request[v1.RemoveMT5AccountRequest]) (*connect.Response[v1.RemoveMT5AccountResponse], error)
+	// 查询账号概览（余额/净值/保证金）
+	GetAccountInfo(context.Context, *connect.Request[v1.GetMT5AccountInfoRequest]) (*connect.Response[v1.MT5AccountInfo], error)
+	// 查询当前持仓
+	GetPositions(context.Context, *connect.Request[v1.GetMT5PositionsRequest]) (*connect.Response[v1.MT5PositionsResponse], error)
+	// 查询历史订单（用于战绩计算）
+	GetHistory(context.Context, *connect.Request[v1.GetMT5HistoryRequest]) (*connect.Response[v1.MT5HistoryResponse], error)
 }
 
 // NewMT5ServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -51,8 +159,49 @@ type MT5ServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewMT5ServiceHandler(svc MT5ServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	mT5ServiceMethods := v1.File_antclaw_v1_mt5_proto.Services().ByName("MT5Service").Methods()
+	mT5ServiceAddAccountHandler := connect.NewUnaryHandler(
+		MT5ServiceAddAccountProcedure,
+		svc.AddAccount,
+		connect.WithSchema(mT5ServiceMethods.ByName("AddAccount")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT5ServiceRemoveAccountHandler := connect.NewUnaryHandler(
+		MT5ServiceRemoveAccountProcedure,
+		svc.RemoveAccount,
+		connect.WithSchema(mT5ServiceMethods.ByName("RemoveAccount")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT5ServiceGetAccountInfoHandler := connect.NewUnaryHandler(
+		MT5ServiceGetAccountInfoProcedure,
+		svc.GetAccountInfo,
+		connect.WithSchema(mT5ServiceMethods.ByName("GetAccountInfo")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT5ServiceGetPositionsHandler := connect.NewUnaryHandler(
+		MT5ServiceGetPositionsProcedure,
+		svc.GetPositions,
+		connect.WithSchema(mT5ServiceMethods.ByName("GetPositions")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT5ServiceGetHistoryHandler := connect.NewUnaryHandler(
+		MT5ServiceGetHistoryProcedure,
+		svc.GetHistory,
+		connect.WithSchema(mT5ServiceMethods.ByName("GetHistory")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.MT5Service/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case MT5ServiceAddAccountProcedure:
+			mT5ServiceAddAccountHandler.ServeHTTP(w, r)
+		case MT5ServiceRemoveAccountProcedure:
+			mT5ServiceRemoveAccountHandler.ServeHTTP(w, r)
+		case MT5ServiceGetAccountInfoProcedure:
+			mT5ServiceGetAccountInfoHandler.ServeHTTP(w, r)
+		case MT5ServiceGetPositionsProcedure:
+			mT5ServiceGetPositionsHandler.ServeHTTP(w, r)
+		case MT5ServiceGetHistoryProcedure:
+			mT5ServiceGetHistoryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -61,3 +210,23 @@ func NewMT5ServiceHandler(svc MT5ServiceHandler, opts ...connect.HandlerOption) 
 
 // UnimplementedMT5ServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedMT5ServiceHandler struct{}
+
+func (UnimplementedMT5ServiceHandler) AddAccount(context.Context, *connect.Request[v1.AddMT5AccountRequest]) (*connect.Response[v1.MT5Account], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT5Service.AddAccount is not implemented"))
+}
+
+func (UnimplementedMT5ServiceHandler) RemoveAccount(context.Context, *connect.Request[v1.RemoveMT5AccountRequest]) (*connect.Response[v1.RemoveMT5AccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT5Service.RemoveAccount is not implemented"))
+}
+
+func (UnimplementedMT5ServiceHandler) GetAccountInfo(context.Context, *connect.Request[v1.GetMT5AccountInfoRequest]) (*connect.Response[v1.MT5AccountInfo], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT5Service.GetAccountInfo is not implemented"))
+}
+
+func (UnimplementedMT5ServiceHandler) GetPositions(context.Context, *connect.Request[v1.GetMT5PositionsRequest]) (*connect.Response[v1.MT5PositionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT5Service.GetPositions is not implemented"))
+}
+
+func (UnimplementedMT5ServiceHandler) GetHistory(context.Context, *connect.Request[v1.GetMT5HistoryRequest]) (*connect.Response[v1.MT5HistoryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT5Service.GetHistory is not implemented"))
+}

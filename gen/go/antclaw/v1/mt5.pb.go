@@ -21,27 +21,31 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Placeholder messages for P2 skeleton
-type MT5PlaceHolderRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type AddMT5AccountRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Server           string                 `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty"`                                             // e.g. "ICMarkets-Demo"
+	Account          string                 `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`                                           // e.g. "88005522"
+	InvestorPassword string                 `protobuf:"bytes,3,opt,name=investor_password,json=investorPassword,proto3" json:"investor_password,omitempty"` // 只读密码（强制要求，不能是主密码）
+	Label            string                 `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"`                                               // 用户自定义标签（可选）
+	IsDemo           bool                   `protobuf:"varint,5,opt,name=is_demo,json=isDemo,proto3" json:"is_demo,omitempty"`                              // 模拟盘/实盘标记
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
-func (x *MT5PlaceHolderRequest) Reset() {
-	*x = MT5PlaceHolderRequest{}
+func (x *AddMT5AccountRequest) Reset() {
+	*x = AddMT5AccountRequest{}
 	mi := &file_antclaw_v1_mt5_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *MT5PlaceHolderRequest) String() string {
+func (x *AddMT5AccountRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MT5PlaceHolderRequest) ProtoMessage() {}
+func (*AddMT5AccountRequest) ProtoMessage() {}
 
-func (x *MT5PlaceHolderRequest) ProtoReflect() protoreflect.Message {
+func (x *AddMT5AccountRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_antclaw_v1_mt5_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,31 +57,73 @@ func (x *MT5PlaceHolderRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MT5PlaceHolderRequest.ProtoReflect.Descriptor instead.
-func (*MT5PlaceHolderRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use AddMT5AccountRequest.ProtoReflect.Descriptor instead.
+func (*AddMT5AccountRequest) Descriptor() ([]byte, []int) {
 	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{0}
 }
 
-type MT5PlaceHolderResponse struct {
+func (x *AddMT5AccountRequest) GetServer() string {
+	if x != nil {
+		return x.Server
+	}
+	return ""
+}
+
+func (x *AddMT5AccountRequest) GetAccount() string {
+	if x != nil {
+		return x.Account
+	}
+	return ""
+}
+
+func (x *AddMT5AccountRequest) GetInvestorPassword() string {
+	if x != nil {
+		return x.InvestorPassword
+	}
+	return ""
+}
+
+func (x *AddMT5AccountRequest) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *AddMT5AccountRequest) GetIsDemo() bool {
+	if x != nil {
+		return x.IsDemo
+	}
+	return false
+}
+
+type MT5Account struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 服务端生成的 UUID
+	Server        string                 `protobuf:"bytes,2,opt,name=server,proto3" json:"server,omitempty"`
+	Account       string                 `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`
+	Label         string                 `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"`
+	IsDemo        bool                   `protobuf:"varint,5,opt,name=is_demo,json=isDemo,proto3" json:"is_demo,omitempty"`
+	Connected     bool                   `protobuf:"varint,6,opt,name=connected,proto3" json:"connected,omitempty"`                  // 当前是否可连接
+	CreatedAt     int64                  `protobuf:"varint,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // unix timestamp
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MT5PlaceHolderResponse) Reset() {
-	*x = MT5PlaceHolderResponse{}
+func (x *MT5Account) Reset() {
+	*x = MT5Account{}
 	mi := &file_antclaw_v1_mt5_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *MT5PlaceHolderResponse) String() string {
+func (x *MT5Account) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MT5PlaceHolderResponse) ProtoMessage() {}
+func (*MT5Account) ProtoMessage() {}
 
-func (x *MT5PlaceHolderResponse) ProtoReflect() protoreflect.Message {
+func (x *MT5Account) ProtoReflect() protoreflect.Message {
 	mi := &file_antclaw_v1_mt5_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -89,9 +135,754 @@ func (x *MT5PlaceHolderResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MT5PlaceHolderResponse.ProtoReflect.Descriptor instead.
-func (*MT5PlaceHolderResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MT5Account.ProtoReflect.Descriptor instead.
+func (*MT5Account) Descriptor() ([]byte, []int) {
 	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *MT5Account) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *MT5Account) GetServer() string {
+	if x != nil {
+		return x.Server
+	}
+	return ""
+}
+
+func (x *MT5Account) GetAccount() string {
+	if x != nil {
+		return x.Account
+	}
+	return ""
+}
+
+func (x *MT5Account) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *MT5Account) GetIsDemo() bool {
+	if x != nil {
+		return x.IsDemo
+	}
+	return false
+}
+
+func (x *MT5Account) GetConnected() bool {
+	if x != nil {
+		return x.Connected
+	}
+	return false
+}
+
+func (x *MT5Account) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+type RemoveMT5AccountRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 账号 UUID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveMT5AccountRequest) Reset() {
+	*x = RemoveMT5AccountRequest{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveMT5AccountRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveMT5AccountRequest) ProtoMessage() {}
+
+func (x *RemoveMT5AccountRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveMT5AccountRequest.ProtoReflect.Descriptor instead.
+func (*RemoveMT5AccountRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RemoveMT5AccountRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type RemoveMT5AccountResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveMT5AccountResponse) Reset() {
+	*x = RemoveMT5AccountResponse{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveMT5AccountResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveMT5AccountResponse) ProtoMessage() {}
+
+func (x *RemoveMT5AccountResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveMT5AccountResponse.ProtoReflect.Descriptor instead.
+func (*RemoveMT5AccountResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *RemoveMT5AccountResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+type GetMT5AccountInfoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 账号 UUID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMT5AccountInfoRequest) Reset() {
+	*x = GetMT5AccountInfoRequest{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMT5AccountInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMT5AccountInfoRequest) ProtoMessage() {}
+
+func (x *GetMT5AccountInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMT5AccountInfoRequest.ProtoReflect.Descriptor instead.
+func (*GetMT5AccountInfoRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetMT5AccountInfoRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type MT5AccountInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Balance       float64                `protobuf:"fixed64,2,opt,name=balance,proto3" json:"balance,omitempty"`                                 // 余额
+	Equity        float64                `protobuf:"fixed64,3,opt,name=equity,proto3" json:"equity,omitempty"`                                   // 净值
+	Margin        float64                `protobuf:"fixed64,4,opt,name=margin,proto3" json:"margin,omitempty"`                                   // 已用保证金
+	FreeMargin    float64                `protobuf:"fixed64,5,opt,name=free_margin,json=freeMargin,proto3" json:"free_margin,omitempty"`         // 可用保证金
+	MarginLevel   float64                `protobuf:"fixed64,6,opt,name=margin_level,json=marginLevel,proto3" json:"margin_level,omitempty"`      // 保证金水平 (%)
+	TodayPnl      float64                `protobuf:"fixed64,7,opt,name=today_pnl,json=todayPnl,proto3" json:"today_pnl,omitempty"`               // 今日浮动盈亏
+	PositionCount int32                  `protobuf:"varint,8,opt,name=position_count,json=positionCount,proto3" json:"position_count,omitempty"` // 持仓数
+	UpdatedAt     int64                  `protobuf:"varint,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`             // unix timestamp
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MT5AccountInfo) Reset() {
+	*x = MT5AccountInfo{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MT5AccountInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MT5AccountInfo) ProtoMessage() {}
+
+func (x *MT5AccountInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MT5AccountInfo.ProtoReflect.Descriptor instead.
+func (*MT5AccountInfo) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MT5AccountInfo) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *MT5AccountInfo) GetBalance() float64 {
+	if x != nil {
+		return x.Balance
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetEquity() float64 {
+	if x != nil {
+		return x.Equity
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetMargin() float64 {
+	if x != nil {
+		return x.Margin
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetFreeMargin() float64 {
+	if x != nil {
+		return x.FreeMargin
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetMarginLevel() float64 {
+	if x != nil {
+		return x.MarginLevel
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetTodayPnl() float64 {
+	if x != nil {
+		return x.TodayPnl
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetPositionCount() int32 {
+	if x != nil {
+		return x.PositionCount
+	}
+	return 0
+}
+
+func (x *MT5AccountInfo) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type GetMT5PositionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 账号 UUID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMT5PositionsRequest) Reset() {
+	*x = GetMT5PositionsRequest{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMT5PositionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMT5PositionsRequest) ProtoMessage() {}
+
+func (x *GetMT5PositionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMT5PositionsRequest.ProtoReflect.Descriptor instead.
+func (*GetMT5PositionsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetMT5PositionsRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type MT5PositionsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Positions     []*MT5Position         `protobuf:"bytes,1,rep,name=positions,proto3" json:"positions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MT5PositionsResponse) Reset() {
+	*x = MT5PositionsResponse{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MT5PositionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MT5PositionsResponse) ProtoMessage() {}
+
+func (x *MT5PositionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MT5PositionsResponse.ProtoReflect.Descriptor instead.
+func (*MT5PositionsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *MT5PositionsResponse) GetPositions() []*MT5Position {
+	if x != nil {
+		return x.Positions
+	}
+	return nil
+}
+
+type MT5Position struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ticket        int64                  `protobuf:"varint,1,opt,name=ticket,proto3" json:"ticket,omitempty"`                                  // 持仓单号
+	Symbol        string                 `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`                                   // 品种
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`                                       // BUY / SELL
+	Volume        float64                `protobuf:"fixed64,4,opt,name=volume,proto3" json:"volume,omitempty"`                                 // 手数
+	OpenPrice     float64                `protobuf:"fixed64,5,opt,name=open_price,json=openPrice,proto3" json:"open_price,omitempty"`          // 开仓价
+	CurrentPrice  float64                `protobuf:"fixed64,6,opt,name=current_price,json=currentPrice,proto3" json:"current_price,omitempty"` // 当前价
+	StopLoss      float64                `protobuf:"fixed64,7,opt,name=stop_loss,json=stopLoss,proto3" json:"stop_loss,omitempty"`             // 止损
+	TakeProfit    float64                `protobuf:"fixed64,8,opt,name=take_profit,json=takeProfit,proto3" json:"take_profit,omitempty"`       // 止盈
+	Profit        float64                `protobuf:"fixed64,9,opt,name=profit,proto3" json:"profit,omitempty"`                                 // 浮动盈亏
+	Swap          float64                `protobuf:"fixed64,10,opt,name=swap,proto3" json:"swap,omitempty"`                                    // 库存费
+	OpenTime      int64                  `protobuf:"varint,11,opt,name=open_time,json=openTime,proto3" json:"open_time,omitempty"`             // unix timestamp
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MT5Position) Reset() {
+	*x = MT5Position{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MT5Position) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MT5Position) ProtoMessage() {}
+
+func (x *MT5Position) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MT5Position.ProtoReflect.Descriptor instead.
+func (*MT5Position) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *MT5Position) GetTicket() int64 {
+	if x != nil {
+		return x.Ticket
+	}
+	return 0
+}
+
+func (x *MT5Position) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *MT5Position) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *MT5Position) GetVolume() float64 {
+	if x != nil {
+		return x.Volume
+	}
+	return 0
+}
+
+func (x *MT5Position) GetOpenPrice() float64 {
+	if x != nil {
+		return x.OpenPrice
+	}
+	return 0
+}
+
+func (x *MT5Position) GetCurrentPrice() float64 {
+	if x != nil {
+		return x.CurrentPrice
+	}
+	return 0
+}
+
+func (x *MT5Position) GetStopLoss() float64 {
+	if x != nil {
+		return x.StopLoss
+	}
+	return 0
+}
+
+func (x *MT5Position) GetTakeProfit() float64 {
+	if x != nil {
+		return x.TakeProfit
+	}
+	return 0
+}
+
+func (x *MT5Position) GetProfit() float64 {
+	if x != nil {
+		return x.Profit
+	}
+	return 0
+}
+
+func (x *MT5Position) GetSwap() float64 {
+	if x != nil {
+		return x.Swap
+	}
+	return 0
+}
+
+func (x *MT5Position) GetOpenTime() int64 {
+	if x != nil {
+		return x.OpenTime
+	}
+	return 0
+}
+
+type GetMT5HistoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                              // 账号 UUID
+	FromTime      int64                  `protobuf:"varint,2,opt,name=from_time,json=fromTime,proto3" json:"from_time,omitempty"` // 起始时间（unix timestamp），默认最近 90 天
+	MaxCount      int32                  `protobuf:"varint,3,opt,name=max_count,json=maxCount,proto3" json:"max_count,omitempty"` // 最大条数，默认 200
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMT5HistoryRequest) Reset() {
+	*x = GetMT5HistoryRequest{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMT5HistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMT5HistoryRequest) ProtoMessage() {}
+
+func (x *GetMT5HistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMT5HistoryRequest.ProtoReflect.Descriptor instead.
+func (*GetMT5HistoryRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetMT5HistoryRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetMT5HistoryRequest) GetFromTime() int64 {
+	if x != nil {
+		return x.FromTime
+	}
+	return 0
+}
+
+func (x *GetMT5HistoryRequest) GetMaxCount() int32 {
+	if x != nil {
+		return x.MaxCount
+	}
+	return 0
+}
+
+type MT5HistoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HistoryOrders []*MT5Order            `protobuf:"bytes,1,rep,name=history_orders,json=historyOrders,proto3" json:"history_orders,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MT5HistoryResponse) Reset() {
+	*x = MT5HistoryResponse{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MT5HistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MT5HistoryResponse) ProtoMessage() {}
+
+func (x *MT5HistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MT5HistoryResponse.ProtoReflect.Descriptor instead.
+func (*MT5HistoryResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *MT5HistoryResponse) GetHistoryOrders() []*MT5Order {
+	if x != nil {
+		return x.HistoryOrders
+	}
+	return nil
+}
+
+func (x *MT5HistoryResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type MT5Order struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ticket        int64                  `protobuf:"varint,1,opt,name=ticket,proto3" json:"ticket,omitempty"`
+	Symbol        string                 `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"` // BUY / SELL
+	Volume        float64                `protobuf:"fixed64,4,opt,name=volume,proto3" json:"volume,omitempty"`
+	OpenPrice     float64                `protobuf:"fixed64,5,opt,name=open_price,json=openPrice,proto3" json:"open_price,omitempty"`
+	ClosePrice    float64                `protobuf:"fixed64,6,opt,name=close_price,json=closePrice,proto3" json:"close_price,omitempty"`
+	Profit        float64                `protobuf:"fixed64,7,opt,name=profit,proto3" json:"profit,omitempty"` // 平仓盈亏
+	Swap          float64                `protobuf:"fixed64,8,opt,name=swap,proto3" json:"swap,omitempty"`
+	Commission    float64                `protobuf:"fixed64,9,opt,name=commission,proto3" json:"commission,omitempty"`
+	OpenTime      int64                  `protobuf:"varint,10,opt,name=open_time,json=openTime,proto3" json:"open_time,omitempty"`
+	CloseTime     int64                  `protobuf:"varint,11,opt,name=close_time,json=closeTime,proto3" json:"close_time,omitempty"`
+	Comment       string                 `protobuf:"bytes,12,opt,name=comment,proto3" json:"comment,omitempty"` // 订单注释
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MT5Order) Reset() {
+	*x = MT5Order{}
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MT5Order) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MT5Order) ProtoMessage() {}
+
+func (x *MT5Order) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_mt5_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MT5Order.ProtoReflect.Descriptor instead.
+func (*MT5Order) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_mt5_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *MT5Order) GetTicket() int64 {
+	if x != nil {
+		return x.Ticket
+	}
+	return 0
+}
+
+func (x *MT5Order) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *MT5Order) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *MT5Order) GetVolume() float64 {
+	if x != nil {
+		return x.Volume
+	}
+	return 0
+}
+
+func (x *MT5Order) GetOpenPrice() float64 {
+	if x != nil {
+		return x.OpenPrice
+	}
+	return 0
+}
+
+func (x *MT5Order) GetClosePrice() float64 {
+	if x != nil {
+		return x.ClosePrice
+	}
+	return 0
+}
+
+func (x *MT5Order) GetProfit() float64 {
+	if x != nil {
+		return x.Profit
+	}
+	return 0
+}
+
+func (x *MT5Order) GetSwap() float64 {
+	if x != nil {
+		return x.Swap
+	}
+	return 0
+}
+
+func (x *MT5Order) GetCommission() float64 {
+	if x != nil {
+		return x.Commission
+	}
+	return 0
+}
+
+func (x *MT5Order) GetOpenTime() int64 {
+	if x != nil {
+		return x.OpenTime
+	}
+	return 0
+}
+
+func (x *MT5Order) GetCloseTime() int64 {
+	if x != nil {
+		return x.CloseTime
+	}
+	return 0
+}
+
+func (x *MT5Order) GetComment() string {
+	if x != nil {
+		return x.Comment
+	}
+	return ""
 }
 
 var File_antclaw_v1_mt5_proto protoreflect.FileDescriptor
@@ -99,11 +890,96 @@ var File_antclaw_v1_mt5_proto protoreflect.FileDescriptor
 const file_antclaw_v1_mt5_proto_rawDesc = "" +
 	"\n" +
 	"\x14antclaw/v1/mt5.proto\x12\n" +
-	"antclaw.v1\"\x17\n" +
-	"\x15MT5PlaceHolderRequest\"\x18\n" +
-	"\x16MT5PlaceHolderResponse2\f\n" +
+	"antclaw.v1\"\xa4\x01\n" +
+	"\x14AddMT5AccountRequest\x12\x16\n" +
+	"\x06server\x18\x01 \x01(\tR\x06server\x12\x18\n" +
+	"\aaccount\x18\x02 \x01(\tR\aaccount\x12+\n" +
+	"\x11investor_password\x18\x03 \x01(\tR\x10investorPassword\x12\x14\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\x12\x17\n" +
+	"\ais_demo\x18\x05 \x01(\bR\x06isDemo\"\xba\x01\n" +
 	"\n" +
-	"MT5ServiceB\x9b\x01\n" +
+	"MT5Account\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06server\x18\x02 \x01(\tR\x06server\x12\x18\n" +
+	"\aaccount\x18\x03 \x01(\tR\aaccount\x12\x14\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\x12\x17\n" +
+	"\ais_demo\x18\x05 \x01(\bR\x06isDemo\x12\x1c\n" +
+	"\tconnected\x18\x06 \x01(\bR\tconnected\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\x03R\tcreatedAt\")\n" +
+	"\x17RemoveMT5AccountRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"4\n" +
+	"\x18RemoveMT5AccountResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"*\n" +
+	"\x18GetMT5AccountInfoRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x91\x02\n" +
+	"\x0eMT5AccountInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
+	"\abalance\x18\x02 \x01(\x01R\abalance\x12\x16\n" +
+	"\x06equity\x18\x03 \x01(\x01R\x06equity\x12\x16\n" +
+	"\x06margin\x18\x04 \x01(\x01R\x06margin\x12\x1f\n" +
+	"\vfree_margin\x18\x05 \x01(\x01R\n" +
+	"freeMargin\x12!\n" +
+	"\fmargin_level\x18\x06 \x01(\x01R\vmarginLevel\x12\x1b\n" +
+	"\ttoday_pnl\x18\a \x01(\x01R\btodayPnl\x12%\n" +
+	"\x0eposition_count\x18\b \x01(\x05R\rpositionCount\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\t \x01(\x03R\tupdatedAt\"(\n" +
+	"\x16GetMT5PositionsRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"M\n" +
+	"\x14MT5PositionsResponse\x125\n" +
+	"\tpositions\x18\x01 \x03(\v2\x17.antclaw.v1.MT5PositionR\tpositions\"\xb4\x02\n" +
+	"\vMT5Position\x12\x16\n" +
+	"\x06ticket\x18\x01 \x01(\x03R\x06ticket\x12\x16\n" +
+	"\x06symbol\x18\x02 \x01(\tR\x06symbol\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x16\n" +
+	"\x06volume\x18\x04 \x01(\x01R\x06volume\x12\x1d\n" +
+	"\n" +
+	"open_price\x18\x05 \x01(\x01R\topenPrice\x12#\n" +
+	"\rcurrent_price\x18\x06 \x01(\x01R\fcurrentPrice\x12\x1b\n" +
+	"\tstop_loss\x18\a \x01(\x01R\bstopLoss\x12\x1f\n" +
+	"\vtake_profit\x18\b \x01(\x01R\n" +
+	"takeProfit\x12\x16\n" +
+	"\x06profit\x18\t \x01(\x01R\x06profit\x12\x12\n" +
+	"\x04swap\x18\n" +
+	" \x01(\x01R\x04swap\x12\x1b\n" +
+	"\topen_time\x18\v \x01(\x03R\bopenTime\"`\n" +
+	"\x14GetMT5HistoryRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
+	"\tfrom_time\x18\x02 \x01(\x03R\bfromTime\x12\x1b\n" +
+	"\tmax_count\x18\x03 \x01(\x05R\bmaxCount\"r\n" +
+	"\x12MT5HistoryResponse\x12;\n" +
+	"\x0ehistory_orders\x18\x01 \x03(\v2\x14.antclaw.v1.MT5OrderR\rhistoryOrders\x12\x1f\n" +
+	"\vtotal_count\x18\x02 \x01(\x05R\n" +
+	"totalCount\"\xc8\x02\n" +
+	"\bMT5Order\x12\x16\n" +
+	"\x06ticket\x18\x01 \x01(\x03R\x06ticket\x12\x16\n" +
+	"\x06symbol\x18\x02 \x01(\tR\x06symbol\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x16\n" +
+	"\x06volume\x18\x04 \x01(\x01R\x06volume\x12\x1d\n" +
+	"\n" +
+	"open_price\x18\x05 \x01(\x01R\topenPrice\x12\x1f\n" +
+	"\vclose_price\x18\x06 \x01(\x01R\n" +
+	"closePrice\x12\x16\n" +
+	"\x06profit\x18\a \x01(\x01R\x06profit\x12\x12\n" +
+	"\x04swap\x18\b \x01(\x01R\x04swap\x12\x1e\n" +
+	"\n" +
+	"commission\x18\t \x01(\x01R\n" +
+	"commission\x12\x1b\n" +
+	"\topen_time\x18\n" +
+	" \x01(\x03R\bopenTime\x12\x1d\n" +
+	"\n" +
+	"close_time\x18\v \x01(\x03R\tcloseTime\x12\x18\n" +
+	"\acomment\x18\f \x01(\tR\acomment2\xaa\x03\n" +
+	"\n" +
+	"MT5Service\x12F\n" +
+	"\n" +
+	"AddAccount\x12 .antclaw.v1.AddMT5AccountRequest\x1a\x16.antclaw.v1.MT5Account\x12Z\n" +
+	"\rRemoveAccount\x12#.antclaw.v1.RemoveMT5AccountRequest\x1a$.antclaw.v1.RemoveMT5AccountResponse\x12R\n" +
+	"\x0eGetAccountInfo\x12$.antclaw.v1.GetMT5AccountInfoRequest\x1a\x1a.antclaw.v1.MT5AccountInfo\x12T\n" +
+	"\fGetPositions\x12\".antclaw.v1.GetMT5PositionsRequest\x1a .antclaw.v1.MT5PositionsResponse\x12N\n" +
+	"\n" +
+	"GetHistory\x12 .antclaw.v1.GetMT5HistoryRequest\x1a\x1e.antclaw.v1.MT5HistoryResponseB\x9b\x01\n" +
 	"\x0ecom.antclaw.v1B\bMt5ProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -120,17 +996,39 @@ func file_antclaw_v1_mt5_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_mt5_proto_rawDescData
 }
 
-var file_antclaw_v1_mt5_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_antclaw_v1_mt5_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_antclaw_v1_mt5_proto_goTypes = []any{
-	(*MT5PlaceHolderRequest)(nil),  // 0: antclaw.v1.MT5PlaceHolderRequest
-	(*MT5PlaceHolderResponse)(nil), // 1: antclaw.v1.MT5PlaceHolderResponse
+	(*AddMT5AccountRequest)(nil),     // 0: antclaw.v1.AddMT5AccountRequest
+	(*MT5Account)(nil),               // 1: antclaw.v1.MT5Account
+	(*RemoveMT5AccountRequest)(nil),  // 2: antclaw.v1.RemoveMT5AccountRequest
+	(*RemoveMT5AccountResponse)(nil), // 3: antclaw.v1.RemoveMT5AccountResponse
+	(*GetMT5AccountInfoRequest)(nil), // 4: antclaw.v1.GetMT5AccountInfoRequest
+	(*MT5AccountInfo)(nil),           // 5: antclaw.v1.MT5AccountInfo
+	(*GetMT5PositionsRequest)(nil),   // 6: antclaw.v1.GetMT5PositionsRequest
+	(*MT5PositionsResponse)(nil),     // 7: antclaw.v1.MT5PositionsResponse
+	(*MT5Position)(nil),              // 8: antclaw.v1.MT5Position
+	(*GetMT5HistoryRequest)(nil),     // 9: antclaw.v1.GetMT5HistoryRequest
+	(*MT5HistoryResponse)(nil),       // 10: antclaw.v1.MT5HistoryResponse
+	(*MT5Order)(nil),                 // 11: antclaw.v1.MT5Order
 }
 var file_antclaw_v1_mt5_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	8,  // 0: antclaw.v1.MT5PositionsResponse.positions:type_name -> antclaw.v1.MT5Position
+	11, // 1: antclaw.v1.MT5HistoryResponse.history_orders:type_name -> antclaw.v1.MT5Order
+	0,  // 2: antclaw.v1.MT5Service.AddAccount:input_type -> antclaw.v1.AddMT5AccountRequest
+	2,  // 3: antclaw.v1.MT5Service.RemoveAccount:input_type -> antclaw.v1.RemoveMT5AccountRequest
+	4,  // 4: antclaw.v1.MT5Service.GetAccountInfo:input_type -> antclaw.v1.GetMT5AccountInfoRequest
+	6,  // 5: antclaw.v1.MT5Service.GetPositions:input_type -> antclaw.v1.GetMT5PositionsRequest
+	9,  // 6: antclaw.v1.MT5Service.GetHistory:input_type -> antclaw.v1.GetMT5HistoryRequest
+	1,  // 7: antclaw.v1.MT5Service.AddAccount:output_type -> antclaw.v1.MT5Account
+	3,  // 8: antclaw.v1.MT5Service.RemoveAccount:output_type -> antclaw.v1.RemoveMT5AccountResponse
+	5,  // 9: antclaw.v1.MT5Service.GetAccountInfo:output_type -> antclaw.v1.MT5AccountInfo
+	7,  // 10: antclaw.v1.MT5Service.GetPositions:output_type -> antclaw.v1.MT5PositionsResponse
+	10, // 11: antclaw.v1.MT5Service.GetHistory:output_type -> antclaw.v1.MT5HistoryResponse
+	7,  // [7:12] is the sub-list for method output_type
+	2,  // [2:7] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_mt5_proto_init() }
@@ -144,7 +1042,7 @@ func file_antclaw_v1_mt5_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_mt5_proto_rawDesc), len(file_antclaw_v1_mt5_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

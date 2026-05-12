@@ -17,7 +17,6 @@ import (
 
 	cryptopkg "github.com/antclaw/antclaw/internal/crypto"
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
-	"github.com/antclaw/antclaw/internal/infra/apiclient/fred"
 	"github.com/antclaw/antclaw/internal/infra/apiclient/mql5"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/infra/redis"
@@ -75,16 +74,8 @@ func main() {
 		logger.Warn("warm-up credentials failed", "error", err)
 	}
 
-	// 构造 client（先用默认 URL）
-	fredClient := fred.NewClient("")
 	mql5Fetcher := mql5.NewFetcher()
 
-	// 注册 OnChange 回调：key/endpoint 变更时热更新 client
-	resolver.OnChange("fred", func(sourceID, secret, endpoint string) {
-		fredClient.SetAPIKey(secret)
-		fredClient.SetBaseURL(endpoint)
-		logger.Info("fred config hot-reloaded", "has_secret", secret != "", "has_endpoint", endpoint != "")
-	})
 	resolver.OnChange("mql5", func(sourceID, secret, endpoint string) {
 		mql5Fetcher.SetBaseURL(endpoint)
 		logger.Info("mql5 endpoint hot-reloaded", "endpoint", endpoint)
@@ -106,6 +97,14 @@ func main() {
 	fredKey := resolver.GetSecret("fred")
 	macroSvc := macro.NewMacroService(macroRepo, fredKey, logger)
 
+	// 热更新 macroSvc 的 FRED key（首次和后续 DB 变更均生效）
+	resolver.OnChange("fred", func(sourceID, secret, endpoint string) {
+		macroSvc.SetFredKey(secret)
+		logger.Info("fred config hot-reloaded", "has_secret", secret != "", "has_endpoint", endpoint != "")
+	})
+	// 立即应用已加载的 key（FireAll 已在上面执行过，但那时 macroSvc 还未创建）
+	macroSvc.SetFredKey(fredKey)
+
 	// 启动定时采集
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -123,7 +122,7 @@ func main() {
 	}
 
 	// 数据采集循环 - 启用所有数据源
-	go runCollectionLoop(ctx, dbpool, calendarSvc, macroSvc, mql5Fetcher, fredClient, logger)
+	go runCollectionLoop(ctx, dbpool, calendarSvc, macroSvc, mql5Fetcher, logger)
 
 	// 订阅 jobs:trigger 频道，支持从管理端手动触发任意 job
 	go subscribeJobTriggers(ctx, redisClient.Raw(), jobRunners, logger)
@@ -148,10 +147,10 @@ func main() {
 }
 
 // 数据采集循环
-func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *calendar.CalendarService, macroSvc *macro.MacroService, mql5Fetcher *apiclient.MQL5Fetcher, fredClient *apiclient.FredClient, logger *slog.Logger) {
+func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *calendar.CalendarService, macroSvc *macro.MacroService, mql5Fetcher *apiclient.MQL5Fetcher, logger *slog.Logger) {
 	// 首次运行：立即执行一次全量采集
 	logger.Info("Running initial full data collection")
-	runAllCollections(ctx, dbpool, calendarSvc, macroSvc, mql5Fetcher, fredClient, logger)
+	runAllCollections(ctx, dbpool, calendarSvc, macroSvc, mql5Fetcher, logger)
 
 	// 创建定时器
 	calendarTicker := time.NewTicker(1 * time.Hour)   // 每小时采集日历
@@ -231,7 +230,7 @@ func runCollectionLoop(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *c
 }
 
 // 执行所有采集任务 - 统一用 runWithEvent 包装以发布实时事件
-func runAllCollections(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *calendar.CalendarService, macroSvc *macro.MacroService, mql5Fetcher *apiclient.MQL5Fetcher, fredClient *apiclient.FredClient, logger *slog.Logger) {
+func runAllCollections(ctx context.Context, dbpool *pgxpool.Pool, calendarSvc *calendar.CalendarService, macroSvc *macro.MacroService, mql5Fetcher *apiclient.MQL5Fetcher, logger *slog.Logger) {
 	runWithEvent(ctx, logger, "calendar-sync", "calendar-sync", func() error { return runCalendarCollection(ctx, calendarSvc, logger) })
 	runWithEvent(ctx, logger, "macro-sync", "macro-sync", func() error { return runMacroCollection(ctx, macroSvc, logger) })
 	runWithEvent(ctx, logger, "actuals-update", "actuals-update", func() error { return runActualsUpdate(ctx, calendarSvc, logger) })
@@ -397,4 +396,3 @@ func publishJobEvent(ctx context.Context, logger *slog.Logger, evt jobEvent) {
 	key := fmt.Sprintf("jobs:status:%s", evt.JobID)
 	_ = globalRedis.Set(ctx, key, string(data), 0)
 }
-

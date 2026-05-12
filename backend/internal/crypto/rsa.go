@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sync"
 )
 
 // RSAManager 管理一对 RSA-2048 密钥对，用于前端 → 后端的混合加密。
@@ -20,7 +19,6 @@ import (
 type RSAManager struct {
 	priv      *rsa.PrivateKey
 	publicPEM []byte
-	once      sync.Once
 }
 
 // LoadOrCreateRSA 从 path 加载私钥；不存在则生成新的并写入。

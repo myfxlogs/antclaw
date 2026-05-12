@@ -108,15 +108,6 @@ func derefString(s *string) string {
 	return *s
 }
 
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
-
 // parseUUID parses a string UUID to uuid.UUID.
 func parseUUID(s string) uuid.UUID {
 	u, err := uuid.Parse(s)

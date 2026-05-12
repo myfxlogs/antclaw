@@ -6,8 +6,11 @@ package antclawv1connect
 
 import (
 	connect "connectrpc.com/connect"
-	_ "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	context "context"
+	errors "errors"
+	v1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	http "net/http"
+	strings "strings"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
@@ -22,8 +25,35 @@ const (
 	MT4ServiceName = "antclaw.v1.MT4Service"
 )
 
+// These constants are the fully-qualified names of the RPCs defined in this package. They're
+// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+//
+// Note that these are different from the fully-qualified method names used by
+// google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
+// reflection-formatted method names, remove the leading slash and convert the remaining slash to a
+// period.
+const (
+	// MT4ServiceAddAccountProcedure is the fully-qualified name of the MT4Service's AddAccount RPC.
+	MT4ServiceAddAccountProcedure = "/antclaw.v1.MT4Service/AddAccount"
+	// MT4ServiceRemoveAccountProcedure is the fully-qualified name of the MT4Service's RemoveAccount
+	// RPC.
+	MT4ServiceRemoveAccountProcedure = "/antclaw.v1.MT4Service/RemoveAccount"
+	// MT4ServiceGetAccountInfoProcedure is the fully-qualified name of the MT4Service's GetAccountInfo
+	// RPC.
+	MT4ServiceGetAccountInfoProcedure = "/antclaw.v1.MT4Service/GetAccountInfo"
+	// MT4ServiceGetPositionsProcedure is the fully-qualified name of the MT4Service's GetPositions RPC.
+	MT4ServiceGetPositionsProcedure = "/antclaw.v1.MT4Service/GetPositions"
+	// MT4ServiceGetHistoryProcedure is the fully-qualified name of the MT4Service's GetHistory RPC.
+	MT4ServiceGetHistoryProcedure = "/antclaw.v1.MT4Service/GetHistory"
+)
+
 // MT4ServiceClient is a client for the antclaw.v1.MT4Service service.
 type MT4ServiceClient interface {
+	AddAccount(context.Context, *connect.Request[v1.AddMT4AccountRequest]) (*connect.Response[v1.MT4Account], error)
+	RemoveAccount(context.Context, *connect.Request[v1.RemoveMT4AccountRequest]) (*connect.Response[v1.RemoveMT4AccountResponse], error)
+	GetAccountInfo(context.Context, *connect.Request[v1.GetMT4AccountInfoRequest]) (*connect.Response[v1.MT4AccountInfo], error)
+	GetPositions(context.Context, *connect.Request[v1.GetMT4PositionsRequest]) (*connect.Response[v1.MT4PositionsResponse], error)
+	GetHistory(context.Context, *connect.Request[v1.GetMT4HistoryRequest]) (*connect.Response[v1.MT4HistoryResponse], error)
 }
 
 // NewMT4ServiceClient constructs a client for the antclaw.v1.MT4Service service. By default, it
@@ -34,15 +64,83 @@ type MT4ServiceClient interface {
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
 func NewMT4ServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) MT4ServiceClient {
-	return &mT4ServiceClient{}
+	baseURL = strings.TrimRight(baseURL, "/")
+	mT4ServiceMethods := v1.File_antclaw_v1_mt4_proto.Services().ByName("MT4Service").Methods()
+	return &mT4ServiceClient{
+		addAccount: connect.NewClient[v1.AddMT4AccountRequest, v1.MT4Account](
+			httpClient,
+			baseURL+MT4ServiceAddAccountProcedure,
+			connect.WithSchema(mT4ServiceMethods.ByName("AddAccount")),
+			connect.WithClientOptions(opts...),
+		),
+		removeAccount: connect.NewClient[v1.RemoveMT4AccountRequest, v1.RemoveMT4AccountResponse](
+			httpClient,
+			baseURL+MT4ServiceRemoveAccountProcedure,
+			connect.WithSchema(mT4ServiceMethods.ByName("RemoveAccount")),
+			connect.WithClientOptions(opts...),
+		),
+		getAccountInfo: connect.NewClient[v1.GetMT4AccountInfoRequest, v1.MT4AccountInfo](
+			httpClient,
+			baseURL+MT4ServiceGetAccountInfoProcedure,
+			connect.WithSchema(mT4ServiceMethods.ByName("GetAccountInfo")),
+			connect.WithClientOptions(opts...),
+		),
+		getPositions: connect.NewClient[v1.GetMT4PositionsRequest, v1.MT4PositionsResponse](
+			httpClient,
+			baseURL+MT4ServiceGetPositionsProcedure,
+			connect.WithSchema(mT4ServiceMethods.ByName("GetPositions")),
+			connect.WithClientOptions(opts...),
+		),
+		getHistory: connect.NewClient[v1.GetMT4HistoryRequest, v1.MT4HistoryResponse](
+			httpClient,
+			baseURL+MT4ServiceGetHistoryProcedure,
+			connect.WithSchema(mT4ServiceMethods.ByName("GetHistory")),
+			connect.WithClientOptions(opts...),
+		),
+	}
 }
 
 // mT4ServiceClient implements MT4ServiceClient.
 type mT4ServiceClient struct {
+	addAccount     *connect.Client[v1.AddMT4AccountRequest, v1.MT4Account]
+	removeAccount  *connect.Client[v1.RemoveMT4AccountRequest, v1.RemoveMT4AccountResponse]
+	getAccountInfo *connect.Client[v1.GetMT4AccountInfoRequest, v1.MT4AccountInfo]
+	getPositions   *connect.Client[v1.GetMT4PositionsRequest, v1.MT4PositionsResponse]
+	getHistory     *connect.Client[v1.GetMT4HistoryRequest, v1.MT4HistoryResponse]
+}
+
+// AddAccount calls antclaw.v1.MT4Service.AddAccount.
+func (c *mT4ServiceClient) AddAccount(ctx context.Context, req *connect.Request[v1.AddMT4AccountRequest]) (*connect.Response[v1.MT4Account], error) {
+	return c.addAccount.CallUnary(ctx, req)
+}
+
+// RemoveAccount calls antclaw.v1.MT4Service.RemoveAccount.
+func (c *mT4ServiceClient) RemoveAccount(ctx context.Context, req *connect.Request[v1.RemoveMT4AccountRequest]) (*connect.Response[v1.RemoveMT4AccountResponse], error) {
+	return c.removeAccount.CallUnary(ctx, req)
+}
+
+// GetAccountInfo calls antclaw.v1.MT4Service.GetAccountInfo.
+func (c *mT4ServiceClient) GetAccountInfo(ctx context.Context, req *connect.Request[v1.GetMT4AccountInfoRequest]) (*connect.Response[v1.MT4AccountInfo], error) {
+	return c.getAccountInfo.CallUnary(ctx, req)
+}
+
+// GetPositions calls antclaw.v1.MT4Service.GetPositions.
+func (c *mT4ServiceClient) GetPositions(ctx context.Context, req *connect.Request[v1.GetMT4PositionsRequest]) (*connect.Response[v1.MT4PositionsResponse], error) {
+	return c.getPositions.CallUnary(ctx, req)
+}
+
+// GetHistory calls antclaw.v1.MT4Service.GetHistory.
+func (c *mT4ServiceClient) GetHistory(ctx context.Context, req *connect.Request[v1.GetMT4HistoryRequest]) (*connect.Response[v1.MT4HistoryResponse], error) {
+	return c.getHistory.CallUnary(ctx, req)
 }
 
 // MT4ServiceHandler is an implementation of the antclaw.v1.MT4Service service.
 type MT4ServiceHandler interface {
+	AddAccount(context.Context, *connect.Request[v1.AddMT4AccountRequest]) (*connect.Response[v1.MT4Account], error)
+	RemoveAccount(context.Context, *connect.Request[v1.RemoveMT4AccountRequest]) (*connect.Response[v1.RemoveMT4AccountResponse], error)
+	GetAccountInfo(context.Context, *connect.Request[v1.GetMT4AccountInfoRequest]) (*connect.Response[v1.MT4AccountInfo], error)
+	GetPositions(context.Context, *connect.Request[v1.GetMT4PositionsRequest]) (*connect.Response[v1.MT4PositionsResponse], error)
+	GetHistory(context.Context, *connect.Request[v1.GetMT4HistoryRequest]) (*connect.Response[v1.MT4HistoryResponse], error)
 }
 
 // NewMT4ServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -51,8 +149,49 @@ type MT4ServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewMT4ServiceHandler(svc MT4ServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	mT4ServiceMethods := v1.File_antclaw_v1_mt4_proto.Services().ByName("MT4Service").Methods()
+	mT4ServiceAddAccountHandler := connect.NewUnaryHandler(
+		MT4ServiceAddAccountProcedure,
+		svc.AddAccount,
+		connect.WithSchema(mT4ServiceMethods.ByName("AddAccount")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT4ServiceRemoveAccountHandler := connect.NewUnaryHandler(
+		MT4ServiceRemoveAccountProcedure,
+		svc.RemoveAccount,
+		connect.WithSchema(mT4ServiceMethods.ByName("RemoveAccount")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT4ServiceGetAccountInfoHandler := connect.NewUnaryHandler(
+		MT4ServiceGetAccountInfoProcedure,
+		svc.GetAccountInfo,
+		connect.WithSchema(mT4ServiceMethods.ByName("GetAccountInfo")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT4ServiceGetPositionsHandler := connect.NewUnaryHandler(
+		MT4ServiceGetPositionsProcedure,
+		svc.GetPositions,
+		connect.WithSchema(mT4ServiceMethods.ByName("GetPositions")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mT4ServiceGetHistoryHandler := connect.NewUnaryHandler(
+		MT4ServiceGetHistoryProcedure,
+		svc.GetHistory,
+		connect.WithSchema(mT4ServiceMethods.ByName("GetHistory")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.MT4Service/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case MT4ServiceAddAccountProcedure:
+			mT4ServiceAddAccountHandler.ServeHTTP(w, r)
+		case MT4ServiceRemoveAccountProcedure:
+			mT4ServiceRemoveAccountHandler.ServeHTTP(w, r)
+		case MT4ServiceGetAccountInfoProcedure:
+			mT4ServiceGetAccountInfoHandler.ServeHTTP(w, r)
+		case MT4ServiceGetPositionsProcedure:
+			mT4ServiceGetPositionsHandler.ServeHTTP(w, r)
+		case MT4ServiceGetHistoryProcedure:
+			mT4ServiceGetHistoryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -61,3 +200,23 @@ func NewMT4ServiceHandler(svc MT4ServiceHandler, opts ...connect.HandlerOption) 
 
 // UnimplementedMT4ServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedMT4ServiceHandler struct{}
+
+func (UnimplementedMT4ServiceHandler) AddAccount(context.Context, *connect.Request[v1.AddMT4AccountRequest]) (*connect.Response[v1.MT4Account], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT4Service.AddAccount is not implemented"))
+}
+
+func (UnimplementedMT4ServiceHandler) RemoveAccount(context.Context, *connect.Request[v1.RemoveMT4AccountRequest]) (*connect.Response[v1.RemoveMT4AccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT4Service.RemoveAccount is not implemented"))
+}
+
+func (UnimplementedMT4ServiceHandler) GetAccountInfo(context.Context, *connect.Request[v1.GetMT4AccountInfoRequest]) (*connect.Response[v1.MT4AccountInfo], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT4Service.GetAccountInfo is not implemented"))
+}
+
+func (UnimplementedMT4ServiceHandler) GetPositions(context.Context, *connect.Request[v1.GetMT4PositionsRequest]) (*connect.Response[v1.MT4PositionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT4Service.GetPositions is not implemented"))
+}
+
+func (UnimplementedMT4ServiceHandler) GetHistory(context.Context, *connect.Request[v1.GetMT4HistoryRequest]) (*connect.Response[v1.MT4HistoryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.MT4Service.GetHistory is not implemented"))
+}

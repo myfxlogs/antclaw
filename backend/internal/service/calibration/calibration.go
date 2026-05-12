@@ -84,10 +84,7 @@ func (p *Platt) Fit(scores []float64, outcomes []bool) error {
 		return ll
 	}
 	x0 := [2]float64{-1.0, math.Log(float64(neg+1) / float64(pos+1))}
-	best, ok := nelderMead2(negLL, x0, 1000, 1e-9)
-	if !ok {
-		// 可接受性退化
-	}
+	best, _ := nelderMead2(negLL, x0, 1000, 1e-9)
 	p.A = best[0]
 	p.B = best[1]
 	p.NSample = n

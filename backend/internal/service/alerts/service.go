@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 
 	alertv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/jackc/pgx/v5"
@@ -120,27 +119,6 @@ RETURNING id,user_id,alert_type,symbol,params::text,enabled,COALESCE(EXTRACT(EPO
 		return nil, err
 	}
 	return &rule, nil
-}
-
-func (s *Service) listActiveByType(ctx context.Context, alertType string) ([]*alertv1.AlertRule, error) {
-	rows, err := s.pool.Query(ctx, `SELECT id,user_id,alert_type,symbol,params::text,enabled,COALESCE(EXTRACT(EPOCH FROM last_fired_at)::bigint,0),cooldown_seconds
-FROM user_signal_alerts WHERE enabled=true AND deleted_at IS NULL AND alert_type=$1`, alertType)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	return pgx.CollectRows(rows, func(r pgx.CollectableRow) (*alertv1.AlertRule, error) {
-		var x alertv1.AlertRule
-		if err := r.Scan(&x.Id, &x.UserId, &x.AlertType, &x.Symbol, &x.ParamsJson, &x.Enabled, &x.LastFiredAt, &x.CooldownSeconds); err != nil {
-			return nil, err
-		}
-		return &x, nil
-	})
-}
-
-func (s *Service) markFired(ctx context.Context, id int64, at time.Time) error {
-	_, err := s.pool.Exec(ctx, `UPDATE user_signal_alerts SET last_fired_at=$1,updated_at=NOW() WHERE id=$2`, at, id)
-	return err
 }
 
 // Legacy API compatibility

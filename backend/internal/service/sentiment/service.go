@@ -41,24 +41,6 @@ func sentimentLabel(score float64) string {
 	}
 }
 
-func convertToOnchain(sentiments []*sentv1.SentimentData) []*sentv1.OnchainMetric {
-	metrics := make([]*sentv1.OnchainMetric, len(sentiments))
-	for i, s := range sentiments {
-		trend := "stable"
-		if s.Score > 0.2 {
-			trend = "rising"
-		} else if s.Score < -0.2 {
-			trend = "falling"
-		}
-		metrics[i] = &sentv1.OnchainMetric{
-			Name:   s.Source,
-			Value:  s.Score,
-			Trend:  trend,
-		}
-	}
-	return metrics
-}
-
 // GetSentiment 从 sentiment_snapshots 读取最近一条真实 fear_greed，赋予全资产复用（F&G 是跨资产加密情绪指标）。
 // score: -100..100 已存 score 列；fear_greed: 0..100。
 func (s *Service) GetSentiment(ctx context.Context, asset string) (*sentv1.GetSentimentResponse, error) {
@@ -98,21 +80,6 @@ func (s *Service) GetSentiment(ctx context.Context, asset string) (*sentv1.GetSe
 	}
 	_ = scoreToFG // 引用保留
 	return &sentv1.GetSentimentResponse{Sentiment: primary, Components: components}, nil
-}
-
-func convertToSentiments(metrics []*sentv1.OnchainMetric) []*sentv1.SentimentData {
-	now := time.Now().Format(time.RFC3339)
-	result := make([]*sentv1.SentimentData, len(metrics))
-	for i, m := range metrics {
-		result[i] = &sentv1.SentimentData{
-			Asset:     m.Name,
-			Score:     m.Value,
-			Label:     sentimentLabel(m.Value),
-			Source:    m.Name,
-			Timestamp: now,
-		}
-	}
-	return result
 }
 
 // GetOnchain 从 onchain_metrics 读取最近一天 asset 的各项指标（宝塔表）。

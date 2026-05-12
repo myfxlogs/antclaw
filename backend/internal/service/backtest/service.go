@@ -34,6 +34,13 @@ func NewService(pool *pgxpool.Pool) *Service {
 
 // RunBacktest runs a new backtest and returns a task ID.
 func (s *Service) RunBacktest(ctx context.Context, config *backtestv1.BacktestConfig, idempotencyKey string) (*backtestv1.RunBacktestResponse, error) {
+	if s.pool == nil {
+		return nil, fmt.Errorf("backtest: postgres pool not configured")
+	}
+	if config.Pair == "" {
+		return nil, fmt.Errorf("backtest: pair required")
+	}
+
 	taskID := fmt.Sprintf("bt-%d", time.Now().UnixNano())
 
 	// Store initial pending task
@@ -43,91 +50,17 @@ func (s *Service) RunBacktest(ctx context.Context, config *backtestv1.BacktestCo
 		Config: config,
 	}
 
-	// Simulate async execution
-	go s.simulateBacktest(taskID, config)
+	// Run real engine async
+	to := time.Now().UTC()
+	from := to.AddDate(-1, 0, 0) // 1 year lookback
+	go func() {
+		_ = s.runEngine(context.Background(), "cta", taskID, config.Pair, from, to)
+	}()
 
 	return &backtestv1.RunBacktestResponse{
 		TaskId: taskID,
 		Status: "pending",
 	}, nil
-}
-
-// simulateBacktest simulates backtest execution with sample data.
-func (s *Service) simulateBacktest(taskID string, config *backtestv1.BacktestConfig) {
-	// Simulate processing time
-	time.Sleep(100 * time.Millisecond)
-
-	// Update to running
-	if task, ok := s.tasks[taskID]; ok {
-		task.Status = "running"
-	}
-
-	// Generate sample trades
-	trades := []*backtestv1.TradeRecord{
-		{
-			TradeId:    "trade-001",
-			EntryTime:  time.Now().Add(-48 * time.Hour).Format(time.RFC3339),
-			ExitTime:   time.Now().Add(-36 * time.Hour).Format(time.RFC3339),
-			Direction:  "long",
-			EntryPrice: "1.0850",
-			ExitPrice:  "1.0920",
-			Pnl:        "70.0",
-			PnlPct:     "0.65",
-		},
-		{
-			TradeId:    "trade-002",
-			EntryTime:  time.Now().Add(-24 * time.Hour).Format(time.RFC3339),
-			ExitTime:   time.Now().Add(-12 * time.Hour).Format(time.RFC3339),
-			Direction:  "short",
-			EntryPrice: "1.0950",
-			ExitPrice:  "1.0880",
-			Pnl:        "70.0",
-			PnlPct:     "0.64",
-		},
-		{
-			TradeId:    "trade-003",
-			EntryTime:  time.Now().Add(-6 * time.Hour).Format(time.RFC3339),
-			ExitTime:   time.Now().Add(-1 * time.Hour).Format(time.RFC3339),
-			Direction:  "long",
-			EntryPrice: "1.0900",
-			ExitPrice:  "1.0870",
-			Pnl:        "-30.0",
-			PnlPct:     "-0.28",
-		},
-	}
-
-	// Calculate metrics
-	var totalTrades int32 = int32(len(trades))
-	var winCount int32
-	var totalPnL float64
-	for _, trade := range trades {
-		if trade.Pnl[0] != '-' {
-			winCount++
-		}
-		// Simple parse
-		var pnl float64
-		fmt.Sscanf(trade.Pnl, "%f", &pnl)
-		totalPnL += pnl
-	}
-
-	winRate := float64(winCount) / float64(totalTrades) * 100
-
-	// Update completed task
-	s.tasks[taskID] = &backtestv1.GetBacktestResponse{
-		TaskId: taskID,
-		Status: "completed",
-		Config: config,
-		Metrics: &backtestv1.BacktestMetrics{
-			TotalReturn:    fmt.Sprintf("%.2f", totalPnL),
-			TotalReturnPct: "1.01",
-			SharpeRatio:    1.35,
-			MaxDrawdown:    0.05,
-			WinRate:        winRate,
-			TotalTrades:    totalTrades,
-			ProfitFactor:   2.33,
-		},
-		Trades: trades,
-	}
 }
 
 // GetBacktest returns the backtest result by task ID.
