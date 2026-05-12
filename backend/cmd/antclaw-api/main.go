@@ -50,7 +50,8 @@ import (
 )
 
 func main() {
-	if err := auth.LoadKeys(); err != nil {
+boot := time.Now()
+if err := auth.LoadKeys(); err != nil {
 		log.Fatalf("failed to load JWT keys: %v", err)
 	}
 
@@ -173,6 +174,10 @@ func main() {
 	// AuthHandler with real PostgreSQL store
 	authHandler := rpc.NewAuthHandler(userStore, nil, auditSvc)
 
+	// SystemService with health check（依赖 boot time、pgPool、redis）
+	systemHandler := rpc.NewSystemHandler(pgPool, redisClient, boot)
+
+
 	// Create HTTP mux and register Connect RPC handlers
 	mux := http.NewServeMux()
 
@@ -180,6 +185,7 @@ func main() {
 	mux.Handle(antclawv1connect.NewAuthServiceHandler(authHandler))
 	cryptoHandler := rpc.NewCryptoConnectHandler(rsaMgr, redisClient)
 	mux.Handle(antclawv1connect.NewCryptoServiceHandler(cryptoHandler))
+	mux.Handle(antclawv1connect.NewSystemServiceHandler(systemHandler))
 	mux.Handle(antclawv1connect.NewPriceServiceHandler(priceHandler))
 	mux.Handle(antclawv1connect.NewVolServiceHandler(volHandler))
 	mux.Handle(antclawv1connect.NewSignalsServiceHandler(signalsHandler))
