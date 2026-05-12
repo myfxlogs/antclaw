@@ -70,25 +70,15 @@ jobs:
         if: always()
         run: docker compose -f deploy/docker-compose.yaml down -v
 
-  buf-lint:
-    name: Protobuf Lint
+  buf:
+    name: Protobuf Lint & Breaking
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v1.50.0
+      - uses: bufbuild/buf-action@v1
         with:
           version: 1.46.0
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Buf lint
-        run: buf lint
-      - name: Buf breaking
-        run: |
-          # 仅在非 main 分支上对 main 做 breaking 检查；main 推送时跳过
-          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
-            buf breaking --against '.git#branch=main'
-          else
-            echo "skipping buf breaking on main"
-          fi
 
   frontend-lint:
     name: Frontend Lint
