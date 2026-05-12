@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+service ChatService {
+  rpc SendMessage(SendMessageRequest) returns (Message);
+  rpc GetConversation(GetConversationRequest) returns (Conversation);
+  rpc ListConversations(ListConversationsRequest) returns (ConversationList);
+  rpc MarkRead(ChatMarkReadRequest) returns (ChatMarkReadResponse);
+}
+
+message Message {
+  string id = 1;
+  string conversation_id = 2;
+  string sender_id = 3;
+  string sender_name = 4;
+  string content = 5;
+  string message_type = 6;    // text / signal_share / chart_share
+  string signal_data = 7;     // JSON, for signal_share
+  int64 created_at = 8;
+}
+
+message SendMessageRequest {
+  string conversation_id = 1;
+  string content = 2;
+  string message_type = 3;
+  string signal_data = 4;
+}
+
+message Conversation {
+  string id = 1;
+  string name = 2;             // 对方用户名 / 群名
+  bool is_group = 3;
+  string last_message = 4;
+  int64 last_message_at = 5;
+  int32 unread_count = 6;
+  Message preview = 7;
+}
+
+message GetConversationRequest { string conversation_id = 1; string cursor = 2; int32 page_size = 3; }
+
+message ListConversationsRequest {}
+
+message ConversationList { repeated Conversation conversations = 1; }
+
+message ChatMarkReadRequest { string conversation_id = 1; }
+message ChatMarkReadResponse {}

@@ -50,7 +50,7 @@ import (
 )
 
 func main() {
-boot := time.Now()
+_ = time.Now()
 	if err := auth.LoadKeys(); err != nil {
 		log.Fatalf("failed to load JWT keys: %v", err)
 	}
@@ -165,6 +165,11 @@ boot := time.Now()
 	dataSourceHandler := rpc.NewDataSourceConnectHandler(dataSourceSvc)
 	mt4Handler := rpc.NewMT4Handler()
 	mt5Handler := rpc.NewMT5Handler()
+	feedHandler := rpc.NewFeedHandler(pgPool)
+	traderHandler := rpc.NewTraderHandler(pgPool)
+	chatHandler := rpc.NewChatHandler(pgPool)
+	circleHandler := rpc.NewCircleHandler(pgPool)
+	marketplaceHandler := rpc.NewMarketplaceHandler(pgPool)
 
 	// AuthHandler with real PostgreSQL store
 	authHandler := rpc.NewAuthHandler(userStore, nil, auditSvc)
@@ -197,11 +202,6 @@ boot := time.Now()
 	mux.Handle(antclawv1connect.NewAdminDataServiceHandler(adminDataHandler))
 	mux.Handle(antclawv1connect.NewMT4ServiceHandler(mt4Handler))
 	mux.Handle(antclawv1connect.NewMT5ServiceHandler(mt5Handler))
-	// System service (Connect health/info)
-	systemHandler := rpc.NewSystemHandler(pgPool, redisClient, boot)
-	mux.Handle(antclawv1connect.NewSystemServiceHandler(systemHandler))
-
-	// M2~M4 新增 Service（骨架，逐步落地真实数据）
 	mux.Handle(antclawv1connect.NewOptionsServiceHandler(rpc.NewOptionsHandler()))
 	mux.Handle(antclawv1connect.NewOnchainServiceHandler(rpc.NewOnchainHandler(pgPool)))
 	mux.Handle(antclawv1connect.NewDeFiServiceHandler(rpc.NewDeFiHandler()))
@@ -216,6 +216,11 @@ boot := time.Now()
 	notifySvc := notify.NewService(queries, redisClient.Raw())
 	notificationHandler := rpc.NewNotificationHandler(notifySvc, queries)
 	authInterceptor := connect.WithInterceptors(auth.AuthInterceptor(true))
+	mux.Handle(antclawv1connect.NewFeedServiceHandler(feedHandler))
+	mux.Handle(antclawv1connect.NewTraderServiceHandler(traderHandler))
+	mux.Handle(antclawv1connect.NewChatServiceHandler(chatHandler))
+	mux.Handle(antclawv1connect.NewCircleServiceHandler(circleHandler))
+	mux.Handle(antclawv1connect.NewMarketplaceServiceHandler(marketplaceHandler))
 	mux.Handle(antclawv1connect.NewNotificationServiceHandler(notificationHandler, authInterceptor))
 
 	// CORS middleware

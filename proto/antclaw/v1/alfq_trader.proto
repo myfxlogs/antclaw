@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// TraderService — AlfQ 交易者档案（M3 阶段）。
+service TraderService {
+  rpc GetProfile(GetTraderProfileRequest) returns (TraderProfile);
+  rpc UpdateProfile(UpdateTraderProfileRequest) returns (TraderProfile);
+  rpc Follow(FollowRequest) returns (FollowResponse);
+  rpc Unfollow(UnfollowRequest) returns (FollowResponse);
+  rpc GetFollowers(GetFollowersRequest) returns (UserList);
+  rpc GetFollowing(GetFollowingRequest) returns (UserList);
+}
+
+message TraderProfile {
+  string user_id = 1;
+  string display_name = 2;
+  string bio = 3;
+  string tier = 4;             // normal / verified / elite
+  bool show_win_rate = 5;
+  bool show_profit_factor = 6;
+  bool show_sharpe = 7;
+  bool show_total_trades = 8;
+  // Stats (only populated if user opted in)
+  double win_rate = 9;
+  double profit_factor = 10;
+  double sharpe_ratio = 11;
+  int32 total_trades = 12;
+  int32 follower_count = 13;
+  int32 following_count = 14;
+  int64 created_at = 15;
+}
+
+message GetTraderProfileRequest { string user_id = 1; }
+message UpdateTraderProfileRequest {
+  string display_name = 1;
+  string bio = 2;
+  bool show_win_rate = 3;
+  bool show_profit_factor = 4;
+  bool show_sharpe = 5;
+  bool show_total_trades = 6;
+}
+
+message FollowRequest { string target_user_id = 1; }
+message FollowResponse { bool success = 1; int32 follower_count = 2; }
+message UnfollowRequest { string target_user_id = 1; }
+
+message GetFollowersRequest { string user_id = 1; string cursor = 2; int32 page_size = 3; }
+message GetFollowingRequest { string user_id = 1; string cursor = 2; int32 page_size = 3; }
+
+message UserList {
+  repeated UserInfo users = 1;
+  string next_cursor = 2;
+}
+
+message UserInfo {
+  string user_id = 1;
+  string display_name = 2;
+  string tier = 3;
+  int32 follower_count = 4;
+}

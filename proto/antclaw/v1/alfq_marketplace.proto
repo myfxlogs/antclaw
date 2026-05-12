@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+service MarketplaceService {
+  rpc ListProducts(ListProductsRequest) returns (ProductList);
+  rpc PublishProduct(PublishProductRequest) returns (Product);
+  rpc PurchaseProduct(PurchaseProductRequest) returns (Purchase);
+  rpc GetMyProducts(GetMyProductsRequest) returns (ProductList);
+  rpc GetMyPurchases(GetMyPurchasesRequest) returns (PurchaseList);
+}
+
+message Product {
+  string id = 1;
+  string author_id = 2;
+  string author_name = 3;
+  string name = 4;
+  string category = 5;        // strategy / indicator / signal / ea
+  string description = 6;
+  string symbol = 7;
+  string purchase_type = 8;   // subscription / one_time
+  double price = 9;
+  int32 trial_days = 10;
+  double rating = 11;
+  int32 purchase_count = 12;
+  int64 created_at = 13;
+}
+
+message PublishProductRequest {
+  string name = 1;
+  string category = 2;
+  string description = 3;
+  string symbol = 4;
+  string purchase_type = 5;
+  double price = 6;
+  int32 trial_days = 7;
+}
+
+message PurchaseProductRequest {
+  string product_id = 1;
+  bool start_trial = 2;
+}
+
+message Purchase {
+  string id = 1;
+  string product_id = 2;
+  string product_name = 3;
+  bool is_trial = 4;
+  int64 expires_at = 5;
+  int64 created_at = 6;
+}
+
+message ListProductsRequest { string category = 1; string cursor = 2; int32 page_size = 3; }
+message ProductList { repeated Product products = 1; string next_cursor = 2; }
+message GetMyProductsRequest { string cursor = 1; int32 page_size = 2; }
+message GetMyPurchasesRequest { string cursor = 1; int32 page_size = 2; }
+message PurchaseList { repeated Purchase purchases = 1; string next_cursor = 2; }

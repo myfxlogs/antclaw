@@ -4,11 +4,114 @@ package antclaw.v1;
 
 option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
 
-// MT5Service provides MT5 equivalence layer (reserved for later phase).
+// MT5Service — MetaTrader 5 只读接入（M0.5 阶段）。
+// 账号绑定、余额/持仓查询、历史订单拉取。
+// 交易执行属于远期规划（策略绑定 MT 自动执行，非跟单）。
 service MT5Service {
-  // RPCs return UNIMPLEMENTED in MVP
+  // 添加 MT5 账号（server + account + investor_password → 连接验证）
+  rpc AddAccount(AddMT5AccountRequest) returns (MT5Account);
+
+  // 删除已绑定账号
+  rpc RemoveAccount(RemoveMT5AccountRequest) returns (RemoveMT5AccountResponse);
+
+  // 查询账号概览（余额/净值/保证金）
+  rpc GetAccountInfo(GetMT5AccountInfoRequest) returns (MT5AccountInfo);
+
+  // 查询当前持仓
+  rpc GetPositions(GetMT5PositionsRequest) returns (MT5PositionsResponse);
+
+  // 查询历史订单（用于战绩计算）
+  rpc GetHistory(GetMT5HistoryRequest) returns (MT5HistoryResponse);
 }
 
-// Placeholder messages for P2 skeleton
-message MT5PlaceHolderRequest {}
-message MT5PlaceHolderResponse {}
+// ---- 消息定义 ----
+
+message AddMT5AccountRequest {
+  string server = 1;     // e.g. "ICMarkets-Demo"
+  string account = 2;    // e.g. "88005522"
+  string investor_password = 3; // 只读密码（强制要求，不能是主密码）
+  string label = 4;      // 用户自定义标签（可选）
+  bool is_demo = 5;      // 模拟盘/实盘标记
+}
+
+message MT5Account {
+  string id = 1;               // 服务端生成的 UUID
+  string server = 2;
+  string account = 3;
+  string label = 4;
+  bool is_demo = 5;
+  bool connected = 6;          // 当前是否可连接
+  int64 created_at = 7;        // unix timestamp
+}
+
+message RemoveMT5AccountRequest {
+  string id = 1;   // 账号 UUID
+}
+
+message RemoveMT5AccountResponse {
+  bool success = 1;
+}
+
+message GetMT5AccountInfoRequest {
+  string id = 1;   // 账号 UUID
+}
+
+message MT5AccountInfo {
+  string id = 1;
+  double balance = 2;         // 余额
+  double equity = 3;          // 净值
+  double margin = 4;          // 已用保证金
+  double free_margin = 5;     // 可用保证金
+  double margin_level = 6;    // 保证金水平 (%)
+  double today_pnl = 7;       // 今日浮动盈亏
+  int32 position_count = 8;   // 持仓数
+  int64 updated_at = 9;       // unix timestamp
+}
+
+message GetMT5PositionsRequest {
+  string id = 1;   // 账号 UUID
+}
+
+message MT5PositionsResponse {
+  repeated MT5Position positions = 1;
+}
+
+message MT5Position {
+  int64 ticket = 1;           // 持仓单号
+  string symbol = 2;          // 品种
+  string type = 3;            // BUY / SELL
+  double volume = 4;          // 手数
+  double open_price = 5;      // 开仓价
+  double current_price = 6;   // 当前价
+  double stop_loss = 7;       // 止损
+  double take_profit = 8;     // 止盈
+  double profit = 9;          // 浮动盈亏
+  double swap = 10;           // 库存费
+  int64 open_time = 11;       // unix timestamp
+}
+
+message GetMT5HistoryRequest {
+  string id = 1;              // 账号 UUID
+  int64 from_time = 2;        // 起始时间（unix timestamp），默认最近 90 天
+  int32 max_count = 3;        // 最大条数，默认 200
+}
+
+message MT5HistoryResponse {
+  repeated MT5Order history_orders = 1;
+  int32 total_count = 2;
+}
+
+message MT5Order {
+  int64 ticket = 1;
+  string symbol = 2;
+  string type = 3;            // BUY / SELL
+  double volume = 4;
+  double open_price = 5;
+  double close_price = 6;
+  double profit = 7;          // 平仓盈亏
+  double swap = 8;
+  double commission = 9;
+  int64 open_time = 10;
+  int64 close_time = 11;
+  string comment = 12;        // 订单注释
+}

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// FeedService — AlfQ 社交 Feed（M3 阶段）。
+service FeedService {
+  rpc CreatePost(CreatePostRequest) returns (Post);
+  rpc GetFeed(GetFeedRequest) returns (FeedResponse);
+  rpc GetPost(GetPostRequest) returns (Post);
+  rpc LikePost(LikePostRequest) returns (Post);
+  rpc UnlikePost(UnlikePostRequest) returns (Post);
+  rpc CommentOnPost(CommentRequest) returns (Comment);
+  rpc SharePost(SharePostRequest) returns (Post);
+}
+
+message Post {
+  string id = 1;
+  string author_id = 2;
+  string author_name = 3;
+  string content = 4;
+  string post_type = 5;       // text / signal_card / chart_share
+  string signal_pair = 6;     // optional, for signal_card
+  string signal_direction = 7;
+  int32 signal_confidence = 8;
+  string visibility = 9;      // public / circle / followers
+  string circle_id = 10;      // if visibility=circle
+  int32 like_count = 11;
+  int32 comment_count = 12;
+  int32 share_count = 13;
+  repeated string liked_by = 14;
+  int64 created_at = 15;
+}
+
+message CreatePostRequest {
+  string content = 1;
+  string post_type = 2;
+  string signal_pair = 3;
+  string signal_direction = 4;
+  int32 signal_confidence = 5;
+  string visibility = 6;
+  string circle_id = 7;
+}
+
+message GetFeedRequest {
+  string cursor = 1;
+  int32 page_size = 2;   // default 20
+  string filter = 3;     // all / signals_only / posts_only
+}
+
+message FeedResponse {
+  repeated Post posts = 1;
+  string next_cursor = 2;
+}
+
+message GetPostRequest { string post_id = 1; }
+
+message LikePostRequest { string post_id = 1; }
+message UnlikePostRequest { string post_id = 1; }
+
+message Comment {
+  string id = 1;
+  string post_id = 2;
+  string author_id = 3;
+  string author_name = 4;
+  string content = 5;
+  int64 created_at = 6;
+}
+
+message CommentRequest {
+  string post_id = 1;
+  string content = 2;
+}
+
+message SharePostRequest {
+  string post_id = 1;
+  string comment = 2;    // optional quote
+}

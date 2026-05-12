@@ -10,44 +10,552 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/mt5.proto.
  */
 export const file_antclaw_v1_mt5: GenFile = /*@__PURE__*/
-  fileDesc("ChRhbnRjbGF3L3YxL210NS5wcm90bxIKYW50Y2xhdy52MSIXChVNVDVQbGFjZUhvbGRlclJlcXVlc3QiGAoWTVQ1UGxhY2VIb2xkZXJSZXNwb25zZTIMCgpNVDVTZXJ2aWNlQpsBCg5jb20uYW50Y2xhdy52MUIITXQ1UHJvdG9QAVo2Z2l0aHViLmNvbS9hbnRjbGF3L2FudGNsYXcvZ2VuL2dvL2FudGNsYXcvdjE7YW50Y2xhd3YxogIDQVhYqgIKQW50Y2xhdy5WMcoCCkFudGNsYXdcVjHiAhZBbnRjbGF3XFYxXEdQQk1ldGFkYXRh6gILQW50Y2xhdzo6VjFiBnByb3RvMw");
+  fileDesc("ChRhbnRjbGF3L3YxL210NS5wcm90bxIKYW50Y2xhdy52MSJyChRBZGRNVDVBY2NvdW50UmVxdWVzdBIOCgZzZXJ2ZXIYASABKAkSDwoHYWNjb3VudBgCIAEoCRIZChFpbnZlc3Rvcl9wYXNzd29yZBgDIAEoCRINCgVsYWJlbBgEIAEoCRIPCgdpc19kZW1vGAUgASgIIoABCgpNVDVBY2NvdW50EgoKAmlkGAEgASgJEg4KBnNlcnZlchgCIAEoCRIPCgdhY2NvdW50GAMgASgJEg0KBWxhYmVsGAQgASgJEg8KB2lzX2RlbW8YBSABKAgSEQoJY29ubmVjdGVkGAYgASgIEhIKCmNyZWF0ZWRfYXQYByABKAMiJQoXUmVtb3ZlTVQ1QWNjb3VudFJlcXVlc3QSCgoCaWQYASABKAkiKwoYUmVtb3ZlTVQ1QWNjb3VudFJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAgiJgoYR2V0TVQ1QWNjb3VudEluZm9SZXF1ZXN0EgoKAmlkGAEgASgJIrcBCg5NVDVBY2NvdW50SW5mbxIKCgJpZBgBIAEoCRIPCgdiYWxhbmNlGAIgASgBEg4KBmVxdWl0eRgDIAEoARIOCgZtYXJnaW4YBCABKAESEwoLZnJlZV9tYXJnaW4YBSABKAESFAoMbWFyZ2luX2xldmVsGAYgASgBEhEKCXRvZGF5X3BubBgHIAEoARIWCg5wb3NpdGlvbl9jb3VudBgIIAEoBRISCgp1cGRhdGVkX2F0GAkgASgDIiQKFkdldE1UNVBvc2l0aW9uc1JlcXVlc3QSCgoCaWQYASABKAkiQgoUTVQ1UG9zaXRpb25zUmVzcG9uc2USKgoJcG9zaXRpb25zGAEgAygLMhcuYW50Y2xhdy52MS5NVDVQb3NpdGlvbiLPAQoLTVQ1UG9zaXRpb24SDgoGdGlja2V0GAEgASgDEg4KBnN5bWJvbBgCIAEoCRIMCgR0eXBlGAMgASgJEg4KBnZvbHVtZRgEIAEoARISCgpvcGVuX3ByaWNlGAUgASgBEhUKDWN1cnJlbnRfcHJpY2UYBiABKAESEQoJc3RvcF9sb3NzGAcgASgBEhMKC3Rha2VfcHJvZml0GAggASgBEg4KBnByb2ZpdBgJIAEoARIMCgRzd2FwGAogASgBEhEKCW9wZW5fdGltZRgLIAEoAyJIChRHZXRNVDVIaXN0b3J5UmVxdWVzdBIKCgJpZBgBIAEoCRIRCglmcm9tX3RpbWUYAiABKAMSEQoJbWF4X2NvdW50GAMgASgFIlcKEk1UNUhpc3RvcnlSZXNwb25zZRIsCg5oaXN0b3J5X29yZGVycxgBIAMoCzIULmFudGNsYXcudjEuTVQ1T3JkZXISEwoLdG90YWxfY291bnQYAiABKAUi2wEKCE1UNU9yZGVyEg4KBnRpY2tldBgBIAEoAxIOCgZzeW1ib2wYAiABKAkSDAoEdHlwZRgDIAEoCRIOCgZ2b2x1bWUYBCABKAESEgoKb3Blbl9wcmljZRgFIAEoARITCgtjbG9zZV9wcmljZRgGIAEoARIOCgZwcm9maXQYByABKAESDAoEc3dhcBgIIAEoARISCgpjb21taXNzaW9uGAkgASgBEhEKCW9wZW5fdGltZRgKIAEoAxISCgpjbG9zZV90aW1lGAsgASgDEg8KB2NvbW1lbnQYDCABKAkyqgMKCk1UNVNlcnZpY2USRgoKQWRkQWNjb3VudBIgLmFudGNsYXcudjEuQWRkTVQ1QWNjb3VudFJlcXVlc3QaFi5hbnRjbGF3LnYxLk1UNUFjY291bnQSWgoNUmVtb3ZlQWNjb3VudBIjLmFudGNsYXcudjEuUmVtb3ZlTVQ1QWNjb3VudFJlcXVlc3QaJC5hbnRjbGF3LnYxLlJlbW92ZU1UNUFjY291bnRSZXNwb25zZRJSCg5HZXRBY2NvdW50SW5mbxIkLmFudGNsYXcudjEuR2V0TVQ1QWNjb3VudEluZm9SZXF1ZXN0GhouYW50Y2xhdy52MS5NVDVBY2NvdW50SW5mbxJUCgxHZXRQb3NpdGlvbnMSIi5hbnRjbGF3LnYxLkdldE1UNVBvc2l0aW9uc1JlcXVlc3QaIC5hbnRjbGF3LnYxLk1UNVBvc2l0aW9uc1Jlc3BvbnNlEk4KCkdldEhpc3RvcnkSIC5hbnRjbGF3LnYxLkdldE1UNUhpc3RvcnlSZXF1ZXN0Gh4uYW50Y2xhdy52MS5NVDVIaXN0b3J5UmVzcG9uc2VCmwEKDmNvbS5hbnRjbGF3LnYxQghNdDVQcm90b1ABWjZnaXRodWIuY29tL2FudGNsYXcvYW50Y2xhdy9nZW4vZ28vYW50Y2xhdy92MTthbnRjbGF3djGiAgNBWFiqAgpBbnRjbGF3LlYxygIKQW50Y2xhd1xWMeICFkFudGNsYXdcVjFcR1BCTWV0YWRhdGHqAgtBbnRjbGF3OjpWMWIGcHJvdG8z");
 
 /**
- * Placeholder messages for P2 skeleton
- *
- * @generated from message antclaw.v1.MT5PlaceHolderRequest
+ * @generated from message antclaw.v1.AddMT5AccountRequest
  */
-export type MT5PlaceHolderRequest = Message<"antclaw.v1.MT5PlaceHolderRequest"> & {
+export type AddMT5AccountRequest = Message<"antclaw.v1.AddMT5AccountRequest"> & {
+  /**
+   * e.g. "ICMarkets-Demo"
+   *
+   * @generated from field: string server = 1;
+   */
+  server: string;
+
+  /**
+   * e.g. "88005522"
+   *
+   * @generated from field: string account = 2;
+   */
+  account: string;
+
+  /**
+   * 只读密码（强制要求，不能是主密码）
+   *
+   * @generated from field: string investor_password = 3;
+   */
+  investorPassword: string;
+
+  /**
+   * 用户自定义标签（可选）
+   *
+   * @generated from field: string label = 4;
+   */
+  label: string;
+
+  /**
+   * 模拟盘/实盘标记
+   *
+   * @generated from field: bool is_demo = 5;
+   */
+  isDemo: boolean;
 };
 
 /**
- * Describes the message antclaw.v1.MT5PlaceHolderRequest.
- * Use `create(MT5PlaceHolderRequestSchema)` to create a new message.
+ * Describes the message antclaw.v1.AddMT5AccountRequest.
+ * Use `create(AddMT5AccountRequestSchema)` to create a new message.
  */
-export const MT5PlaceHolderRequestSchema: GenMessage<MT5PlaceHolderRequest> = /*@__PURE__*/
+export const AddMT5AccountRequestSchema: GenMessage<AddMT5AccountRequest> = /*@__PURE__*/
   messageDesc(file_antclaw_v1_mt5, 0);
 
 /**
- * @generated from message antclaw.v1.MT5PlaceHolderResponse
+ * @generated from message antclaw.v1.MT5Account
  */
-export type MT5PlaceHolderResponse = Message<"antclaw.v1.MT5PlaceHolderResponse"> & {
+export type MT5Account = Message<"antclaw.v1.MT5Account"> & {
+  /**
+   * 服务端生成的 UUID
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string server = 2;
+   */
+  server: string;
+
+  /**
+   * @generated from field: string account = 3;
+   */
+  account: string;
+
+  /**
+   * @generated from field: string label = 4;
+   */
+  label: string;
+
+  /**
+   * @generated from field: bool is_demo = 5;
+   */
+  isDemo: boolean;
+
+  /**
+   * 当前是否可连接
+   *
+   * @generated from field: bool connected = 6;
+   */
+  connected: boolean;
+
+  /**
+   * unix timestamp
+   *
+   * @generated from field: int64 created_at = 7;
+   */
+  createdAt: bigint;
 };
 
 /**
- * Describes the message antclaw.v1.MT5PlaceHolderResponse.
- * Use `create(MT5PlaceHolderResponseSchema)` to create a new message.
+ * Describes the message antclaw.v1.MT5Account.
+ * Use `create(MT5AccountSchema)` to create a new message.
  */
-export const MT5PlaceHolderResponseSchema: GenMessage<MT5PlaceHolderResponse> = /*@__PURE__*/
+export const MT5AccountSchema: GenMessage<MT5Account> = /*@__PURE__*/
   messageDesc(file_antclaw_v1_mt5, 1);
 
 /**
- * MT5Service provides MT5 equivalence layer (reserved for later phase).
- *
- * RPCs return UNIMPLEMENTED in MVP
+ * @generated from message antclaw.v1.RemoveMT5AccountRequest
+ */
+export type RemoveMT5AccountRequest = Message<"antclaw.v1.RemoveMT5AccountRequest"> & {
+  /**
+   * 账号 UUID
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message antclaw.v1.RemoveMT5AccountRequest.
+ * Use `create(RemoveMT5AccountRequestSchema)` to create a new message.
+ */
+export const RemoveMT5AccountRequestSchema: GenMessage<RemoveMT5AccountRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 2);
+
+/**
+ * @generated from message antclaw.v1.RemoveMT5AccountResponse
+ */
+export type RemoveMT5AccountResponse = Message<"antclaw.v1.RemoveMT5AccountResponse"> & {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+};
+
+/**
+ * Describes the message antclaw.v1.RemoveMT5AccountResponse.
+ * Use `create(RemoveMT5AccountResponseSchema)` to create a new message.
+ */
+export const RemoveMT5AccountResponseSchema: GenMessage<RemoveMT5AccountResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 3);
+
+/**
+ * @generated from message antclaw.v1.GetMT5AccountInfoRequest
+ */
+export type GetMT5AccountInfoRequest = Message<"antclaw.v1.GetMT5AccountInfoRequest"> & {
+  /**
+   * 账号 UUID
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetMT5AccountInfoRequest.
+ * Use `create(GetMT5AccountInfoRequestSchema)` to create a new message.
+ */
+export const GetMT5AccountInfoRequestSchema: GenMessage<GetMT5AccountInfoRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 4);
+
+/**
+ * @generated from message antclaw.v1.MT5AccountInfo
+ */
+export type MT5AccountInfo = Message<"antclaw.v1.MT5AccountInfo"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * 余额
+   *
+   * @generated from field: double balance = 2;
+   */
+  balance: number;
+
+  /**
+   * 净值
+   *
+   * @generated from field: double equity = 3;
+   */
+  equity: number;
+
+  /**
+   * 已用保证金
+   *
+   * @generated from field: double margin = 4;
+   */
+  margin: number;
+
+  /**
+   * 可用保证金
+   *
+   * @generated from field: double free_margin = 5;
+   */
+  freeMargin: number;
+
+  /**
+   * 保证金水平 (%)
+   *
+   * @generated from field: double margin_level = 6;
+   */
+  marginLevel: number;
+
+  /**
+   * 今日浮动盈亏
+   *
+   * @generated from field: double today_pnl = 7;
+   */
+  todayPnl: number;
+
+  /**
+   * 持仓数
+   *
+   * @generated from field: int32 position_count = 8;
+   */
+  positionCount: number;
+
+  /**
+   * unix timestamp
+   *
+   * @generated from field: int64 updated_at = 9;
+   */
+  updatedAt: bigint;
+};
+
+/**
+ * Describes the message antclaw.v1.MT5AccountInfo.
+ * Use `create(MT5AccountInfoSchema)` to create a new message.
+ */
+export const MT5AccountInfoSchema: GenMessage<MT5AccountInfo> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 5);
+
+/**
+ * @generated from message antclaw.v1.GetMT5PositionsRequest
+ */
+export type GetMT5PositionsRequest = Message<"antclaw.v1.GetMT5PositionsRequest"> & {
+  /**
+   * 账号 UUID
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetMT5PositionsRequest.
+ * Use `create(GetMT5PositionsRequestSchema)` to create a new message.
+ */
+export const GetMT5PositionsRequestSchema: GenMessage<GetMT5PositionsRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 6);
+
+/**
+ * @generated from message antclaw.v1.MT5PositionsResponse
+ */
+export type MT5PositionsResponse = Message<"antclaw.v1.MT5PositionsResponse"> & {
+  /**
+   * @generated from field: repeated antclaw.v1.MT5Position positions = 1;
+   */
+  positions: MT5Position[];
+};
+
+/**
+ * Describes the message antclaw.v1.MT5PositionsResponse.
+ * Use `create(MT5PositionsResponseSchema)` to create a new message.
+ */
+export const MT5PositionsResponseSchema: GenMessage<MT5PositionsResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 7);
+
+/**
+ * @generated from message antclaw.v1.MT5Position
+ */
+export type MT5Position = Message<"antclaw.v1.MT5Position"> & {
+  /**
+   * 持仓单号
+   *
+   * @generated from field: int64 ticket = 1;
+   */
+  ticket: bigint;
+
+  /**
+   * 品种
+   *
+   * @generated from field: string symbol = 2;
+   */
+  symbol: string;
+
+  /**
+   * BUY / SELL
+   *
+   * @generated from field: string type = 3;
+   */
+  type: string;
+
+  /**
+   * 手数
+   *
+   * @generated from field: double volume = 4;
+   */
+  volume: number;
+
+  /**
+   * 开仓价
+   *
+   * @generated from field: double open_price = 5;
+   */
+  openPrice: number;
+
+  /**
+   * 当前价
+   *
+   * @generated from field: double current_price = 6;
+   */
+  currentPrice: number;
+
+  /**
+   * 止损
+   *
+   * @generated from field: double stop_loss = 7;
+   */
+  stopLoss: number;
+
+  /**
+   * 止盈
+   *
+   * @generated from field: double take_profit = 8;
+   */
+  takeProfit: number;
+
+  /**
+   * 浮动盈亏
+   *
+   * @generated from field: double profit = 9;
+   */
+  profit: number;
+
+  /**
+   * 库存费
+   *
+   * @generated from field: double swap = 10;
+   */
+  swap: number;
+
+  /**
+   * unix timestamp
+   *
+   * @generated from field: int64 open_time = 11;
+   */
+  openTime: bigint;
+};
+
+/**
+ * Describes the message antclaw.v1.MT5Position.
+ * Use `create(MT5PositionSchema)` to create a new message.
+ */
+export const MT5PositionSchema: GenMessage<MT5Position> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 8);
+
+/**
+ * @generated from message antclaw.v1.GetMT5HistoryRequest
+ */
+export type GetMT5HistoryRequest = Message<"antclaw.v1.GetMT5HistoryRequest"> & {
+  /**
+   * 账号 UUID
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * 起始时间（unix timestamp），默认最近 90 天
+   *
+   * @generated from field: int64 from_time = 2;
+   */
+  fromTime: bigint;
+
+  /**
+   * 最大条数，默认 200
+   *
+   * @generated from field: int32 max_count = 3;
+   */
+  maxCount: number;
+};
+
+/**
+ * Describes the message antclaw.v1.GetMT5HistoryRequest.
+ * Use `create(GetMT5HistoryRequestSchema)` to create a new message.
+ */
+export const GetMT5HistoryRequestSchema: GenMessage<GetMT5HistoryRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 9);
+
+/**
+ * @generated from message antclaw.v1.MT5HistoryResponse
+ */
+export type MT5HistoryResponse = Message<"antclaw.v1.MT5HistoryResponse"> & {
+  /**
+   * @generated from field: repeated antclaw.v1.MT5Order history_orders = 1;
+   */
+  historyOrders: MT5Order[];
+
+  /**
+   * @generated from field: int32 total_count = 2;
+   */
+  totalCount: number;
+};
+
+/**
+ * Describes the message antclaw.v1.MT5HistoryResponse.
+ * Use `create(MT5HistoryResponseSchema)` to create a new message.
+ */
+export const MT5HistoryResponseSchema: GenMessage<MT5HistoryResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 10);
+
+/**
+ * @generated from message antclaw.v1.MT5Order
+ */
+export type MT5Order = Message<"antclaw.v1.MT5Order"> & {
+  /**
+   * @generated from field: int64 ticket = 1;
+   */
+  ticket: bigint;
+
+  /**
+   * @generated from field: string symbol = 2;
+   */
+  symbol: string;
+
+  /**
+   * BUY / SELL
+   *
+   * @generated from field: string type = 3;
+   */
+  type: string;
+
+  /**
+   * @generated from field: double volume = 4;
+   */
+  volume: number;
+
+  /**
+   * @generated from field: double open_price = 5;
+   */
+  openPrice: number;
+
+  /**
+   * @generated from field: double close_price = 6;
+   */
+  closePrice: number;
+
+  /**
+   * 平仓盈亏
+   *
+   * @generated from field: double profit = 7;
+   */
+  profit: number;
+
+  /**
+   * @generated from field: double swap = 8;
+   */
+  swap: number;
+
+  /**
+   * @generated from field: double commission = 9;
+   */
+  commission: number;
+
+  /**
+   * @generated from field: int64 open_time = 10;
+   */
+  openTime: bigint;
+
+  /**
+   * @generated from field: int64 close_time = 11;
+   */
+  closeTime: bigint;
+
+  /**
+   * 订单注释
+   *
+   * @generated from field: string comment = 12;
+   */
+  comment: string;
+};
+
+/**
+ * Describes the message antclaw.v1.MT5Order.
+ * Use `create(MT5OrderSchema)` to create a new message.
+ */
+export const MT5OrderSchema: GenMessage<MT5Order> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_mt5, 11);
+
+/**
+ * MT5Service — MetaTrader 5 只读接入（M0.5 阶段）。
+ * 账号绑定、余额/持仓查询、历史订单拉取。
+ * 交易执行属于远期规划（策略绑定 MT 自动执行，非跟单）。
  *
  * @generated from service antclaw.v1.MT5Service
  */
 export const MT5Service: GenService<{
+  /**
+   * 添加 MT5 账号（server + account + investor_password → 连接验证）
+   *
+   * @generated from rpc antclaw.v1.MT5Service.AddAccount
+   */
+  addAccount: {
+    methodKind: "unary";
+    input: typeof AddMT5AccountRequestSchema;
+    output: typeof MT5AccountSchema;
+  },
+  /**
+   * 删除已绑定账号
+   *
+   * @generated from rpc antclaw.v1.MT5Service.RemoveAccount
+   */
+  removeAccount: {
+    methodKind: "unary";
+    input: typeof RemoveMT5AccountRequestSchema;
+    output: typeof RemoveMT5AccountResponseSchema;
+  },
+  /**
+   * 查询账号概览（余额/净值/保证金）
+   *
+   * @generated from rpc antclaw.v1.MT5Service.GetAccountInfo
+   */
+  getAccountInfo: {
+    methodKind: "unary";
+    input: typeof GetMT5AccountInfoRequestSchema;
+    output: typeof MT5AccountInfoSchema;
+  },
+  /**
+   * 查询当前持仓
+   *
+   * @generated from rpc antclaw.v1.MT5Service.GetPositions
+   */
+  getPositions: {
+    methodKind: "unary";
+    input: typeof GetMT5PositionsRequestSchema;
+    output: typeof MT5PositionsResponseSchema;
+  },
+  /**
+   * 查询历史订单（用于战绩计算）
+   *
+   * @generated from rpc antclaw.v1.MT5Service.GetHistory
+   */
+  getHistory: {
+    methodKind: "unary";
+    input: typeof GetMT5HistoryRequestSchema;
+    output: typeof MT5HistoryResponseSchema;
+  },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_mt5, 0);
 

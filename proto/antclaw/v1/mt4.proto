@@ -4,12 +4,91 @@ package antclaw.v1;
 
 option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
 
-// MT4Service provides MT4 equivalence layer (reserved for later phase).
-// See: AntClaw-未决项清单.md
+// MT4Service — MetaTrader 4 只读接入（M0.5 阶段）。
+// 与 MT5 并列提供，消息结构一致，实现路径不同。
 service MT4Service {
-  // RPCs return UNIMPLEMENTED in MVP
+  rpc AddAccount(AddMT4AccountRequest) returns (MT4Account);
+  rpc RemoveAccount(RemoveMT4AccountRequest) returns (RemoveMT4AccountResponse);
+  rpc GetAccountInfo(GetMT4AccountInfoRequest) returns (MT4AccountInfo);
+  rpc GetPositions(GetMT4PositionsRequest) returns (MT4PositionsResponse);
+  rpc GetHistory(GetMT4HistoryRequest) returns (MT4HistoryResponse);
 }
 
-// Placeholder messages for P2 skeleton
-message MT4PlaceHolderRequest {}
-message MT4PlaceHolderResponse {}
+message AddMT4AccountRequest {
+  string server = 1;
+  string account = 2;
+  string investor_password = 3;
+  string label = 4;
+  bool is_demo = 5;
+}
+
+message MT4Account {
+  string id = 1;
+  string server = 2;
+  string account = 3;
+  string label = 4;
+  bool is_demo = 5;
+  bool connected = 6;
+  int64 created_at = 7;
+}
+
+message RemoveMT4AccountRequest { string id = 1; }
+message RemoveMT4AccountResponse { bool success = 1; }
+
+message GetMT4AccountInfoRequest { string id = 1; }
+
+message MT4AccountInfo {
+  string id = 1;
+  double balance = 2;
+  double equity = 3;
+  double margin = 4;
+  double free_margin = 5;
+  double margin_level = 6;
+  double today_pnl = 7;
+  int32 position_count = 8;
+  int64 updated_at = 9;
+}
+
+message GetMT4PositionsRequest { string id = 1; }
+
+message MT4PositionsResponse { repeated MT4Position positions = 1; }
+
+message MT4Position {
+  int64 ticket = 1;
+  string symbol = 2;
+  string type = 3;
+  double volume = 4;
+  double open_price = 5;
+  double current_price = 6;
+  double stop_loss = 7;
+  double take_profit = 8;
+  double profit = 9;
+  double swap = 10;
+  int64 open_time = 11;
+}
+
+message GetMT4HistoryRequest {
+  string id = 1;
+  int64 from_time = 2;
+  int32 max_count = 3;
+}
+
+message MT4HistoryResponse {
+  repeated MT4Order history_orders = 1;
+  int32 total_count = 2;
+}
+
+message MT4Order {
+  int64 ticket = 1;
+  string symbol = 2;
+  string type = 3;
+  double volume = 4;
+  double open_price = 5;
+  double close_price = 6;
+  double profit = 7;
+  double swap = 8;
+  double commission = 9;
+  int64 open_time = 10;
+  int64 close_time = 11;
+  string comment = 12;
+}
