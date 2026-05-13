@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">AlfQ</string>
+    <string name="app_tagline">トレーダーのソーシャルターミナル</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">ホーム</string>
+    <string name="nav_discover">発見</string>
+    <string name="nav_post">投稿</string>
+    <string name="nav_messages">メッセージ</string>
+    <string name="nav_me">マイ</string>
+
+    <!-- Login -->
+    <string name="login_title">AlfQ</string>
+    <string name="login_email">メールアドレス</string>
+    <string name="login_password">パスワード</string>
+    <string name="login_button">ログイン</string>
+    <string name="login_register">登録</string>
+    <string name="login_forgot_password">パスワードをお忘れですか</string>
+    <string name="login_error_default">ログインに失敗しました</string>
+
+    <!-- Register -->
+    <string name="register_title">AlfQ 登録</string>
+    <string name="register_email">メールアドレス</string>
+    <string name="register_username">ユーザー名</string>
+    <string name="register_password">パスワード</string>
+    <string name="register_button">登録</string>
+    <string name="register_has_account">アカウントをお持ちですか？ログイン</string>
+    <string name="register_error_default">登録に失敗しました。再試行してください</string>
+
+    <!-- Feed -->
+    <string name="feed_search">検索</string>
+    <string name="feed_notifications">通知</string>
+    <string name="feed_tab_hot">人気</string>
+    <string name="feed_tab_recommended">おすすめ</string>
+    <string name="feed_tab_signals">シグナル</string>
+    <string name="feed_tab_following">フォロー中</string>
+    <string name="feed_empty_title">トレーダーをフォローしてリアルタイムシグナルを取得</string>
+    <string name="feed_empty_action">発見へ</string>
+    <string name="feed_retry">再試行</string>
+    <string name="feed_system_signal">システムシグナル</string>
+    <string name="feed_time_just_now">たった今</string>
+
+    <!-- Signal Detail -->
+    <string name="signal_detail_back">戻る</string>
+    <string name="signal_detail_confidence">確信度: %1$d%%</string>
+    <string name="signal_detail_price">現在価格: %1$s</string>
+
+    <!-- Discover -->
+    <string name="discover_search_hint">トレーダー、サークル、シグナルを検索…</string>
+    <string name="discover_hot_traders">人気トレーダー</string>
+    <string name="discover_action_view">見る</string>
+    <string name="discover_empty_title">おすすめトレーダーはいません</string>
+    <string name="discover_empty_body">トレーダーをフォローするとここに表示されます</string>
+
+    <!-- Post -->
+    <string name="post_close">閉じる</string>
+    <string name="post_publish">投稿</string>
+    <string name="post_hint">トレードの見解を共有…</string>
+    <string name="post_signal_hint">シグナル参照（例: EURUSD）</string>
+    <string name="post_visibility_public">公開</string>
+    <string name="post_visibility_followers">フォロワー</string>
+    <string name="post_visibility_circle">サークル</string>
+    <string name="post_success">投稿しました！</string>
+
+    <!-- Chat -->
+    <string name="chat_title">メッセージ</string>
+    <string name="chat_group_suffix">（グループ）</string>
+
+    <!-- Me / Profile -->
+    <string name="me_settings">設定</string>
+    <string name="me_account_management">アカウント管理</string>
+    <string name="me_trading_accounts">取引口座</string>
+    <string name="me_mt_desc">MT4/MT5 読み取り専用接続</string>
+    <string name="me_my_alerts">マイアラート</string>
+    <string name="me_alerts_desc">価格 / シグナル / マクロ</string>
+    <string name="me_logout">ログアウト</string>
+    <string name="me_loading">読み込み中…</string>
+    <string name="me_default_name">トレーダー</string>
+    <string name="me_following">フォロー中</string>
+    <string name="me_followers">フォロワー</string>
+    <string name="me_win_rate">勝率</string>
+
+    <!-- Tier labels -->
+    <string name="tier_verified">🟢 認証済みトレーダー</string>
+    <string name="tier_elite">🔵 エリートトレーダー</string>
+
+    <!-- Trader Profile -->
+    <string name="profile_title">トレーダープロフィール</string>
+    <string name="profile_followers">フォロワー</string>
+    <string name="profile_following">フォロー中</string>
+    <string name="profile_follow">フォロー</string>
+    <string name="profile_unfollow">フォロー解除</string>
+    <string name="profile_stats_title">取引実績</string>
+    <string name="profile_win_rate">勝率</string>
+    <string name="profile_profit_factor">プロフィットファクター</string>
+    <string name="profile_sharpe">シャープレシオ</string>
+    <string name="profile_total_trades">総取引数</string>
+
+    <!-- MT Accounts -->
+    <string name="mt_title">取引口座</string>
+    <string name="mt_bind_new">新しい口座を連携</string>
+    <string name="mt_load_failed">読み込みに失敗しました</string>
+    <string name="mt_retry">再試行</string>
+    <string name="mt_empty_title">取引口座がありません</string>
+    <string name="mt_empty_action">MT口座を連携</string>
+    <string name="mt_disconnect">切断</string>
+    <string name="mt_connected">● 接続済み</string>
+    <string name="mt_demo">デモ</string>
+    <string name="mt_live">リアル</string>
+    <string name="mt_balance">残高</string>
+    <string name="mt_equity">有効証拠金</string>
+    <string name="mt_server">サーバー</string>
+    <string name="mt_bind_failed">連携に失敗しました</string>
+
+    <!-- Bind MT Account Wizard -->
+    <string name="bind_mt_title">MT口座を連携</string>
+    <string name="bind_step_platform">プラットフォーム</string>
+    <string name="bind_step_credentials">認証情報</string>
+    <string name="bind_step_confirm">確認</string>
+    <string name="bind_step1_title">ステップ1: プラットフォームとサーバーを選択</string>
+    <string name="bind_platform_type">プラットフォームタイプ</string>
+    <string name="bind_server">サーバー</string>
+    <string name="bind_search_server">サーバーを検索</string>
+    <string name="bind_next">次へ</string>
+    <string name="bind_step2_title">ステップ2: 認証情報を入力</string>
+    <string name="bind_account">口座</string>
+    <string name="bind_account_hint">MT口座を入力</string>
+    <string name="bind_investor_password">読み取り専用パスワード</string>
+    <string name="bind_password_hint">投資家パスワードを入力</string>
+    <string name="bind_previous">前へ</string>
+    <string name="bind_step3_title">ステップ3: 連携を確認</string>
+    <string name="bind_label">ラベル（任意）</string>
+    <string name="bind_label_hint">例: メインリアル口座</string>
+    <string name="bind_account_type">口座タイプ</string>
+    <string name="bind_demo">デモ</string>
+    <string name="bind_live">リアル</string>
+    <string name="bind_confirm">連携を確認</string>
+    <string name="bind_binding">連携中…</string>
+
+    <!-- Alerts -->
+    <string name="alerts_title">マイアラート</string>
+    <string name="alerts_add">+ 追加</string>
+    <string name="alerts_empty">アラート購読はありません</string>
+    <string name="alerts_add_alert">アラートを追加</string>
+    <string name="alerts_delete">削除</string>
+    <string name="alert_dialog_title">アラートを追加</string>
+    <string name="alert_type_label">タイプ:</string>
+    <string name="alert_pair_label">通貨ペア</string>
+    <string name="alert_condition_label">条件:</string>
+    <string name="alert_threshold_label">閾値</string>
+    <string name="alert_subscribe">購読</string>
+    <string name="alert_cancel">キャンセル</string>
+
+    <!-- Notification Center -->
+    <string name="notif_title">通知センター</string>
+    <string name="notif_mark_all_read">すべて既読</string>
+    <string name="notif_empty">通知はありません</string>
+    <string name="notif_load_failed">読み込みに失敗しました</string>
+
+    <!-- Notification Preferences -->
+    <string name="notif_prefs_title">通知設定</string>
+    <string name="notif_prefs_alerts">アラートチャンネル</string>
+    <string name="notif_prefs_market">市場アラート</string>
+    <string name="notif_prefs_macro">マクロアラート</string>
+    <string name="notif_prefs_cot">COTバイアス</string>
+    <string name="notif_prefs_onchain">オンチェーンデータ</string>
+    <string name="notif_prefs_digest">ダイジェスト</string>
+    <string name="notif_prefs_daily_digest">デイリーダイジェスト</string>
+    <string name="notif_prefs_weekly_digest">ウィークリーダイジェスト</string>
+    <string name="notif_prefs_filter">フィルター</string>
+    <string name="notif_prefs_high_impact_only">高インパクトイベントのみ</string>
+
+    <!-- Language -->
+    <string name="settings_language">言語</string>
+    <string name="settings_language_title">言語を選択</string>
+
+    <!-- 共通 -->
+    <string name="common_back">戻る</string>
+    <string name="common_close">閉じる</string>
+    <string name="common_loading">読み込み中…</string>
+    <string name="common_retry">再試行</string>
+    <string name="common_error">読み込みに失敗しました</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">キャンセル</string>
+
+    <!-- シグナル方向 -->
+    <string name="direction_bullish">↗</string>
+    <string name="direction_bearish">↘</string>
+    <string name="direction_neutral">→</string>
+</resources>
