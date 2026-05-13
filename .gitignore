@@ -61,3 +61,4 @@ Emulator/
 /backend/cmd/antclaw-cli/antclaw-cli
 /backend/cmd/antclaw-worker/antclaw-worker
 .deepseek/
+emulator/

@@ -11,35 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class SignalBarItem(
-    val pair: String,
-    val direction: String,
-    val confidence: Int,
-    val price: String,
-)
-
-data class FeedCard(
-    val id: String,
-    val type: String,
-    val author: String,
-    val pair: String? = null,
-    val direction: String? = null,
-    val confidence: Int? = null,
-    val content: String = "",
-    val timeAgo: String = "",
-)
-
-data class FeedUiState(
-    val signalBar: List<SignalBarItem> = emptyList(),
-    val cards: List<FeedCard> = emptyList(),
-    val loading: Boolean = true,
-    val error: String? = null,
-)
-
 @HiltViewModel
-class FeedViewModel @Inject constructor() : ViewModel() {
-    private val signalsClient = SignalsRpcClient()
-    private val priceClient = PriceRpcClient()
+class FeedViewModel @Inject constructor(
+    private val signalsClient: SignalsRpcClient,
+    private val priceClient: PriceRpcClient,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()

@@ -3,7 +3,7 @@ kotlin = "2.0.21"
 agp = "8.7.3"
 composeBom = "2024.12.01"
 hilt = "2.51.1"
-connectRpc = "0.8.0"
+connectRpc = "0.7.0"
 protobufKotlin = "4.29.3"
 room = "2.6.1"
 navigationCompose = "2.8.5"
@@ -33,6 +33,7 @@ hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = 
 # Connect-RPC
 connect-protobuf = { module = "com.connectrpc:connect-kotlin", version.ref = "connectRpc" }
 connect-okhttp = { module = "com.connectrpc:connect-kotlin-okhttp", version.ref = "connectRpc" }
+connect-google-java-ext = { module = "com.connectrpc:connect-kotlin-google-java-ext", version.ref = "connectRpc" }
 protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "protobufKotlin" }
 
 # Room

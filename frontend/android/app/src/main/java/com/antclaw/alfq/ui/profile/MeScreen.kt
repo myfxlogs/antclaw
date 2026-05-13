@@ -1,56 +1,113 @@
 package com.antclaw.alfq.ui.profile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.antclaw.alfq.ui.theme.SpacingMd
+import com.antclaw.alfq.ui.theme.SpacingSm
+import com.antclaw.alfq.ui.theme.SpacingLg
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeScreen(
     onLogout: () -> Unit,
     onNavigateToMTAccounts: () -> Unit = {},
     onNavigateToAlerts: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
-        Text("我", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("战绩 · 交易账号 · 警报 · 设置", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-        Spacer(modifier = Modifier.height(24.dp))
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Top Bar
+        TopAppBar(
+            title = { },
+            actions = {
+                IconButton(onClick = { /* TODO: Navigate to settings */ }) {
+                    Icon(Icons.Default.Settings, contentDescription = "设置")
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
+        )
 
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-            Column {
-                MenuRow("交易账号", "MT4/MT5 只读连接") { onNavigateToMTAccounts() }
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                MenuRow("我的警报", "价格/信号/宏观") { onNavigateToAlerts() }
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                MenuRow("交易市场", "策略/指标/信号") { }
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                MenuRow("设置", "通知/隐私/外观") { }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = SpacingMd, vertical = SpacingMd)
+        ) {
+            item {
+                // Profile Header
+                Column(modifier = Modifier.padding(bottom = SpacingMd)) {
+                    Text("交易员名称", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
+                    Text("@trader_username", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(SpacingMd))
+                    Text("专注外汇与加密货币交易，分享实时信号与交易策略", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(SpacingMd))
+                    Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        Column { Text("128", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold); Text("关注", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        Column { Text("1.2K", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold); Text("粉丝", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        Column { Text("87%", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold); Text("胜率", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    }
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
-        OutlinedButton(onClick = onLogout) { Text("退出登录") }
-        Spacer(modifier = Modifier.height(32.dp))
-    }
-}
-
-@Composable
-private fun MenuRow(title: String, subtitle: String, onClick: () -> Unit) {
-    TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Column(horizontalAlignment = Alignment.Start) {
-                Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+            item {
+                Spacer(modifier = Modifier.height(SpacingMd))
+                Text("账号管理", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(SpacingSm))
             }
-            Text(">", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
+
+            item {
+                Surface(
+                    onClick = onNavigateToMTAccounts,
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        Modifier.padding(SpacingMd),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("交易账号", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                            Text("MT4/MT5 只读连接", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Text(">", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
+            item {
+                Surface(
+                    onClick = onNavigateToAlerts,
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        Modifier.padding(SpacingMd),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("我的警报", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                            Text("价格/信号/宏观", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Text(">", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(SpacingLg))
+                OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("退出登录") }
+            }
         }
     }
 }

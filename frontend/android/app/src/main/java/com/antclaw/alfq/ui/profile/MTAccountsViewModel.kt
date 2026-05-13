@@ -1,5 +1,8 @@
 package com.antclaw.alfq.ui.profile
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.rpc.MT5AddAccountReq
@@ -32,15 +35,14 @@ data class MTAccountsUiState(
 )
 
 @HiltViewModel
-class MTAccountsViewModel @Inject constructor() : ViewModel() {
-
-    private val rpc = MT5RpcClient()
+class MTAccountsViewModel @Inject constructor(
+    private val rpc: MT5RpcClient,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MTAccountsUiState())
     val uiState: StateFlow<MTAccountsUiState> = _uiState.asStateFlow()
 
     var showAddDialog by mutableStateOf(false)
-        private set
 
     // Demo accounts for UI testing (replace with real RPC when backend ready)
     private val demoAccounts = listOf(
@@ -54,7 +56,7 @@ class MTAccountsViewModel @Inject constructor() : ViewModel() {
         MTAccountUi(
             id = "2", server = "Exness-Demo", account = "11223344",
             label = "策略测试", isDemo = true,
-            info = MT5InfoResp(balance = 5000.0, equity = 5040.0, today_pnl = 0.008),
+            info = MT5InfoResp(balance = 5000.0, equity = 5040.0, margin = 0.0, today_pnl = 0.008),
             orderCount = 45
         )
     )

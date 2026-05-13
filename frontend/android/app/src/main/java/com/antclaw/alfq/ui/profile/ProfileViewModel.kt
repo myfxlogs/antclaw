@@ -26,8 +26,9 @@ data class ProfileUiState(
 )
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor() : ViewModel() {
-    private val client = TraderRpcClient()
+class ProfileViewModel @Inject constructor(
+    private val client: TraderRpcClient,
+) : ViewModel() {
     private var currentUserId = ""
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -41,7 +42,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     fun toggleFollow() {
         viewModelScope.launch {
             val resp = if (_uiState.value.isFollowing) client.unfollow(currentUserId)
-            else { client.follow(currentUserId); return@launch client.follow(currentUserId) }
+            else client.follow(currentUserId)
             _uiState.value = _uiState.value.copy(isFollowing = !_uiState.value.isFollowing, followerCount = resp.follower_count)
         }
     }

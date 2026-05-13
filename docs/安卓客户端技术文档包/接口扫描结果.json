@@ -1,0 +1,1697 @@
+{
+  "base_url": "https://api.alfq.org/",
+  "service_count": 39,
+  "rpc_count": 229,
+  "registered_count": 38,
+  "unregistered": [
+    "StreamService"
+  ],
+  "services": [
+    {
+      "file": "proto/antclaw/v1/admin.proto",
+      "service": "AdminService",
+      "registered": true,
+      "scope": "管理端",
+      "rpcs": [
+        {
+          "name": "ListUsers",
+          "request": "ListUsersRequest",
+          "response": "ListUsersResponse",
+          "stream": false
+        },
+        {
+          "name": "SetRole",
+          "request": "SetRoleRequest",
+          "response": "SetRoleResponse",
+          "stream": false
+        },
+        {
+          "name": "Ban",
+          "request": "BanRequest",
+          "response": "BanResponse",
+          "stream": false
+        },
+        {
+          "name": "Unban",
+          "request": "UnbanRequest",
+          "response": "UnbanResponse",
+          "stream": false
+        },
+        {
+          "name": "RunJob",
+          "request": "RunJobRequest",
+          "response": "RunJobResponse",
+          "stream": false
+        },
+        {
+          "name": "ListJobs",
+          "request": "ListJobsRequest",
+          "response": "ListJobsResponse",
+          "stream": false
+        },
+        {
+          "name": "SetJobEnabled",
+          "request": "SetJobEnabledRequest",
+          "response": "SetJobEnabledResponse",
+          "stream": false
+        },
+        {
+          "name": "ListAuditLogs",
+          "request": "ListAuditLogsRequest",
+          "response": "ListAuditLogsResponse",
+          "stream": false
+        },
+        {
+          "name": "ListWebhookDeliveries",
+          "request": "ListWebhookDeliveriesRequest",
+          "response": "ListWebhookDeliveriesResponse",
+          "stream": false
+        },
+        {
+          "name": "ForceLogout",
+          "request": "ForceLogoutRequest",
+          "response": "ForceLogoutResponse",
+          "stream": false
+        },
+        {
+          "name": "AdminResetUserPassword",
+          "request": "AdminResetUserPasswordRequest",
+          "response": "AdminResetUserPasswordResponse",
+          "stream": false
+        },
+        {
+          "name": "SetUserCodeID",
+          "request": "SetUserCodeIDRequest",
+          "response": "SetUserCodeIDResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/admin_data.proto",
+      "service": "AdminDataService",
+      "registered": true,
+      "scope": "管理端",
+      "rpcs": [
+        {
+          "name": "GetDataSummary",
+          "request": "GetDataSummaryRequest",
+          "response": "GetDataSummaryResponse",
+          "stream": false
+        },
+        {
+          "name": "GetDataPreview",
+          "request": "GetDataPreviewRequest",
+          "response": "GetDataPreviewResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/ai.proto",
+      "service": "AIService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "Chat",
+          "request": "stream ChatRequest",
+          "response": "ChatResponse",
+          "stream": true
+        },
+        {
+          "name": "Interpret",
+          "request": "InterpretRequest",
+          "response": "InterpretResponse",
+          "stream": false
+        },
+        {
+          "name": "Outlook",
+          "request": "OutlookRequest",
+          "response": "OutlookResponse",
+          "stream": false
+        },
+        {
+          "name": "BuildContext",
+          "request": "BuildContextRequest",
+          "response": "BuildContextResponse",
+          "stream": false
+        },
+        {
+          "name": "RememberFact",
+          "request": "RememberFactRequest",
+          "response": "RememberFactResponse",
+          "stream": false
+        },
+        {
+          "name": "RecallFact",
+          "request": "RecallFactRequest",
+          "response": "RecallFactResponse",
+          "stream": false
+        },
+        {
+          "name": "SearchMemory",
+          "request": "SearchMemoryRequest",
+          "response": "SearchMemoryResponse",
+          "stream": false
+        },
+        {
+          "name": "CheckRateLimit",
+          "request": "CheckRateLimitRequest",
+          "response": "CheckRateLimitResponse",
+          "stream": false
+        },
+        {
+          "name": "RunWithTools",
+          "request": "RunWithToolsRequest",
+          "response": "RunWithToolsResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/alerts.proto",
+      "service": "AlertService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "ListSubscriptions",
+          "request": "ListSubscriptionsRequest",
+          "response": "ListSubscriptionsResponse",
+          "stream": false
+        },
+        {
+          "name": "Subscribe",
+          "request": "SubscribeRequest",
+          "response": "SubscribeResponse",
+          "stream": false
+        },
+        {
+          "name": "Unsubscribe",
+          "request": "UnsubscribeRequest",
+          "response": "UnsubscribeResponse",
+          "stream": false
+        },
+        {
+          "name": "RegisterWebhook",
+          "request": "RegisterWebhookRequest",
+          "response": "RegisterWebhookResponse",
+          "stream": false
+        },
+        {
+          "name": "ListWebhooks",
+          "request": "ListWebhooksRequest",
+          "response": "ListWebhooksResponse",
+          "stream": false
+        },
+        {
+          "name": "CreateAlert",
+          "request": "CreateAlertRequest",
+          "response": "CreateAlertResponse",
+          "stream": false
+        },
+        {
+          "name": "ListAlerts",
+          "request": "ListAlertsRequest",
+          "response": "ListAlertsResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateAlert",
+          "request": "UpdateAlertRequest",
+          "response": "UpdateAlertResponse",
+          "stream": false
+        },
+        {
+          "name": "DeleteAlert",
+          "request": "DeleteAlertRequest",
+          "response": "DeleteAlertResponse",
+          "stream": false
+        },
+        {
+          "name": "ToggleAlert",
+          "request": "ToggleAlertRequest",
+          "response": "ToggleAlertResponse",
+          "stream": false
+        },
+        {
+          "name": "DecideAlert",
+          "request": "DecideAlertRequest",
+          "response": "DecideAlertResponse",
+          "stream": false
+        },
+        {
+          "name": "GetPreferences",
+          "request": "GetPreferencesRequest",
+          "response": "GetPreferencesResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdatePreferences",
+          "request": "UpdatePreferencesRequest",
+          "response": "UpdatePreferencesResponse",
+          "stream": false
+        },
+        {
+          "name": "SetUserTier",
+          "request": "SetUserTierRequest",
+          "response": "SetUserTierResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAlertHistory",
+          "request": "GetAlertHistoryRequest",
+          "response": "GetAlertHistoryResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/alfq_chat.proto",
+      "service": "ChatService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "SendMessage",
+          "request": "SendMessageRequest",
+          "response": "Message",
+          "stream": false
+        },
+        {
+          "name": "GetConversation",
+          "request": "GetConversationRequest",
+          "response": "Conversation",
+          "stream": false
+        },
+        {
+          "name": "ListConversations",
+          "request": "ListConversationsRequest",
+          "response": "ConversationList",
+          "stream": false
+        },
+        {
+          "name": "MarkRead",
+          "request": "ChatMarkReadRequest",
+          "response": "ChatMarkReadResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/alfq_circle.proto",
+      "service": "CircleService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "CreateCircle",
+          "request": "CreateCircleRequest",
+          "response": "Circle",
+          "stream": false
+        },
+        {
+          "name": "JoinCircle",
+          "request": "JoinCircleRequest",
+          "response": "Circle",
+          "stream": false
+        },
+        {
+          "name": "LeaveCircle",
+          "request": "LeaveCircleRequest",
+          "response": "LeaveCircleResponse",
+          "stream": false
+        },
+        {
+          "name": "GetCircleFeed",
+          "request": "GetCircleFeedRequest",
+          "response": "CircleFeedResponse",
+          "stream": false
+        },
+        {
+          "name": "ListCircles",
+          "request": "ListCirclesRequest",
+          "response": "CircleList",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/alfq_feed.proto",
+      "service": "FeedService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "CreatePost",
+          "request": "CreatePostRequest",
+          "response": "Post",
+          "stream": false
+        },
+        {
+          "name": "GetFeed",
+          "request": "GetFeedRequest",
+          "response": "FeedResponse",
+          "stream": false
+        },
+        {
+          "name": "GetPost",
+          "request": "GetPostRequest",
+          "response": "Post",
+          "stream": false
+        },
+        {
+          "name": "LikePost",
+          "request": "LikePostRequest",
+          "response": "Post",
+          "stream": false
+        },
+        {
+          "name": "UnlikePost",
+          "request": "UnlikePostRequest",
+          "response": "Post",
+          "stream": false
+        },
+        {
+          "name": "CommentOnPost",
+          "request": "CommentRequest",
+          "response": "Comment",
+          "stream": false
+        },
+        {
+          "name": "SharePost",
+          "request": "SharePostRequest",
+          "response": "Post",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/alfq_marketplace.proto",
+      "service": "MarketplaceService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "ListProducts",
+          "request": "ListProductsRequest",
+          "response": "ProductList",
+          "stream": false
+        },
+        {
+          "name": "PublishProduct",
+          "request": "PublishProductRequest",
+          "response": "Product",
+          "stream": false
+        },
+        {
+          "name": "PurchaseProduct",
+          "request": "PurchaseProductRequest",
+          "response": "Purchase",
+          "stream": false
+        },
+        {
+          "name": "GetMyProducts",
+          "request": "GetMyProductsRequest",
+          "response": "ProductList",
+          "stream": false
+        },
+        {
+          "name": "GetMyPurchases",
+          "request": "GetMyPurchasesRequest",
+          "response": "PurchaseList",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/alfq_trader.proto",
+      "service": "TraderService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetProfile",
+          "request": "GetTraderProfileRequest",
+          "response": "TraderProfile",
+          "stream": false
+        },
+        {
+          "name": "UpdateProfile",
+          "request": "UpdateTraderProfileRequest",
+          "response": "TraderProfile",
+          "stream": false
+        },
+        {
+          "name": "Follow",
+          "request": "FollowRequest",
+          "response": "FollowResponse",
+          "stream": false
+        },
+        {
+          "name": "Unfollow",
+          "request": "UnfollowRequest",
+          "response": "FollowResponse",
+          "stream": false
+        },
+        {
+          "name": "GetFollowers",
+          "request": "GetFollowersRequest",
+          "response": "UserList",
+          "stream": false
+        },
+        {
+          "name": "GetFollowing",
+          "request": "GetFollowingRequest",
+          "response": "UserList",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/auth.proto",
+      "service": "AuthService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "Register",
+          "request": "RegisterRequest",
+          "response": "RegisterResponse",
+          "stream": false
+        },
+        {
+          "name": "Login",
+          "request": "LoginRequest",
+          "response": "LoginResponse",
+          "stream": false
+        },
+        {
+          "name": "Refresh",
+          "request": "RefreshRequest",
+          "response": "RefreshResponse",
+          "stream": false
+        },
+        {
+          "name": "Logout",
+          "request": "LogoutRequest",
+          "response": "LogoutResponse",
+          "stream": false
+        },
+        {
+          "name": "RequestPasswordReset",
+          "request": "RequestPasswordResetRequest",
+          "response": "RequestPasswordResetResponse",
+          "stream": false
+        },
+        {
+          "name": "ResetPassword",
+          "request": "ResetPasswordRequest",
+          "response": "ResetPasswordResponse",
+          "stream": false
+        },
+        {
+          "name": "VerifyEmail",
+          "request": "VerifyEmailRequest",
+          "response": "VerifyEmailResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/backtest.proto",
+      "service": "BacktestService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "RunBacktest",
+          "request": "RunBacktestRequest",
+          "response": "RunBacktestResponse",
+          "stream": false
+        },
+        {
+          "name": "GetBacktest",
+          "request": "GetBacktestRequest",
+          "response": "GetBacktestResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAccuracy",
+          "request": "GetAccuracyRequest",
+          "response": "GetAccuracyResponse",
+          "stream": false
+        },
+        {
+          "name": "RunQuantBt",
+          "request": "RunQuantBtRequest",
+          "response": "RunQuantBtResponse",
+          "stream": false
+        },
+        {
+          "name": "RunVpBt",
+          "request": "RunVpBtRequest",
+          "response": "RunVpBtResponse",
+          "stream": false
+        },
+        {
+          "name": "RunCtaBt",
+          "request": "RunCtaBtRequest",
+          "response": "RunCtaBtResponse",
+          "stream": false
+        },
+        {
+          "name": "RunWalkforward",
+          "request": "RunWalkforwardRequest",
+          "response": "RunWalkforwardResponse",
+          "stream": false
+        },
+        {
+          "name": "GetWalkforwardResult",
+          "request": "GetWalkforwardResultRequest",
+          "response": "GetWalkforwardResultResponse",
+          "stream": false
+        },
+        {
+          "name": "RunBootstrap",
+          "request": "RunBootstrapRequest",
+          "response": "RunBootstrapResponse",
+          "stream": false
+        },
+        {
+          "name": "RunMonteCarlo",
+          "request": "RunMonteCarloRequest",
+          "response": "RunMonteCarloResponse",
+          "stream": false
+        },
+        {
+          "name": "GetTrades",
+          "request": "GetTradesRequest",
+          "response": "GetTradesResponse",
+          "stream": false
+        },
+        {
+          "name": "GetMetricsByRegime",
+          "request": "GetMetricsByRegimeRequest",
+          "response": "GetMetricsByRegimeResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/calendar.proto",
+      "service": "CalendarService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "ListEvents",
+          "request": "ListEventsRequest",
+          "response": "ListEventsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetEvent",
+          "request": "GetEventRequest",
+          "response": "GetEventResponse",
+          "stream": false
+        },
+        {
+          "name": "GetImpact",
+          "request": "GetImpactRequest",
+          "response": "GetImpactResponse",
+          "stream": false
+        },
+        {
+          "name": "GetImpactHistory",
+          "request": "GetImpactHistoryRequest",
+          "response": "GetImpactHistoryResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/cot.proto",
+      "service": "COTService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetSummary",
+          "request": "GetSummaryRequest",
+          "response": "GetSummaryResponse",
+          "stream": false
+        },
+        {
+          "name": "Compare",
+          "request": "CompareRequest",
+          "response": "CompareResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSignals",
+          "request": "GetSignalsRequest",
+          "response": "GetSignalsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetHistory",
+          "request": "COTServiceGetHistoryRequest",
+          "response": "COTServiceGetHistoryResponse",
+          "stream": false
+        },
+        {
+          "name": "SubscribePairAlert",
+          "request": "SubscribePairAlertRequest",
+          "response": "SubscribePairAlertResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/crypto.proto",
+      "service": "CryptoService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetCryptoPublicKey",
+          "request": "GetCryptoPublicKeyRequest",
+          "response": "GetCryptoPublicKeyResponse",
+          "stream": false
+        },
+        {
+          "name": "PostEnvelope",
+          "request": "PostEnvelopeRequest",
+          "response": "PostEnvelopeResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/datasource.proto",
+      "service": "DataSourceService",
+      "registered": true,
+      "scope": "管理端",
+      "rpcs": [
+        {
+          "name": "ListDataSources",
+          "request": "ListDataSourcesRequest",
+          "response": "ListDataSourcesResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateDataSource",
+          "request": "UpdateDataSourceRequest",
+          "response": "UpdateDataSourceResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/defi.proto",
+      "service": "DeFiService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetTopProtocols",
+          "request": "GetTopProtocolsRequest",
+          "response": "GetTopProtocolsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetProtocolTVL",
+          "request": "GetProtocolTVLRequest",
+          "response": "GetProtocolTVLResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAnalysis",
+          "request": "DeFiServiceGetAnalysisRequest",
+          "response": "DeFiServiceGetAnalysisResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/fedwatch.proto",
+      "service": "FedWatchService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetFOMCProbabilities",
+          "request": "GetFOMCProbabilitiesRequest",
+          "response": "GetFOMCProbabilitiesResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/macro.proto",
+      "service": "MacroService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetFred",
+          "request": "GetFredRequest",
+          "response": "GetFredResponse",
+          "stream": false
+        },
+        {
+          "name": "GetEcb",
+          "request": "GetEcbRequest",
+          "response": "GetEcbResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSnb",
+          "request": "GetSnbRequest",
+          "response": "GetSnbResponse",
+          "stream": false
+        },
+        {
+          "name": "GetOecdLeading",
+          "request": "GetOecdLeadingRequest",
+          "response": "GetOecdLeadingResponse",
+          "stream": false
+        },
+        {
+          "name": "GetEurostat",
+          "request": "GetEurostatRequest",
+          "response": "GetEurostatResponse",
+          "stream": false
+        },
+        {
+          "name": "GetBis",
+          "request": "GetBisRequest",
+          "response": "GetBisResponse",
+          "stream": false
+        },
+        {
+          "name": "GetTradingEconomics",
+          "request": "GetTradingEconomicsRequest",
+          "response": "GetTradingEconomicsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetDtccSwaps",
+          "request": "GetDtccSwapsRequest",
+          "response": "GetDtccSwapsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSec13f",
+          "request": "GetSec13fRequest",
+          "response": "GetSec13fResponse",
+          "stream": false
+        },
+        {
+          "name": "GetTreasuryAuctions",
+          "request": "GetTreasuryAuctionsRequest",
+          "response": "GetTreasuryAuctionsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetFedWatch",
+          "request": "GetFedWatchRequest",
+          "response": "GetFedWatchResponse",
+          "stream": false
+        },
+        {
+          "name": "GetWorldBank",
+          "request": "GetWorldBankRequest",
+          "response": "GetWorldBankResponse",
+          "stream": false
+        },
+        {
+          "name": "GetImfWeo",
+          "request": "GetImfWeoRequest",
+          "response": "GetImfWeoResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/macro_extras.proto",
+      "service": "MacroExtrasService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetSeries",
+          "request": "MacroExtrasServiceGetSeriesRequest",
+          "response": "MacroExtrasServiceGetSeriesResponse",
+          "stream": false
+        },
+        {
+          "name": "ListAvailableSeries",
+          "request": "ListAvailableSeriesRequest",
+          "response": "ListAvailableSeriesResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/mt4.proto",
+      "service": "MT4Service",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "AddAccount",
+          "request": "AddMT4AccountRequest",
+          "response": "MT4Account",
+          "stream": false
+        },
+        {
+          "name": "RemoveAccount",
+          "request": "RemoveMT4AccountRequest",
+          "response": "RemoveMT4AccountResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAccountInfo",
+          "request": "GetMT4AccountInfoRequest",
+          "response": "MT4AccountInfo",
+          "stream": false
+        },
+        {
+          "name": "GetPositions",
+          "request": "GetMT4PositionsRequest",
+          "response": "MT4PositionsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetHistory",
+          "request": "GetMT4HistoryRequest",
+          "response": "MT4HistoryResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/mt5.proto",
+      "service": "MT5Service",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "AddAccount",
+          "request": "AddMT5AccountRequest",
+          "response": "MT5Account",
+          "stream": false
+        },
+        {
+          "name": "RemoveAccount",
+          "request": "RemoveMT5AccountRequest",
+          "response": "RemoveMT5AccountResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAccountInfo",
+          "request": "GetMT5AccountInfoRequest",
+          "response": "MT5AccountInfo",
+          "stream": false
+        },
+        {
+          "name": "GetPositions",
+          "request": "GetMT5PositionsRequest",
+          "response": "MT5PositionsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetHistory",
+          "request": "GetMT5HistoryRequest",
+          "response": "MT5HistoryResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/notification.proto",
+      "service": "NotificationService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "ListUnread",
+          "request": "ListUnreadRequest",
+          "response": "ListUnreadResponse",
+          "stream": false
+        },
+        {
+          "name": "ListHistory",
+          "request": "ListHistoryRequest",
+          "response": "ListHistoryResponse",
+          "stream": false
+        },
+        {
+          "name": "UnreadCount",
+          "request": "UnreadCountRequest",
+          "response": "UnreadCountResponse",
+          "stream": false
+        },
+        {
+          "name": "MarkRead",
+          "request": "MarkReadRequest",
+          "response": "MarkReadResponse",
+          "stream": false
+        },
+        {
+          "name": "MarkAllRead",
+          "request": "MarkAllReadRequest",
+          "response": "MarkAllReadResponse",
+          "stream": false
+        },
+        {
+          "name": "GetPrefs",
+          "request": "GetPrefsRequest",
+          "response": "GetPrefsResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdatePrefs",
+          "request": "UpdatePrefsRequest",
+          "response": "UpdatePrefsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAlertPrefs",
+          "request": "GetAlertPrefsRequest",
+          "response": "GetAlertPrefsResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateAlertPrefs",
+          "request": "UpdateAlertPrefsRequest",
+          "response": "UpdateAlertPrefsResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/onchain.proto",
+      "service": "OnchainService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetMetrics",
+          "request": "OnchainServiceGetMetricsRequest",
+          "response": "OnchainServiceGetMetricsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAnalysis",
+          "request": "OnchainServiceGetAnalysisRequest",
+          "response": "OnchainServiceGetAnalysisResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/options.proto",
+      "service": "OptionsService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetGEX",
+          "request": "GetGEXRequest",
+          "response": "GetGEXResponse",
+          "stream": false
+        },
+        {
+          "name": "GetIVSurface",
+          "request": "GetIVSurfaceRequest",
+          "response": "GetIVSurfaceResponse",
+          "stream": false
+        },
+        {
+          "name": "GetOptionsSkew",
+          "request": "GetOptionsSkewRequest",
+          "response": "GetOptionsSkewResponse",
+          "stream": false
+        },
+        {
+          "name": "GetIVAlerts",
+          "request": "GetIVAlertsRequest",
+          "response": "GetIVAlertsResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/price.proto",
+      "service": "PriceService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetPrice",
+          "request": "GetPriceRequest",
+          "response": "GetPriceResponse",
+          "stream": false
+        },
+        {
+          "name": "GetLevels",
+          "request": "GetLevelsRequest",
+          "response": "GetLevelsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetMarketOverview",
+          "request": "GetMarketOverviewRequest",
+          "response": "GetMarketOverviewResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSession",
+          "request": "GetSessionRequest",
+          "response": "GetSessionResponse",
+          "stream": false
+        },
+        {
+          "name": "RunScenario",
+          "request": "RunScenarioRequest",
+          "response": "RunScenarioResponse",
+          "stream": false
+        },
+        {
+          "name": "GetRegime",
+          "request": "GetRegimeRequest",
+          "response": "GetRegimeResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSeasonal",
+          "request": "GetSeasonalRequest",
+          "response": "GetSeasonalResponse",
+          "stream": false
+        },
+        {
+          "name": "GetVolatility",
+          "request": "GetVolatilityRequest",
+          "response": "GetVolatilityResponse",
+          "stream": false
+        },
+        {
+          "name": "GetHurst",
+          "request": "GetHurstRequest",
+          "response": "GetHurstResponse",
+          "stream": false
+        },
+        {
+          "name": "GetCorrelations",
+          "request": "GetCorrelationsRequest",
+          "response": "GetCorrelationsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetDivergences",
+          "request": "GetDivergencesRequest",
+          "response": "GetDivergencesResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/regime.proto",
+      "service": "RegimeService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetOverlay",
+          "request": "GetOverlayRequest",
+          "response": "GetOverlayResponse",
+          "stream": false
+        },
+        {
+          "name": "ListRecent",
+          "request": "ListRecentRequest",
+          "response": "ListRecentResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/report.proto",
+      "service": "ReportService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetReport",
+          "request": "GetReportRequest",
+          "response": "GetReportResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/sec.proto",
+      "service": "SECService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "ListFilings",
+          "request": "ListFilingsRequest",
+          "response": "ListFilingsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetFiling",
+          "request": "GetFilingRequest",
+          "response": "GetFilingResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAnalysis",
+          "request": "SECServiceGetAnalysisRequest",
+          "response": "SECServiceGetAnalysisResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/sentiment.proto",
+      "service": "SentimentService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetSentiment",
+          "request": "GetSentimentRequest",
+          "response": "GetSentimentResponse",
+          "stream": false
+        },
+        {
+          "name": "GetOnchain",
+          "request": "GetOnchainRequest",
+          "response": "GetOnchainResponse",
+          "stream": false
+        },
+        {
+          "name": "GetDefiHealth",
+          "request": "GetDefiHealthRequest",
+          "response": "GetDefiHealthResponse",
+          "stream": false
+        },
+        {
+          "name": "GetCarryMonitor",
+          "request": "GetCarryMonitorRequest",
+          "response": "GetCarryMonitorResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/sentiment_extras.proto",
+      "service": "SentimentExtrasService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetCBOEPutCall",
+          "request": "GetCBOEPutCallRequest",
+          "response": "GetCBOEPutCallResponse",
+          "stream": false
+        },
+        {
+          "name": "GetMyFXBookPositions",
+          "request": "GetMyFXBookPositionsRequest",
+          "response": "GetMyFXBookPositionsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetInsiderTrades",
+          "request": "GetInsiderTradesRequest",
+          "response": "GetInsiderTradesResponse",
+          "stream": false
+        },
+        {
+          "name": "GetCryptoSocial",
+          "request": "GetCryptoSocialRequest",
+          "response": "GetCryptoSocialResponse",
+          "stream": false
+        },
+        {
+          "name": "GetFinvizMetrics",
+          "request": "GetFinvizMetricsRequest",
+          "response": "GetFinvizMetricsResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/signals.proto",
+      "service": "SignalsService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetBias",
+          "request": "GetBiasRequest",
+          "response": "GetBiasResponse",
+          "stream": false
+        },
+        {
+          "name": "GetRank",
+          "request": "GetRankRequest",
+          "response": "GetRankResponse",
+          "stream": false
+        },
+        {
+          "name": "GetXFactors",
+          "request": "GetXFactorsRequest",
+          "response": "GetXFactorsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetRadar",
+          "request": "GetRadarRequest",
+          "response": "GetRadarResponse",
+          "stream": false
+        },
+        {
+          "name": "GetIntensity",
+          "request": "GetIntensityRequest",
+          "response": "GetIntensityResponse",
+          "stream": false
+        },
+        {
+          "name": "GetTransition",
+          "request": "GetTransitionRequest",
+          "response": "GetTransitionResponse",
+          "stream": false
+        },
+        {
+          "name": "GetCryptoAlpha",
+          "request": "GetCryptoAlphaRequest",
+          "response": "GetCryptoAlphaResponse",
+          "stream": false
+        },
+        {
+          "name": "GetUnified",
+          "request": "GetUnifiedRequest",
+          "response": "GetUnifiedResponse",
+          "stream": false
+        },
+        {
+          "name": "GetQuant",
+          "request": "GetQuantRequest",
+          "response": "GetQuantResponse",
+          "stream": false
+        },
+        {
+          "name": "GetCta",
+          "request": "GetCtaRequest",
+          "response": "GetCtaResponse",
+          "stream": false
+        },
+        {
+          "name": "GetBriefing",
+          "request": "GetBriefingRequest",
+          "response": "GetBriefingResponse",
+          "stream": false
+        },
+        {
+          "name": "GetOutlook",
+          "request": "GetOutlookRequest",
+          "response": "GetOutlookResponse",
+          "stream": false
+        },
+        {
+          "name": "FitCalibration",
+          "request": "FitCalibrationRequest",
+          "response": "FitCalibrationResponse",
+          "stream": false
+        },
+        {
+          "name": "PredictCalibrated",
+          "request": "PredictCalibratedRequest",
+          "response": "PredictCalibratedResponse",
+          "stream": false
+        },
+        {
+          "name": "ListCalibrations",
+          "request": "ListCalibrationsRequest",
+          "response": "ListCalibrationsResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/strategy.proto",
+      "service": "StrategyService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "ListStrategies",
+          "request": "ListStrategiesRequest",
+          "response": "ListStrategiesResponse",
+          "stream": false
+        },
+        {
+          "name": "GetStrategy",
+          "request": "GetStrategyRequest",
+          "response": "GetStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "CreateStrategy",
+          "request": "CreateStrategyRequest",
+          "response": "CreateStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateStrategy",
+          "request": "UpdateStrategyRequest",
+          "response": "UpdateStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "DeleteStrategy",
+          "request": "DeleteStrategyRequest",
+          "response": "DeleteStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "EnableStrategy",
+          "request": "EnableStrategyRequest",
+          "response": "EnableStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "DisableStrategy",
+          "request": "DisableStrategyRequest",
+          "response": "DisableStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "RunStrategy",
+          "request": "RunStrategyRequest",
+          "response": "RunStrategyResponse",
+          "stream": false
+        },
+        {
+          "name": "ListStrategyRuns",
+          "request": "ListStrategyRunsRequest",
+          "response": "ListStrategyRunsResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/stream.proto",
+      "service": "StreamService",
+      "registered": false,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "SubscribeEvents",
+          "request": "SubscribeEventsRequest",
+          "response": "SubscribeEventsResponse",
+          "stream": true
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/system.proto",
+      "service": "SystemService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "Healthz",
+          "request": "HealthzRequest",
+          "response": "HealthzResponse",
+          "stream": false
+        },
+        {
+          "name": "Readyz",
+          "request": "ReadyzRequest",
+          "response": "ReadyzResponse",
+          "stream": false
+        },
+        {
+          "name": "Info",
+          "request": "InfoRequest",
+          "response": "InfoResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/system_ai.proto",
+      "service": "SystemAIService",
+      "registered": true,
+      "scope": "管理端",
+      "rpcs": [
+        {
+          "name": "ListConfigs",
+          "request": "ListSystemAIConfigsRequest",
+          "response": "ListSystemAIConfigsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetConfig",
+          "request": "GetSystemAIConfigRequest",
+          "response": "GetSystemAIConfigResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateConfig",
+          "request": "UpdateSystemAIConfigRequest",
+          "response": "UpdateSystemAIConfigResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateSecret",
+          "request": "UpdateSystemAISecretRequest",
+          "response": "UpdateSystemAISecretResponse",
+          "stream": false
+        },
+        {
+          "name": "DiscoverModels",
+          "request": "DiscoverSystemAIModelsRequest",
+          "response": "DiscoverSystemAIModelsResponse",
+          "stream": false
+        },
+        {
+          "name": "ValidateConnection",
+          "request": "ValidateSystemAIConnectionRequest",
+          "response": "ValidateSystemAIConnectionResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/ta.proto",
+      "service": "TAService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetIndicators",
+          "request": "GetIndicatorsRequest",
+          "response": "GetIndicatorsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetElliott",
+          "request": "GetElliottRequest",
+          "response": "GetElliottResponse",
+          "stream": false
+        },
+        {
+          "name": "GetWyckoff",
+          "request": "GetWyckoffRequest",
+          "response": "GetWyckoffResponse",
+          "stream": false
+        },
+        {
+          "name": "GetIct",
+          "request": "GetIctRequest",
+          "response": "GetIctResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAmt",
+          "request": "GetAmtRequest",
+          "response": "GetAmtResponse",
+          "stream": false
+        },
+        {
+          "name": "GetOrderflow",
+          "request": "GetOrderflowRequest",
+          "response": "GetOrderflowResponse",
+          "stream": false
+        },
+        {
+          "name": "GetVolumeProfile",
+          "request": "GetVolumeProfileRequest",
+          "response": "GetVolumeProfileResponse",
+          "stream": false
+        },
+        {
+          "name": "GetIntermarket",
+          "request": "GetIntermarketRequest",
+          "response": "GetIntermarketResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/treasury.proto",
+      "service": "TreasuryService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetCurve",
+          "request": "GetCurveRequest",
+          "response": "GetCurveResponse",
+          "stream": false
+        },
+        {
+          "name": "GetAnalysis",
+          "request": "TreasuryServiceGetAnalysisRequest",
+          "response": "TreasuryServiceGetAnalysisResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/user.proto",
+      "service": "UserService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetMe",
+          "request": "GetMeRequest",
+          "response": "GetMeResponse",
+          "stream": false
+        },
+        {
+          "name": "UpdateSettings",
+          "request": "UpdateSettingsRequest",
+          "response": "UpdateSettingsResponse",
+          "stream": false
+        },
+        {
+          "name": "GetMembership",
+          "request": "GetMembershipRequest",
+          "response": "GetMembershipResponse",
+          "stream": false
+        },
+        {
+          "name": "StartOnboarding",
+          "request": "StartOnboardingRequest",
+          "response": "StartOnboardingResponse",
+          "stream": false
+        },
+        {
+          "name": "GetHistory",
+          "request": "GetHistoryRequest",
+          "response": "GetHistoryResponse",
+          "stream": false
+        },
+        {
+          "name": "ClearHistory",
+          "request": "ClearHistoryRequest",
+          "response": "ClearHistoryResponse",
+          "stream": false
+        },
+        {
+          "name": "ListPins",
+          "request": "ListPinsRequest",
+          "response": "ListPinsResponse",
+          "stream": false
+        },
+        {
+          "name": "Pin",
+          "request": "PinRequest",
+          "response": "PinResponse",
+          "stream": false
+        },
+        {
+          "name": "Unpin",
+          "request": "UnpinRequest",
+          "response": "UnpinResponse",
+          "stream": false
+        },
+        {
+          "name": "SubmitFeedback",
+          "request": "SubmitFeedbackRequest",
+          "response": "SubmitFeedbackResponse",
+          "stream": false
+        },
+        {
+          "name": "SetAiKey",
+          "request": "SetAiKeyRequest",
+          "response": "SetAiKeyResponse",
+          "stream": false
+        }
+      ]
+    },
+    {
+      "file": "proto/antclaw/v1/vol.proto",
+      "service": "VolService",
+      "registered": true,
+      "scope": "客户端/通用",
+      "rpcs": [
+        {
+          "name": "GetVix",
+          "request": "GetVixRequest",
+          "response": "GetVixResponse",
+          "stream": false
+        },
+        {
+          "name": "GetMove",
+          "request": "GetMoveRequest",
+          "response": "GetMoveResponse",
+          "stream": false
+        },
+        {
+          "name": "GetDvol",
+          "request": "GetDvolRequest",
+          "response": "GetDvolResponse",
+          "stream": false
+        },
+        {
+          "name": "GetGex",
+          "request": "GetGexRequest",
+          "response": "GetGexResponse",
+          "stream": false
+        },
+        {
+          "name": "GetIvol",
+          "request": "GetIvolRequest",
+          "response": "GetIvolResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSkew",
+          "request": "GetSkewRequest",
+          "response": "GetSkewResponse",
+          "stream": false
+        },
+        {
+          "name": "GetSkewVixAlert",
+          "request": "GetSkewVixAlertRequest",
+          "response": "GetSkewVixAlertResponse",
+          "stream": false
+        }
+      ]
+    }
+  ]
+}

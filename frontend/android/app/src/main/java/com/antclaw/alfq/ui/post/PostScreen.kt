@@ -1,45 +1,20 @@
 package com.antclaw.alfq.ui.post
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.antclaw.alfq.data.rpc.CreatePostReq
-import com.antclaw.alfq.data.rpc.FeedRpcClient
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import com.antclaw.alfq.ui.theme.SpacingMd
 
-@HiltViewModel
-class PostViewModel @Inject constructor() : ViewModel() {
-    private val client = FeedRpcClient()
-    val posted = MutableStateFlow(false)
-
-    fun post(content: String, signalPair: String, signalDirection: String, signalConfidence: Int, visibility: String) {
-        viewModelScope.launch {
-            try {
-                client.createPost(CreatePostReq(
-                    content = content,
-                    post_type = if (signalPair.isNotBlank()) "signal_card" else "text",
-                    signal_pair = signalPair,
-                    signal_direction = signalDirection,
-                    signal_confidence = signalConfidence,
-                    visibility = visibility
-                ))
-                posted.value = true
-            } catch (_: Exception) { }
-        }
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
     var content by remember { mutableStateOf("") }
@@ -51,44 +26,89 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
 
     LaunchedEffect(posted) { if (posted) { showSuccess = true; content = "" } }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("发布", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = content,
-            onValueChange = { content = it },
-            label = { Text("分享你的交易观点...") },
-            modifier = Modifier.fillMaxWidth().weight(0.4f),
-            maxLines = 8
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(
-            value = signalPair,
-            onValueChange = { signalPair = it },
-            label = { Text("引用信号（可选，如 EURUSD）") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("public" to "公开", "followers" to "关注者", "circle" to "圈子").forEach { (v, label) ->
-                FilterChip(selected = visibility == v, onClick = { visibility = v }, label = { Text(label) })
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { /* TODO: Navigate back */ }) {
+                        Icon(Icons.Default.Close, contentDescription = "关闭")
+                    }
+                },
+                actions = {
+                    Button(
+                        onClick = { viewModel.post(content, signalPair, "", 0, visibility) },
+                        enabled = content.isNotBlank(),
+                        modifier = Modifier.padding(end = SpacingMd)
+                    ) { Text("发布") }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
         }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = SpacingMd),
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Avatar + Input
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                // Avatar placeholder
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = SpacingMd)
+                ) {
+                    // User avatar would go here
+                }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { viewModel.post(content, signalPair, "", 0, visibility) },
-            enabled = content.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("发布") }
+                // Content input
+                Column(modifier = Modifier.weight(1f)) {
+                    TextField(
+                        value = content,
+                        onValueChange = { content = it },
+                        placeholder = { Text("分享你的交易观点...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        maxLines = 8
+                    )
 
-        if (showSuccess) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("发布成功！", color = MaterialTheme.colorScheme.primary)
+                    // Signal pair input
+                    if (signalPair.isNotBlank()) {
+                        OutlinedTextField(
+                            value = signalPair,
+                            onValueChange = { signalPair = it },
+                            placeholder = { Text("引用信号（如 EURUSD）") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(SpacingMd))
+
+            // Visibility options
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("public" to "公开", "followers" to "关注者", "circle" to "圈子").forEach { (v, label) ->
+                    FilterChip(selected = visibility == v, onClick = { visibility = v }, label = { Text(label) })
+                }
+            }
+
+            if (showSuccess) {
+                Spacer(modifier = Modifier.height(SpacingMd))
+                Text("发布成功！", color = MaterialTheme.colorScheme.primary)
+            }
         }
     }
 }

@@ -19,8 +19,9 @@ data class AlertUiState(
 )
 
 @HiltViewModel
-class AlertViewModel @Inject constructor() : ViewModel() {
-    private val client = AlertsRpcClient()
+class AlertViewModel @Inject constructor(
+    private val client: AlertsRpcClient,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AlertUiState())
     val uiState: StateFlow<AlertUiState> = _uiState.asStateFlow()

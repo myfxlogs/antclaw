@@ -8,32 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-data class ConvUi(val id: String, val name: String, val isGroup: Boolean, val lastMessage: String, val timeAgo: String, val unreadCount: Int = 0)
-data class ChatUiState(val conversations: List<ConvUi> = emptyList(), val loading: Boolean = true)
-
-@HiltViewModel
-class ChatViewModel @Inject constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow(ChatUiState())
-    val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
-
-    init { viewModelScope.launch { _uiState.value = ChatUiState(demoConvs, false) } }
-
-    companion object {
-        val demoConvs = listOf(
-            ConvUi("1", "Alex Chen", false, "这个位置值得关注...", "2m前", 2),
-            ConvUi("2", "EURUSD 交易圈", true, "李：收到信号分享", "1h前"),
-        )
-    }
-}
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), onBack: () -> Unit) {

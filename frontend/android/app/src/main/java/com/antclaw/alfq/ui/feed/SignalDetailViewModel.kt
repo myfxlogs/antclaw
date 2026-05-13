@@ -23,9 +23,10 @@ data class SignalDetailUiState(
 )
 
 @HiltViewModel
-class SignalDetailViewModel @Inject constructor() : ViewModel() {
-    private val signalsClient = SignalsRpcClient()
-    private val priceClient = PriceRpcClient()
+class SignalDetailViewModel @Inject constructor(
+    private val signalsClient: SignalsRpcClient,
+    private val priceClient: PriceRpcClient,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignalDetailUiState())
     val uiState: StateFlow<SignalDetailUiState> = _uiState.asStateFlow()
