@@ -51,8 +51,7 @@ func (h *SystemHandler) Readyz(ctx context.Context, _ *connect.Request[antclawv1
 	return connect.NewResponse(&antclawv1.ReadyzResponse{Ready: ready}), nil
 }
 
-func (h *SystemHandler) Info(ctx context.Context, _ *connect.Request[antclawv1.InfoRequest]) (*connect.Response[antclawv1.InfoResponse], error) {
-	_ = ctx
+func (h *SystemHandler) Info(_ context.Context, _ *connect.Request[antclawv1.InfoRequest]) (*connect.Response[antclawv1.InfoResponse], error) {
 	return connect.NewResponse(&antclawv1.InfoResponse{
 		Version:          "0.1.0",
 		GitCommit:        "dev",

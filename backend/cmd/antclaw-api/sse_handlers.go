@@ -122,6 +122,7 @@ func userNotificationsSSE(rdb *redisv9.Client) http.HandlerFunc {
 		w.Header().Set("X-Accel-Buffering", "no")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, ": connected user=%s ts=%d\n\n", userID, time.Now().Unix())
+		flusher.Flush()
 
 		channel := "user:" + userID + ":notifications"
 		ctx := r.Context()
