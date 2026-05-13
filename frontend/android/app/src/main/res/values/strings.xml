@@ -1,4 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">AlfQ</string>
+    <string name="app_tagline">Trader’s Social Terminal</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_discover">Discover</string>
+    <string name="nav_post">Post</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_me">Me</string>
+
+    <!-- Login -->
+    <string name="login_title">AlfQ</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_register">Register</string>
+    <string name="login_forgot_password">Forgot password</string>
+    <string name="login_error_default">Login failed</string>
+
+    <!-- Register -->
+    <string name="register_title">Register AlfQ</string>
+    <string name="register_email">Email</string>
+    <string name="register_username">Username</string>
+    <string name="register_password">Password</string>
+    <string name="register_button">Register</string>
+    <string name="register_has_account">Already have an account? Login</string>
+    <string name="register_error_default">Registration failed, please retry</string>
+
+    <!-- Feed -->
+    <string name="feed_search">Search</string>
+    <string name="feed_notifications">Notifications</string>
+    <string name="feed_tab_hot">Hot</string>
+    <string name="feed_tab_recommended">Recommended</string>
+    <string name="feed_tab_signals">Signals</string>
+    <string name="feed_tab_following">Following</string>
+    <string name="feed_empty_title">Follow traders for real-time signals</string>
+    <string name="feed_empty_action">Go Discover</string>
+    <string name="feed_retry">Retry</string>
+    <string name="feed_system_signal">System Signal</string>
+    <string name="feed_time_just_now">just now</string>
+
+    <!-- Signal Detail -->
+    <string name="signal_detail_back">Back</string>
+    <string name="signal_detail_confidence">Confidence: %1$d%%</string>
+    <string name="signal_detail_price">Current price: %1$s</string>
+
+    <!-- Discover -->
+    <string name="discover_search_hint">Search traders, circles, signals…</string>
+    <string name="discover_hot_traders">Hot Traders</string>
+    <string name="discover_action_view">View</string>
+    <string name="discover_empty_title">No recommended traders</string>
+    <string name="discover_empty_body">Follow some traders and they’ll appear here</string>
+
+    <!-- Post -->
+    <string name="post_close">Close</string>
+    <string name="post_publish">Publish</string>
+    <string name="post_hint">Share your trading view…</string>
+    <string name="post_signal_hint">Reference signal (e.g. EURUSD)</string>
+    <string name="post_visibility_public">Public</string>
+    <string name="post_visibility_followers">Followers</string>
+    <string name="post_visibility_circle">Circle</string>
+    <string name="post_success">Published!</string>
+
+    <!-- Chat -->
+    <string name="chat_title">Messages</string>
+    <string name="chat_group_suffix"> (Group)</string>
+
+    <!-- Me / Profile -->
+    <string name="me_settings">Settings</string>
+    <string name="me_account_management">Account Management</string>
+    <string name="me_trading_accounts">Trading Accounts</string>
+    <string name="me_mt_desc">MT4/MT5 read-only connection</string>
+    <string name="me_my_alerts">My Alerts</string>
+    <string name="me_alerts_desc">Price / Signal / Macro</string>
+    <string name="me_logout">Logout</string>
+    <string name="me_loading">Loading…</string>
+    <string name="me_default_name">Trader</string>
+    <string name="me_following">Following</string>
+    <string name="me_followers">Followers</string>
+    <string name="me_win_rate">Win Rate</string>
+
+    <!-- Tier labels -->
+    <string name="tier_verified">🟢 Verified Trader</string>
+    <string name="tier_elite">🔵 Elite Trader</string>
+
+    <!-- Trader Profile -->
+    <string name="profile_title">Trader Profile</string>
+    <string name="profile_followers">Followers</string>
+    <string name="profile_following">Following</string>
+    <string name="profile_follow">Follow</string>
+    <string name="profile_unfollow">Unfollow</string>
+    <string name="profile_stats_title">Trading Record</string>
+    <string name="profile_win_rate">Win Rate</string>
+    <string name="profile_profit_factor">Profit Factor</string>
+    <string name="profile_sharpe">Sharpe</string>
+    <string name="profile_total_trades">Total Trades</string>
+
+    <!-- MT Accounts -->
+    <string name="mt_title">Trading Accounts</string>
+    <string name="mt_bind_new">Bind New Account</string>
+    <string name="mt_load_failed">Load failed</string>
+    <string name="mt_retry">Retry</string>
+    <string name="mt_empty_title">No trading accounts</string>
+    <string name="mt_empty_action">Bind MT Account</string>
+    <string name="mt_disconnect">Disconnect</string>
+    <string name="mt_connected">Connected</string>
+    <string name="mt_demo">Demo</string>
+    <string name="mt_live">Live</string>
+    <string name="mt_balance">Balance</string>
+    <string name="mt_equity">Equity</string>
+    <string name="mt_server">Server</string>
+    <string name="mt_bind_failed">Binding failed</string>
+
+    <!-- Bind MT Account Wizard -->
+    <string name="bind_mt_title">Bind MT Account</string>
+    <string name="bind_step_platform">Platform</string>
+    <string name="bind_step_credentials">Credentials</string>
+    <string name="bind_step_confirm">Confirm</string>
+    <string name="bind_step1_title">Step 1: Select platform &amp; server</string>
+    <string name="bind_platform_type">Platform Type</string>
+    <string name="bind_server">Server</string>
+    <string name="bind_search_server">Search server</string>
+    <string name="bind_next">Next</string>
+    <string name="bind_step2_title">Step 2: Enter credentials</string>
+    <string name="bind_account">Account</string>
+    <string name="bind_account_hint">Enter MT account</string>
+    <string name="bind_investor_password">Read-only password</string>
+    <string name="bind_password_hint">Enter investor password</string>
+    <string name="bind_previous">Previous</string>
+    <string name="bind_step3_title">Step 3: Confirm binding</string>
+    <string name="bind_label">Label (optional)</string>
+    <string name="bind_label_hint">e.g. main live account</string>
+    <string name="bind_account_type">Account Type</string>
+    <string name="bind_demo">Demo</string>
+    <string name="bind_live">Live</string>
+    <string name="bind_confirm">Confirm Binding</string>
+    <string name="bind_binding">Binding…</string>
+
+    <!-- Alerts -->
+    <string name="alerts_title">My Alerts</string>
+    <string name="alerts_add">+ Add</string>
+    <string name="alerts_empty">No alert subscriptions</string>
+    <string name="alerts_add_alert">Add Alert</string>
+    <string name="alerts_delete">Delete</string>
+    <string name="alert_dialog_title">Add Alert</string>
+    <string name="alert_type_label">Type:</string>
+    <string name="alert_pair_label">Symbol</string>
+    <string name="alert_condition_label">Condition:</string>
+    <string name="alert_threshold_label">Threshold</string>
+    <string name="alert_subscribe">Subscribe</string>
+    <string name="alert_cancel">Cancel</string>
+
+    <!-- Notification Center -->
+    <string name="notif_title">Notification Center</string>
+    <string name="notif_mark_all_read">Mark All Read</string>
+    <string name="notif_empty">No notifications</string>
+    <string name="notif_load_failed">Load failed</string>
+
+    <!-- Notification Preferences -->
+    <string name="notif_prefs_title">Notification Preferences</string>
+    <string name="notif_prefs_alerts">Alert Channels</string>
+    <string name="notif_prefs_market">Market Alerts</string>
+    <string name="notif_prefs_macro">Macro Alerts</string>
+    <string name="notif_prefs_cot">COT Bias</string>
+    <string name="notif_prefs_onchain">On-chain Data</string>
+    <string name="notif_prefs_digest">Digests</string>
+    <string name="notif_prefs_daily_digest">Daily Digest</string>
+    <string name="notif_prefs_weekly_digest">Weekly Digest</string>
+    <string name="notif_prefs_filter">Filter</string>
+    <string name="notif_prefs_high_impact_only">High-impact events only</string>
+
+    <!-- Language -->
+    <string name="settings_language">Language</string>
+    <string name="settings_language_title">Select Language</string>
+
+    <!-- 通用 -->
+    <string name="common_back">Back</string>
+    <string name="common_close">Close</string>
+    <string name="common_loading">Loading…</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_error">Load failed</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+
+    <!-- 信号方向 -->
+    <string name="direction_bullish">↗</string>
+    <string name="direction_bearish">↘</string>
+    <string name="direction_neutral">→</string>
+
+    <!-- 服务器列表（MT 绑定向导） -->
+    <string-array name="mt_server_list">
+        <item>ICMarkets-Demo</item>
+        <item>ICMarkets-Live</item>
+        <item>RoboForex-Demo</item>
+        <item>RoboForex-Live</item>
+        <item>FBS-Demo</item>
+        <item>FBS-Live</item>
+        <item>Exness-Demo</item>
+        <item>Exness-Live</item>
+    </string-array>
 </resources>

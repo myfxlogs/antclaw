@@ -14,9 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.components.SignalCard
 import com.antclaw.alfq.ui.theme.*
 
@@ -34,12 +36,12 @@ fun FeedScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             title = {
-                Text("AlfQ", style = MaterialTheme.typography.titleLarge,
+                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             },
             actions = {
                 IconButton(onClick = onSearchClick) {
-                    Icon(Icons.Default.Search, contentDescription = "\u641c\u7d22",
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.feed_search),
                         tint = MaterialTheme.colorScheme.onSurface)
                 }
                 IconButton(onClick = onNotificationClick) {
@@ -48,14 +50,12 @@ fun FeedScreen(
                             Badge { Text(if (notificationCount > 99) "99+" else notificationCount.toString()) }
                         }
                     }) {
-                        Icon(Icons.Default.Notifications, contentDescription = "\u901a\u77e5",
+                        Icon(Icons.Default.Notifications, contentDescription = stringResource(R.string.feed_notifications),
                             tint = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background
-            ),
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             modifier = Modifier.shadow(4.dp)
         )
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
@@ -73,25 +73,21 @@ fun FeedScreen(
             },
             modifier = Modifier.shadow(2.dp)
         ) {
-            Tab(selected = true, onClick = {}, text = { Text("\u70ed\u95e8", fontWeight = FontWeight.Bold) })
-            Tab(selected = false, onClick = {}, text = { Text("\u63a8\u8350", fontWeight = FontWeight.Normal) })
-            Tab(selected = false, onClick = {}, text = { Text("\u4fe1\u53f7", fontWeight = FontWeight.Normal) })
-            Tab(selected = false, onClick = {}, text = { Text("\u5173\u6ce8", fontWeight = FontWeight.Normal) })
+            Tab(selected = true, onClick = {}, text = { Text(stringResource(R.string.feed_tab_hot), fontWeight = FontWeight.Bold) })
+            Tab(selected = false, onClick = {}, text = { Text(stringResource(R.string.feed_tab_recommended), fontWeight = FontWeight.Normal) })
+            Tab(selected = false, onClick = {}, text = { Text(stringResource(R.string.feed_tab_signals), fontWeight = FontWeight.Normal) })
+            Tab(selected = false, onClick = {}, text = { Text(stringResource(R.string.feed_tab_following), fontWeight = FontWeight.Normal) })
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
         if (state.signalBar.isNotEmpty()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
                     .padding(horizontal = SpacingMd, vertical = SpacingSm),
                 horizontalArrangement = Arrangement.spacedBy(SpacingSm)
             ) {
-                state.signalBar.forEach { item ->
-                    SignalChip(item, onClick = { onSignalClick(item.pair) })
-                }
+                state.signalBar.forEach { item -> SignalChip(item, onClick = { onSignalClick(item.pair) }) }
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
         }
@@ -107,17 +103,16 @@ fun FeedScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(state.error!!, color = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.height(SpacingSm))
-                        TextButton(onClick = { viewModel.load() }) { Text("\u91cd\u8bd5") }
+                        TextButton(onClick = { viewModel.load() }) { Text(stringResource(R.string.feed_retry)) }
                     }
                 }
             }
             state.cards.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("\u5173\u6ce8\u4ea4\u6613\u5458\uff0c\u83b7\u53d6\u5b9e\u65f6\u4fe1\u53f7",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.feed_empty_title), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.height(SpacingSm))
-                        Button(onClick = { /* Navigate to discover */ }) { Text("\u53bb\u53d1\u73b0") }
+                        Button(onClick = { }) { Text(stringResource(R.string.feed_empty_action)) }
                     }
                 }
             }
@@ -128,9 +123,7 @@ fun FeedScreen(
                     verticalArrangement = Arrangement.spacedBy(SpacingMd)
                 ) {
                     items(state.cards, key = { it.id }) { card ->
-                        SignalCard(card, onDetailClick = {
-                            card.pair?.let { onSignalClick(it) }
-                        })
+                        SignalCard(card, onDetailClick = { card.pair?.let { onSignalClick(it) } })
                     }
                 }
             }
@@ -141,31 +134,20 @@ fun FeedScreen(
 @Composable
 fun SignalChip(item: SignalBarItem, onClick: () -> Unit) {
     val textColor = when (item.direction) {
-        "bullish" -> BullGreen
-        "bearish" -> BearRed
+        "bullish" -> BullGreen; "bearish" -> BearRed
         else -> MaterialTheme.colorScheme.onSurface
     }
     val directionIcon = when (item.direction) {
-        "bullish" -> "\u2197"
-        "bearish" -> "\u2198"
-        else -> "\u2192"
+        "bullish" -> stringResource(R.string.direction_bullish)
+        "bearish" -> stringResource(R.string.direction_bearish)
+        else -> stringResource(R.string.direction_neutral)
     }
-
-    Surface(
-        onClick = onClick,
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = SpacingSm, vertical = SpacingXs),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(item.pair, style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold, color = textColor)
-            Text("$directionIcon ${item.confidence}%",
-                style = MaterialTheme.typography.labelMedium, color = textColor)
-            Text(item.price, style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+    Surface(onClick = onClick, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant) {
+        Column(modifier = Modifier.padding(horizontal = SpacingSm, vertical = SpacingXs),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(item.pair, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = textColor)
+            Text("$directionIcon ${item.confidence}%", style = MaterialTheme.typography.labelMedium, color = textColor)
+            Text(item.price, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
         }
     }
 }

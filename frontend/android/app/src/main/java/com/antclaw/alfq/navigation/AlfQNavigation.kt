@@ -18,18 +18,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.antclaw.alfq.R
 
 data class NavTab(val route: String, val label: String, val icon: ImageVector)
 
 val tabs = listOf(
-    NavTab("feed", "首页", Icons.Default.Home),
-    NavTab("discover", "发现", Icons.Default.Search),
-    NavTab("me", "我的", Icons.Default.Person),
+    NavTab("feed", "Home", Icons.Default.Home),
+    NavTab("discover", "Discover", Icons.Default.Search),
+    NavTab("me", "Me", Icons.Default.Person),
 )
 
 @Composable
@@ -54,7 +56,6 @@ fun BottomNavBarWithFAB(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Home
             NavigationItem(
                 selected = currentRoute == "feed",
                 onClick = {
@@ -66,11 +67,10 @@ fun BottomNavBarWithFAB(
                         }
                     }
                 },
-                icon = { Icon(Icons.Default.Home, contentDescription = "首页") },
-                label = "首页"
+                icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.nav_home)) },
+                label = stringResource(R.string.nav_home)
             )
 
-            // Discover
             NavigationItem(
                 selected = currentRoute == "discover",
                 onClick = {
@@ -82,11 +82,10 @@ fun BottomNavBarWithFAB(
                         }
                     }
                 },
-                icon = { Icon(Icons.Default.Search, contentDescription = "发现") },
-                label = "发现"
+                icon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.nav_discover)) },
+                label = stringResource(R.string.nav_discover)
             )
 
-            // Post - FAB
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -97,20 +96,19 @@ fun BottomNavBarWithFAB(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "发布",
+                    contentDescription = stringResource(R.string.nav_post),
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(24.dp)
                 )
             }
 
-            // Chat / 通知
             Box(modifier = Modifier.width(56.dp).clickable(onClick = onChatClick).padding(vertical = 8.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.ChatBubbleOutline, contentDescription = "消息")
+                        Icon(Icons.Default.ChatBubbleOutline, contentDescription = stringResource(R.string.nav_messages))
                     }
                     Text(
-                        "消息",
+                        stringResource(R.string.nav_messages),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -134,7 +132,6 @@ fun BottomNavBarWithFAB(
                 }
             }
 
-            // Me
             NavigationItem(
                 selected = currentRoute == "me",
                 onClick = {
@@ -146,8 +143,8 @@ fun BottomNavBarWithFAB(
                         }
                     }
                 },
-                icon = { Icon(Icons.Default.Person, contentDescription = "我的") },
-                label = "我的"
+                icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.nav_me)) },
+                label = stringResource(R.string.nav_me)
             )
         }
     }
@@ -170,9 +167,7 @@ private fun NavigationItem(
         Box(
             modifier = Modifier.size(24.dp),
             contentAlignment = Alignment.Center
-        ) {
-            icon()
-        }
+        ) { icon() }
         Text(
             label,
             style = MaterialTheme.typography.labelSmall,
@@ -183,8 +178,5 @@ private fun NavigationItem(
 
 @Composable
 fun BottomNavBar(navController: NavController, notificationCount: Int = 0) {
-    BottomNavBarWithFAB(
-        navController = navController,
-        notificationCount = notificationCount
-    )
+    BottomNavBarWithFAB(navController = navController, notificationCount = notificationCount)
 }

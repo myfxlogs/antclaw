@@ -33,6 +33,9 @@ class FeedViewModel @Inject constructor() : ViewModel() {
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
     private val defaultPairs = listOf("EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "XAUUSD", "BTCUSD")
 
+    private val authorSystem = "\u7cfb\u7edf\u4fe1\u53f7"
+    private val timeJustNow = "\u521a\u521a"
+
     init { load() }
 
     fun load() {
@@ -53,12 +56,10 @@ class FeedViewModel @Inject constructor() : ViewModel() {
                 "antclaw.v1.SignalsService/GetBias", biasReq,
                 Signals.GetBiasRequest::class, Signals.GetBiasResponse::class)
             val bias = biasResp.biasesList.firstOrNull()
-
             val priceReq = Price.GetPriceRequest.newBuilder().setPair(pair).setTimeframe("1D").setCount(1).build()
             val priceResp = RpcHelper.unary(
                 "antclaw.v1.PriceService/GetPrice", priceReq,
                 Price.GetPriceRequest::class, Price.GetPriceResponse::class)
-
             SignalBarItem(pair, bias?.direction ?: "neutral",
                 ((bias?.confidence ?: 0.0) * 100).toInt(), priceResp.current.ifEmpty { "--" })
         } catch (_: Exception) { SignalBarItem(pair) }
@@ -71,9 +72,9 @@ class FeedViewModel @Inject constructor() : ViewModel() {
                 "antclaw.v1.SignalsService/GetUnified", req,
                 Signals.GetUnifiedRequest::class, Signals.GetUnifiedResponse::class)
             if (!resp.hasSignal()) return@mapNotNull null
-            FeedCard("signal_$pair", "\u7cfb\u7edf\u4fe1\u53f7", resp.signal.pair, resp.signal.direction,
+            FeedCard("signal_$pair", authorSystem, resp.signal.pair, resp.signal.direction,
                 ((resp.signal.confidence) * 100).toInt(),
-                resp.signal.contributingFactorsList.joinToString(" \u00b7 "), "\u521a\u521a")
+                resp.signal.contributingFactorsList.joinToString(" \u00b7 "), timeJustNow)
         } catch (_: Exception) { null }
     }
 }

@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.theme.SpacingMd
 import com.antclaw.alfq.ui.theme.SpacingSm
 
@@ -29,11 +31,9 @@ fun DiscoverScreen(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("\u641c\u7d22\u4ea4\u6613\u5458\u3001\u5708\u5b50\u3001\u4fe1\u53f7...") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "\u641c\u7d22") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(SpacingMd),
+            placeholder = { Text(stringResource(R.string.discover_search_hint)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.discover_search_hint)) },
+            modifier = Modifier.fillMaxWidth().padding(SpacingMd),
             singleLine = true
         )
 
@@ -49,10 +49,9 @@ fun DiscoverScreen(
                     contentPadding = PaddingValues(horizontal = SpacingMd, vertical = SpacingMd),
                     verticalArrangement = Arrangement.spacedBy(SpacingMd)
                 ) {
-                    // 热门交易员
                     if (state.traders.isNotEmpty()) {
                         item {
-                            Text("\u70ed\u95e8\u4ea4\u6613\u5458", style = MaterialTheme.typography.titleMedium,
+                            Text(stringResource(R.string.discover_hot_traders), style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(SpacingSm))
                         }
@@ -63,40 +62,32 @@ fun DiscoverScreen(
                                 color = MaterialTheme.colorScheme.surfaceVariant,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Row(
-                                    Modifier.padding(SpacingMd),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                                Row(Modifier.padding(SpacingMd), horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically) {
                                     Column {
                                         Text(trader.displayName.ifEmpty { trader.userId },
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Bold)
+                                            style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                                         if (trader.tier.isNotEmpty() && trader.tier != "normal") {
                                             Text(trader.tier, style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.primary)
                                         }
                                     }
                                     OutlinedButton(onClick = { onTraderClick(trader.userId) }) {
-                                        Text("\u67e5\u770b")
+                                        Text(stringResource(R.string.discover_action_view))
                                     }
                                 }
                             }
                         }
                     }
-
-                    // 提示空状态
                     if (state.traders.isEmpty() && state.error == null) {
                         item {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
+                            Box(modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("\u6682\u65e0\u63a8\u8350\u4ea4\u6613\u5458",
+                                    Text(stringResource(R.string.discover_empty_title),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    Text("\u5173\u6ce8\u4e00\u4e9b\u4ea4\u6613\u5458\u540e\u5c06\u5728\u6b64\u663e\u793a",
+                                    Text(stringResource(R.string.discover_empty_body),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
                                 }
