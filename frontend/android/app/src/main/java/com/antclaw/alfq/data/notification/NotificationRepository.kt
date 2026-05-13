@@ -1,63 +1,37 @@
 package com.antclaw.alfq.data.notification
 
 import antclaw.v1.NotificationOuterClass
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
-import com.connectrpc.MethodSpec
-import com.connectrpc.ResponseMessage
-import com.connectrpc.StreamType
-import com.connectrpc.getOrThrow
+import com.antclaw.alfq.data.rpc.RpcHelper
 import java.time.Instant
 
 class NotificationRepository {
 
-    private fun client() = ConnectTransportProvider.createProtocolClient()
+    suspend fun unreadCount(): Long = try {
+        RpcHelper.unary("antclaw.v1.NotificationService/UnreadCount",
+            NotificationOuterClass.UnreadCountRequest.getDefaultInstance(),
+            NotificationOuterClass.UnreadCountRequest::class, NotificationOuterClass.UnreadCountResponse::class).count
+    } catch (_: Exception) { 0 }
 
-    suspend fun unreadCount(): Long {
-        return try {
-            val spec = MethodSpec("antclaw.v1.NotificationService/UnreadCount",
-                NotificationOuterClass.UnreadCountRequest::class,
-                NotificationOuterClass.UnreadCountResponse::class,
-                StreamType.UNARY)
-            val resp: ResponseMessage<NotificationOuterClass.UnreadCountResponse> =
-                client().unary(NotificationOuterClass.UnreadCountRequest.getDefaultInstance(), emptyMap(), spec)
-            resp.getOrThrow().count
-        } catch (_: Exception) { 0 }
-    }
-
-    suspend fun listUnread(limit: Int = 100): List<ClientNotification> {
-        return try {
-            val req = NotificationOuterClass.ListUnreadRequest.newBuilder().setLimit(limit).build()
-            val spec = MethodSpec("antclaw.v1.NotificationService/ListUnread",
-                NotificationOuterClass.ListUnreadRequest::class,
-                NotificationOuterClass.ListUnreadResponse::class,
-                StreamType.UNARY)
-            val resp: ResponseMessage<NotificationOuterClass.ListUnreadResponse> = client().unary(req, emptyMap(), spec)
-            resp.getOrThrow().itemsList.map { it.toClient() }
-        } catch (_: Exception) { emptyList() }
-    }
+    suspend fun listUnread(limit: Int = 100): List<ClientNotification> = try {
+        val req = NotificationOuterClass.ListUnreadRequest.newBuilder().setLimit(limit).build()
+        RpcHelper.unary("antclaw.v1.NotificationService/ListUnread", req,
+            NotificationOuterClass.ListUnreadRequest::class, NotificationOuterClass.ListUnreadResponse::class)
+            .itemsList.map { it.toClient() }
+    } catch (_: Exception) { emptyList() }
 
     suspend fun markRead(id: String) {
         try {
             val req = NotificationOuterClass.MarkReadRequest.newBuilder().setId(id).build()
-            val spec = MethodSpec("antclaw.v1.NotificationService/MarkRead",
-                NotificationOuterClass.MarkReadRequest::class,
-                NotificationOuterClass.MarkReadResponse::class,
-                StreamType.UNARY)
-            client().unary(req, emptyMap(), spec)
+            RpcHelper.unary("antclaw.v1.NotificationService/MarkRead", req,
+                NotificationOuterClass.MarkReadRequest::class, NotificationOuterClass.MarkReadResponse::class)
         } catch (_: Exception) {}
     }
 
-    suspend fun markAllRead(): Long {
-        return try {
-            val spec = MethodSpec("antclaw.v1.NotificationService/MarkAllRead",
-                NotificationOuterClass.MarkAllReadRequest::class,
-                NotificationOuterClass.MarkAllReadResponse::class,
-                StreamType.UNARY)
-            val resp: ResponseMessage<NotificationOuterClass.MarkAllReadResponse> =
-                client().unary(NotificationOuterClass.MarkAllReadRequest.getDefaultInstance(), emptyMap(), spec)
-            resp.getOrThrow().marked
-        } catch (_: Exception) { 0 }
-    }
+    suspend fun markAllRead(): Long = try {
+        RpcHelper.unary("antclaw.v1.NotificationService/MarkAllRead",
+            NotificationOuterClass.MarkAllReadRequest.getDefaultInstance(),
+            NotificationOuterClass.MarkAllReadRequest::class, NotificationOuterClass.MarkAllReadResponse::class).marked
+    } catch (_: Exception) { 0 }
 }
 
 private fun NotificationOuterClass.Notification.toClient() = ClientNotification(

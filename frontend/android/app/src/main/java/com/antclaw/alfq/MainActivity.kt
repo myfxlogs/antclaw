@@ -1,6 +1,6 @@
 package com.antclaw.alfq
 
-import android.content.res.Configuration
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,17 +10,15 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        val lang = LocaleManager.getSelectedLanguage(newBase)
+        super.attachBaseContext(LocaleManager.applyLocale(newBase, lang))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            AlfQApp()
-        }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        LocaleManager.applyLocale(applicationContext,
-            LocaleManager.getSelectedLanguage(applicationContext))
+        setContent { AlfQApp() }
     }
 }
