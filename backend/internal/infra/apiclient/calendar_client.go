@@ -37,7 +37,8 @@ type CalendarEvent struct {
 	Country     string `json:"country"`
 	Currency    string `json:"currency"`
 	Impact      string `json:"impact"`       // "low", "medium", "high"
-	ScheduledAt string `json:"scheduled_at"` // ISO8601
+	ScheduledAt string `json:"scheduled_at"` // ISO8601 (FullDate)
+	ReleaseDate int64  `json:"release_date"`  // Unix milliseconds (ReleaseDate)
 	Previous    string `json:"previous"`
 	Forecast    string `json:"forecast"`
 	Actual      string `json:"actual"`
@@ -180,6 +181,7 @@ func normalizeEvent(e MQL5Event) CalendarEvent {
 		Currency:    e.CurrencyCode,
 		Impact:      impact,
 		ScheduledAt: e.FullDate,
+		ReleaseDate: e.ReleaseDate,
 		Previous:    e.PreviousValue,
 		Forecast:    e.ForecastValue,
 		Actual:      e.ActualValue,

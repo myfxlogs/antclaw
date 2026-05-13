@@ -54,8 +54,12 @@ func (s *CalendarService) SyncWeek(ctx context.Context) (*SyncResult, error) {
 		direction := s.calculateImpactDirection(e)
 		surpriseLabel := s.classifySurprise(surprise)
 
-		// Parse scheduled time
-		scheduledAt, _ := time.Parse(time.RFC3339, e.ScheduledAt)
+		// Parse scheduled time - prefer ReleaseDate (Unix ms), fallback to FullDate
+		scheduledAt, err := s.parseEventTime(e)
+		if err != nil {
+			s.logger.Warn("failed to parse event time, skipping", "event_id", e.EventID, "error", err)
+			continue
+		}
 
 		event := postgres.CalendarEvent{
 			EventID:         s.truncate(s.generateEventID(e), 64),
@@ -225,10 +229,35 @@ func (s *CalendarService) classifySurprise(surprise float64) string {
 	}
 }
 
+// parseEventTime parses event time from CalendarEvent.
+// Prefers ReleaseDate (Unix milliseconds), falls back to FullDate.
+func (s *CalendarService) parseEventTime(e apiclient.CalendarEvent) (time.Time, error) {
+	// Prefer ReleaseDate (Unix milliseconds)
+	if e.ReleaseDate > 0 {
+		return time.UnixMilli(e.ReleaseDate).UTC(), nil
+	}
+
+	// Fallback to FullDate: format is "2026-05-11T14:00:00" (no timezone)
+	if e.ScheduledAt != "" {
+		// Parse in UTC since MQL5 FullDate is UTC
+		t, err := time.ParseInLocation("2006-01-02T15:04:05", e.ScheduledAt, time.UTC)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("invalid FullDate format: %w", err)
+		}
+		return t, nil
+	}
+
+	return time.Time{}, fmt.Errorf("both ReleaseDate and ScheduledAt are empty")
+}
+
 // generateEventID generates unique event ID
 func (s *CalendarService) generateEventID(e apiclient.CalendarEvent) string {
-	// Parse scheduled_at time and use it for ID
-	t, _ := time.Parse(time.RFC3339, e.ScheduledAt)
+	// Parse event time for ID
+	t, err := s.parseEventTime(e)
+	if err != nil {
+		// Fallback to current time if parsing fails (should not happen after parseEventTime check)
+		t = time.Now()
+	}
 	return fmt.Sprintf("%s_%s_%d",
 		e.Currency,
 		strings.ReplaceAll(strings.ToLower(e.Title), " ", "_"),
