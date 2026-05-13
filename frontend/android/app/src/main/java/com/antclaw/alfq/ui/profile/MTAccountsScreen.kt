@@ -3,10 +3,13 @@ package com.antclaw.alfq.ui.profile
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.ui.theme.BullGreen
@@ -15,62 +18,86 @@ import com.antclaw.alfq.ui.theme.BearRed
 @Composable
 fun MTAccountsScreen(
     viewModel: MTAccountsViewModel = hiltViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onBindClick: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Header
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = onBack) { Text("← 返回") }
             Text("交易账号", style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = { viewModel.showAddDialog = true }) {
-                Text("+ 添加")
+            TextButton(onClick = onBindClick) {
+                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("绑定新账户")
             }
         }
 
-        if (state.loading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        when {
+            state.loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-        } else if (state.accounts.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("暂无交易账号", style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = { viewModel.showAddDialog = true }) {
-                        Text("添加 MT5 账号")
+            state.error != null -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("加载失败", style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error)
+                        Text(state.error ?: "", style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedButton(onClick = { viewModel.loadAccounts() }) {
+                            Text("重试")
+                        }
                     }
                 }
             }
-        } else {
-            LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
-                items(state.accounts) { account ->
-                    MTAccountCard(account, onRemove = { viewModel.removeAccount(account.id) })
-                    Spacer(modifier = Modifier.height(8.dp))
+            state.accounts.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("暂无交易账号", style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = onBindClick) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("绑定 MT 账户")
+                        }
+                    }
+                }
+            }
+            else -> {
+                LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    items(state.accounts, key = { "${it.type}_${it.id}" }) { account ->
+                        MtAccountCard(
+                            account = account,
+                            onRemove = {
+                                if (account.type == "MT4") {
+                                    viewModel.removeMt4Account(account.id)
+                                } else {
+                                    viewModel.removeMt5Account(account.id)
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
         }
-    }
-
-    // Add Account Dialog
-    if (viewModel.showAddDialog) {
-        AddAccountDialog(
-            onDismiss = { viewModel.showAddDialog = false },
-            onAdd = { server, account, password, label, isDemo ->
-                viewModel.addAccount(server, account, password, label, isDemo)
-            }
-        )
     }
 }
 
 @Composable
-fun MTAccountCard(account: MTAccountUi, onRemove: () -> Unit) {
+fun MtAccountCard(account: MtAccountItem, onRemove: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -81,53 +108,69 @@ fun MTAccountCard(account: MTAccountUi, onRemove: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(
-                        "${account.label.ifEmpty { account.server }} #${account.account}",
-                        style = MaterialTheme.typography.titleSmall
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "[${account.type}] ",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            "${account.label.ifEmpty { account.server }} #${account.account}",
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        if (account.isDemo) "模拟盘" else "实盘",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            if (account.isDemo) "模拟盘" else "实盘",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                        if (account.connected) {
+                            Text(
+                                "● 已连接",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = BullGreen,
+                            )
+                        }
+                    }
                 }
                 TextButton(onClick = onRemove) {
                     Text("断开", color = MaterialTheme.colorScheme.error)
                 }
             }
 
-            if (account.info != null) {
+            if (account.balance > 0 || account.equity > 0) {
                 Spacer(modifier = Modifier.height(12.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    AccountStat("余额", "$${String.format("%.0f", account.info!!.balance)}")
-                    AccountStat("净值", "$${String.format("%.0f", account.info!!.equity)}")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    AccountStat("余额", "$${String.format("%.0f", account.balance)}")
+                    AccountStat("净值", "$${String.format("%.0f", account.equity)}")
                     AccountStat(
-                        "今日",
-                        "${if (account.info!!.today_pnl >= 0) "+" else ""}${String.format("%.1f", account.info!!.today_pnl * 100)}%",
-                        if (account.info!!.today_pnl >= 0) BullGreen else BearRed
+                        "服务器",
+                        account.server,
                     )
                 }
-            }
-
-            if (account.positions.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "持仓 ${account.positions.size} 笔",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
         }
     }
 }
 
 @Composable
-fun AccountStat(label: String, value: String, color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface) {
+fun AccountStat(
+    label: String,
+    value: String,
+    color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, style = MaterialTheme.typography.titleMedium, color = color)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
     }
 }
-
-

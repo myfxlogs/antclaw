@@ -25,12 +25,11 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-    init {
-        // 尝试恢复登录态
+    fun autoLogin(onSuccess: (String) -> Unit) {
         viewModelScope.launch {
             val token = authRepo.restoreToken()
             if (token != null) {
-                // 已有有效 token，跳过登录
+                onSuccess(token)
             }
         }
     }

@@ -2,24 +2,35 @@ package com.antclaw.alfq.ui.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.antclaw.alfq.data.rpc.*
+import antclaw.v1.Signals
+import antclaw.v1.Price
+import com.antclaw.alfq.data.rpc.RpcHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class FeedViewModel @Inject constructor(
-    private val signalsClient: SignalsRpcClient,
-    private val priceClient: PriceRpcClient,
-) : ViewModel() {
+data class SignalBarItem(
+    val pair: String, val direction: String = "neutral",
+    val confidence: Int = 0, val price: String = "--"
+)
+data class FeedCard(
+    val id: String, val author: String = "", val pair: String? = null,
+    val direction: String = "neutral", val confidence: Int = 0,
+    val content: String = "", val timeAgo: String = ""
+)
+data class FeedUiState(
+    val signalBar: List<SignalBarItem> = emptyList(),
+    val cards: List<FeedCard> = emptyList(),
+    val loading: Boolean = false, val error: String? = null
+)
 
+@HiltViewModel
+class FeedViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
-
     private val defaultPairs = listOf("EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "XAUUSD", "BTCUSD")
 
     init { load() }
@@ -28,51 +39,41 @@ class FeedViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true, error = null)
             try {
-                val signalBar = loadSignalBar()
-                val cards = loadFeedCards()
-                _uiState.value = FeedUiState(signalBar = signalBar, cards = cards, loading = false)
+                _uiState.value = FeedUiState(signalBar = loadSignalBar(), cards = loadFeedCards())
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(loading = false, error = e.message ?: "加载失败")
+                _uiState.value = _uiState.value.copy(error = e.message)
             }
         }
     }
 
-    private suspend fun loadSignalBar(): List<SignalBarItem> {
-        return defaultPairs.map { pair ->
-            try {
-                val biasResp = signalsClient.getBias(SigBiasReq(pair, "1D"))
-                val bias = biasResp.biases.firstOrNull()
-                val priceResp = priceClient.getBars(PriceReq(pair, "1D", 1))
-                SignalBarItem(
-                    pair = pair,
-                    direction = bias?.direction ?: "neutral",
-                    confidence = ((bias?.confidence ?: 0.0) * 100).toInt(),
-                    price = priceResp.current.ifEmpty { "--" }
-                )
-            } catch (_: Exception) {
-                SignalBarItem(pair = pair, direction = "neutral", confidence = 0, price = "--")
-            }
-        }
+    private suspend fun loadSignalBar(): List<SignalBarItem> = defaultPairs.map { pair ->
+        try {
+            val biasReq = Signals.GetBiasRequest.newBuilder().setPair(pair).setTimeframe("1D").build()
+            val biasResp = RpcHelper.unary(
+                "antclaw.v1.SignalsService/GetBias", biasReq,
+                Signals.GetBiasRequest::class, Signals.GetBiasResponse::class)
+            val bias = biasResp.biasesList.firstOrNull()
+
+            val priceReq = Price.GetPriceRequest.newBuilder().setPair(pair).setTimeframe("1D").setCount(1).build()
+            val priceResp = RpcHelper.unary(
+                "antclaw.v1.PriceService/GetPrice", priceReq,
+                Price.GetPriceRequest::class, Price.GetPriceResponse::class)
+
+            SignalBarItem(pair, bias?.direction ?: "neutral",
+                ((bias?.confidence ?: 0.0) * 100).toInt(), priceResp.current.ifEmpty { "--" })
+        } catch (_: Exception) { SignalBarItem(pair) }
     }
 
-    private suspend fun loadFeedCards(): List<FeedCard> {
-        val cards = mutableListOf<FeedCard>()
-        for (pair in defaultPairs.take(3)) {
-            try {
-                val unified = signalsClient.getUnified(SigUnifiedReq(pair))
-                val sig = unified.signal ?: continue
-                cards.add(FeedCard(
-                    id = "signal_$pair",
-                    type = "signal_card",
-                    author = "系统信号",
-                    pair = sig.pair,
-                    direction = sig.direction,
-                    confidence = ((sig.confidence) * 100).toInt(),
-                    content = sig.contributing_factors.joinToString(" \u00b7 "),
-                    timeAgo = "刚刚"
-                ))
-            } catch (_: Exception) { }
-        }
-        return cards
+    private suspend fun loadFeedCards(): List<FeedCard> = defaultPairs.take(3).mapNotNull { pair ->
+        try {
+            val req = Signals.GetUnifiedRequest.newBuilder().setPair(pair).build()
+            val resp = RpcHelper.unary(
+                "antclaw.v1.SignalsService/GetUnified", req,
+                Signals.GetUnifiedRequest::class, Signals.GetUnifiedResponse::class)
+            if (!resp.hasSignal()) return@mapNotNull null
+            FeedCard("signal_$pair", "\u7cfb\u7edf\u4fe1\u53f7", resp.signal.pair, resp.signal.direction,
+                ((resp.signal.confidence) * 100).toInt(),
+                resp.signal.contributingFactorsList.joinToString(" \u00b7 "), "\u521a\u521a")
+        } catch (_: Exception) { null }
     }
 }

@@ -9,7 +9,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.ui.theme.BullGreen
-import com.antclaw.alfq.ui.theme.BearRed
 
 @Composable
 fun ProfileScreen(
@@ -35,7 +34,6 @@ fun ProfileScreen(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else {
             Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                // Name + Tier
                 Text(state.displayName, style = MaterialTheme.typography.headlineMedium)
                 val tierLabel = when (state.tier) { "verified" -> "🟢 认证交易员" "elite" -> "🔵 精英交易员" else -> "" }
                 if (tierLabel.isNotEmpty()) Text(tierLabel, color = MaterialTheme.colorScheme.primary)
@@ -43,7 +41,6 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Follow stats
                 Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("${state.followerCount}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
@@ -59,10 +56,8 @@ fun ProfileScreen(
                 Button(onClick = { viewModel.toggleFollow() }) {
                     Text(if (state.isFollowing) "取消关注" else "关注")
                 }
-
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Stats card
                 Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("交易战绩", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)

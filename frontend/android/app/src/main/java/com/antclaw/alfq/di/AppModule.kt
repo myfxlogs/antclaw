@@ -3,6 +3,7 @@ package com.antclaw.alfq.di
 import android.content.Context
 import androidx.room.Room
 import com.antclaw.alfq.data.local.AppDatabase
+import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
 import com.connectrpc.ProtocolClientInterface
 import com.connectrpc.okhttp.ConnectOkHttpClient
@@ -19,21 +20,24 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideConnectClient(): ConnectOkHttpClient {
-        return ConnectTransportProvider.create()
+    fun provideTokenStore(@ApplicationContext context: Context): TokenStore {
+        val store = TokenStore(context)
+        ConnectTransportProvider.init(store)
+        return store
     }
 
     @Provides
     @Singleton
-    fun provideProtocolClient(): ProtocolClientInterface {
-        return ConnectTransportProvider.createProtocolClient()
-    }
+    fun provideConnectClient(): ConnectOkHttpClient = ConnectTransportProvider.create()
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "alfq.db")
-            .fallbackToDestructiveMigration() // debug-only; add proper Migration for releases
+    fun provideProtocolClient(): ProtocolClientInterface = ConnectTransportProvider.createProtocolClient()
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "alfq.db")
+            .fallbackToDestructiveMigration()
             .build()
-    }
 }

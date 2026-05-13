@@ -12,11 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.antclaw.alfq.ui.theme.SpacingMd
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
+fun PostScreen(
+    viewModel: PostViewModel = hiltViewModel(),
+    onClose: () -> Unit = {},
+) {
     var content by remember { mutableStateOf("") }
     var signalPair by remember { mutableStateOf("") }
     var visibility by remember { mutableStateOf("public") }
@@ -31,8 +35,8 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: Navigate back */ }) {
-                        Icon(Icons.Default.Close, contentDescription = "关闭")
+                    IconButton(onClick = onClose) {
+                        Icon(Icons.Default.Close, contentDescription = "\u5173\u95ed")
                     }
                 },
                 actions = {
@@ -40,7 +44,7 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
                         onClick = { viewModel.post(content, signalPair, "", 0, visibility) },
                         enabled = content.isNotBlank(),
                         modifier = Modifier.padding(end = SpacingMd)
-                    ) { Text("发布") }
+                    ) { Text("\u53d1\u5e03") }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
@@ -55,23 +59,18 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
                 .padding(horizontal = SpacingMd),
             verticalArrangement = Arrangement.Top
         ) {
-            // Avatar + Input
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                // Avatar placeholder
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .padding(end = SpacingMd)
-                ) {
-                    // User avatar would go here
-                }
+                )
 
-                // Content input
                 Column(modifier = Modifier.weight(1f)) {
                     TextField(
                         value = content,
                         onValueChange = { content = it },
-                        placeholder = { Text("分享你的交易观点...") },
+                        placeholder = { Text("\u5206\u4eab\u4f60\u7684\u4ea4\u6613\u89c2\u70b9...") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -82,12 +81,11 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
                         maxLines = 8
                     )
 
-                    // Signal pair input
                     if (signalPair.isNotBlank()) {
                         OutlinedTextField(
                             value = signalPair,
                             onValueChange = { signalPair = it },
-                            placeholder = { Text("引用信号（如 EURUSD）") },
+                            placeholder = { Text("\u5f15\u7528\u4fe1\u53f7\uff08\u5982 EURUSD\uff09") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
@@ -98,16 +96,15 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel()) {
 
             Spacer(modifier = Modifier.height(SpacingMd))
 
-            // Visibility options
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("public" to "公开", "followers" to "关注者", "circle" to "圈子").forEach { (v, label) ->
+                listOf("public" to "\u516c\u5f00", "followers" to "\u5173\u6ce8\u8005", "circle" to "\u5708\u5b50").forEach { (v, label) ->
                     FilterChip(selected = visibility == v, onClick = { visibility = v }, label = { Text(label) })
                 }
             }
 
             if (showSuccess) {
                 Spacer(modifier = Modifier.height(SpacingMd))
-                Text("发布成功！", color = MaterialTheme.colorScheme.primary)
+                Text("\u53d1\u5e03\u6210\u529f\uff01", color = MaterialTheme.colorScheme.primary)
             }
         }
     }

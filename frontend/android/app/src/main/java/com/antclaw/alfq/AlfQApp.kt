@@ -2,13 +2,8 @@ package com.antclaw.alfq
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -26,6 +21,7 @@ import com.antclaw.alfq.ui.profile.MeScreen
 import com.antclaw.alfq.ui.profile.MTAccountsScreen
 import com.antclaw.alfq.ui.alerts.AlertScreen
 import com.antclaw.alfq.ui.login.LoginScreen
+import com.antclaw.alfq.ui.login.RegisterScreen
 import com.antclaw.alfq.ui.notification.NotificationCenterScreen
 import com.antclaw.alfq.ui.notification.NotificationPrefsScreen
 import com.antclaw.alfq.ui.notification.NotificationViewModel
@@ -39,18 +35,33 @@ fun AlfQApp() {
 
     AlfQTheme(darkTheme = false) {
         if (!isLoggedIn.value) {
-            LoginScreen(
-                onLoginSuccess = { token ->
-                    ConnectTransportProvider.setTokenProvider { token }
-                    isLoggedIn.value = true
+            val authNavController = rememberNavController()
+            NavHost(
+                navController = authNavController,
+                startDestination = "login"
+            ) {
+                composable("login") {
+                    LoginScreen(
+                        onLoginSuccess = { token ->
+                            ConnectTransportProvider.setToken(token)
+                            isLoggedIn.value = true
+                        },
+                        onRegisterClick = { authNavController.navigate("register") },
+                    )
                 }
-            )
+                composable("register") {
+                    RegisterScreen(
+                        onBack = { authNavController.popBackStack() },
+                        onRegisterSuccess = { token ->
+                            ConnectTransportProvider.setToken(token)
+                            isLoggedIn.value = true
+                        },
+                    )
+                }
+            }
         } else {
             MainContent(
-                onLogout = {
-                    ConnectTransportProvider.setTokenProvider { null }
-                    isLoggedIn.value = false
-                }
+                onLogout = { isLoggedIn.value = false }
             )
         }
     }
@@ -62,7 +73,6 @@ fun MainContent(onLogout: () -> Unit) {
     val notifVm: NotificationViewModel = viewModel()
     val notifState by notifVm.state.collectAsState()
 
-    // SSE 前后台生命周期管理
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -96,19 +106,35 @@ fun MainContent(onLogout: () -> Unit) {
                         notificationCount = notifState.unreadCount,
                         onSignalClick = { pair -> navController.navigate("signal/$pair") },
                         onNotificationClick = { navController.navigate("notifications") },
+                        onSearchClick = { navController.navigate("discover") },
                     )
                 }
-                composable("discover") { DiscoverScreen() }
-                composable("post") { PostScreen() }
+                composable("discover") {
+                    DiscoverScreen(
+                        onTraderClick = { userId -> navController.navigate("profile/$userId") },
+                    )
+                }
+                composable("post") {
+                    PostScreen(onClose = { navController.popBackStack() })
+                }
                 composable("me") {
                     MeScreen(
                         onLogout = onLogout,
                         onNavigateToMTAccounts = { navController.navigate("mt_accounts") },
-                        onNavigateToAlerts = { navController.navigate("alerts") }
+                        onNavigateToAlerts = { navController.navigate("alerts") },
+                        onNavigateToSettings = { navController.navigate("notification_prefs") },
                     )
                 }
                 composable("mt_accounts") {
-                    MTAccountsScreen(onBack = { navController.popBackStack() })
+                    MTAccountsScreen(
+                        onBack = { navController.popBackStack() },
+                        onBindClick = { navController.navigate("bind_mt_account") }
+                    )
+                }
+                composable("bind_mt_account") {
+                    com.antclaw.alfq.ui.mt.BindMtAccountScreen(
+                        onBack = { navController.popBackStack() },
+                    )
                 }
                 composable("alerts") {
                     AlertScreen(onBack = { navController.popBackStack() })
@@ -129,6 +155,16 @@ fun MainContent(onLogout: () -> Unit) {
                 ) { backStackEntry ->
                     val pair = backStackEntry.arguments?.getString("pair") ?: "EURUSD"
                     SignalDetailScreen(pair = pair, onBack = { navController.popBackStack() })
+                }
+                composable(
+                    route = "profile/{userId}",
+                    arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString("userId") ?: "me"
+                    com.antclaw.alfq.ui.profile.ProfileScreen(
+                        userId = userId,
+                        onBack = { navController.popBackStack() }
+                    )
                 }
             }
         )

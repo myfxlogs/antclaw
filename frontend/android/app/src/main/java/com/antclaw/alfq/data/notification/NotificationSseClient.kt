@@ -4,6 +4,7 @@ import android.util.Log
 import com.antclaw.alfq.BuildConfig
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
 import kotlinx.coroutines.*
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import okhttp3.OkHttpClient
@@ -47,7 +48,7 @@ class NotificationSseClient {
         scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         backoffIndex = 0
         job = scope?.launch {
-            while (isActive) {
+            while (coroutineContext.isActive) {
                 try {
                     connectBlocking(token)
                 } catch (e: CancellationException) {
@@ -97,7 +98,7 @@ class NotificationSseClient {
 
         if (response.code == 401) {
             Log.w(TAG, "SSE 401, stop reconnecting")
-            ConnectTransportProvider.setTokenProvider { null }
+            ConnectTransportProvider.clearToken()
             disconnect()
             return
         }
@@ -117,8 +118,9 @@ class NotificationSseClient {
             var eventType = ""
             val dataBuilder = StringBuilder()
 
-            while (isActive) {
-                val line = reader.readLine() ?: break
+            while (coroutineContext.isActive) {
+                val line = reader.readLine()
+                if (line == null) break
                 when {
                     line.startsWith("event:") -> {
                         eventType = line.removePrefix("event:").trim()

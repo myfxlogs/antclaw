@@ -36,12 +36,12 @@ fun AlertScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("暂无警报订阅", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = { showAddDialog = true }) { Text("添加警报") }
+                    Button(onClick = { showAddDialog = true }) { Text("添加警报") }
                 }
             }
         } else {
             LazyColumn(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(state.subscriptions) { sub ->
+                items(state.subscriptions, key = { it.subscriptionId }) { sub ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -53,13 +53,10 @@ fun AlertScreen(
                         ) {
                             Column {
                                 Text("${sub.pair} ${sub.condition} ${sub.threshold}", style = MaterialTheme.typography.bodyLarge)
-                                Text(sub.alert_type, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                                Text(sub.alertType, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                             }
-                            Row {
-                                Switch(checked = sub.active, onCheckedChange = { /* TODO: toggle */ })
-                                TextButton(onClick = { viewModel.unsubscribe(sub.subscription_id) }) {
-                                    Text("删除", color = MaterialTheme.colorScheme.error)
-                                }
+                            TextButton(onClick = { viewModel.unsubscribe(sub.subscriptionId) }) {
+                                Text("删除", color = MaterialTheme.colorScheme.error)
                             }
                         }
                     }
@@ -94,7 +91,6 @@ fun AddAlertDialog(
         title = { Text("添加警报") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Type
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("类型: ", modifier = Modifier.width(80.dp))
                     listOf("signal", "price", "macro").forEach { t ->

@@ -1,16 +1,8 @@
 package com.antclaw.alfq.ui.profile
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.antclaw.alfq.data.rpc.MT5AddAccountReq
-import com.antclaw.alfq.data.rpc.MT5InfoReq
-import com.antclaw.alfq.data.rpc.MT5InfoResp
-import com.antclaw.alfq.data.rpc.MT5PositionResp
-import com.antclaw.alfq.data.rpc.MT5RemoveReq
-import com.antclaw.alfq.data.rpc.MT5RpcClient
+import com.antclaw.alfq.data.mt.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,73 +10,135 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class MTAccountUi(
+data class MtAccountItem(
     val id: String,
     val server: String,
     val account: String,
     val label: String,
+    val type: String,
     val isDemo: Boolean,
-    val info: MT5InfoResp? = null,
-    val positions: List<MT5PositionResp> = emptyList(),
-    val orderCount: Int = 0,
+    val connected: Boolean,
+    val balance: Double,
+    val equity: Double,
+    val createdAt: Long,
 )
 
-data class MTAccountsUiState(
-    val accounts: List<MTAccountUi> = emptyList(),
-    val loading: Boolean = true,
+data class MtAccountsUiState(
+    val accounts: List<MtAccountItem> = emptyList(),
+    val loading: Boolean = false,
+    val error: String? = null,
+    val binding: Boolean = false,
+    val bindError: String? = null,
+    val bindSuccess: Boolean = false,
 )
 
 @HiltViewModel
-class MTAccountsViewModel @Inject constructor(
-    private val rpc: MT5RpcClient,
-) : ViewModel() {
+class MTAccountsViewModel @Inject constructor() : ViewModel() {
+    private val _uiState = MutableStateFlow(MtAccountsUiState())
+    val uiState: StateFlow<MtAccountsUiState> = _uiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(MTAccountsUiState())
-    val uiState: StateFlow<MTAccountsUiState> = _uiState.asStateFlow()
-
-    var showAddDialog by mutableStateOf(false)
-
-    // Demo accounts for UI testing (replace with real RPC when backend ready)
-    private val demoAccounts = listOf(
-        MTAccountUi(
-            id = "1", server = "ICMarkets-Demo", account = "88005522",
-            label = "主要实盘", isDemo = false,
-            info = MT5InfoResp(balance = 12450.0, equity = 12680.0, margin = 980.0, today_pnl = 0.032),
-            positions = listOf(MT5PositionResp(ticket = 1001, symbol = "EURUSD", type = "BUY"), MT5PositionResp(ticket = 1002, symbol = "XAUUSD", type = "SELL")),
-            orderCount = 247
-        ),
-        MTAccountUi(
-            id = "2", server = "Exness-Demo", account = "11223344",
-            label = "策略测试", isDemo = true,
-            info = MT5InfoResp(balance = 5000.0, equity = 5040.0, margin = 0.0, today_pnl = 0.008),
-            orderCount = 45
-        )
-    )
-
-    init {
+    fun loadAccounts() {
         viewModelScope.launch {
-            // Placeholder: load from local storage
-            _uiState.value = MTAccountsUiState(accounts = demoAccounts, loading = false)
-        }
-    }
-
-    fun addAccount(server: String, account: String, password: String, label: String, isDemo: Boolean) {
-        viewModelScope.launch {
-            showAddDialog = false
+            _uiState.value = _uiState.value.copy(loading = true, error = null)
             try {
-                // rpc.addAccount(MT5AddAccountReq(server, account, password, label, isDemo))
-                // Reload list
+                refreshBalances()
+                _uiState.value = _uiState.value.copy(loading = false)
             } catch (e: Exception) {
-                // Handle error
+                _uiState.value = _uiState.value.copy(loading = false, error = e.message)
             }
         }
     }
 
-    fun removeAccount(id: String) {
+    private suspend fun refreshBalances() {
+        val updated = _uiState.value.accounts.map { account ->
+            try {
+                when (account.type) {
+                    "MT4" -> {
+                        val info = MtRpcClient.getMt4AccountInfo(account.id)
+                        account.copy(balance = info.balance, equity = info.equity)
+                    }
+                    "MT5" -> {
+                        val info = MtRpcClient.getMt5AccountInfo(account.id)
+                        account.copy(balance = info.balance, equity = info.equity)
+                    }
+                    else -> account
+                }
+            } catch (_: Exception) { account }
+        }
+        _uiState.value = _uiState.value.copy(accounts = updated)
+    }
+
+    fun bindMt4Account(server: String, account: String, password: String, label: String, isDemo: Boolean) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(binding = true, bindError = null)
+            try {
+                val req = AddMt4Request(server, account, password, label, isDemo)
+                val a = MtRpcClient.addMt4Account(req)
+                val item = MtAccountItem(
+                    a.id, a.server, a.account, a.label, "MT4",
+                    a.isDemo, a.connected, 0.0, 0.0, a.createdAt
+                )
+                _uiState.value = _uiState.value.copy(
+                    binding = false, bindSuccess = true,
+                    accounts = _uiState.value.accounts + item,
+                )
+                refreshBalances()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    binding = false,
+                    bindError = e.message ?: "\u7ed1\u5b9a\u5931\u8d25"
+                )
+            }
+        }
+    }
+
+    fun bindMt5Account(server: String, account: String, password: String, label: String, isDemo: Boolean) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(binding = true, bindError = null)
+            try {
+                val req = AddMt5Request(server, account, password, label, isDemo)
+                val a = MtRpcClient.addMt5Account(req)
+                val item = MtAccountItem(
+                    a.id, a.server, a.account, a.label, "MT5",
+                    a.isDemo, a.connected, 0.0, 0.0, a.createdAt
+                )
+                _uiState.value = _uiState.value.copy(
+                    binding = false, bindSuccess = true,
+                    accounts = _uiState.value.accounts + item,
+                )
+                refreshBalances()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    binding = false,
+                    bindError = e.message ?: "\u7ed1\u5b9a\u5931\u8d25"
+                )
+            }
+        }
+    }
+
+    fun removeMt4Account(id: String) {
         viewModelScope.launch {
             try {
-                // rpc.removeAccount(MT5RemoveReq(id))
-            } catch (e: Exception) { }
+                MtRpcClient.removeMt4Account(id)
+                _uiState.value = _uiState.value.copy(
+                    accounts = _uiState.value.accounts.filter { it.id != id }
+                )
+            } catch (_: Exception) {}
         }
+    }
+
+    fun removeMt5Account(id: String) {
+        viewModelScope.launch {
+            try {
+                MtRpcClient.removeMt5Account(id)
+                _uiState.value = _uiState.value.copy(
+                    accounts = _uiState.value.accounts.filter { it.id != id }
+                )
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun clearBindResult() {
+        _uiState.value = _uiState.value.copy(bindSuccess = false, bindError = null)
     }
 }
