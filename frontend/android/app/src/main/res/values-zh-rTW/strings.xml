@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">AlfQ</string>
+    <string name="app_tagline">交易員的社交終端</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">首頁</string>
+    <string name="nav_discover">發現</string>
+    <string name="nav_post">發佈</string>
+    <string name="nav_messages">訊息</string>
+    <string name="nav_me">我的</string>
+
+    <!-- Login -->
+    <string name="login_title">AlfQ</string>
+    <string name="login_email">電子郵件</string>
+    <string name="login_password">密碼</string>
+    <string name="login_button">登入</string>
+    <string name="login_register">註冊</string>
+    <string name="login_forgot_password">忘記密碼</string>
+    <string name="login_error_default">登入失敗</string>
+
+    <!-- Register -->
+    <string name="register_title">註冊 AlfQ</string>
+    <string name="register_email">電子郵件</string>
+    <string name="register_username">使用者名稱</string>
+    <string name="register_password">密碼</string>
+    <string name="register_button">註冊</string>
+    <string name="register_has_account">已有帳號？登入</string>
+    <string name="register_error_default">註冊失敗，請重試</string>
+
+    <!-- Feed -->
+    <string name="feed_search">搜尋</string>
+    <string name="feed_notifications">通知</string>
+    <string name="feed_tab_hot">熱門</string>
+    <string name="feed_tab_recommended">推薦</string>
+    <string name="feed_tab_signals">訊號</string>
+    <string name="feed_tab_following">追蹤中</string>
+    <string name="feed_empty_title">追蹤交易員，獲取即時訊號</string>
+    <string name="feed_empty_action">去發現</string>
+    <string name="feed_retry">重試</string>
+    <string name="feed_system_signal">系統訊號</string>
+    <string name="feed_time_just_now">剛剛</string>
+
+    <!-- Signal Detail -->
+    <string name="signal_detail_back">返回</string>
+    <string name="signal_detail_confidence">信心度: %1$d%%</string>
+    <string name="signal_detail_price">目前價格: %1$s</string>
+
+    <!-- Discover -->
+    <string name="discover_search_hint">搜尋交易員、圈子、訊號…</string>
+    <string name="discover_hot_traders">熱門交易員</string>
+    <string name="discover_action_view">查看</string>
+    <string name="discover_empty_title">暫無推薦交易員</string>
+    <string name="discover_empty_body">追蹤一些交易員後將在此顯示</string>
+
+    <!-- Post -->
+    <string name="post_close">關閉</string>
+    <string name="post_publish">發佈</string>
+    <string name="post_hint">分享你的交易觀點…</string>
+    <string name="post_signal_hint">引用訊號（如 EURUSD）</string>
+    <string name="post_visibility_public">公開</string>
+    <string name="post_visibility_followers">追蹤者</string>
+    <string name="post_visibility_circle">圈子</string>
+    <string name="post_success">發佈成功！</string>
+
+    <!-- Chat -->
+    <string name="chat_title">訊息</string>
+    <string name="chat_group_suffix">（群組）</string>
+
+    <!-- Me / Profile -->
+    <string name="me_settings">設定</string>
+    <string name="me_account_management">帳號管理</string>
+    <string name="me_trading_accounts">交易帳號</string>
+    <string name="me_mt_desc">MT4/MT5 唯讀連接</string>
+    <string name="me_my_alerts">我的警報</string>
+    <string name="me_alerts_desc">價格/訊號/宏觀</string>
+    <string name="me_logout">登出</string>
+    <string name="me_loading">載入中…</string>
+    <string name="me_default_name">交易員</string>
+    <string name="me_following">追蹤中</string>
+    <string name="me_followers">粉絲</string>
+    <string name="me_win_rate">勝率</string>
+
+    <!-- Tier labels -->
+    <string name="tier_verified">🟢 認證交易員</string>
+    <string name="tier_elite">🔵 菁英交易員</string>
+
+    <!-- Trader Profile -->
+    <string name="profile_title">交易者檔案</string>
+    <string name="profile_followers">追蹤者</string>
+    <string name="profile_following">追蹤中</string>
+    <string name="profile_follow">追蹤</string>
+    <string name="profile_unfollow">取消追蹤</string>
+    <string name="profile_stats_title">交易戰績</string>
+    <string name="profile_win_rate">勝率</string>
+    <string name="profile_profit_factor">盈虧比</string>
+    <string name="profile_sharpe">夏普</string>
+    <string name="profile_total_trades">總筆數</string>
+
+    <!-- MT Accounts -->
+    <string name="mt_title">交易帳號</string>
+    <string name="mt_bind_new">綁定新帳戶</string>
+    <string name="mt_load_failed">載入失敗</string>
+    <string name="mt_retry">重試</string>
+    <string name="mt_empty_title">暫無交易帳號</string>
+    <string name="mt_empty_action">綁定 MT 帳戶</string>
+    <string name="mt_disconnect">斷開</string>
+    <string name="mt_connected">● 已連接</string>
+    <string name="mt_demo">模擬盤</string>
+    <string name="mt_live">實盤</string>
+    <string name="mt_balance">餘額</string>
+    <string name="mt_equity">淨值</string>
+    <string name="mt_server">伺服器</string>
+    <string name="mt_bind_failed">綁定失敗</string>
+
+    <!-- Bind MT Account Wizard -->
+    <string name="bind_mt_title">綁定 MT 帳戶</string>
+    <string name="bind_step_platform">平台</string>
+    <string name="bind_step_credentials">憑證</string>
+    <string name="bind_step_confirm">確認</string>
+    <string name="bind_step1_title">步驟 1: 選擇平台與伺服器</string>
+    <string name="bind_platform_type">平台類型</string>
+    <string name="bind_server">伺服器</string>
+    <string name="bind_search_server">搜尋伺服器</string>
+    <string name="bind_next">下一步</string>
+    <string name="bind_step2_title">步驟 2: 輸入帳戶憑證</string>
+    <string name="bind_account">交易帳號</string>
+    <string name="bind_account_hint">輸入 MT 帳號</string>
+    <string name="bind_investor_password">唯讀密碼</string>
+    <string name="bind_password_hint">輸入投資者密碼</string>
+    <string name="bind_previous">上一步</string>
+    <string name="bind_step3_title">步驟 3: 確認綁定</string>
+    <string name="bind_label">標籤（可選）</string>
+    <string name="bind_label_hint">例如：主要實盤</string>
+    <string name="bind_account_type">帳戶類型</string>
+    <string name="bind_demo">模擬盤</string>
+    <string name="bind_live">實盤</string>
+    <string name="bind_confirm">確認綁定</string>
+    <string name="bind_binding">綁定中…</string>
+
+    <!-- Alerts -->
+    <string name="alerts_title">我的警報</string>
+    <string name="alerts_add">+ 新增</string>
+    <string name="alerts_empty">暫無警報訂閱</string>
+    <string name="alerts_add_alert">新增警報</string>
+    <string name="alerts_delete">刪除</string>
+    <string name="alert_dialog_title">新增警報</string>
+    <string name="alert_type_label">類型:</string>
+    <string name="alert_pair_label">品種</string>
+    <string name="alert_condition_label">條件:</string>
+    <string name="alert_threshold_label">閾值</string>
+    <string name="alert_subscribe">訂閱</string>
+    <string name="alert_cancel">取消</string>
+
+    <!-- Notification Center -->
+    <string name="notif_title">通知中心</string>
+    <string name="notif_mark_all_read">全部已讀</string>
+    <string name="notif_empty">暫無通知</string>
+    <string name="notif_load_failed">載入失敗</string>
+
+    <!-- Notification Preferences -->
+    <string name="notif_prefs_title">推送偏好</string>
+    <string name="notif_prefs_alerts">警報頻道</string>
+    <string name="notif_prefs_market">市場警報</string>
+    <string name="notif_prefs_macro">宏觀警報</string>
+    <string name="notif_prefs_cot">COT 偏向</string>
+    <string name="notif_prefs_onchain">鏈上數據</string>
+    <string name="notif_prefs_digest">摘要</string>
+    <string name="notif_prefs_daily_digest">每日摘要</string>
+    <string name="notif_prefs_weekly_digest">每週摘要</string>
+    <string name="notif_prefs_filter">過濾</string>
+    <string name="notif_prefs_high_impact_only">僅高影響事件</string>
+
+    <!-- Language -->
+    <string name="settings_language">語言</string>
+    <string name="settings_language_title">選擇語言</string>
+
+    <!-- 通用 -->
+    <string name="common_back">返回</string>
+    <string name="common_close">關閉</string>
+    <string name="common_loading">載入中…</string>
+    <string name="common_retry">重試</string>
+    <string name="common_error">載入失敗</string>
+    <string name="common_ok">確定</string>
+    <string name="common_cancel">取消</string>
+
+    <!-- 訊號方向 -->
+    <string name="direction_bullish">↗</string>
+    <string name="direction_bearish">↘</string>
+    <string name="direction_neutral">→</string>
+</resources>

@@ -16,6 +16,7 @@ import java.util.Locale
  *   id — Bahasa Indonesia
  *   ms — Bahasa Melayu
  *   ja — 日本語
+ *   zh-TW — 繁體中文
  */
 object LocaleManager {
 
@@ -23,7 +24,7 @@ object LocaleManager {
     const val KEY_SELECTED_LANGUAGE = "selected_language"
     const val KEY_FIRST_LAUNCH_DONE = "first_launch_done"
 
-    val SUPPORTED_LOCALES = setOf("en", "zh", "vi", "th", "id", "ms", "ja")
+    val SUPPORTED_LOCALES = setOf("en", "zh", "zh-TW", "vi", "th", "id", "ms", "ja")
 
     fun init(context: Context) {
         val prefs = context.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
@@ -71,6 +72,7 @@ object LocaleManager {
         "id" to "Bahasa Indonesia",
         "ms" to "Bahasa Melayu",
         "ja" to "日本語",
+        "zh-TW" to "繁體中文",
     )
 
     private fun saveSelectedLanguage(context: Context, languageTag: String) {
@@ -86,11 +88,22 @@ object LocaleManager {
             @Suppress("DEPRECATION")
             config.locale
         }
-        return locale?.language ?: "en"
+        return if (locale != null) {
+            val lang = locale.language.lowercase(Locale.ENGLISH)
+            val country = locale.country.uppercase(Locale.ENGLISH)
+            // 繁体中文设备用 zh-TW 标签区分
+            if (lang == "zh" && country == "TW") "zh-TW"
+            else if (lang == "zh" && (country == "HK" || country == "MO")) "zh-TW"
+            else lang
+        } else "en"
     }
 
     private fun bestMatchLocale(languageTag: String): String {
-        val lang = languageTag.substringBefore("-").lowercase(Locale.ENGLISH)
+        // 先尝试完整标签匹配（如 zh-TW vs zh）
+        val lower = languageTag.lowercase(Locale.ENGLISH)
+        if (lower in SUPPORTED_LOCALES) return lower
+        // 回退到前缀匹配
+        val lang = lower.substringBefore("-")
         return if (lang in SUPPORTED_LOCALES) lang else "en"
     }
 }
