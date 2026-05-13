@@ -17,6 +17,8 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "BASE_URL", "\"https://api.alfq.org/\"")
     }
 
     buildTypes {
@@ -37,6 +39,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -47,6 +50,7 @@ dependencies {
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.material3)
     implementation(libs.compose.navigation)
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Lifecycle
     implementation(libs.lifecycle.runtime)
@@ -60,6 +64,7 @@ dependencies {
     // Connect-RPC
     implementation(libs.connect.protobuf)
     implementation(libs.connect.okhttp)
+    implementation(libs.connect.google.java.ext)
     implementation(libs.protobuf.kotlin)
 
     // Room

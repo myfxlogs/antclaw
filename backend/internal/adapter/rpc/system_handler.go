@@ -53,11 +53,15 @@ func (h *SystemHandler) Readyz(ctx context.Context, _ *connect.Request[antclawv1
 
 func (h *SystemHandler) Info(ctx context.Context, _ *connect.Request[antclawv1.InfoRequest]) (*connect.Response[antclawv1.InfoResponse], error) {
 	_ = ctx
-	// 版本信息可从环境注入，这里以占位符返回
 	return connect.NewResponse(&antclawv1.InfoResponse{
-		Version:   "0.1.0",
-		GitCommit: "dev",
-		BuiltAt:   timestamppb.New(h.boot),
+		Version:          "0.1.0",
+		GitCommit:        "dev",
+		BuiltAt:          timestamppb.New(h.boot),
+		ProtoVersion:     "1.0.0",
+		MinClientVersion: "1.0.0",
+		MaintenanceMode:  false,
+		ServerTimezone:   "UTC",
+		ServerTime:       time.Now().Unix(),
 	}), nil
 }
 

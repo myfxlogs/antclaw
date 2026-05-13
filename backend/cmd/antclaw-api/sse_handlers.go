@@ -104,9 +104,13 @@ func userNotificationsSSE(rdb *redisv9.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID, err := extractUserIDFromRequest(r)
 		if err != nil {
+			log.Printf("SSE notifications: auth failed remote=%s", r.RemoteAddr)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
+		log.Printf("SSE notifications: connected user=%s remote=%s", userID, r.RemoteAddr)
+		defer log.Printf("SSE notifications: disconnected user=%s", userID)
+
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			http.Error(w, "streaming unsupported", http.StatusInternalServerError)
@@ -118,7 +122,6 @@ func userNotificationsSSE(rdb *redisv9.Client) http.HandlerFunc {
 		w.Header().Set("X-Accel-Buffering", "no")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, ": connected user=%s ts=%d\n\n", userID, time.Now().Unix())
-		flusher.Flush()
 
 		channel := "user:" + userID + ":notifications"
 		ctx := r.Context()

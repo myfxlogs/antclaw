@@ -47,6 +47,23 @@ func AuthInterceptor(requireAuth bool) connect.UnaryInterceptorFunc {
 	}
 }
 
+// AdminInterceptor 在 AuthInterceptor 之后执行，确保调用者具有管理员角色。
+// 必须与 AuthInterceptor(true) 配合使用。
+func AdminInterceptor() connect.UnaryInterceptorFunc {
+	return func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			role, ok := RoleFromContext(ctx)
+			if !ok {
+				return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("admin access required"))
+			}
+			if role != "admin" && role != "super_admin" {
+				return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("admin access required"))
+			}
+			return next(ctx, req)
+		}
+	}
+}
+
 func extractToken(header http.Header) (string, error) {
 	auth := header.Get("Authorization")
 	if auth == "" {

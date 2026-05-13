@@ -295,12 +295,17 @@ func (*InfoRequest) Descriptor() ([]byte, []int) {
 }
 
 type InfoResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Version       string                 `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
-	GitCommit     string                 `protobuf:"bytes,2,opt,name=git_commit,json=gitCommit,proto3" json:"git_commit,omitempty"`
-	BuiltAt       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=built_at,json=builtAt,proto3" json:"built_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Version          string                 `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
+	GitCommit        string                 `protobuf:"bytes,2,opt,name=git_commit,json=gitCommit,proto3" json:"git_commit,omitempty"`
+	BuiltAt          *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=built_at,json=builtAt,proto3" json:"built_at,omitempty"`
+	ProtoVersion     string                 `protobuf:"bytes,4,opt,name=proto_version,json=protoVersion,proto3" json:"proto_version,omitempty"`               // 协议版本，如 "1.0.0"
+	MinClientVersion string                 `protobuf:"bytes,5,opt,name=min_client_version,json=minClientVersion,proto3" json:"min_client_version,omitempty"` // 最低兼容客户端版本
+	MaintenanceMode  bool                   `protobuf:"varint,6,opt,name=maintenance_mode,json=maintenanceMode,proto3" json:"maintenance_mode,omitempty"`     // 是否维护模式
+	ServerTimezone   string                 `protobuf:"bytes,7,opt,name=server_timezone,json=serverTimezone,proto3" json:"server_timezone,omitempty"`         // 服务端时区
+	ServerTime       int64                  `protobuf:"varint,8,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                    // 服务端当前 unix 秒
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *InfoResponse) Reset() {
@@ -354,6 +359,41 @@ func (x *InfoResponse) GetBuiltAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *InfoResponse) GetProtoVersion() string {
+	if x != nil {
+		return x.ProtoVersion
+	}
+	return ""
+}
+
+func (x *InfoResponse) GetMinClientVersion() string {
+	if x != nil {
+		return x.MinClientVersion
+	}
+	return ""
+}
+
+func (x *InfoResponse) GetMaintenanceMode() bool {
+	if x != nil {
+		return x.MaintenanceMode
+	}
+	return false
+}
+
+func (x *InfoResponse) GetServerTimezone() string {
+	if x != nil {
+		return x.ServerTimezone
+	}
+	return ""
+}
+
+func (x *InfoResponse) GetServerTime() int64 {
+	if x != nil {
+		return x.ServerTime
+	}
+	return 0
+}
+
 var File_antclaw_v1_system_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_system_proto_rawDesc = "" +
@@ -378,12 +418,18 @@ const file_antclaw_v1_system_proto_rawDesc = "" +
 	"\rReadyzRequest\"&\n" +
 	"\x0eReadyzResponse\x12\x14\n" +
 	"\x05ready\x18\x01 \x01(\bR\x05ready\"\r\n" +
-	"\vInfoRequest\"~\n" +
+	"\vInfoRequest\"\xc6\x02\n" +
 	"\fInfoResponse\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x1d\n" +
 	"\n" +
 	"git_commit\x18\x02 \x01(\tR\tgitCommit\x125\n" +
-	"\bbuilt_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\abuiltAt2\xcf\x01\n" +
+	"\bbuilt_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\abuiltAt\x12#\n" +
+	"\rproto_version\x18\x04 \x01(\tR\fprotoVersion\x12,\n" +
+	"\x12min_client_version\x18\x05 \x01(\tR\x10minClientVersion\x12)\n" +
+	"\x10maintenance_mode\x18\x06 \x01(\bR\x0fmaintenanceMode\x12'\n" +
+	"\x0fserver_timezone\x18\a \x01(\tR\x0eserverTimezone\x12\x1f\n" +
+	"\vserver_time\x18\b \x01(\x03R\n" +
+	"serverTime2\xcf\x01\n" +
 	"\rSystemService\x12B\n" +
 	"\aHealthz\x12\x1a.antclaw.v1.HealthzRequest\x1a\x1b.antclaw.v1.HealthzResponse\x12?\n" +
 	"\x06Readyz\x12\x19.antclaw.v1.ReadyzRequest\x1a\x1a.antclaw.v1.ReadyzResponse\x129\n" +

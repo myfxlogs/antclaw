@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/system.proto.
  */
 export const file_antclaw_v1_system: GenFile = /*@__PURE__*/
-  fileDesc("ChdhbnRjbGF3L3YxL3N5c3RlbS5wcm90bxIKYW50Y2xhdy52MSIQCg5IZWFsdGh6UmVxdWVzdCLiAQoPSGVhbHRoelJlc3BvbnNlEg4KBnN0YXR1cxgBIAEoCRI/Cgpjb21wb25lbnRzGAIgAygLMisuYW50Y2xhdy52MS5IZWFsdGh6UmVzcG9uc2UuQ29tcG9uZW50c0VudHJ5Ei4KCmNoZWNrZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGk4KD0NvbXBvbmVudHNFbnRyeRILCgNrZXkYASABKAkSKgoFdmFsdWUYAiABKAsyGy5hbnRjbGF3LnYxLkNvbXBvbmVudEhlYWx0aDoCOAEiPwoPQ29tcG9uZW50SGVhbHRoEgwKBG5hbWUYASABKAkSDgoGc3RhdHVzGAIgASgJEg4KBmRldGFpbBgDIAEoCSIPCg1SZWFkeXpSZXF1ZXN0Ih8KDlJlYWR5elJlc3BvbnNlEg0KBXJlYWR5GAEgASgIIg0KC0luZm9SZXF1ZXN0ImEKDEluZm9SZXNwb25zZRIPCgd2ZXJzaW9uGAEgASgJEhIKCmdpdF9jb21taXQYAiABKAkSLAoIYnVpbHRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wMs8BCg1TeXN0ZW1TZXJ2aWNlEkIKB0hlYWx0aHoSGi5hbnRjbGF3LnYxLkhlYWx0aHpSZXF1ZXN0GhsuYW50Y2xhdy52MS5IZWFsdGh6UmVzcG9uc2USPwoGUmVhZHl6EhkuYW50Y2xhdy52MS5SZWFkeXpSZXF1ZXN0GhouYW50Y2xhdy52MS5SZWFkeXpSZXNwb25zZRI5CgRJbmZvEhcuYW50Y2xhdy52MS5JbmZvUmVxdWVzdBoYLmFudGNsYXcudjEuSW5mb1Jlc3BvbnNlQp4BCg5jb20uYW50Y2xhdy52MUILU3lzdGVtUHJvdG9QAVo2Z2l0aHViLmNvbS9hbnRjbGF3L2FudGNsYXcvZ2VuL2dvL2FudGNsYXcvdjE7YW50Y2xhd3YxogIDQVhYqgIKQW50Y2xhdy5WMcoCCkFudGNsYXdcVjHiAhZBbnRjbGF3XFYxXEdQQk1ldGFkYXRh6gILQW50Y2xhdzo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("ChdhbnRjbGF3L3YxL3N5c3RlbS5wcm90bxIKYW50Y2xhdy52MSIQCg5IZWFsdGh6UmVxdWVzdCLiAQoPSGVhbHRoelJlc3BvbnNlEg4KBnN0YXR1cxgBIAEoCRI/Cgpjb21wb25lbnRzGAIgAygLMisuYW50Y2xhdy52MS5IZWFsdGh6UmVzcG9uc2UuQ29tcG9uZW50c0VudHJ5Ei4KCmNoZWNrZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGk4KD0NvbXBvbmVudHNFbnRyeRILCgNrZXkYASABKAkSKgoFdmFsdWUYAiABKAsyGy5hbnRjbGF3LnYxLkNvbXBvbmVudEhlYWx0aDoCOAEiPwoPQ29tcG9uZW50SGVhbHRoEgwKBG5hbWUYASABKAkSDgoGc3RhdHVzGAIgASgJEg4KBmRldGFpbBgDIAEoCSIPCg1SZWFkeXpSZXF1ZXN0Ih8KDlJlYWR5elJlc3BvbnNlEg0KBXJlYWR5GAEgASgIIg0KC0luZm9SZXF1ZXN0ItwBCgxJbmZvUmVzcG9uc2USDwoHdmVyc2lvbhgBIAEoCRISCgpnaXRfY29tbWl0GAIgASgJEiwKCGJ1aWx0X2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIVCg1wcm90b192ZXJzaW9uGAQgASgJEhoKEm1pbl9jbGllbnRfdmVyc2lvbhgFIAEoCRIYChBtYWludGVuYW5jZV9tb2RlGAYgASgIEhcKD3NlcnZlcl90aW1lem9uZRgHIAEoCRITCgtzZXJ2ZXJfdGltZRgIIAEoAzLPAQoNU3lzdGVtU2VydmljZRJCCgdIZWFsdGh6EhouYW50Y2xhdy52MS5IZWFsdGh6UmVxdWVzdBobLmFudGNsYXcudjEuSGVhbHRoelJlc3BvbnNlEj8KBlJlYWR5ehIZLmFudGNsYXcudjEuUmVhZHl6UmVxdWVzdBoaLmFudGNsYXcudjEuUmVhZHl6UmVzcG9uc2USOQoESW5mbxIXLmFudGNsYXcudjEuSW5mb1JlcXVlc3QaGC5hbnRjbGF3LnYxLkluZm9SZXNwb25zZUKeAQoOY29tLmFudGNsYXcudjFCC1N5c3RlbVByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message antclaw.v1.HealthzRequest
@@ -146,6 +146,41 @@ export type InfoResponse = Message<"antclaw.v1.InfoResponse"> & {
    * @generated from field: google.protobuf.Timestamp built_at = 3;
    */
   builtAt?: Timestamp | undefined;
+
+  /**
+   * 协议版本，如 "1.0.0"
+   *
+   * @generated from field: string proto_version = 4;
+   */
+  protoVersion: string;
+
+  /**
+   * 最低兼容客户端版本
+   *
+   * @generated from field: string min_client_version = 5;
+   */
+  minClientVersion: string;
+
+  /**
+   * 是否维护模式
+   *
+   * @generated from field: bool maintenance_mode = 6;
+   */
+  maintenanceMode: boolean;
+
+  /**
+   * 服务端时区
+   *
+   * @generated from field: string server_timezone = 7;
+   */
+  serverTimezone: string;
+
+  /**
+   * 服务端当前 unix 秒
+   *
+   * @generated from field: int64 server_time = 8;
+   */
+  serverTime: bigint;
 };
 
 /**

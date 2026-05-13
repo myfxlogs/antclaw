@@ -32,4 +32,9 @@ message InfoResponse {
   string version = 1;
   string git_commit = 2;
   google.protobuf.Timestamp built_at = 3;
+  string proto_version = 4;       // 协议版本，如 "1.0.0"
+  string min_client_version = 5;  // 最低兼容客户端版本
+  bool maintenance_mode = 6;      // 是否维护模式
+  string server_timezone = 7;     // 服务端时区
+  int64 server_time = 8;          // 服务端当前 unix 秒
 }
