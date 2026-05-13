@@ -821,6 +821,298 @@ func (x *UpdatePrefsResponse) GetPrefs() *NotificationPrefs {
 	return nil
 }
 
+type AlertPrefs struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Currencies           []string               `protobuf:"bytes,1,rep,name=currencies,proto3" json:"currencies,omitempty"`                                          // 关注货币，默认 ["USD","EUR","GBP","JPY","CHF","CAD","AUD","NZD"]
+	Symbols              []string               `protobuf:"bytes,2,rep,name=symbols,proto3" json:"symbols,omitempty"`                                                // 关注品种，默认空
+	Impacts              []string               `protobuf:"bytes,3,rep,name=impacts,proto3" json:"impacts,omitempty"`                                                // 影响级别过滤，默认 ["high","medium"]
+	ReminderMinutes      []int32                `protobuf:"varint,4,rep,packed,name=reminder_minutes,json=reminderMinutes,proto3" json:"reminder_minutes,omitempty"` // 提前提醒分钟数，默认 [60,15]
+	HighImpactOnly       bool                   `protobuf:"varint,5,opt,name=high_impact_only,json=highImpactOnly,proto3" json:"high_impact_only,omitempty"`         // 仅高影响事件
+	DailyDigestEnabled   bool                   `protobuf:"varint,6,opt,name=daily_digest_enabled,json=dailyDigestEnabled,proto3" json:"daily_digest_enabled,omitempty"`
+	WeeklyDigestEnabled  bool                   `protobuf:"varint,7,opt,name=weekly_digest_enabled,json=weeklyDigestEnabled,proto3" json:"weekly_digest_enabled,omitempty"`
+	CotAlertsEnabled     bool                   `protobuf:"varint,8,opt,name=cot_alerts_enabled,json=cotAlertsEnabled,proto3" json:"cot_alerts_enabled,omitempty"`
+	MacroAlertsEnabled   bool                   `protobuf:"varint,9,opt,name=macro_alerts_enabled,json=macroAlertsEnabled,proto3" json:"macro_alerts_enabled,omitempty"`
+	OptionsAlertsEnabled bool                   `protobuf:"varint,10,opt,name=options_alerts_enabled,json=optionsAlertsEnabled,proto3" json:"options_alerts_enabled,omitempty"`
+	OnchainAlertsEnabled bool                   `protobuf:"varint,11,opt,name=onchain_alerts_enabled,json=onchainAlertsEnabled,proto3" json:"onchain_alerts_enabled,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *AlertPrefs) Reset() {
+	*x = AlertPrefs{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AlertPrefs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AlertPrefs) ProtoMessage() {}
+
+func (x *AlertPrefs) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AlertPrefs.ProtoReflect.Descriptor instead.
+func (*AlertPrefs) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *AlertPrefs) GetCurrencies() []string {
+	if x != nil {
+		return x.Currencies
+	}
+	return nil
+}
+
+func (x *AlertPrefs) GetSymbols() []string {
+	if x != nil {
+		return x.Symbols
+	}
+	return nil
+}
+
+func (x *AlertPrefs) GetImpacts() []string {
+	if x != nil {
+		return x.Impacts
+	}
+	return nil
+}
+
+func (x *AlertPrefs) GetReminderMinutes() []int32 {
+	if x != nil {
+		return x.ReminderMinutes
+	}
+	return nil
+}
+
+func (x *AlertPrefs) GetHighImpactOnly() bool {
+	if x != nil {
+		return x.HighImpactOnly
+	}
+	return false
+}
+
+func (x *AlertPrefs) GetDailyDigestEnabled() bool {
+	if x != nil {
+		return x.DailyDigestEnabled
+	}
+	return false
+}
+
+func (x *AlertPrefs) GetWeeklyDigestEnabled() bool {
+	if x != nil {
+		return x.WeeklyDigestEnabled
+	}
+	return false
+}
+
+func (x *AlertPrefs) GetCotAlertsEnabled() bool {
+	if x != nil {
+		return x.CotAlertsEnabled
+	}
+	return false
+}
+
+func (x *AlertPrefs) GetMacroAlertsEnabled() bool {
+	if x != nil {
+		return x.MacroAlertsEnabled
+	}
+	return false
+}
+
+func (x *AlertPrefs) GetOptionsAlertsEnabled() bool {
+	if x != nil {
+		return x.OptionsAlertsEnabled
+	}
+	return false
+}
+
+func (x *AlertPrefs) GetOnchainAlertsEnabled() bool {
+	if x != nil {
+		return x.OnchainAlertsEnabled
+	}
+	return false
+}
+
+type GetAlertPrefsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertPrefsRequest) Reset() {
+	*x = GetAlertPrefsRequest{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertPrefsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertPrefsRequest) ProtoMessage() {}
+
+func (x *GetAlertPrefsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertPrefsRequest.ProtoReflect.Descriptor instead.
+func (*GetAlertPrefsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{17}
+}
+
+type GetAlertPrefsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prefs         *AlertPrefs            `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertPrefsResponse) Reset() {
+	*x = GetAlertPrefsResponse{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertPrefsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertPrefsResponse) ProtoMessage() {}
+
+func (x *GetAlertPrefsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertPrefsResponse.ProtoReflect.Descriptor instead.
+func (*GetAlertPrefsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetAlertPrefsResponse) GetPrefs() *AlertPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
+type UpdateAlertPrefsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prefs         *AlertPrefs            `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAlertPrefsRequest) Reset() {
+	*x = UpdateAlertPrefsRequest{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAlertPrefsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAlertPrefsRequest) ProtoMessage() {}
+
+func (x *UpdateAlertPrefsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAlertPrefsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateAlertPrefsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateAlertPrefsRequest) GetPrefs() *AlertPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
+type UpdateAlertPrefsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prefs         *AlertPrefs            `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAlertPrefsResponse) Reset() {
+	*x = UpdateAlertPrefsResponse{}
+	mi := &file_antclaw_v1_notification_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAlertPrefsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAlertPrefsResponse) ProtoMessage() {}
+
+func (x *UpdateAlertPrefsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_notification_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAlertPrefsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateAlertPrefsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_notification_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpdateAlertPrefsResponse) GetPrefs() *AlertPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
 var File_antclaw_v1_notification_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_notification_proto_rawDesc = "" +
@@ -876,7 +1168,30 @@ const file_antclaw_v1_notification_proto_rawDesc = "" +
 	"\x12UpdatePrefsRequest\x123\n" +
 	"\x05prefs\x18\x01 \x01(\v2\x1d.antclaw.v1.NotificationPrefsR\x05prefs\"J\n" +
 	"\x13UpdatePrefsResponse\x123\n" +
-	"\x05prefs\x18\x01 \x01(\v2\x1d.antclaw.v1.NotificationPrefsR\x05prefs2\xb0\x04\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x1d.antclaw.v1.NotificationPrefsR\x05prefs\"\xe7\x03\n" +
+	"\n" +
+	"AlertPrefs\x12\x1e\n" +
+	"\n" +
+	"currencies\x18\x01 \x03(\tR\n" +
+	"currencies\x12\x18\n" +
+	"\asymbols\x18\x02 \x03(\tR\asymbols\x12\x18\n" +
+	"\aimpacts\x18\x03 \x03(\tR\aimpacts\x12)\n" +
+	"\x10reminder_minutes\x18\x04 \x03(\x05R\x0freminderMinutes\x12(\n" +
+	"\x10high_impact_only\x18\x05 \x01(\bR\x0ehighImpactOnly\x120\n" +
+	"\x14daily_digest_enabled\x18\x06 \x01(\bR\x12dailyDigestEnabled\x122\n" +
+	"\x15weekly_digest_enabled\x18\a \x01(\bR\x13weeklyDigestEnabled\x12,\n" +
+	"\x12cot_alerts_enabled\x18\b \x01(\bR\x10cotAlertsEnabled\x120\n" +
+	"\x14macro_alerts_enabled\x18\t \x01(\bR\x12macroAlertsEnabled\x124\n" +
+	"\x16options_alerts_enabled\x18\n" +
+	" \x01(\bR\x14optionsAlertsEnabled\x124\n" +
+	"\x16onchain_alerts_enabled\x18\v \x01(\bR\x14onchainAlertsEnabled\"\x16\n" +
+	"\x14GetAlertPrefsRequest\"E\n" +
+	"\x15GetAlertPrefsResponse\x12,\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x16.antclaw.v1.AlertPrefsR\x05prefs\"G\n" +
+	"\x17UpdateAlertPrefsRequest\x12,\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x16.antclaw.v1.AlertPrefsR\x05prefs\"H\n" +
+	"\x18UpdateAlertPrefsResponse\x12,\n" +
+	"\x05prefs\x18\x01 \x01(\v2\x16.antclaw.v1.AlertPrefsR\x05prefs2\xe5\x05\n" +
 	"\x13NotificationService\x12K\n" +
 	"\n" +
 	"ListUnread\x12\x1d.antclaw.v1.ListUnreadRequest\x1a\x1e.antclaw.v1.ListUnreadResponse\x12N\n" +
@@ -885,7 +1200,9 @@ const file_antclaw_v1_notification_proto_rawDesc = "" +
 	"\bMarkRead\x12\x1b.antclaw.v1.MarkReadRequest\x1a\x1c.antclaw.v1.MarkReadResponse\x12N\n" +
 	"\vMarkAllRead\x12\x1e.antclaw.v1.MarkAllReadRequest\x1a\x1f.antclaw.v1.MarkAllReadResponse\x12E\n" +
 	"\bGetPrefs\x12\x1b.antclaw.v1.GetPrefsRequest\x1a\x1c.antclaw.v1.GetPrefsResponse\x12N\n" +
-	"\vUpdatePrefs\x12\x1e.antclaw.v1.UpdatePrefsRequest\x1a\x1f.antclaw.v1.UpdatePrefsResponseB\xa4\x01\n" +
+	"\vUpdatePrefs\x12\x1e.antclaw.v1.UpdatePrefsRequest\x1a\x1f.antclaw.v1.UpdatePrefsResponse\x12T\n" +
+	"\rGetAlertPrefs\x12 .antclaw.v1.GetAlertPrefsRequest\x1a!.antclaw.v1.GetAlertPrefsResponse\x12]\n" +
+	"\x10UpdateAlertPrefs\x12#.antclaw.v1.UpdateAlertPrefsRequest\x1a$.antclaw.v1.UpdateAlertPrefsResponseB\xa4\x01\n" +
 	"\x0ecom.antclaw.v1B\x11NotificationProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -902,52 +1219,64 @@ func file_antclaw_v1_notification_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_notification_proto_rawDescData
 }
 
-var file_antclaw_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_antclaw_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_antclaw_v1_notification_proto_goTypes = []any{
-	(*Notification)(nil),        // 0: antclaw.v1.Notification
-	(*NotificationPrefs)(nil),   // 1: antclaw.v1.NotificationPrefs
-	(*ListUnreadRequest)(nil),   // 2: antclaw.v1.ListUnreadRequest
-	(*ListUnreadResponse)(nil),  // 3: antclaw.v1.ListUnreadResponse
-	(*ListHistoryRequest)(nil),  // 4: antclaw.v1.ListHistoryRequest
-	(*ListHistoryResponse)(nil), // 5: antclaw.v1.ListHistoryResponse
-	(*UnreadCountRequest)(nil),  // 6: antclaw.v1.UnreadCountRequest
-	(*UnreadCountResponse)(nil), // 7: antclaw.v1.UnreadCountResponse
-	(*MarkReadRequest)(nil),     // 8: antclaw.v1.MarkReadRequest
-	(*MarkReadResponse)(nil),    // 9: antclaw.v1.MarkReadResponse
-	(*MarkAllReadRequest)(nil),  // 10: antclaw.v1.MarkAllReadRequest
-	(*MarkAllReadResponse)(nil), // 11: antclaw.v1.MarkAllReadResponse
-	(*GetPrefsRequest)(nil),     // 12: antclaw.v1.GetPrefsRequest
-	(*GetPrefsResponse)(nil),    // 13: antclaw.v1.GetPrefsResponse
-	(*UpdatePrefsRequest)(nil),  // 14: antclaw.v1.UpdatePrefsRequest
-	(*UpdatePrefsResponse)(nil), // 15: antclaw.v1.UpdatePrefsResponse
-	nil,                         // 16: antclaw.v1.Notification.DataEntry
+	(*Notification)(nil),             // 0: antclaw.v1.Notification
+	(*NotificationPrefs)(nil),        // 1: antclaw.v1.NotificationPrefs
+	(*ListUnreadRequest)(nil),        // 2: antclaw.v1.ListUnreadRequest
+	(*ListUnreadResponse)(nil),       // 3: antclaw.v1.ListUnreadResponse
+	(*ListHistoryRequest)(nil),       // 4: antclaw.v1.ListHistoryRequest
+	(*ListHistoryResponse)(nil),      // 5: antclaw.v1.ListHistoryResponse
+	(*UnreadCountRequest)(nil),       // 6: antclaw.v1.UnreadCountRequest
+	(*UnreadCountResponse)(nil),      // 7: antclaw.v1.UnreadCountResponse
+	(*MarkReadRequest)(nil),          // 8: antclaw.v1.MarkReadRequest
+	(*MarkReadResponse)(nil),         // 9: antclaw.v1.MarkReadResponse
+	(*MarkAllReadRequest)(nil),       // 10: antclaw.v1.MarkAllReadRequest
+	(*MarkAllReadResponse)(nil),      // 11: antclaw.v1.MarkAllReadResponse
+	(*GetPrefsRequest)(nil),          // 12: antclaw.v1.GetPrefsRequest
+	(*GetPrefsResponse)(nil),         // 13: antclaw.v1.GetPrefsResponse
+	(*UpdatePrefsRequest)(nil),       // 14: antclaw.v1.UpdatePrefsRequest
+	(*UpdatePrefsResponse)(nil),      // 15: antclaw.v1.UpdatePrefsResponse
+	(*AlertPrefs)(nil),               // 16: antclaw.v1.AlertPrefs
+	(*GetAlertPrefsRequest)(nil),     // 17: antclaw.v1.GetAlertPrefsRequest
+	(*GetAlertPrefsResponse)(nil),    // 18: antclaw.v1.GetAlertPrefsResponse
+	(*UpdateAlertPrefsRequest)(nil),  // 19: antclaw.v1.UpdateAlertPrefsRequest
+	(*UpdateAlertPrefsResponse)(nil), // 20: antclaw.v1.UpdateAlertPrefsResponse
+	nil,                              // 21: antclaw.v1.Notification.DataEntry
 }
 var file_antclaw_v1_notification_proto_depIdxs = []int32{
-	16, // 0: antclaw.v1.Notification.data:type_name -> antclaw.v1.Notification.DataEntry
+	21, // 0: antclaw.v1.Notification.data:type_name -> antclaw.v1.Notification.DataEntry
 	0,  // 1: antclaw.v1.ListUnreadResponse.items:type_name -> antclaw.v1.Notification
 	0,  // 2: antclaw.v1.ListHistoryResponse.items:type_name -> antclaw.v1.Notification
 	1,  // 3: antclaw.v1.GetPrefsResponse.prefs:type_name -> antclaw.v1.NotificationPrefs
 	1,  // 4: antclaw.v1.UpdatePrefsRequest.prefs:type_name -> antclaw.v1.NotificationPrefs
 	1,  // 5: antclaw.v1.UpdatePrefsResponse.prefs:type_name -> antclaw.v1.NotificationPrefs
-	2,  // 6: antclaw.v1.NotificationService.ListUnread:input_type -> antclaw.v1.ListUnreadRequest
-	4,  // 7: antclaw.v1.NotificationService.ListHistory:input_type -> antclaw.v1.ListHistoryRequest
-	6,  // 8: antclaw.v1.NotificationService.UnreadCount:input_type -> antclaw.v1.UnreadCountRequest
-	8,  // 9: antclaw.v1.NotificationService.MarkRead:input_type -> antclaw.v1.MarkReadRequest
-	10, // 10: antclaw.v1.NotificationService.MarkAllRead:input_type -> antclaw.v1.MarkAllReadRequest
-	12, // 11: antclaw.v1.NotificationService.GetPrefs:input_type -> antclaw.v1.GetPrefsRequest
-	14, // 12: antclaw.v1.NotificationService.UpdatePrefs:input_type -> antclaw.v1.UpdatePrefsRequest
-	3,  // 13: antclaw.v1.NotificationService.ListUnread:output_type -> antclaw.v1.ListUnreadResponse
-	5,  // 14: antclaw.v1.NotificationService.ListHistory:output_type -> antclaw.v1.ListHistoryResponse
-	7,  // 15: antclaw.v1.NotificationService.UnreadCount:output_type -> antclaw.v1.UnreadCountResponse
-	9,  // 16: antclaw.v1.NotificationService.MarkRead:output_type -> antclaw.v1.MarkReadResponse
-	11, // 17: antclaw.v1.NotificationService.MarkAllRead:output_type -> antclaw.v1.MarkAllReadResponse
-	13, // 18: antclaw.v1.NotificationService.GetPrefs:output_type -> antclaw.v1.GetPrefsResponse
-	15, // 19: antclaw.v1.NotificationService.UpdatePrefs:output_type -> antclaw.v1.UpdatePrefsResponse
-	13, // [13:20] is the sub-list for method output_type
-	6,  // [6:13] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	16, // 6: antclaw.v1.GetAlertPrefsResponse.prefs:type_name -> antclaw.v1.AlertPrefs
+	16, // 7: antclaw.v1.UpdateAlertPrefsRequest.prefs:type_name -> antclaw.v1.AlertPrefs
+	16, // 8: antclaw.v1.UpdateAlertPrefsResponse.prefs:type_name -> antclaw.v1.AlertPrefs
+	2,  // 9: antclaw.v1.NotificationService.ListUnread:input_type -> antclaw.v1.ListUnreadRequest
+	4,  // 10: antclaw.v1.NotificationService.ListHistory:input_type -> antclaw.v1.ListHistoryRequest
+	6,  // 11: antclaw.v1.NotificationService.UnreadCount:input_type -> antclaw.v1.UnreadCountRequest
+	8,  // 12: antclaw.v1.NotificationService.MarkRead:input_type -> antclaw.v1.MarkReadRequest
+	10, // 13: antclaw.v1.NotificationService.MarkAllRead:input_type -> antclaw.v1.MarkAllReadRequest
+	12, // 14: antclaw.v1.NotificationService.GetPrefs:input_type -> antclaw.v1.GetPrefsRequest
+	14, // 15: antclaw.v1.NotificationService.UpdatePrefs:input_type -> antclaw.v1.UpdatePrefsRequest
+	17, // 16: antclaw.v1.NotificationService.GetAlertPrefs:input_type -> antclaw.v1.GetAlertPrefsRequest
+	19, // 17: antclaw.v1.NotificationService.UpdateAlertPrefs:input_type -> antclaw.v1.UpdateAlertPrefsRequest
+	3,  // 18: antclaw.v1.NotificationService.ListUnread:output_type -> antclaw.v1.ListUnreadResponse
+	5,  // 19: antclaw.v1.NotificationService.ListHistory:output_type -> antclaw.v1.ListHistoryResponse
+	7,  // 20: antclaw.v1.NotificationService.UnreadCount:output_type -> antclaw.v1.UnreadCountResponse
+	9,  // 21: antclaw.v1.NotificationService.MarkRead:output_type -> antclaw.v1.MarkReadResponse
+	11, // 22: antclaw.v1.NotificationService.MarkAllRead:output_type -> antclaw.v1.MarkAllReadResponse
+	13, // 23: antclaw.v1.NotificationService.GetPrefs:output_type -> antclaw.v1.GetPrefsResponse
+	15, // 24: antclaw.v1.NotificationService.UpdatePrefs:output_type -> antclaw.v1.UpdatePrefsResponse
+	18, // 25: antclaw.v1.NotificationService.GetAlertPrefs:output_type -> antclaw.v1.GetAlertPrefsResponse
+	20, // 26: antclaw.v1.NotificationService.UpdateAlertPrefs:output_type -> antclaw.v1.UpdateAlertPrefsResponse
+	18, // [18:27] is the sub-list for method output_type
+	9,  // [9:18] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_notification_proto_init() }
@@ -961,7 +1290,7 @@ func file_antclaw_v1_notification_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_notification_proto_rawDesc), len(file_antclaw_v1_notification_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

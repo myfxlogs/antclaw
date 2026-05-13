@@ -127,6 +127,9 @@ func main() {
 	// 订阅 jobs:trigger 频道，支持从管理端手动触发任意 job
 	go subscribeJobTriggers(ctx, redisClient.Raw(), jobRunners, logger)
 
+	// 客户端智能推送调度循环
+	go runPushLoop(ctx, dbpool, redisClient.Raw(), logger)
+
 	// 启动播种：为所有已知 Job 写入 pending 快照，避免页面显示"未运行"
 	seedInitialJobSnapshots(ctx, redisClient.Raw(), jobRunners, logger)
 
@@ -138,6 +141,12 @@ func main() {
 	logger.Info("  Price data (every 6 hours)")
 	logger.Info("  Sentiment data (hourly)")
 	logger.Info("  Onchain data (hourly)")
+	logger.Info("Enabled push notifications:")
+	logger.Info("  Calendar pre/actual/surprise (every 1m)")
+	logger.Info("  Daily digest (every 30m)")
+	logger.Info("  Macro/Options/Onchain (every 1h)")
+	logger.Info("  Carry/Regime/Risk (every 4h)")
+	logger.Info("  COT/Calibration (every 6h)")
 	logger.Info("Press Ctrl+C to stop.")
 	<-sigChan
 	logger.Info("Shutting down...")

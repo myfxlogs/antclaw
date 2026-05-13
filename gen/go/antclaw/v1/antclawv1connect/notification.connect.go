@@ -54,6 +54,12 @@ const (
 	// NotificationServiceUpdatePrefsProcedure is the fully-qualified name of the NotificationService's
 	// UpdatePrefs RPC.
 	NotificationServiceUpdatePrefsProcedure = "/antclaw.v1.NotificationService/UpdatePrefs"
+	// NotificationServiceGetAlertPrefsProcedure is the fully-qualified name of the
+	// NotificationService's GetAlertPrefs RPC.
+	NotificationServiceGetAlertPrefsProcedure = "/antclaw.v1.NotificationService/GetAlertPrefs"
+	// NotificationServiceUpdateAlertPrefsProcedure is the fully-qualified name of the
+	// NotificationService's UpdateAlertPrefs RPC.
+	NotificationServiceUpdateAlertPrefsProcedure = "/antclaw.v1.NotificationService/UpdateAlertPrefs"
 )
 
 // NotificationServiceClient is a client for the antclaw.v1.NotificationService service.
@@ -65,6 +71,9 @@ type NotificationServiceClient interface {
 	MarkAllRead(context.Context, *connect.Request[v1.MarkAllReadRequest]) (*connect.Response[v1.MarkAllReadResponse], error)
 	GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error)
 	UpdatePrefs(context.Context, *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error)
+	// 业务级告警偏好（货币/品种/影响级别/提醒提前量/channel 开关）
+	GetAlertPrefs(context.Context, *connect.Request[v1.GetAlertPrefsRequest]) (*connect.Response[v1.GetAlertPrefsResponse], error)
+	UpdateAlertPrefs(context.Context, *connect.Request[v1.UpdateAlertPrefsRequest]) (*connect.Response[v1.UpdateAlertPrefsResponse], error)
 }
 
 // NewNotificationServiceClient constructs a client for the antclaw.v1.NotificationService service.
@@ -120,18 +129,32 @@ func NewNotificationServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(notificationServiceMethods.ByName("UpdatePrefs")),
 			connect.WithClientOptions(opts...),
 		),
+		getAlertPrefs: connect.NewClient[v1.GetAlertPrefsRequest, v1.GetAlertPrefsResponse](
+			httpClient,
+			baseURL+NotificationServiceGetAlertPrefsProcedure,
+			connect.WithSchema(notificationServiceMethods.ByName("GetAlertPrefs")),
+			connect.WithClientOptions(opts...),
+		),
+		updateAlertPrefs: connect.NewClient[v1.UpdateAlertPrefsRequest, v1.UpdateAlertPrefsResponse](
+			httpClient,
+			baseURL+NotificationServiceUpdateAlertPrefsProcedure,
+			connect.WithSchema(notificationServiceMethods.ByName("UpdateAlertPrefs")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // notificationServiceClient implements NotificationServiceClient.
 type notificationServiceClient struct {
-	listUnread  *connect.Client[v1.ListUnreadRequest, v1.ListUnreadResponse]
-	listHistory *connect.Client[v1.ListHistoryRequest, v1.ListHistoryResponse]
-	unreadCount *connect.Client[v1.UnreadCountRequest, v1.UnreadCountResponse]
-	markRead    *connect.Client[v1.MarkReadRequest, v1.MarkReadResponse]
-	markAllRead *connect.Client[v1.MarkAllReadRequest, v1.MarkAllReadResponse]
-	getPrefs    *connect.Client[v1.GetPrefsRequest, v1.GetPrefsResponse]
-	updatePrefs *connect.Client[v1.UpdatePrefsRequest, v1.UpdatePrefsResponse]
+	listUnread       *connect.Client[v1.ListUnreadRequest, v1.ListUnreadResponse]
+	listHistory      *connect.Client[v1.ListHistoryRequest, v1.ListHistoryResponse]
+	unreadCount      *connect.Client[v1.UnreadCountRequest, v1.UnreadCountResponse]
+	markRead         *connect.Client[v1.MarkReadRequest, v1.MarkReadResponse]
+	markAllRead      *connect.Client[v1.MarkAllReadRequest, v1.MarkAllReadResponse]
+	getPrefs         *connect.Client[v1.GetPrefsRequest, v1.GetPrefsResponse]
+	updatePrefs      *connect.Client[v1.UpdatePrefsRequest, v1.UpdatePrefsResponse]
+	getAlertPrefs    *connect.Client[v1.GetAlertPrefsRequest, v1.GetAlertPrefsResponse]
+	updateAlertPrefs *connect.Client[v1.UpdateAlertPrefsRequest, v1.UpdateAlertPrefsResponse]
 }
 
 // ListUnread calls antclaw.v1.NotificationService.ListUnread.
@@ -169,6 +192,16 @@ func (c *notificationServiceClient) UpdatePrefs(ctx context.Context, req *connec
 	return c.updatePrefs.CallUnary(ctx, req)
 }
 
+// GetAlertPrefs calls antclaw.v1.NotificationService.GetAlertPrefs.
+func (c *notificationServiceClient) GetAlertPrefs(ctx context.Context, req *connect.Request[v1.GetAlertPrefsRequest]) (*connect.Response[v1.GetAlertPrefsResponse], error) {
+	return c.getAlertPrefs.CallUnary(ctx, req)
+}
+
+// UpdateAlertPrefs calls antclaw.v1.NotificationService.UpdateAlertPrefs.
+func (c *notificationServiceClient) UpdateAlertPrefs(ctx context.Context, req *connect.Request[v1.UpdateAlertPrefsRequest]) (*connect.Response[v1.UpdateAlertPrefsResponse], error) {
+	return c.updateAlertPrefs.CallUnary(ctx, req)
+}
+
 // NotificationServiceHandler is an implementation of the antclaw.v1.NotificationService service.
 type NotificationServiceHandler interface {
 	ListUnread(context.Context, *connect.Request[v1.ListUnreadRequest]) (*connect.Response[v1.ListUnreadResponse], error)
@@ -178,6 +211,9 @@ type NotificationServiceHandler interface {
 	MarkAllRead(context.Context, *connect.Request[v1.MarkAllReadRequest]) (*connect.Response[v1.MarkAllReadResponse], error)
 	GetPrefs(context.Context, *connect.Request[v1.GetPrefsRequest]) (*connect.Response[v1.GetPrefsResponse], error)
 	UpdatePrefs(context.Context, *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error)
+	// 业务级告警偏好（货币/品种/影响级别/提醒提前量/channel 开关）
+	GetAlertPrefs(context.Context, *connect.Request[v1.GetAlertPrefsRequest]) (*connect.Response[v1.GetAlertPrefsResponse], error)
+	UpdateAlertPrefs(context.Context, *connect.Request[v1.UpdateAlertPrefsRequest]) (*connect.Response[v1.UpdateAlertPrefsResponse], error)
 }
 
 // NewNotificationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -229,6 +265,18 @@ func NewNotificationServiceHandler(svc NotificationServiceHandler, opts ...conne
 		connect.WithSchema(notificationServiceMethods.ByName("UpdatePrefs")),
 		connect.WithHandlerOptions(opts...),
 	)
+	notificationServiceGetAlertPrefsHandler := connect.NewUnaryHandler(
+		NotificationServiceGetAlertPrefsProcedure,
+		svc.GetAlertPrefs,
+		connect.WithSchema(notificationServiceMethods.ByName("GetAlertPrefs")),
+		connect.WithHandlerOptions(opts...),
+	)
+	notificationServiceUpdateAlertPrefsHandler := connect.NewUnaryHandler(
+		NotificationServiceUpdateAlertPrefsProcedure,
+		svc.UpdateAlertPrefs,
+		connect.WithSchema(notificationServiceMethods.ByName("UpdateAlertPrefs")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.NotificationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case NotificationServiceListUnreadProcedure:
@@ -245,6 +293,10 @@ func NewNotificationServiceHandler(svc NotificationServiceHandler, opts ...conne
 			notificationServiceGetPrefsHandler.ServeHTTP(w, r)
 		case NotificationServiceUpdatePrefsProcedure:
 			notificationServiceUpdatePrefsHandler.ServeHTTP(w, r)
+		case NotificationServiceGetAlertPrefsProcedure:
+			notificationServiceGetAlertPrefsHandler.ServeHTTP(w, r)
+		case NotificationServiceUpdateAlertPrefsProcedure:
+			notificationServiceUpdateAlertPrefsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -280,4 +332,12 @@ func (UnimplementedNotificationServiceHandler) GetPrefs(context.Context, *connec
 
 func (UnimplementedNotificationServiceHandler) UpdatePrefs(context.Context, *connect.Request[v1.UpdatePrefsRequest]) (*connect.Response[v1.UpdatePrefsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.NotificationService.UpdatePrefs is not implemented"))
+}
+
+func (UnimplementedNotificationServiceHandler) GetAlertPrefs(context.Context, *connect.Request[v1.GetAlertPrefsRequest]) (*connect.Response[v1.GetAlertPrefsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.NotificationService.GetAlertPrefs is not implemented"))
+}
+
+func (UnimplementedNotificationServiceHandler) UpdateAlertPrefs(context.Context, *connect.Request[v1.UpdateAlertPrefsRequest]) (*connect.Response[v1.UpdateAlertPrefsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.NotificationService.UpdateAlertPrefs is not implemented"))
 }

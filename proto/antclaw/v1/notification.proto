@@ -18,6 +18,10 @@ service NotificationService {
 
   rpc GetPrefs(GetPrefsRequest) returns (GetPrefsResponse);
   rpc UpdatePrefs(UpdatePrefsRequest) returns (UpdatePrefsResponse);
+
+  // 业务级告警偏好（货币/品种/影响级别/提醒提前量/channel 开关）
+  rpc GetAlertPrefs(GetAlertPrefsRequest) returns (GetAlertPrefsResponse);
+  rpc UpdateAlertPrefs(UpdateAlertPrefsRequest) returns (UpdateAlertPrefsResponse);
 }
 
 message Notification {
@@ -64,3 +68,23 @@ message GetPrefsResponse   { NotificationPrefs prefs = 1; }
 
 message UpdatePrefsRequest  { NotificationPrefs prefs = 1; }
 message UpdatePrefsResponse { NotificationPrefs prefs = 1; }
+
+message AlertPrefs {
+  repeated string currencies        = 1;  // 关注货币，默认 ["USD","EUR","GBP","JPY","CHF","CAD","AUD","NZD"]
+  repeated string symbols           = 2;  // 关注品种，默认空
+  repeated string impacts           = 3;  // 影响级别过滤，默认 ["high","medium"]
+  repeated int32  reminder_minutes  = 4;  // 提前提醒分钟数，默认 [60,15]
+  bool   high_impact_only           = 5;  // 仅高影响事件
+  bool   daily_digest_enabled       = 6;
+  bool   weekly_digest_enabled      = 7;
+  bool   cot_alerts_enabled         = 8;
+  bool   macro_alerts_enabled       = 9;
+  bool   options_alerts_enabled     = 10;
+  bool   onchain_alerts_enabled     = 11;
+}
+
+message GetAlertPrefsRequest    {}
+message GetAlertPrefsResponse   { AlertPrefs prefs = 1; }
+
+message UpdateAlertPrefsRequest  { AlertPrefs prefs = 1; }
+message UpdateAlertPrefsResponse { AlertPrefs prefs = 1; }

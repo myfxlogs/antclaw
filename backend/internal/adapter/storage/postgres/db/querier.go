@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -22,6 +23,7 @@ type Querier interface {
 	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (uuid.UUID, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteOldPushStates(ctx context.Context, lastSentAt pgtype.Timestamptz) error
 	DeleteUserAIKey(ctx context.Context, arg DeleteUserAIKeyParams) error
 	GetAuditLogByID(ctx context.Context, id int64) (AuditLog, error)
 	GetLastAuditLog(ctx context.Context) (AuditLog, error)
@@ -29,10 +31,12 @@ type Querier interface {
 	GetNotificationByIDForUser(ctx context.Context, arg GetNotificationByIDForUserParams) (Notification, error)
 	GetNotificationHistory(ctx context.Context, arg GetNotificationHistoryParams) ([]Notification, error)
 	GetPasswordResetToken(ctx context.Context, tokenHash []byte) (PasswordReset, error)
+	GetPushState(ctx context.Context, arg GetPushStateParams) (NotificationPushState, error)
 	GetRefreshToken(ctx context.Context, jti uuid.UUID) (RefreshToken, error)
 	GetSessionByID(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUnreadNotifications(ctx context.Context, arg GetUnreadNotificationsParams) ([]Notification, error)
 	GetUserAIKey(ctx context.Context, arg GetUserAIKeyParams) (UserAiKey, error)
+	GetUserAlertPreferences(ctx context.Context, userID uuid.UUID) (UserAlertPreference, error)
 	GetUserByCodeID(ctx context.Context, codeID *string) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
@@ -42,8 +46,11 @@ type Querier interface {
 	IsSessionRevoked(ctx context.Context, id uuid.UUID) (bool, error)
 	ListActiveAIKeys(ctx context.Context) ([]UserAiKey, error)
 	ListAuditLogs(ctx context.Context, arg ListAuditLogsParams) ([]AuditLog, error)
+	ListPushStatesByUser(ctx context.Context, arg ListPushStatesByUserParams) ([]NotificationPushState, error)
 	ListUserSessions(ctx context.Context, userID uuid.UUID) ([]Session, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	// 分批扫描用户（用于 digest 批量推送），返回有偏好的用户及偏好。
+	ListUsersWithAlertPrefs(ctx context.Context, arg ListUsersWithAlertPrefsParams) ([]ListUsersWithAlertPrefsRow, error)
 	MarkAllRead(ctx context.Context, userID uuid.UUID) error
 	MarkNotificationRead(ctx context.Context, arg MarkNotificationReadParams) error
 	MarkPasswordResetTokenConsumed(ctx context.Context, tokenHash []byte) error
@@ -62,6 +69,8 @@ type Querier interface {
 	UpdateUserCodeID(ctx context.Context, arg UpdateUserCodeIDParams) error
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
 	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
+	UpsertPushState(ctx context.Context, arg UpsertPushStateParams) (NotificationPushState, error)
+	UpsertUserAlertPreferences(ctx context.Context, arg UpsertUserAlertPreferencesParams) (UserAlertPreference, error)
 	UpsertUserNotificationPrefs(ctx context.Context, arg UpsertUserNotificationPrefsParams) (UserNotificationPref, error)
 }
 

@@ -169,6 +169,60 @@ func (h *NotificationHandler) UpdatePrefs(ctx context.Context, req *connect.Requ
 	return connect.NewResponse(&v1.UpdatePrefsResponse{Prefs: prefsToProto(out)}), nil
 }
 
+func (h *NotificationHandler) GetAlertPrefs(ctx context.Context, _ *connect.Request[v1.GetAlertPrefsRequest]) (*connect.Response[v1.GetAlertPrefsResponse], error) {
+	uid, err := h.currentUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	p, err := h.q.GetUserAlertPreferences(ctx, uid)
+	if err != nil {
+		// 未配置 → 返回内置默认。
+		return connect.NewResponse(&v1.GetAlertPrefsResponse{Prefs: &v1.AlertPrefs{
+			Currencies:         []string{"USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "NZD"},
+			Symbols:            []string{},
+			Impacts:            []string{"high", "medium"},
+			ReminderMinutes:    []int32{60, 15},
+			HighImpactOnly:     false,
+			DailyDigestEnabled: true,
+			WeeklyDigestEnabled: true,
+			CotAlertsEnabled:   true,
+			MacroAlertsEnabled: true,
+			OptionsAlertsEnabled: true,
+			OnchainAlertsEnabled: true,
+		}}), nil
+	}
+	return connect.NewResponse(&v1.GetAlertPrefsResponse{Prefs: alertPrefsToProto(p)}), nil
+}
+
+func (h *NotificationHandler) UpdateAlertPrefs(ctx context.Context, req *connect.Request[v1.UpdateAlertPrefsRequest]) (*connect.Response[v1.UpdateAlertPrefsResponse], error) {
+	uid, err := h.currentUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	in := req.Msg.GetPrefs()
+	if in == nil {
+		in = &v1.AlertPrefs{}
+	}
+	out, err := h.q.UpsertUserAlertPreferences(ctx, db.UpsertUserAlertPreferencesParams{
+		UserID:              uid,
+		Currencies:          in.GetCurrencies(),
+		Symbols:             in.GetSymbols(),
+		Impacts:             in.GetImpacts(),
+		ReminderMinutes:     in.GetReminderMinutes(),
+		HighImpactOnly:      in.GetHighImpactOnly(),
+		DailyDigestEnabled:  in.GetDailyDigestEnabled(),
+		WeeklyDigestEnabled: in.GetWeeklyDigestEnabled(),
+		CotAlertsEnabled:    in.GetCotAlertsEnabled(),
+		MacroAlertsEnabled:  in.GetMacroAlertsEnabled(),
+		OptionsAlertsEnabled: in.GetOptionsAlertsEnabled(),
+		OnchainAlertsEnabled: in.GetOnchainAlertsEnabled(),
+	})
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return connect.NewResponse(&v1.UpdateAlertPrefsResponse{Prefs: alertPrefsToProto(out)}), nil
+}
+
 // ---------- 转换 ----------
 
 func toProtoList(rows []db.Notification) []*v1.Notification {
@@ -226,6 +280,22 @@ func prefsToProto(p db.UserNotificationPref) *v1.NotificationPrefs {
 		Timezone:     p.Timezone,
 		PushEnabled:  p.PushEnabled,
 		EmailEnabled: p.EmailEnabled,
+	}
+}
+
+func alertPrefsToProto(p db.UserAlertPreference) *v1.AlertPrefs {
+	return &v1.AlertPrefs{
+		Currencies:         append([]string(nil), p.Currencies...),
+		Symbols:            append([]string(nil), p.Symbols...),
+		Impacts:            append([]string(nil), p.Impacts...),
+		ReminderMinutes:    append([]int32(nil), p.ReminderMinutes...),
+		HighImpactOnly:     p.HighImpactOnly,
+		DailyDigestEnabled: p.DailyDigestEnabled,
+		WeeklyDigestEnabled: p.WeeklyDigestEnabled,
+		CotAlertsEnabled:   p.CotAlertsEnabled,
+		MacroAlertsEnabled: p.MacroAlertsEnabled,
+		OptionsAlertsEnabled: p.OptionsAlertsEnabled,
+		OnchainAlertsEnabled: p.OnchainAlertsEnabled,
 	}
 }
 

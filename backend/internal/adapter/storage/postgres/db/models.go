@@ -20,11 +20,29 @@ type AiCache struct {
 	ExpiresAt   pgtype.Timestamptz `json:"expires_at"`
 }
 
+type AiConversation struct {
+	ThreadID  string             `json:"thread_id"`
+	UserID    *string            `json:"user_id"`
+	StartedAt pgtype.Timestamptz `json:"started_at"`
+	LastAt    pgtype.Timestamptz `json:"last_at"`
+}
+
 type AiMemory struct {
-	UserID    string             `json:"user_id"`
-	Path      string             `json:"path"`
+	ID        string             `json:"id"`
+	UserID    *string            `json:"user_id"`
+	Scope     *string            `json:"scope"`
+	Key       *string            `json:"key"`
+	Value     *string            `json:"value"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type AiMessage struct {
+	ThreadID  string             `json:"thread_id"`
+	Seq       int32              `json:"seq"`
+	Role      *string            `json:"role"`
 	Content   *string            `json:"content"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 type AiUsage struct {
@@ -38,6 +56,17 @@ type AiUsage struct {
 	DurationMs       *int32             `json:"duration_ms"`
 	Error            *string            `json:"error"`
 	CreatedAt        pgtype.Timestamptz `json:"created_at"`
+}
+
+type AlertLog struct {
+	ID        int64              `json:"id"`
+	UserID    *string            `json:"user_id"`
+	AlertType *string            `json:"alert_type"`
+	Severity  *string            `json:"severity"`
+	Payload   []byte             `json:"payload"`
+	Sent      *bool              `json:"sent"`
+	Reason    *string            `json:"reason"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 type AuditLog struct {
@@ -66,6 +95,16 @@ type BacktestJob struct {
 	Error       *string            `json:"error"`
 }
 
+type BacktestMetricsByRegime struct {
+	JobID       string   `json:"job_id"`
+	Regime      string   `json:"regime"`
+	NTrades     *int32   `json:"n_trades"`
+	Sharpe      *float64 `json:"sharpe"`
+	Sortino     *float64 `json:"sortino"`
+	MaxDrawdown *float64 `json:"max_drawdown"`
+	WinRate     *float64 `json:"win_rate"`
+}
+
 type BacktestResult struct {
 	JobID       uuid.UUID          `json:"job_id"`
 	Summary     []byte             `json:"summary"`
@@ -73,6 +112,22 @@ type BacktestResult struct {
 	Trades      []byte             `json:"trades"`
 	Detailed    []byte             `json:"detailed"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+}
+
+type BacktestTrade struct {
+	JobID    string             `json:"job_id"`
+	Seq      int32              `json:"seq"`
+	OpenedAt pgtype.Timestamptz `json:"opened_at"`
+	ClosedAt pgtype.Timestamptz `json:"closed_at"`
+	Side     string             `json:"side"`
+	Entry    *float64           `json:"entry"`
+	Exit     *float64           `json:"exit"`
+	Pnl      *float64           `json:"pnl"`
+	PnlPct   *float64           `json:"pnl_pct"`
+	Mfe      *float64           `json:"mfe"`
+	Mae      *float64           `json:"mae"`
+	Cost     *float64           `json:"cost"`
+	Regime   *string            `json:"regime"`
 }
 
 type BisCreditGap struct {
@@ -410,39 +465,35 @@ type Notification struct {
 	ID        uuid.UUID          `json:"id"`
 	UserID    uuid.UUID          `json:"user_id"`
 	Type      string             `json:"type"`
-	Category  string             `json:"category"`
 	Title     string             `json:"title"`
 	Body      string             `json:"body"`
 	Data      []byte             `json:"data"`
 	Priority  *string            `json:"priority"`
-	Severity  string             `json:"severity"`
-	DedupKey  *string            `json:"dedup_key"`
 	IsRead    *bool              `json:"is_read"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	ReadAt    pgtype.Timestamptz `json:"read_at"`
+	Category  string             `json:"category"`
+	DedupKey  *string            `json:"dedup_key"`
+	Severity  string             `json:"severity"`
 }
 
-type UserNotificationPref struct {
-	UserID       uuid.UUID          `json:"user_id"`
-	EnabledTypes []string           `json:"enabled_types"`
-	MinSeverity  string             `json:"min_severity"`
-	QuietStart   pgtype.Time        `json:"quiet_start"`
-	QuietEnd     pgtype.Time        `json:"quiet_end"`
-	Timezone     string             `json:"timezone"`
-	PushEnabled  bool               `json:"push_enabled"`
-	EmailEnabled bool               `json:"email_enabled"`
-	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+type NotificationPushState struct {
+	ID          int64              `json:"id"`
+	UserID      uuid.UUID          `json:"user_id"`
+	EventKey    string             `json:"event_key"`
+	PushType    string             `json:"push_type"`
+	LastSentAt  pgtype.Timestamptz `json:"last_sent_at"`
+	PayloadHash string             `json:"payload_hash"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
 }
 
 type OnchainMetric struct {
-	Date         pgtype.Date `json:"date"`
-	Asset        string      `json:"asset"`
-	FlowIn       *float64    `json:"flow_in"`
-	FlowOut      *float64    `json:"flow_out"`
-	NetFlow      *float64    `json:"net_flow"`
-	ActiveAddr   *int64      `json:"active_addr"`
-	TxCount      *int64      `json:"tx_count"`
-	OnchainScore *float64    `json:"onchain_score"`
+	Time   pgtype.Timestamptz `json:"time"`
+	Asset  string             `json:"asset"`
+	Metric string             `json:"metric"`
+	Value  float64            `json:"value"`
+	Source *string            `json:"source"`
 }
 
 type OrderflowAbsorption struct {
@@ -593,13 +644,12 @@ type Session struct {
 }
 
 type SignalCalibration struct {
-	SignalType string             `json:"signal_type"`
-	LogisticA  *float64           `json:"logistic_a"`
-	LogisticB  *float64           `json:"logistic_b"`
-	SampleSize *int32             `json:"sample_size"`
-	WinRate    *float64           `json:"win_rate"`
-	AvgReturn  *float64           `json:"avg_return"`
-	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+	ModelID  string             `json:"model_id"`
+	Type     string             `json:"type"`
+	Params   []byte             `json:"params"`
+	NSamples *int32             `json:"n_samples"`
+	Brier    *float64           `json:"brier"`
+	FittedAt pgtype.Timestamptz `json:"fitted_at"`
 }
 
 type SignalOutcome struct {
@@ -669,10 +719,10 @@ type User struct {
 	Timezone        string             `json:"timezone"`
 	TotpSecretEnc   []byte             `json:"totp_secret_enc"`
 	TotpEnabled     *bool              `json:"totp_enabled"`
-	CodeID          *string            `json:"code_id"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt       pgtype.Timestamptz `json:"deleted_at"`
+	CodeID          *string            `json:"code_id"`
 }
 
 type UserAiKey struct {
@@ -684,6 +734,51 @@ type UserAiKey struct {
 	LastError      *string            `json:"last_error"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
+type UserAlertPreference struct {
+	UserID               uuid.UUID          `json:"user_id"`
+	Currencies           []string           `json:"currencies"`
+	Symbols              []string           `json:"symbols"`
+	Impacts              []string           `json:"impacts"`
+	ReminderMinutes      []int32            `json:"reminder_minutes"`
+	HighImpactOnly       bool               `json:"high_impact_only"`
+	DailyDigestEnabled   bool               `json:"daily_digest_enabled"`
+	WeeklyDigestEnabled  bool               `json:"weekly_digest_enabled"`
+	CotAlertsEnabled     bool               `json:"cot_alerts_enabled"`
+	MacroAlertsEnabled   bool               `json:"macro_alerts_enabled"`
+	OptionsAlertsEnabled bool               `json:"options_alerts_enabled"`
+	OnchainAlertsEnabled bool               `json:"onchain_alerts_enabled"`
+	UpdatedAt            pgtype.Timestamptz `json:"updated_at"`
+}
+
+type UserNotificationPref struct {
+	UserID       uuid.UUID          `json:"user_id"`
+	EnabledTypes []string           `json:"enabled_types"`
+	MinSeverity  string             `json:"min_severity"`
+	QuietStart   pgtype.Time        `json:"quiet_start"`
+	QuietEnd     pgtype.Time        `json:"quiet_end"`
+	Timezone     string             `json:"timezone"`
+	PushEnabled  bool               `json:"push_enabled"`
+	EmailEnabled bool               `json:"email_enabled"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+}
+
+type UserPreference struct {
+	UserID          string   `json:"user_id"`
+	Pairs           []string `json:"pairs"`
+	HighImpactOnly  *bool    `json:"high_impact_only"`
+	QuietHoursStart *int32   `json:"quiet_hours_start"`
+	QuietHoursEnd   *int32   `json:"quiet_hours_end"`
+	Timezone        *string  `json:"timezone"`
+}
+
+type UserQuota struct {
+	UserID       string             `json:"user_id"`
+	Tier         string             `json:"tier"`
+	AiCallsToday *int32             `json:"ai_calls_today"`
+	AiMaxPerDay  *int32             `json:"ai_max_per_day"`
+	ResetAt      pgtype.Timestamptz `json:"reset_at"`
 }
 
 type VixTermStructure struct {
