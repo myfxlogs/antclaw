@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/antclaw/antclaw/internal/auth"
 	"github.com/antclaw/antclaw/internal/service/audit"
 	authv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
@@ -21,6 +22,7 @@ type AuthHandler struct {
 	users UserStore
 	rdb   *redis.Client
 	audit *audit.AuditService
+	pg    *pgxpool.Pool
 }
 
 // UserStore is the persistence port required by AuthHandler.
@@ -43,8 +45,8 @@ type UserStore interface {
 	RevokeUserRefreshTokens(ctx context.Context, userID string) error
 }
 
-func NewAuthHandler(users UserStore, rdb *redis.Client, auditSvc *audit.AuditService) *AuthHandler {
-	return &AuthHandler{users: users, rdb: rdb, audit: auditSvc}
+func NewAuthHandler(users UserStore, rdb *redis.Client, auditSvc *audit.AuditService, pg *pgxpool.Pool) *AuthHandler {
+	return &AuthHandler{users: users, rdb: rdb, audit: auditSvc, pg: pg}
 }
 
 func (h *AuthHandler) Register(ctx context.Context, req *connect.Request[authv1.RegisterRequest]) (*connect.Response[authv1.RegisterResponse], error) {
@@ -81,6 +83,7 @@ func (h *AuthHandler) Register(ctx context.Context, req *connect.Request[authv1.
 	}
 
 	h.logAudit(ctx, &userID, audit.ActionRegister, "users", "user registered", req.Msg.Client)
+	h.upsertDevice(ctx, userID, req.Msg.Client)
 
 	return connect.NewResponse(&authv1.RegisterResponse{
 		UserId:       userID,
@@ -144,6 +147,7 @@ func (h *AuthHandler) Login(ctx context.Context, req *connect.Request[authv1.Log
 	}
 
 	h.logAudit(ctx, &userID, audit.ActionLogin, "users", "login success", req.Msg.Client)
+	h.upsertDevice(ctx, userID, req.Msg.Client)
 
 	return connect.NewResponse(&authv1.LoginResponse{
 		UserId:       userID,
@@ -245,6 +249,20 @@ func (h *AuthHandler) ResetPassword(ctx context.Context, req *connect.Request[au
 
 func (h *AuthHandler) VerifyEmail(ctx context.Context, req *connect.Request[authv1.VerifyEmailRequest]) (*connect.Response[authv1.VerifyEmailResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("not implemented"))
+}
+
+// upsertDevice 在登录/注册成功时将 device_id 写入 devices 表。
+// 后续客户端可通过 ReportDeviceInfo RPC 补全 model/os_version 等详细信息。
+func (h *AuthHandler) upsertDevice(ctx context.Context, userID string, client *authv1.ClientInfo) {
+	if h.pg == nil || client == nil || client.DeviceId == "" {
+		return
+	}
+	_, _ = h.pg.Exec(ctx, `
+		INSERT INTO devices (device_id, user_id)
+		VALUES ($1, $2)
+		ON CONFLICT (device_id) DO UPDATE SET user_id=$2, updated_at=NOW()`,
+		client.DeviceId, userID,
+	)
 }
 
 // helpers

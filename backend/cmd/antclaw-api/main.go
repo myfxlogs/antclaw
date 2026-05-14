@@ -27,6 +27,7 @@ import (
 	infrapq "github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/infra/redis"
 	"github.com/antclaw/antclaw/internal/notify"
+	"github.com/antclaw/antclaw/internal/service/presence"
 	"github.com/antclaw/antclaw/internal/service/admin"
 	"github.com/antclaw/antclaw/internal/service/ai"
 	"github.com/antclaw/antclaw/internal/service/alerts"
@@ -79,7 +80,11 @@ if err := auth.LoadKeys(); err != nil {
 
 	// ===== 加密能力初始化 =====
 	// SecretBox：用于数据源敏感字段的存储级加密（Argon2id+AES-GCM）
-	secretBox, err := cryptopkg.NewSecretBox(os.Getenv("ANTCLAW_SECRET_MASTER_KEY"))
+	masterKey, err := cryptopkg.LoadOrCreateMasterKey()
+	if err != nil {
+		log.Fatalf("failed to load/create master key: %v", err)
+	}
+	secretBox, err := cryptopkg.NewSecretBox(masterKey)
 	if err != nil {
 		log.Fatalf("failed to init SecretBox: %v", err)
 	}
@@ -142,6 +147,12 @@ if err := auth.LoadKeys(); err != nil {
 	})
 	reportSvc := reportsvc.NewService(signalsService, backtestSvc)
 
+	// Notification service —— 持久化 + 实时推送（SSE）
+	notifySvc := notify.NewService(queries, redisClient.Raw())
+
+	// 在线用户追踪器（SSE 连接/断开时自动注册/注销）
+	presenceTracker := presence.NewTracker()
+
 	// Initialize all handlers with dependency injection
 	priceHandler := rpc.NewPriceHandler(priceSvc)
 	volHandler := rpc.NewVolHandler(volSvc)
@@ -154,7 +165,7 @@ if err := auth.LoadKeys(); err != nil {
 	alertGate := alerts.NewGate(pgPool)
 	alertsHandler := rpc.NewAlertsHandler(alertsSvc).WithGate(alertGate)
 	userHandler := rpc.NewUserHandler(userSvc)
-	adminHandler := rpc.NewAdminHandler(adminSvc)
+	adminHandler := rpc.NewAdminHandler(adminSvc, notifySvc, presenceTracker, pgPool)
 	calendarHandler := rpc.NewCalendarHandler(calendarSvc)
 	cotHandler := rpc.NewCOTHandler(cotSvc)
 	backtestHandler := rpc.NewBacktestHandler(backtestSvc)
@@ -172,10 +183,10 @@ if err := auth.LoadKeys(); err != nil {
 	marketplaceHandler := rpc.NewMarketplaceHandler(pgPool)
 
 	// AuthHandler with real PostgreSQL store
-	authHandler := rpc.NewAuthHandler(userStore, nil, auditSvc)
+	authHandler := rpc.NewAuthHandler(userStore, nil, auditSvc, pgPool)
 
 	// SystemService with health check（依赖 boot time、pgPool、redis）
-	systemHandler := rpc.NewSystemHandler(pgPool, redisClient, boot)
+	systemHandler := rpc.NewSystemHandler(pgPool, redisClient, boot, presenceTracker)
 
 
 	// Create HTTP mux and register Connect RPC handlers
@@ -221,9 +232,9 @@ if err := auth.LoadKeys(); err != nil {
 	mux.Handle(antclawv1connect.NewTreasuryServiceHandler(rpc.NewTreasuryHandler()))
 	mux.Handle(antclawv1connect.NewSentimentExtrasServiceHandler(rpc.NewSentimentExtrasHandlerWithResolver(resolver)))
 	mux.Handle(antclawv1connect.NewRegimeServiceHandler(rpc.NewRegimeHandler(regime.NewService(pgPool))))
+	mux.Handle(antclawv1connect.NewDeviceServiceHandler(rpc.NewDeviceHandler(pgPool)))
 
-	// Notification service —— 持久化 + 实时推送（SSE）。要求登录态。
-	notifySvc := notify.NewService(queries, redisClient.Raw())
+	// Notification handler —— 要求登录态。
 	notificationHandler := rpc.NewNotificationHandler(notifySvc, queries)
 	authInterceptor := connect.WithInterceptors(auth.AuthInterceptor(true))
 	mux.Handle(antclawv1connect.NewFeedServiceHandler(feedHandler))
@@ -258,7 +269,7 @@ if err := auth.LoadKeys(); err != nil {
 	mux.HandleFunc("/sse/options_alerts", alertsEventsHandler(redisClient.Raw(), "stream:options_alerts"))
 	mux.HandleFunc("/sse/signals_alerts", alertsEventsHandler(redisClient.Raw(), "stream:signals_alerts"))
 	// 个人通知 SSE：从 JWT cookie/Bearer 解析 user_id，订阅 user:{userID}:notifications。
-	mux.HandleFunc("/sse/notifications", userNotificationsSSE(redisClient.Raw()))
+	mux.HandleFunc("/sse/notifications", userNotificationsSSE(redisClient.Raw(), presenceTracker))
 
 	// Create HTTP server with h2c (HTTP/2 without TLS)
 	server := &http.Server{
