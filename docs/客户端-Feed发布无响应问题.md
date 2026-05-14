@@ -186,7 +186,34 @@ fun PostScreen(
 
 ---
 
-## 五、涉及文件清单
+## 五、发布成功后刷新 Feed
+
+PostScreen 只清空了输入框，但没有触发 Feed 刷新。新帖发布成功后，Feed 列表看不到刚发的帖。
+
+**PostViewModel 改造时一并处理**：
+
+```kotlin
+// PostViewModel 新增事件通道
+private val _postSuccess = MutableSharedFlow<Unit>()
+val postSuccess: SharedFlow<Unit> = _postSuccess.asSharedFlow()
+
+fun post(...) {
+    viewModelScope.launch {
+        _postState.value = PostState.Loading
+        try {
+            feedRpc.createPost(req)
+            _postState.value = PostState.Success
+            _postSuccess.emit(Unit)  // ← 通知 Feed 刷新
+        } catch (e: Exception) { ... }
+    }
+}
+```
+
+Feed 列表监听 `postSuccess` 事件，收到后重新调用 `GetFeed`（不带 cursor，从头加载）。
+
+---
+
+## 六、涉及文件清单
 
 | 文件 | 改动 |
 |---|---|
