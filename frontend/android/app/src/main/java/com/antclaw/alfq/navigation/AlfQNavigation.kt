@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ private data class NavTab(val route: String, val labelRes: Int, val icon: ImageV
 
 private val mainTabs = listOf(
     NavTab("feed", R.string.nav_home, Icons.Default.Home),
+    NavTab("social", R.string.nav_social, Icons.Default.People),
     NavTab("discover", R.string.nav_discover, Icons.Default.Search),
 )
 
@@ -94,7 +96,7 @@ fun BottomNavBarWithFAB(
 
             // 消息
             NavigationItem(
-                selected = currentRoute == "chat",
+                selected = currentRoute == "notifications",
                 onClick = onChatClick,
                 icon = { Icon(Icons.Default.Email, contentDescription = stringResource(R.string.nav_messages)) },
                 label = stringResource(R.string.nav_messages),

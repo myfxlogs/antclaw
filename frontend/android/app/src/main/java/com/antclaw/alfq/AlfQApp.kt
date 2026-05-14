@@ -7,15 +7,16 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.antclaw.alfq.ui.chat.ChatScreen
 import com.antclaw.alfq.ui.feed.FeedScreen
 import com.antclaw.alfq.ui.feed.SignalDetailScreen
+import com.antclaw.alfq.ui.social.SocialFeedScreen
+import com.antclaw.alfq.ui.post.PostDetailScreen
 import com.antclaw.alfq.ui.discover.DiscoverScreen
 import com.antclaw.alfq.ui.post.PostScreen
 import com.antclaw.alfq.ui.profile.MeScreen
@@ -73,7 +74,7 @@ fun AlfQApp() {
 @Composable
 fun MainContent(onLogout: () -> Unit) {
     val navController = rememberNavController()
-    val notifVm: NotificationViewModel = hiltViewModel()
+    val notifVm: NotificationViewModel = viewModel()
     val notifState by notifVm.state.collectAsState()
     LifecycleAware(notifVm::onForeground, notifVm::onBackground)
 
@@ -83,7 +84,7 @@ fun MainContent(onLogout: () -> Unit) {
                 navController = navController,
                 notificationCount = notifState.unreadCount,
                 onPostClick = { navController.navigate("post") },
-                onChatClick = { navController.navigate("chat") }
+                onChatClick = { navController.navigate("notifications") }
             )
         }
     ) { padding ->
@@ -103,6 +104,19 @@ fun MainContent(onLogout: () -> Unit) {
             composable("discover") {
                 DiscoverScreen(onTraderClick = { userId -> navController.navigate("profile/$userId") })
             }
+            composable("social") {
+                SocialFeedScreen(
+                    onPostClick = { postId -> navController.navigate("postDetail/$postId") },
+                    onPostCreate = { navController.navigate("post") },
+                )
+            }
+            composable(
+                route = "postDetail/{postId}",
+                arguments = listOf(navArgument("postId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getString("postId") ?: ""
+                PostDetailScreen(postId = postId, onBack = { navController.popBackStack() })
+            }
             composable("post") { PostScreen(onClose = { navController.popBackStack() }) }
             composable("me") {
                 MeScreen(
@@ -120,7 +134,6 @@ fun MainContent(onLogout: () -> Unit) {
             }
             composable("bind_mt_account") { BindMtAccountScreen(onBack = { navController.popBackStack() }) }
             composable("alerts") { AlertScreen(onBack = { navController.popBackStack() }) }
-            composable("chat") { ChatScreen(onBack = { navController.popBackStack() }) }
             composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
             composable("notification_prefs") { NotificationPrefsScreen(onBack = { navController.popBackStack() }) }
             composable("settings/language") { LanguagePickerScreen(onBack = { navController.popBackStack() }) }

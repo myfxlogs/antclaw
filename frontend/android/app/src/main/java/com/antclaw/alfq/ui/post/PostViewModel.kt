@@ -3,7 +3,7 @@ package com.antclaw.alfq.ui.post
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import antclaw.v1.AlfqFeed
-import com.antclaw.alfq.data.rpc.FeedRpcClient
+import com.antclaw.alfq.data.rpc.SocialRpc
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,32 +26,25 @@ sealed class PostState {
  */
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val feedRpc: FeedRpcClient,
+    private val socialRpc: SocialRpc,
 ) : ViewModel() {
 
     private val _postState = MutableStateFlow<PostState>(PostState.Idle)
     val postState: StateFlow<PostState> = _postState.asStateFlow()
 
-    /**
-     * 发布帖子
-     */
     fun post(content: String, signalPair: String, signalDirection: String, signalConfidence: Int, visibility: String) {
-        // 防重复提交
         if (_postState.value is PostState.Loading) return
-        
         viewModelScope.launch {
             _postState.value = PostState.Loading
             try {
-                val req = AlfqFeed.CreatePostRequest.newBuilder()
+                socialRpc.createPost(AlfqFeed.CreatePostRequest.newBuilder()
                     .setContent(content)
-                    .setPostType(if (signalPair.isBlank()) "post" else "signal")
-                    .setSignalPair(if (signalPair.isBlank()) "" else signalPair)
+                    .setPostType(if (signalPair.isBlank()) "text" else "signal_card")
+                    .setSignalPair(signalPair)
                     .setSignalDirection(signalDirection)
                     .setSignalConfidence(signalConfidence)
                     .setVisibility(visibility)
-                    .build()
-                
-                feedRpc.createPost(req)
+                    .build())
                 _postState.value = PostState.Success
             } catch (e: Exception) {
                 _postState.value = PostState.Error(e.message ?: "发布失败，请重试")
@@ -59,10 +52,5 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 重置状态（用于错误后重新发布）
-     */
-    fun reset() {
-        _postState.value = PostState.Idle
-    }
+    fun reset() { _postState.value = PostState.Idle }
 }

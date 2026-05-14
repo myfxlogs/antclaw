@@ -10,6 +10,7 @@
     <string name="nav_post">Post</string>
     <string name="nav_messages">Messages</string>
     <string name="nav_me">Me</string>
+    <string name="nav_social">Social</string>
 
     <!-- Login -->
     <string name="login_title">Alpha</string>
