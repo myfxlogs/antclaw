@@ -186,30 +186,70 @@ fun PostScreen(
 
 ---
 
-## 五、发布成功后刷新 Feed
+## 五、发布成功后看不到帖子——缺失社交 Feed 展示页面
 
-PostScreen 只清空了输入框，但没有触发 Feed 刷新。新帖发布成功后，Feed 列表看不到刚发的帖。
+**当前状态：PostScreen 只清空输入框，且客户端没有社交 Feed 展示页面。**
 
-**PostViewModel 改造时一并处理**：
+```
+客户端现有:
+  PostScreen → CreatePost ✅  (发帖)
+  FeedScreen → SignalsService ✅ (信号卡，非社交帖子)
+  FeedRpc.kt → createPost() ✅ (RPC 封装)
+
+客户端缺失:
+  SocialFeedScreen → FeedService.GetFeed ❌  (查看帖子)
+  PostViewModel 发布后通知刷新 ❌
+```
+
+帖子发到了服务端 `alfq_posts` 表，但客户端**没有任何 UI 调用 `GetFeed`**。首页 FeedScreen 显示的是交易信号，不是用户社交帖子。
+
+### 需要的改动
+
+**1. 新建 SocialFeedViewModel**
 
 ```kotlin
-// PostViewModel 新增事件通道
-private val _postSuccess = MutableSharedFlow<Unit>()
-val postSuccess: SharedFlow<Unit> = _postSuccess.asSharedFlow()
+@HiltViewModel
+class SocialFeedViewModel @Inject constructor(
+    private val feedRpc: FeedRpcClient
+) : ViewModel() {
+    private val _posts = MutableStateFlow<List<Post>>(emptyList())
+    val posts: StateFlow<List<Post>> = _posts.asStateFlow()
 
-fun post(...) {
-    viewModelScope.launch {
-        _postState.value = PostState.Loading
-        try {
-            feedRpc.createPost(req)
-            _postState.value = PostState.Success
-            _postSuccess.emit(Unit)  // ← 通知 Feed 刷新
-        } catch (e: Exception) { ... }
+    fun loadFeed() {
+        viewModelScope.launch {
+            val resp = feedRpc.getFeed(pageSize = 20)
+            _posts.value = resp
+        }
     }
 }
 ```
 
-Feed 列表监听 `postSuccess` 事件，收到后重新调用 `GetFeed`（不带 cursor，从头加载）。
+**2. 新建 SocialFeedScreen**
+
+```kotlin
+@Composable
+fun SocialFeedScreen(viewModel: SocialFeedViewModel = hiltViewModel()) {
+    val posts by viewModel.posts.collectAsState()
+    LazyColumn {
+        items(posts) { post ->
+            PostCard(post)
+        }
+    }
+}
+```
+
+**3. 路由注册** — 在 `AlfQApp.kt` NavHost 添加:
+```kotlin
+composable("social_feed") { SocialFeedScreen() }
+```
+
+**4. PostViewModel 发布后通知刷新**
+
+```kotlin
+private val _postSuccess = MutableSharedFlow<Unit>()
+val postSuccess: SharedFlow<Unit> = _postSuccess.asSharedFlow()
+// CreatePost 成功后: _postSuccess.emit(Unit)
+```
 
 ---
 
