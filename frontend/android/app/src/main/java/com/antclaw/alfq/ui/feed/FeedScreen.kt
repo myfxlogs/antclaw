@@ -36,7 +36,7 @@ fun FeedScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             title = {
-                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge,
+                Text("α", style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             },
             actions = {
