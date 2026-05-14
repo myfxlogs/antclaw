@@ -2,3 +2,5 @@ packages:
   - 'frontend/*'
   - 'frontend/packages/*'
   - 'gen/ts'
+allowBuilds:
+  esbuild: set this to true or false
