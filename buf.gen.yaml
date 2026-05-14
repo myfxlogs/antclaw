@@ -17,5 +17,7 @@ plugins:
     out: gen/ts
     opt:
       - target=ts
-  # Kotlin proto 桩需要本地 protoc 生成：
-  # protoc --kotlin_out=gen/kotlin --connectkotlin_out=gen/kotlin proto/antclaw/v1/*.proto
+  - remote: buf.build/protocolbuffers/kotlin
+    out: gen/kotlin
+  - remote: buf.build/connectrpc/kotlin
+    out: gen/kotlin

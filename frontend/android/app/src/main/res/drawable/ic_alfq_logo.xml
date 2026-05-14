@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="128dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    
+    <!-- 外圆背景 -->
+    <path
+        android:fillColor="#141D22"
+        android:pathData="M124,64 A60,60 0 1,1 4,64 A60,60 0 1,1 124,64"/>
+    
+    <!-- 内圆背景 -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M116,64 A52,52 0 1,1 12,64 A52,52 0 1,1 116,64"/>
+    
+    <!-- 金色圆环装饰 -->
+    <path
+        android:strokeColor="#D4AF37"
+        android:strokeWidth="2"
+        android:pathData="M112,64 A48,48 0 1,1 16,64 A48,48 0 1,1 112,64"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- 上升趋势线 -->
+    <path
+        android:strokeColor="#E6C65C"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M35,85 Q45,70 60,65 T90,45"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- 箭头头部 -->
+    <path
+        android:fillColor="#E6C65C"
+        android:pathData="M88,47 L95,38 L98,46 L95,50 Z"/>
+    
+    <!-- 水平支撑线 -->
+    <path
+        android:strokeColor="#5A6B75"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:pathData="M30,88 L100,88"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- 成交量柱 -->
+    <path
+        android:fillColor="#00A651"
+        android:pathData="M40,65 L48,65 L48,88 L40,88 Z"/>
+    <path
+        android:fillColor="#00A651"
+        android:pathData="M55,55 L63,55 L63,88 L55,88 Z"/>
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M70,70 L78,70 L78,88 L70,88 Z"/>
+    <path
+        android:fillColor="#00A651"
+        android:pathData="M85,50 L93,50 L93,88 L85,88 Z"/>
+    
+    <!-- 希腊字母 Alpha (α) -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M45,30 L50,55 L72,55 L78,30 L83,55 L100,55 L95,68 L40,68 L35,55 L52,55 Z"/>
+    
+    <!-- Q 字母 -->
+    <path
+        android:strokeColor="#D4AF37"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M108,32 L108,68 A18,18 0 0,1 108,47"
+        android:fillColor="@android:color/transparent"/>
+    <path
+        android:strokeColor="#D4AF37"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M108,54 L120,62"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

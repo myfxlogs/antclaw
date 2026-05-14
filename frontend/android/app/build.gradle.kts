@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
+    id("com.google.protobuf")
 }
 
 android {
@@ -43,6 +44,22 @@ android {
     }
 }
 
+// ── Protobuf code generation ──
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.29.3"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     // Compose
     implementation(platform(libs.compose.bom))
@@ -75,6 +92,9 @@ dependencies {
     // Networking
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.sse)
+
+    // DataStore
+    implementation(libs.datastore.preferences)
 
     // Image
     implementation(libs.coil)
