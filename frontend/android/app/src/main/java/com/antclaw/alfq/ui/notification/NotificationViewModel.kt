@@ -1,21 +1,21 @@
 package com.antclaw.alfq.ui.notification
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import antclaw.v1.NotificationOuterClass
 import com.antclaw.alfq.data.notification.*
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
-import com.connectrpc.MethodSpec
-import com.connectrpc.StreamType
-import com.connectrpc.getOrThrow
+import com.antclaw.alfq.data.sse.SseManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NotificationViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class NotificationViewModel @Inject constructor(
+    private val sseManager: SseManager,
+    private val notifRepo: NotificationRepository,
+    application: Application,
+) : androidx.lifecycle.AndroidViewModel(application) {
 
-    private val repo = NotificationRepository()
-    private val sseClient = NotificationSseClient()
     private val systemNotifier = AndroidNotificationHelper(application)
 
     private val _state = MutableStateFlow(NotificationUiState())
@@ -24,7 +24,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
     private val _isForeground = MutableStateFlow(true)
     val isForeground: StateFlow<Boolean> = _isForeground.asStateFlow()
 
-    // 偏好设置状态
+    // 偏好设置
     private val _prefs = MutableStateFlow(AlertPrefs())
     val prefs: StateFlow<AlertPrefs> = _prefs.asStateFlow()
 
@@ -39,8 +39,8 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
     fun loadInitial() {
         viewModelScope.launch {
             try {
-                val count = repo.unreadCount()
-                val items = repo.listUnread()
+                val count = notifRepo.unreadCount()
+                val items = notifRepo.listUnread()
                 _state.update { it.copy(unreadCount = count.toInt(), items = items) }
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message) }
@@ -50,7 +50,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
 
     private fun connectSse() {
         viewModelScope.launch {
-            sseClient.notifications.collect { notif ->
+            sseManager.notifications.collect { notif ->
                 _state.update {
                     it.copy(
                         unreadCount = it.unreadCount + 1,
@@ -63,28 +63,28 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
             }
         }
         viewModelScope.launch {
-            sseClient.connected.collect { connected ->
+            sseManager.connected.collect { connected ->
                 _state.update { it.copy(connected = connected, error = if (!connected) null else it.error) }
             }
         }
-        sseClient.connect()
+        sseManager.connect()
     }
 
     fun onForeground() {
         _isForeground.value = true
         loadInitial()
-        sseClient.reconnect()
+        sseManager.reconnect()
     }
 
     fun onBackground() {
         _isForeground.value = false
-        sseClient.disconnect()
+        sseManager.disconnect()
     }
 
     fun markRead(id: String) {
         viewModelScope.launch {
             try {
-                repo.markRead(id)
+                notifRepo.markRead(id)
                 _state.update {
                     val newItems = it.items.map { notif ->
                         if (notif.id == id) notif.copy(isRead = true, readAt = java.time.Instant.now()) else notif
@@ -100,7 +100,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
     fun markAllRead() {
         viewModelScope.launch {
             try {
-                repo.markAllRead()
+                notifRepo.markAllRead()
                 _state.update {
                     val now = java.time.Instant.now()
                     it.copy(
@@ -122,29 +122,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             _prefsLoading.value = true
             try {
-                val client = ConnectTransportProvider.createProtocolClient()
-                val spec = MethodSpec("antclaw.v1.NotificationService/GetAlertPrefs",
-                    NotificationOuterClass.GetAlertPrefsRequest::class,
-                    NotificationOuterClass.GetAlertPrefsResponse::class,
-                    StreamType.UNARY)
-                val resp = client.unary(
-                    NotificationOuterClass.GetAlertPrefsRequest.getDefaultInstance(),
-                    emptyMap(), spec
-                ).getOrThrow()
-                val p = resp.prefs
-                _prefs.value = AlertPrefs(
-                    currencies = p.currenciesList,
-                    symbols = p.symbolsList,
-                    impacts = p.impactsList,
-                    reminderMinutes = p.reminderMinutesList,
-                    highImpactOnly = p.highImpactOnly,
-                    dailyDigestEnabled = p.dailyDigestEnabled,
-                    weeklyDigestEnabled = p.weeklyDigestEnabled,
-                    cotAlertsEnabled = p.cotAlertsEnabled,
-                    macroAlertsEnabled = p.macroAlertsEnabled,
-                    optionsAlertsEnabled = p.optionsAlertsEnabled,
-                    onchainAlertsEnabled = p.onchainAlertsEnabled,
-                )
+                _prefs.value = notifRepo.getAlertPrefs()
             } catch (_: Exception) {
                 // 保留默认值
             } finally {
@@ -156,26 +134,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
     fun updatePrefs(prefs: AlertPrefs) {
         viewModelScope.launch {
             try {
-                val client = ConnectTransportProvider.createProtocolClient()
-                val proto = NotificationOuterClass.AlertPrefs.newBuilder()
-                    .addAllCurrencies(prefs.currencies)
-                    .addAllSymbols(prefs.symbols)
-                    .addAllImpacts(prefs.impacts)
-                    .addAllReminderMinutes(prefs.reminderMinutes)
-                    .setHighImpactOnly(prefs.highImpactOnly)
-                    .setDailyDigestEnabled(prefs.dailyDigestEnabled)
-                    .setWeeklyDigestEnabled(prefs.weeklyDigestEnabled)
-                    .setCotAlertsEnabled(prefs.cotAlertsEnabled)
-                    .setMacroAlertsEnabled(prefs.macroAlertsEnabled)
-                    .setOptionsAlertsEnabled(prefs.optionsAlertsEnabled)
-                    .setOnchainAlertsEnabled(prefs.onchainAlertsEnabled)
-                    .build()
-                val req = NotificationOuterClass.UpdateAlertPrefsRequest.newBuilder().setPrefs(proto).build()
-                val spec = MethodSpec("antclaw.v1.NotificationService/UpdateAlertPrefs",
-                    NotificationOuterClass.UpdateAlertPrefsRequest::class,
-                    NotificationOuterClass.UpdateAlertPrefsResponse::class,
-                    StreamType.UNARY)
-                client.unary(req, emptyMap(), spec).getOrThrow()
+                notifRepo.updateAlertPrefs(prefs)
                 _prefs.value = prefs
             } catch (_: Exception) {}
         }
@@ -183,7 +142,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
 
     override fun onCleared() {
         super.onCleared()
-        sseClient.disconnect()
+        sseManager.disconnect()
         systemNotifier.cancelAll()
     }
 }

@@ -35,7 +35,8 @@ yarn-error.log*
 Thumbs.db
 
 # Data
-data/
+# Build output data directories (not Android source data/ package)
+**/build/**/data/
 *.db
 *.db-journal
 
