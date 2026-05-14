@@ -45,7 +45,7 @@ import {
   GetDataPreviewRequestSchema,
 } from '@antclaw/proto/antclaw/v1/admin_data_pb'
 import { CryptoService, GetCryptoPublicKeyRequestSchema } from '@antclaw/proto/antclaw/v1/crypto_pb'
-import { SystemService, HealthzRequestSchema } from '@antclaw/proto/antclaw/v1/system_pb'
+import { SystemService, HealthzRequestSchema, GetOnlineUsersRequestSchema, GetPushStatsRequestSchema } from '@antclaw/proto/antclaw/v1/system_pb'
 import {
   NotificationService,
   ListUnreadRequestSchema,
@@ -170,6 +170,129 @@ export async function getSystemHealth() {
     uptime: 'unknown',
     db_status: pg,
     redis_status: rd,
+  }
+}
+
+export interface OnlineUser {
+  userId: string
+  displayName: string
+  remoteAddr: string
+  connectedAt: number
+}
+
+// 手动推送
+export async function sendPush(params: {
+  title: string
+  body: string
+  severity: string
+  targetUserIds: string[]
+  category: string
+}): Promise<{ sentCount: number; onlineCount: number; pushLogId: string }> {
+  const { AdminService, SendPushRequestSchema } = await import('@antclaw/proto/antclaw/v1/admin_pb')
+  const adminClient = createClient(AdminService, transport)
+  const res = await adminClient.sendPush(create(SendPushRequestSchema, {
+    title: params.title,
+    body: params.body,
+    severity: params.severity,
+    targetUserIds: params.targetUserIds,
+    category: params.category,
+  }))
+  return {
+    sentCount: res.sentCount,
+    onlineCount: res.onlineCount,
+    pushLogId: res.pushLogId,
+  }
+}
+
+export async function getPushHistory(params?: {
+  pageSize?: number
+  cursor?: string
+}): Promise<{ entries: { id: string; title: string; body: string; severity: string; targetCount: number; sentCount: number; adminUserId: string; createdAt: number }[]; nextCursor: string }> {
+  const { AdminService, GetPushHistoryRequestSchema } = await import('@antclaw/proto/antclaw/v1/admin_pb')
+  const adminClient = createClient(AdminService, transport)
+  const res = await adminClient.getPushHistory(create(GetPushHistoryRequestSchema, {
+    pageSize: params?.pageSize || 50,
+    cursor: params?.cursor || '',
+  }))
+  return {
+    entries: (res.entries || []).map(e => ({
+      id: e.id,
+      title: e.title,
+      body: e.body,
+      severity: e.severity,
+      targetCount: e.targetCount,
+      sentCount: e.sentCount,
+      adminUserId: e.adminUserId,
+      createdAt: Number(e.createdAt),
+    })),
+    nextCursor: res.nextCursor,
+  }
+}
+
+export interface DeviceInfo {
+  deviceId: string; model: string; brand: string; osVersion: string; osType: string
+  appVersion: string; buildNumber: string; screenWidth: number; screenHeight: number
+  networkType: string; timezone: string; locale: string; manufacturer: string
+  fingerprint: string; userId: string; displayName: string; username: string; codeId: string
+  createdAt: number; updatedAt: number
+}
+
+export async function deleteDevice(deviceId: string): Promise<boolean> {
+  const { DeviceService, DeleteDeviceInfoRequestSchema } = await import('@antclaw/proto/antclaw/v1/device_pb')
+  const client = createClient(DeviceService, transport)
+  const res = await client.deleteDeviceInfo(create(DeleteDeviceInfoRequestSchema, { deviceId }))
+  return res.success
+}
+
+export async function listDevices(params?: {
+  osTypeFilter?: string
+}): Promise<{ devices: DeviceInfo[]; total: number }> {
+  const { DeviceService, ListDevicesRequestSchema } = await import('@antclaw/proto/antclaw/v1/device_pb')
+  const client = createClient(DeviceService, transport)
+  const res = await client.listDevices(create(ListDevicesRequestSchema, {
+    osTypeFilter: params?.osTypeFilter || '',
+  }))
+  return {
+    devices: (res.devices || []).map((d: any) => ({
+      deviceId: d.deviceId, model: d.model, brand: d.brand, osVersion: d.osVersion,
+      osType: d.osType, appVersion: d.appVersion, buildNumber: d.buildNumber,
+      screenWidth: d.screenWidth, screenHeight: d.screenHeight, networkType: d.networkType,
+      timezone: d.timezone, locale: d.locale, manufacturer: d.manufacturer,
+      fingerprint: d.fingerprint, userId: d.userId,
+      displayName: d.displayName, username: d.username, codeId: d.codeId,
+      createdAt: Number(d.createdAt), updatedAt: Number(d.updatedAt),
+    })),
+    total: res.total,
+  }
+}
+
+export async function getPushStats(): Promise<{
+  totalNotifications: number
+  totalPushStateRecords: number
+  byType: { pushType: string; count: number }[]
+  recent1h: number
+  recent24h: number
+}> {
+  const res = await systemClient.getPushStats(create(GetPushStatsRequestSchema, {}))
+  return {
+    totalNotifications: Number(res.totalNotifications),
+    totalPushStateRecords: Number(res.totalPushStateRecords),
+    byType: (res.byType || []).map(t => ({ pushType: t.pushType, count: t.count })),
+    recent1h: Number(res.recent1h),
+    recent24h: Number(res.recent24h),
+  }
+}
+
+export async function getOnlineUsers(): Promise<{ count: number; users: OnlineUser[] }> {
+  const res = await systemClient.getOnlineUsers(create(GetOnlineUsersRequestSchema, {}))
+  return {
+    count: res.count,
+    users: (res.users || []).map(u => ({
+      userId: u.userId,
+      displayName: u.displayName || u.userId.substring(0, 8),
+      remoteAddr: u.remoteAddr,
+      connectedAt: Number(u.connectedAt),
+    })),
   }
 }
 

@@ -10,6 +10,8 @@ import DataSources from './pages/DataSources'
 import Strategies from './pages/Strategies'
 import SystemAI from './pages/SystemAI'
 import Login from './pages/Login'
+import PushManagement from './pages/PushManagement'
+import Devices from './pages/Devices'
 
 // M-A..M-G features
 import GEXPage from './features/options/GEXPage'
@@ -61,6 +63,8 @@ function App() {
           <Route path="strategies" element={<Strategies />} />
           <Route path="system-ai" element={<SystemAI />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="push" element={<PushManagement />} />
+          <Route path="devices" element={<Devices />} />
 
           {/* features */}
           <Route path="options/gex" element={<GEXPage />} />

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Activity, ClipboardList, Database, KeyRound,
-  Settings, LogOut, TrendingUp, Bot, BarChart3, LineChart, Globe2,
-  Layers, Shield, MessageCircle, Wand2, ChevronDown, ChevronRight,
+  Settings, LogOut, TrendingUp, Bot, BarChart3, LineChart, Globe2, Send,
+  Layers, Shield, MessageCircle, Wand2, ChevronDown, ChevronRight, Smartphone,
 } from 'lucide-react'
 import { logout } from '../lib/api'
 import NotificationsBell from './NotificationsBell'
@@ -24,6 +24,8 @@ const groups: NavGroup[] = [
       { path: '/datasources', label: '数据源', icon: KeyRound },
       { path: '/strategies', label: '策略', icon: TrendingUp },
       { path: '/system-ai', label: 'AI 配置', icon: Bot },
+      { path: '/devices', label: '设备管理', icon: Smartphone },
+      { path: '/push', label: '推送管理', icon: Send },
       { path: '/settings', label: '设置', icon: Settings },
     ],
   },
