@@ -108,11 +108,12 @@ object LocaleManager {
     }
 
     private fun bestMatchLocale(languageTag: String): String {
-        // 先尝试完整标签匹配（如 zh-TW vs zh）
-        val lower = languageTag.lowercase(Locale.ENGLISH)
-        if (lower in SUPPORTED_LOCALES) return lower
-        // 回退到前缀匹配
-        val lang = lower.substringBefore("-")
+        val normalized = languageTag.replace('_', '-')
+        val locale = Locale.forLanguageTag(normalized)
+        val lang = locale.language.lowercase(Locale.ENGLISH)
+        val country = locale.country.uppercase(Locale.ENGLISH)
+        if (lang == "zh" && (country == "TW" || country == "HK" || country == "MO")) return "zh-TW"
+        if (lang == "zh") return "zh"
         return if (lang in SUPPORTED_LOCALES) lang else "en"
     }
 }

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
 import com.antclaw.alfq.data.notification.AlertPrefs
 
@@ -17,7 +17,7 @@ import com.antclaw.alfq.data.notification.AlertPrefs
 @Composable
 fun NotificationPrefsScreen(
     onBack: () -> Unit,
-    vm: NotificationViewModel = viewModel(),
+    vm: NotificationViewModel = hiltViewModel(),
 ) {
     val prefs by vm.prefs.collectAsState()
     val loading by vm.prefsLoading.collectAsState()

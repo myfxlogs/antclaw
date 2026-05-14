@@ -189,4 +189,16 @@
     <string name="direction_bullish">↗</string>
     <string name="direction_bearish">↘</string>
     <string name="direction_neutral">→</string>
+
+    <!-- 伺服器列表（MT 綁定嚮導） -->
+    <string-array name="mt_server_list">
+        <item>ICMarkets-Demo</item>
+        <item>ICMarkets-Live</item>
+        <item>RoboForex-Demo</item>
+        <item>RoboForex-Live</item>
+        <item>FBS-Demo</item>
+        <item>FBS-Live</item>
+        <item>Exness-Demo</item>
+        <item>Exness-Live</item>
+    </string-array>
 </resources>

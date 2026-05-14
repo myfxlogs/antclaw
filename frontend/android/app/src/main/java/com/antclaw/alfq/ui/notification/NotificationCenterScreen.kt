@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
 import com.antclaw.alfq.data.notification.ClientNotification
 import com.antclaw.alfq.ui.theme.*
@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter
 fun NotificationCenterScreen(
     onBack: () -> Unit,
     onNotificationClick: (ClientNotification) -> Unit = {},
-    vm: NotificationViewModel = viewModel(),
+    vm: NotificationViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsState()
     Scaffold(

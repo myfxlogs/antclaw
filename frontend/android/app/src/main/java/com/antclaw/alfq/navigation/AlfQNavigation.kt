@@ -94,7 +94,7 @@ fun BottomNavBarWithFAB(
 
             // 消息
             NavigationItem(
-                selected = currentRoute == "notifications",
+                selected = currentRoute == "chat",
                 onClick = onChatClick,
                 icon = { Icon(Icons.Default.Email, contentDescription = stringResource(R.string.nav_messages)) },
                 label = stringResource(R.string.nav_messages),
