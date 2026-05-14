@@ -17,6 +17,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -78,6 +80,40 @@ func (s *SecretBox) Seal(plaintext []byte) (ciphertext, salt, nonce []byte, err 
 }
 
 // Open 用 (ciphertext, salt, nonce) 解密；任何字段被篡改都会触发认证失败。
+const defaultKeyPath = "/data/antclaw_master_key"
+
+// LoadOrCreateMasterKey 获取主密钥：环境变量优先（用于迁移场景），
+// 其次读取持久化文件，最后自动生成并保存。确保重启不丢失。
+func LoadOrCreateMasterKey() (string, error) {
+	if k := os.Getenv("ANTCLAW_SECRET_MASTER_KEY"); k != "" {
+		return k, nil
+	}
+	path := os.Getenv("ANTCLAW_MASTER_KEY_PATH")
+	if path == "" {
+		path = defaultKeyPath
+	}
+	data, err := os.ReadFile(path)
+	if err == nil {
+		return string(data), nil
+	}
+	if !os.IsNotExist(err) {
+		return "", fmt.Errorf("read master key: %w", err)
+	}
+	// 首次运行：生成并保存
+	key := make([]byte, 32)
+	if _, err := rand.Read(key); err != nil {
+		return "", fmt.Errorf("generate master key: %w", err)
+	}
+	b64 := base64.StdEncoding.EncodeToString(key)
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		return "", fmt.Errorf("mkdir for key: %w", err)
+	}
+	if err := os.WriteFile(path, []byte(b64), 0600); err != nil {
+		return "", fmt.Errorf("write master key: %w", err)
+	}
+	return b64, nil
+}
+
 func (s *SecretBox) Open(ciphertext, salt, nonce []byte) ([]byte, error) {
 	if len(salt) != saltLen || len(nonce) != nonceLen {
 		return nil, fmt.Errorf("invalid salt/nonce length")
