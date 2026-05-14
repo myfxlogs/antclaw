@@ -62,3 +62,6 @@ Emulator/
 /backend/cmd/antclaw-worker/antclaw-worker
 .deepseek/
 emulator/
+gen/kotlin/
+frontend/android/.gradle/
+skills/
