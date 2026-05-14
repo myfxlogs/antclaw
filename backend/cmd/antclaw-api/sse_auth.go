@@ -9,8 +9,8 @@ import (
 )
 
 // extractUserIDFromRequest 从 Authorization: Bearer 或 Cookie antclaw_at= 中提取 access_token，
-// 校验后返回 user_id。SSE 在浏览器端依赖 cookie（EventSource 无法自定义请求头）。
-func extractUserIDFromRequest(r *http.Request) (string, error) {
+// 校验后返回 user_id 和 role。SSE 在浏览器端依赖 cookie（EventSource 无法自定义请求头）。
+func extractUserIDFromRequest(r *http.Request) (userID, role string, err error) {
 	token := ""
 	if a := r.Header.Get("Authorization"); a != "" {
 		parts := strings.SplitN(a, " ", 2)
@@ -28,14 +28,14 @@ func extractUserIDFromRequest(r *http.Request) (string, error) {
 		token = r.URL.Query().Get("access_token")
 	}
 	if token == "" {
-		return "", errors.New("missing token")
+		return "", "", errors.New("missing token")
 	}
 	claims, err := auth.ValidateToken(token, auth.TokenTypeAccess)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	if claims.Subject == "" {
-		return "", errors.New("invalid claims")
+		return "", "", errors.New("invalid claims")
 	}
-	return claims.Subject, nil
+	return claims.Subject, claims.Role, nil
 }

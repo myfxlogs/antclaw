@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/system.proto.
  */
 export const file_antclaw_v1_system: GenFile = /*@__PURE__*/
-  fileDesc("ChdhbnRjbGF3L3YxL3N5c3RlbS5wcm90bxIKYW50Y2xhdy52MSIQCg5IZWFsdGh6UmVxdWVzdCLiAQoPSGVhbHRoelJlc3BvbnNlEg4KBnN0YXR1cxgBIAEoCRI/Cgpjb21wb25lbnRzGAIgAygLMisuYW50Y2xhdy52MS5IZWFsdGh6UmVzcG9uc2UuQ29tcG9uZW50c0VudHJ5Ei4KCmNoZWNrZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGk4KD0NvbXBvbmVudHNFbnRyeRILCgNrZXkYASABKAkSKgoFdmFsdWUYAiABKAsyGy5hbnRjbGF3LnYxLkNvbXBvbmVudEhlYWx0aDoCOAEiPwoPQ29tcG9uZW50SGVhbHRoEgwKBG5hbWUYASABKAkSDgoGc3RhdHVzGAIgASgJEg4KBmRldGFpbBgDIAEoCSIPCg1SZWFkeXpSZXF1ZXN0Ih8KDlJlYWR5elJlc3BvbnNlEg0KBXJlYWR5GAEgASgIIg0KC0luZm9SZXF1ZXN0ItwBCgxJbmZvUmVzcG9uc2USDwoHdmVyc2lvbhgBIAEoCRISCgpnaXRfY29tbWl0GAIgASgJEiwKCGJ1aWx0X2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIVCg1wcm90b192ZXJzaW9uGAQgASgJEhoKEm1pbl9jbGllbnRfdmVyc2lvbhgFIAEoCRIYChBtYWludGVuYW5jZV9tb2RlGAYgASgIEhcKD3NlcnZlcl90aW1lem9uZRgHIAEoCRITCgtzZXJ2ZXJfdGltZRgIIAEoAzLPAQoNU3lzdGVtU2VydmljZRJCCgdIZWFsdGh6EhouYW50Y2xhdy52MS5IZWFsdGh6UmVxdWVzdBobLmFudGNsYXcudjEuSGVhbHRoelJlc3BvbnNlEj8KBlJlYWR5ehIZLmFudGNsYXcudjEuUmVhZHl6UmVxdWVzdBoaLmFudGNsYXcudjEuUmVhZHl6UmVzcG9uc2USOQoESW5mbxIXLmFudGNsYXcudjEuSW5mb1JlcXVlc3QaGC5hbnRjbGF3LnYxLkluZm9SZXNwb25zZUKeAQoOY29tLmFudGNsYXcudjFCC1N5c3RlbVByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+  fileDesc("ChdhbnRjbGF3L3YxL3N5c3RlbS5wcm90bxIKYW50Y2xhdy52MSIQCg5IZWFsdGh6UmVxdWVzdCLiAQoPSGVhbHRoelJlc3BvbnNlEg4KBnN0YXR1cxgBIAEoCRI/Cgpjb21wb25lbnRzGAIgAygLMisuYW50Y2xhdy52MS5IZWFsdGh6UmVzcG9uc2UuQ29tcG9uZW50c0VudHJ5Ei4KCmNoZWNrZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGk4KD0NvbXBvbmVudHNFbnRyeRILCgNrZXkYASABKAkSKgoFdmFsdWUYAiABKAsyGy5hbnRjbGF3LnYxLkNvbXBvbmVudEhlYWx0aDoCOAEiPwoPQ29tcG9uZW50SGVhbHRoEgwKBG5hbWUYASABKAkSDgoGc3RhdHVzGAIgASgJEg4KBmRldGFpbBgDIAEoCSIPCg1SZWFkeXpSZXF1ZXN0Ih8KDlJlYWR5elJlc3BvbnNlEg0KBXJlYWR5GAEgASgIIg0KC0luZm9SZXF1ZXN0ItwBCgxJbmZvUmVzcG9uc2USDwoHdmVyc2lvbhgBIAEoCRISCgpnaXRfY29tbWl0GAIgASgJEiwKCGJ1aWx0X2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIVCg1wcm90b192ZXJzaW9uGAQgASgJEhoKEm1pbl9jbGllbnRfdmVyc2lvbhgFIAEoCRIYChBtYWludGVuYW5jZV9tb2RlGAYgASgIEhcKD3NlcnZlcl90aW1lem9uZRgHIAEoCRITCgtzZXJ2ZXJfdGltZRgIIAEoAyIXChVHZXRPbmxpbmVVc2Vyc1JlcXVlc3QiYgoOT25saW5lVXNlckluZm8SDwoHdXNlcl9pZBgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSEwoLcmVtb3RlX2FkZHIYAyABKAkSFAoMY29ubmVjdGVkX2F0GAQgASgDIlIKFkdldE9ubGluZVVzZXJzUmVzcG9uc2USDQoFY291bnQYASABKAUSKQoFdXNlcnMYAiADKAsyGi5hbnRjbGF3LnYxLk9ubGluZVVzZXJJbmZvIhUKE0dldFB1c2hTdGF0c1JlcXVlc3QiMAoMUHVzaFR5cGVTdGF0EhEKCXB1c2hfdHlwZRgBIAEoCRINCgVjb3VudBgCIAEoBSKnAQoUR2V0UHVzaFN0YXRzUmVzcG9uc2USGwoTdG90YWxfbm90aWZpY2F0aW9ucxgBIAEoAxIgChh0b3RhbF9wdXNoX3N0YXRlX3JlY29yZHMYAiABKAMSKQoHYnlfdHlwZRgDIAMoCzIYLmFudGNsYXcudjEuUHVzaFR5cGVTdGF0EhEKCXJlY2VudF8xaBgEIAEoAxISCgpyZWNlbnRfMjRoGAUgASgDMvsCCg1TeXN0ZW1TZXJ2aWNlEkIKB0hlYWx0aHoSGi5hbnRjbGF3LnYxLkhlYWx0aHpSZXF1ZXN0GhsuYW50Y2xhdy52MS5IZWFsdGh6UmVzcG9uc2USPwoGUmVhZHl6EhkuYW50Y2xhdy52MS5SZWFkeXpSZXF1ZXN0GhouYW50Y2xhdy52MS5SZWFkeXpSZXNwb25zZRI5CgRJbmZvEhcuYW50Y2xhdy52MS5JbmZvUmVxdWVzdBoYLmFudGNsYXcudjEuSW5mb1Jlc3BvbnNlElcKDkdldE9ubGluZVVzZXJzEiEuYW50Y2xhdy52MS5HZXRPbmxpbmVVc2Vyc1JlcXVlc3QaIi5hbnRjbGF3LnYxLkdldE9ubGluZVVzZXJzUmVzcG9uc2USUQoMR2V0UHVzaFN0YXRzEh8uYW50Y2xhdy52MS5HZXRQdXNoU3RhdHNSZXF1ZXN0GiAuYW50Y2xhdy52MS5HZXRQdXNoU3RhdHNSZXNwb25zZUKeAQoOY29tLmFudGNsYXcudjFCC1N5c3RlbVByb3RvUAFaNmdpdGh1Yi5jb20vYW50Y2xhdy9hbnRjbGF3L2dlbi9nby9hbnRjbGF3L3YxO2FudGNsYXd2MaICA0FYWKoCCkFudGNsYXcuVjHKAgpBbnRjbGF3XFYx4gIWQW50Y2xhd1xWMVxHUEJNZXRhZGF0YeoCC0FudGNsYXc6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message antclaw.v1.HealthzRequest
@@ -191,6 +191,147 @@ export const InfoResponseSchema: GenMessage<InfoResponse> = /*@__PURE__*/
   messageDesc(file_antclaw_v1_system, 6);
 
 /**
+ * @generated from message antclaw.v1.GetOnlineUsersRequest
+ */
+export type GetOnlineUsersRequest = Message<"antclaw.v1.GetOnlineUsersRequest"> & {
+};
+
+/**
+ * Describes the message antclaw.v1.GetOnlineUsersRequest.
+ * Use `create(GetOnlineUsersRequestSchema)` to create a new message.
+ */
+export const GetOnlineUsersRequestSchema: GenMessage<GetOnlineUsersRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_system, 7);
+
+/**
+ * @generated from message antclaw.v1.OnlineUserInfo
+ */
+export type OnlineUserInfo = Message<"antclaw.v1.OnlineUserInfo"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string display_name = 2;
+   */
+  displayName: string;
+
+  /**
+   * @generated from field: string remote_addr = 3;
+   */
+  remoteAddr: string;
+
+  /**
+   * unix 秒
+   *
+   * @generated from field: int64 connected_at = 4;
+   */
+  connectedAt: bigint;
+};
+
+/**
+ * Describes the message antclaw.v1.OnlineUserInfo.
+ * Use `create(OnlineUserInfoSchema)` to create a new message.
+ */
+export const OnlineUserInfoSchema: GenMessage<OnlineUserInfo> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_system, 8);
+
+/**
+ * @generated from message antclaw.v1.GetOnlineUsersResponse
+ */
+export type GetOnlineUsersResponse = Message<"antclaw.v1.GetOnlineUsersResponse"> & {
+  /**
+   * @generated from field: int32 count = 1;
+   */
+  count: number;
+
+  /**
+   * @generated from field: repeated antclaw.v1.OnlineUserInfo users = 2;
+   */
+  users: OnlineUserInfo[];
+};
+
+/**
+ * Describes the message antclaw.v1.GetOnlineUsersResponse.
+ * Use `create(GetOnlineUsersResponseSchema)` to create a new message.
+ */
+export const GetOnlineUsersResponseSchema: GenMessage<GetOnlineUsersResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_system, 9);
+
+/**
+ * @generated from message antclaw.v1.GetPushStatsRequest
+ */
+export type GetPushStatsRequest = Message<"antclaw.v1.GetPushStatsRequest"> & {
+};
+
+/**
+ * Describes the message antclaw.v1.GetPushStatsRequest.
+ * Use `create(GetPushStatsRequestSchema)` to create a new message.
+ */
+export const GetPushStatsRequestSchema: GenMessage<GetPushStatsRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_system, 10);
+
+/**
+ * @generated from message antclaw.v1.PushTypeStat
+ */
+export type PushTypeStat = Message<"antclaw.v1.PushTypeStat"> & {
+  /**
+   * @generated from field: string push_type = 1;
+   */
+  pushType: string;
+
+  /**
+   * @generated from field: int32 count = 2;
+   */
+  count: number;
+};
+
+/**
+ * Describes the message antclaw.v1.PushTypeStat.
+ * Use `create(PushTypeStatSchema)` to create a new message.
+ */
+export const PushTypeStatSchema: GenMessage<PushTypeStat> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_system, 11);
+
+/**
+ * @generated from message antclaw.v1.GetPushStatsResponse
+ */
+export type GetPushStatsResponse = Message<"antclaw.v1.GetPushStatsResponse"> & {
+  /**
+   * @generated from field: int64 total_notifications = 1;
+   */
+  totalNotifications: bigint;
+
+  /**
+   * @generated from field: int64 total_push_state_records = 2;
+   */
+  totalPushStateRecords: bigint;
+
+  /**
+   * @generated from field: repeated antclaw.v1.PushTypeStat by_type = 3;
+   */
+  byType: PushTypeStat[];
+
+  /**
+   * @generated from field: int64 recent_1h = 4;
+   */
+  recent1h: bigint;
+
+  /**
+   * @generated from field: int64 recent_24h = 5;
+   */
+  recent24h: bigint;
+};
+
+/**
+ * Describes the message antclaw.v1.GetPushStatsResponse.
+ * Use `create(GetPushStatsResponseSchema)` to create a new message.
+ */
+export const GetPushStatsResponseSchema: GenMessage<GetPushStatsResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_system, 12);
+
+/**
  * @generated from service antclaw.v1.SystemService
  */
 export const SystemService: GenService<{
@@ -217,6 +358,22 @@ export const SystemService: GenService<{
     methodKind: "unary";
     input: typeof InfoRequestSchema;
     output: typeof InfoResponseSchema;
+  },
+  /**
+   * @generated from rpc antclaw.v1.SystemService.GetOnlineUsers
+   */
+  getOnlineUsers: {
+    methodKind: "unary";
+    input: typeof GetOnlineUsersRequestSchema;
+    output: typeof GetOnlineUsersResponseSchema;
+  },
+  /**
+   * @generated from rpc antclaw.v1.SystemService.GetPushStats
+   */
+  getPushStats: {
+    methodKind: "unary";
+    input: typeof GetPushStatsRequestSchema;
+    output: typeof GetPushStatsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_system, 0);

@@ -47,6 +47,12 @@ service AdminService {
   // 管理员为用户设置/修改数字 ID（5-10 位，避开 4/7，不以 0 开头）。
   // 留空 code_id 触发系统重新随机分配；非空则直接采用并校验唯一性。
   rpc SetUserCodeID(SetUserCodeIDRequest) returns (SetUserCodeIDResponse);
+
+  // 手动推送消息给指定用户（或全部在线用户）
+  rpc SendPush(SendPushRequest) returns (SendPushResponse);
+
+  // 查询手动推送历史
+  rpc GetPushHistory(GetPushHistoryRequest) returns (GetPushHistoryResponse);
 }
 
 // ListUsers request
@@ -212,4 +218,41 @@ message SetUserCodeIDRequest {
 message SetUserCodeIDResponse {
   // 实际生效的 code_id（包含自动生成的情况）。
   string code_id = 1;
+}
+
+// ---------- 手动推送 ----------
+
+message SendPushRequest {
+  string title = 1;                  // 推送标题
+  string body = 2;                   // 推送正文（支持基本文本）
+  string severity = 3;               // low | normal | high | critical
+  repeated string target_user_ids = 4; // 目标用户 ID 列表；空 = 全部在线用户
+  string category = 5;               // 默认 "system"
+}
+
+message SendPushResponse {
+  int32 sent_count = 1;              // 实际发送数
+  int32 online_count = 2;            // 在线用户数（target 为空时有效）
+  string push_log_id = 3;            // 日志记录 ID
+}
+
+message PushHistoryEntry {
+  string id = 1;
+  string title = 2;
+  string body = 3;
+  string severity = 4;
+  int32 target_count = 5;            // 目标用户数
+  int32 sent_count = 6;              // 实际发送数
+  string admin_user_id = 7;          // 操作管理员 ID
+  int64 created_at = 8;              // unix 秒
+}
+
+message GetPushHistoryRequest {
+  int32 page_size = 1;               // 默认 50
+  string cursor = 2;                 // 游标（created_at desc）
+}
+
+message GetPushHistoryResponse {
+  repeated PushHistoryEntry entries = 1;
+  string next_cursor = 2;
 }

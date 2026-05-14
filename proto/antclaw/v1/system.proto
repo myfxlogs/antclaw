@@ -10,6 +10,8 @@ service SystemService {
   rpc Healthz(HealthzRequest) returns (HealthzResponse);
   rpc Readyz(ReadyzRequest) returns (ReadyzResponse);
   rpc Info(InfoRequest) returns (InfoResponse);
+  rpc GetOnlineUsers(GetOnlineUsersRequest) returns (GetOnlineUsersResponse);
+  rpc GetPushStats(GetPushStatsRequest) returns (GetPushStatsResponse);
 }
 
 message HealthzRequest {}
@@ -37,4 +39,33 @@ message InfoResponse {
   bool maintenance_mode = 6;      // 是否维护模式
   string server_timezone = 7;     // 服务端时区
   int64 server_time = 8;          // 服务端当前 unix 秒
+}
+
+message GetOnlineUsersRequest {}
+
+message OnlineUserInfo {
+  string user_id = 1;
+  string display_name = 2;
+  string remote_addr = 3;
+  int64 connected_at = 4;         // unix 秒
+}
+
+message GetOnlineUsersResponse {
+  int32 count = 1;
+  repeated OnlineUserInfo users = 2;
+}
+
+message GetPushStatsRequest {}
+
+message PushTypeStat {
+  string push_type = 1;
+  int32 count = 2;
+}
+
+message GetPushStatsResponse {
+  int64 total_notifications = 1;
+  int64 total_push_state_records = 2;
+  repeated PushTypeStat by_type = 3;
+  int64 recent_1h = 4;
+  int64 recent_24h = 5;
 }

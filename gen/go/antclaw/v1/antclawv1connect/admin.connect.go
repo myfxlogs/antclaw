@@ -63,6 +63,11 @@ const (
 	// AdminServiceSetUserCodeIDProcedure is the fully-qualified name of the AdminService's
 	// SetUserCodeID RPC.
 	AdminServiceSetUserCodeIDProcedure = "/antclaw.v1.AdminService/SetUserCodeID"
+	// AdminServiceSendPushProcedure is the fully-qualified name of the AdminService's SendPush RPC.
+	AdminServiceSendPushProcedure = "/antclaw.v1.AdminService/SendPush"
+	// AdminServiceGetPushHistoryProcedure is the fully-qualified name of the AdminService's
+	// GetPushHistory RPC.
+	AdminServiceGetPushHistoryProcedure = "/antclaw.v1.AdminService/GetPushHistory"
 )
 
 // AdminServiceClient is a client for the antclaw.v1.AdminService service.
@@ -92,6 +97,10 @@ type AdminServiceClient interface {
 	// 管理员为用户设置/修改数字 ID（5-10 位，避开 4/7，不以 0 开头）。
 	// 留空 code_id 触发系统重新随机分配；非空则直接采用并校验唯一性。
 	SetUserCodeID(context.Context, *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error)
+	// 手动推送消息给指定用户（或全部在线用户）
+	SendPush(context.Context, *connect.Request[v1.SendPushRequest]) (*connect.Response[v1.SendPushResponse], error)
+	// 查询手动推送历史
+	GetPushHistory(context.Context, *connect.Request[v1.GetPushHistoryRequest]) (*connect.Response[v1.GetPushHistoryResponse], error)
 }
 
 // NewAdminServiceClient constructs a client for the antclaw.v1.AdminService service. By default, it
@@ -177,6 +186,18 @@ func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(adminServiceMethods.ByName("SetUserCodeID")),
 			connect.WithClientOptions(opts...),
 		),
+		sendPush: connect.NewClient[v1.SendPushRequest, v1.SendPushResponse](
+			httpClient,
+			baseURL+AdminServiceSendPushProcedure,
+			connect.WithSchema(adminServiceMethods.ByName("SendPush")),
+			connect.WithClientOptions(opts...),
+		),
+		getPushHistory: connect.NewClient[v1.GetPushHistoryRequest, v1.GetPushHistoryResponse](
+			httpClient,
+			baseURL+AdminServiceGetPushHistoryProcedure,
+			connect.WithSchema(adminServiceMethods.ByName("GetPushHistory")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -194,6 +215,8 @@ type adminServiceClient struct {
 	forceLogout            *connect.Client[v1.ForceLogoutRequest, v1.ForceLogoutResponse]
 	adminResetUserPassword *connect.Client[v1.AdminResetUserPasswordRequest, v1.AdminResetUserPasswordResponse]
 	setUserCodeID          *connect.Client[v1.SetUserCodeIDRequest, v1.SetUserCodeIDResponse]
+	sendPush               *connect.Client[v1.SendPushRequest, v1.SendPushResponse]
+	getPushHistory         *connect.Client[v1.GetPushHistoryRequest, v1.GetPushHistoryResponse]
 }
 
 // ListUsers calls antclaw.v1.AdminService.ListUsers.
@@ -256,6 +279,16 @@ func (c *adminServiceClient) SetUserCodeID(ctx context.Context, req *connect.Req
 	return c.setUserCodeID.CallUnary(ctx, req)
 }
 
+// SendPush calls antclaw.v1.AdminService.SendPush.
+func (c *adminServiceClient) SendPush(ctx context.Context, req *connect.Request[v1.SendPushRequest]) (*connect.Response[v1.SendPushResponse], error) {
+	return c.sendPush.CallUnary(ctx, req)
+}
+
+// GetPushHistory calls antclaw.v1.AdminService.GetPushHistory.
+func (c *adminServiceClient) GetPushHistory(ctx context.Context, req *connect.Request[v1.GetPushHistoryRequest]) (*connect.Response[v1.GetPushHistoryResponse], error) {
+	return c.getPushHistory.CallUnary(ctx, req)
+}
+
 // AdminServiceHandler is an implementation of the antclaw.v1.AdminService service.
 type AdminServiceHandler interface {
 	// List users with pagination
@@ -283,6 +316,10 @@ type AdminServiceHandler interface {
 	// 管理员为用户设置/修改数字 ID（5-10 位，避开 4/7，不以 0 开头）。
 	// 留空 code_id 触发系统重新随机分配；非空则直接采用并校验唯一性。
 	SetUserCodeID(context.Context, *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error)
+	// 手动推送消息给指定用户（或全部在线用户）
+	SendPush(context.Context, *connect.Request[v1.SendPushRequest]) (*connect.Response[v1.SendPushResponse], error)
+	// 查询手动推送历史
+	GetPushHistory(context.Context, *connect.Request[v1.GetPushHistoryRequest]) (*connect.Response[v1.GetPushHistoryResponse], error)
 }
 
 // NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -364,6 +401,18 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(adminServiceMethods.ByName("SetUserCodeID")),
 		connect.WithHandlerOptions(opts...),
 	)
+	adminServiceSendPushHandler := connect.NewUnaryHandler(
+		AdminServiceSendPushProcedure,
+		svc.SendPush,
+		connect.WithSchema(adminServiceMethods.ByName("SendPush")),
+		connect.WithHandlerOptions(opts...),
+	)
+	adminServiceGetPushHistoryHandler := connect.NewUnaryHandler(
+		AdminServiceGetPushHistoryProcedure,
+		svc.GetPushHistory,
+		connect.WithSchema(adminServiceMethods.ByName("GetPushHistory")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AdminServiceListUsersProcedure:
@@ -390,6 +439,10 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 			adminServiceAdminResetUserPasswordHandler.ServeHTTP(w, r)
 		case AdminServiceSetUserCodeIDProcedure:
 			adminServiceSetUserCodeIDHandler.ServeHTTP(w, r)
+		case AdminServiceSendPushProcedure:
+			adminServiceSendPushHandler.ServeHTTP(w, r)
+		case AdminServiceGetPushHistoryProcedure:
+			adminServiceGetPushHistoryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -445,4 +498,12 @@ func (UnimplementedAdminServiceHandler) AdminResetUserPassword(context.Context, 
 
 func (UnimplementedAdminServiceHandler) SetUserCodeID(context.Context, *connect.Request[v1.SetUserCodeIDRequest]) (*connect.Response[v1.SetUserCodeIDResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AdminService.SetUserCodeID is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) SendPush(context.Context, *connect.Request[v1.SendPushRequest]) (*connect.Response[v1.SendPushResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AdminService.SendPush is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) GetPushHistory(context.Context, *connect.Request[v1.GetPushHistoryRequest]) (*connect.Response[v1.GetPushHistoryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.AdminService.GetPushHistory is not implemented"))
 }

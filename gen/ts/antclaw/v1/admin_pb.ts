@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file antclaw/v1/admin.proto.
  */
 export const file_antclaw_v1_admin: GenFile = /*@__PURE__*/
-  fileDesc("ChZhbnRjbGF3L3YxL2FkbWluLnByb3RvEgphbnRjbGF3LnYxInUKEExpc3RVc2Vyc1JlcXVlc3QSDgoGY3Vyc29yGAEgASgJEhEKCXBhZ2Vfc2l6ZRgCIAEoBRIUCgxlbWFpbF9maWx0ZXIYAyABKAkSEwoLcm9sZV9maWx0ZXIYBCABKAkSEwoLYmFubmVkX29ubHkYBSABKAgiWAoRTGlzdFVzZXJzUmVzcG9uc2USHwoFdXNlcnMYASADKAsyEC5hbnRjbGF3LnYxLlVzZXISEwoLbmV4dF9jdXJzb3IYAiABKAkSDQoFdG90YWwYAyABKAUiMAoOU2V0Um9sZVJlcXVlc3QSDwoHdXNlcl9pZBgBIAEoCRINCgVyb2xlcxgCIAMoCSIxCg9TZXRSb2xlUmVzcG9uc2USHgoEdXNlchgBIAEoCzIQLmFudGNsYXcudjEuVXNlciJBCgpCYW5SZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkSDgoGcmVhc29uGAIgASgJEhIKCmV4cGlyZXNfYXQYAyABKAMiDQoLQmFuUmVzcG9uc2UiHwoMVW5iYW5SZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkiDwoNVW5iYW5SZXNwb25zZSKHAQoNUnVuSm9iUmVxdWVzdBIQCghqb2JfbmFtZRgBIAEoCRI1CgZwYXJhbXMYAiADKAsyJS5hbnRjbGF3LnYxLlJ1bkpvYlJlcXVlc3QuUGFyYW1zRW50cnkaLQoLUGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIwCg5SdW5Kb2JSZXNwb25zZRIOCgZqb2JfaWQYASABKAkSDgoGc3RhdHVzGAIgASgJIoABCgNKb2ISDgoGam9iX2lkGAEgASgJEhAKCGpvYl9uYW1lGAIgASgJEg4KBnN0YXR1cxgDIAEoCRIQCghsYXN0X3J1bhgEIAEoCRIQCghuZXh0X3J1bhgFIAEoCRIPCgdlbmFibGVkGAYgASgIEhIKCmxhc3RfZXJyb3IYByABKAkiKAoPTGlzdEpvYnNSZXF1ZXN0EhUKDXN0YXR1c19maWx0ZXIYASABKAkiMQoQTGlzdEpvYnNSZXNwb25zZRIdCgRqb2JzGAEgAygLMg8uYW50Y2xhdy52MS5Kb2IiNwoUU2V0Sm9iRW5hYmxlZFJlcXVlc3QSDgoGam9iX2lkGAEgASgJEg8KB2VuYWJsZWQYAiABKAgiOAoVU2V0Sm9iRW5hYmxlZFJlc3BvbnNlEg4KBmpvYl9pZBgBIAEoCRIPCgdlbmFibGVkGAIgASgIIosBCg1BdWRpdExvZ0VudHJ5Eg4KBmxvZ19pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEg4KBmFjdGlvbhgDIAEoCRIQCghyZXNvdXJjZRgEIAEoCRIPCgdkZXRhaWxzGAUgASgJEhIKCmNyZWF0ZWRfYXQYBiABKAMSEgoKaXBfYWRkcmVzcxgHIAEoCSKTAQoUTGlzdEF1ZGl0TG9nc1JlcXVlc3QSDgoGY3Vyc29yGAEgASgJEhEKCXBhZ2Vfc2l6ZRgCIAEoBRIWCg51c2VyX2lkX2ZpbHRlchgDIAEoCRIVCg1hY3Rpb25fZmlsdGVyGAQgASgJEikKCnRpbWVfcmFuZ2UYBSABKAsyFS5hbnRjbGF3LnYxLlRpbWVSYW5nZSJYChVMaXN0QXVkaXRMb2dzUmVzcG9uc2USKgoHZW50cmllcxgBIAMoCzIZLmFudGNsYXcudjEuQXVkaXRMb2dFbnRyeRITCgtuZXh0X2N1cnNvchgCIAEoCSKIAQoPV2ViaG9va0RlbGl2ZXJ5EhMKC2RlbGl2ZXJ5X2lkGAEgASgJEhIKCndlYmhvb2tfaWQYAiABKAkSEgoKZXZlbnRfdHlwZRgDIAEoCRITCgtzdGF0dXNfY29kZRgEIAEoBRIPCgdzdWNjZXNzGAUgASgIEhIKCmNyZWF0ZWRfYXQYBiABKAMiXAocTGlzdFdlYmhvb2tEZWxpdmVyaWVzUmVxdWVzdBIOCgZjdXJzb3IYASABKAkSEQoJcGFnZV9zaXplGAIgASgFEhkKEXdlYmhvb2tfaWRfZmlsdGVyGAMgASgJImUKHUxpc3RXZWJob29rRGVsaXZlcmllc1Jlc3BvbnNlEi8KCmRlbGl2ZXJpZXMYASADKAsyGy5hbnRjbGF3LnYxLldlYmhvb2tEZWxpdmVyeRITCgtuZXh0X2N1cnNvchgCIAEoCSIlChJGb3JjZUxvZ291dFJlcXVlc3QSDwoHdXNlcl9pZBgBIAEoCSIVChNGb3JjZUxvZ291dFJlc3BvbnNlIkYKHUFkbWluUmVzZXRVc2VyUGFzc3dvcmRSZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIiAKHkFkbWluUmVzZXRVc2VyUGFzc3dvcmRSZXNwb25zZSI4ChRTZXRVc2VyQ29kZUlEUmVxdWVzdBIPCgd1c2VyX2lkGAEgASgJEg8KB2NvZGVfaWQYAiABKAkiKAoVU2V0VXNlckNvZGVJRFJlc3BvbnNlEg8KB2NvZGVfaWQYASABKAkyywcKDEFkbWluU2VydmljZRJICglMaXN0VXNlcnMSHC5hbnRjbGF3LnYxLkxpc3RVc2Vyc1JlcXVlc3QaHS5hbnRjbGF3LnYxLkxpc3RVc2Vyc1Jlc3BvbnNlEkIKB1NldFJvbGUSGi5hbnRjbGF3LnYxLlNldFJvbGVSZXF1ZXN0GhsuYW50Y2xhdy52MS5TZXRSb2xlUmVzcG9uc2USNgoDQmFuEhYuYW50Y2xhdy52MS5CYW5SZXF1ZXN0GhcuYW50Y2xhdy52MS5CYW5SZXNwb25zZRI8CgVVbmJhbhIYLmFudGNsYXcudjEuVW5iYW5SZXF1ZXN0GhkuYW50Y2xhdy52MS5VbmJhblJlc3BvbnNlEj8KBlJ1bkpvYhIZLmFudGNsYXcudjEuUnVuSm9iUmVxdWVzdBoaLmFudGNsYXcudjEuUnVuSm9iUmVzcG9uc2USRQoITGlzdEpvYnMSGy5hbnRjbGF3LnYxLkxpc3RKb2JzUmVxdWVzdBocLmFudGNsYXcudjEuTGlzdEpvYnNSZXNwb25zZRJUCg1TZXRKb2JFbmFibGVkEiAuYW50Y2xhdy52MS5TZXRKb2JFbmFibGVkUmVxdWVzdBohLmFudGNsYXcudjEuU2V0Sm9iRW5hYmxlZFJlc3BvbnNlElQKDUxpc3RBdWRpdExvZ3MSIC5hbnRjbGF3LnYxLkxpc3RBdWRpdExvZ3NSZXF1ZXN0GiEuYW50Y2xhdy52MS5MaXN0QXVkaXRMb2dzUmVzcG9uc2USbAoVTGlzdFdlYmhvb2tEZWxpdmVyaWVzEiguYW50Y2xhdy52MS5MaXN0V2ViaG9va0RlbGl2ZXJpZXNSZXF1ZXN0GikuYW50Y2xhdy52MS5MaXN0V2ViaG9va0RlbGl2ZXJpZXNSZXNwb25zZRJOCgtGb3JjZUxvZ291dBIeLmFudGNsYXcudjEuRm9yY2VMb2dvdXRSZXF1ZXN0Gh8uYW50Y2xhdy52MS5Gb3JjZUxvZ291dFJlc3BvbnNlEm8KFkFkbWluUmVzZXRVc2VyUGFzc3dvcmQSKS5hbnRjbGF3LnYxLkFkbWluUmVzZXRVc2VyUGFzc3dvcmRSZXF1ZXN0GiouYW50Y2xhdy52MS5BZG1pblJlc2V0VXNlclBhc3N3b3JkUmVzcG9uc2USVAoNU2V0VXNlckNvZGVJRBIgLmFudGNsYXcudjEuU2V0VXNlckNvZGVJRFJlcXVlc3QaIS5hbnRjbGF3LnYxLlNldFVzZXJDb2RlSURSZXNwb25zZUKdAQoOY29tLmFudGNsYXcudjFCCkFkbWluUHJvdG9QAVo2Z2l0aHViLmNvbS9hbnRjbGF3L2FudGNsYXcvZ2VuL2dvL2FudGNsYXcvdjE7YW50Y2xhd3YxogIDQVhYqgIKQW50Y2xhdy5WMcoCCkFudGNsYXdcVjHiAhZBbnRjbGF3XFYxXEdQQk1ldGFkYXRh6gILQW50Y2xhdzo6VjFiBnByb3RvMw", [file_antclaw_v1_common, file_antclaw_v1_user]);
+  fileDesc("ChZhbnRjbGF3L3YxL2FkbWluLnByb3RvEgphbnRjbGF3LnYxInUKEExpc3RVc2Vyc1JlcXVlc3QSDgoGY3Vyc29yGAEgASgJEhEKCXBhZ2Vfc2l6ZRgCIAEoBRIUCgxlbWFpbF9maWx0ZXIYAyABKAkSEwoLcm9sZV9maWx0ZXIYBCABKAkSEwoLYmFubmVkX29ubHkYBSABKAgiWAoRTGlzdFVzZXJzUmVzcG9uc2USHwoFdXNlcnMYASADKAsyEC5hbnRjbGF3LnYxLlVzZXISEwoLbmV4dF9jdXJzb3IYAiABKAkSDQoFdG90YWwYAyABKAUiMAoOU2V0Um9sZVJlcXVlc3QSDwoHdXNlcl9pZBgBIAEoCRINCgVyb2xlcxgCIAMoCSIxCg9TZXRSb2xlUmVzcG9uc2USHgoEdXNlchgBIAEoCzIQLmFudGNsYXcudjEuVXNlciJBCgpCYW5SZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkSDgoGcmVhc29uGAIgASgJEhIKCmV4cGlyZXNfYXQYAyABKAMiDQoLQmFuUmVzcG9uc2UiHwoMVW5iYW5SZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkiDwoNVW5iYW5SZXNwb25zZSKHAQoNUnVuSm9iUmVxdWVzdBIQCghqb2JfbmFtZRgBIAEoCRI1CgZwYXJhbXMYAiADKAsyJS5hbnRjbGF3LnYxLlJ1bkpvYlJlcXVlc3QuUGFyYW1zRW50cnkaLQoLUGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIwCg5SdW5Kb2JSZXNwb25zZRIOCgZqb2JfaWQYASABKAkSDgoGc3RhdHVzGAIgASgJIoABCgNKb2ISDgoGam9iX2lkGAEgASgJEhAKCGpvYl9uYW1lGAIgASgJEg4KBnN0YXR1cxgDIAEoCRIQCghsYXN0X3J1bhgEIAEoCRIQCghuZXh0X3J1bhgFIAEoCRIPCgdlbmFibGVkGAYgASgIEhIKCmxhc3RfZXJyb3IYByABKAkiKAoPTGlzdEpvYnNSZXF1ZXN0EhUKDXN0YXR1c19maWx0ZXIYASABKAkiMQoQTGlzdEpvYnNSZXNwb25zZRIdCgRqb2JzGAEgAygLMg8uYW50Y2xhdy52MS5Kb2IiNwoUU2V0Sm9iRW5hYmxlZFJlcXVlc3QSDgoGam9iX2lkGAEgASgJEg8KB2VuYWJsZWQYAiABKAgiOAoVU2V0Sm9iRW5hYmxlZFJlc3BvbnNlEg4KBmpvYl9pZBgBIAEoCRIPCgdlbmFibGVkGAIgASgIIosBCg1BdWRpdExvZ0VudHJ5Eg4KBmxvZ19pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEg4KBmFjdGlvbhgDIAEoCRIQCghyZXNvdXJjZRgEIAEoCRIPCgdkZXRhaWxzGAUgASgJEhIKCmNyZWF0ZWRfYXQYBiABKAMSEgoKaXBfYWRkcmVzcxgHIAEoCSKTAQoUTGlzdEF1ZGl0TG9nc1JlcXVlc3QSDgoGY3Vyc29yGAEgASgJEhEKCXBhZ2Vfc2l6ZRgCIAEoBRIWCg51c2VyX2lkX2ZpbHRlchgDIAEoCRIVCg1hY3Rpb25fZmlsdGVyGAQgASgJEikKCnRpbWVfcmFuZ2UYBSABKAsyFS5hbnRjbGF3LnYxLlRpbWVSYW5nZSJYChVMaXN0QXVkaXRMb2dzUmVzcG9uc2USKgoHZW50cmllcxgBIAMoCzIZLmFudGNsYXcudjEuQXVkaXRMb2dFbnRyeRITCgtuZXh0X2N1cnNvchgCIAEoCSKIAQoPV2ViaG9va0RlbGl2ZXJ5EhMKC2RlbGl2ZXJ5X2lkGAEgASgJEhIKCndlYmhvb2tfaWQYAiABKAkSEgoKZXZlbnRfdHlwZRgDIAEoCRITCgtzdGF0dXNfY29kZRgEIAEoBRIPCgdzdWNjZXNzGAUgASgIEhIKCmNyZWF0ZWRfYXQYBiABKAMiXAocTGlzdFdlYmhvb2tEZWxpdmVyaWVzUmVxdWVzdBIOCgZjdXJzb3IYASABKAkSEQoJcGFnZV9zaXplGAIgASgFEhkKEXdlYmhvb2tfaWRfZmlsdGVyGAMgASgJImUKHUxpc3RXZWJob29rRGVsaXZlcmllc1Jlc3BvbnNlEi8KCmRlbGl2ZXJpZXMYASADKAsyGy5hbnRjbGF3LnYxLldlYmhvb2tEZWxpdmVyeRITCgtuZXh0X2N1cnNvchgCIAEoCSIlChJGb3JjZUxvZ291dFJlcXVlc3QSDwoHdXNlcl9pZBgBIAEoCSIVChNGb3JjZUxvZ291dFJlc3BvbnNlIkYKHUFkbWluUmVzZXRVc2VyUGFzc3dvcmRSZXF1ZXN0Eg8KB3VzZXJfaWQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIiAKHkFkbWluUmVzZXRVc2VyUGFzc3dvcmRSZXNwb25zZSI4ChRTZXRVc2VyQ29kZUlEUmVxdWVzdBIPCgd1c2VyX2lkGAEgASgJEg8KB2NvZGVfaWQYAiABKAkiKAoVU2V0VXNlckNvZGVJRFJlc3BvbnNlEg8KB2NvZGVfaWQYASABKAkiawoPU2VuZFB1c2hSZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEgwKBGJvZHkYAiABKAkSEAoIc2V2ZXJpdHkYAyABKAkSFwoPdGFyZ2V0X3VzZXJfaWRzGAQgAygJEhAKCGNhdGVnb3J5GAUgASgJIlEKEFNlbmRQdXNoUmVzcG9uc2USEgoKc2VudF9jb3VudBgBIAEoBRIUCgxvbmxpbmVfY291bnQYAiABKAUSEwoLcHVzaF9sb2dfaWQYAyABKAkiogEKEFB1c2hIaXN0b3J5RW50cnkSCgoCaWQYASABKAkSDQoFdGl0bGUYAiABKAkSDAoEYm9keRgDIAEoCRIQCghzZXZlcml0eRgEIAEoCRIUCgx0YXJnZXRfY291bnQYBSABKAUSEgoKc2VudF9jb3VudBgGIAEoBRIVCg1hZG1pbl91c2VyX2lkGAcgASgJEhIKCmNyZWF0ZWRfYXQYCCABKAMiOgoVR2V0UHVzaEhpc3RvcnlSZXF1ZXN0EhEKCXBhZ2Vfc2l6ZRgBIAEoBRIOCgZjdXJzb3IYAiABKAkiXAoWR2V0UHVzaEhpc3RvcnlSZXNwb25zZRItCgdlbnRyaWVzGAEgAygLMhwuYW50Y2xhdy52MS5QdXNoSGlzdG9yeUVudHJ5EhMKC25leHRfY3Vyc29yGAIgASgJMusICgxBZG1pblNlcnZpY2USSAoJTGlzdFVzZXJzEhwuYW50Y2xhdy52MS5MaXN0VXNlcnNSZXF1ZXN0Gh0uYW50Y2xhdy52MS5MaXN0VXNlcnNSZXNwb25zZRJCCgdTZXRSb2xlEhouYW50Y2xhdy52MS5TZXRSb2xlUmVxdWVzdBobLmFudGNsYXcudjEuU2V0Um9sZVJlc3BvbnNlEjYKA0JhbhIWLmFudGNsYXcudjEuQmFuUmVxdWVzdBoXLmFudGNsYXcudjEuQmFuUmVzcG9uc2USPAoFVW5iYW4SGC5hbnRjbGF3LnYxLlVuYmFuUmVxdWVzdBoZLmFudGNsYXcudjEuVW5iYW5SZXNwb25zZRI/CgZSdW5Kb2ISGS5hbnRjbGF3LnYxLlJ1bkpvYlJlcXVlc3QaGi5hbnRjbGF3LnYxLlJ1bkpvYlJlc3BvbnNlEkUKCExpc3RKb2JzEhsuYW50Y2xhdy52MS5MaXN0Sm9ic1JlcXVlc3QaHC5hbnRjbGF3LnYxLkxpc3RKb2JzUmVzcG9uc2USVAoNU2V0Sm9iRW5hYmxlZBIgLmFudGNsYXcudjEuU2V0Sm9iRW5hYmxlZFJlcXVlc3QaIS5hbnRjbGF3LnYxLlNldEpvYkVuYWJsZWRSZXNwb25zZRJUCg1MaXN0QXVkaXRMb2dzEiAuYW50Y2xhdy52MS5MaXN0QXVkaXRMb2dzUmVxdWVzdBohLmFudGNsYXcudjEuTGlzdEF1ZGl0TG9nc1Jlc3BvbnNlEmwKFUxpc3RXZWJob29rRGVsaXZlcmllcxIoLmFudGNsYXcudjEuTGlzdFdlYmhvb2tEZWxpdmVyaWVzUmVxdWVzdBopLmFudGNsYXcudjEuTGlzdFdlYmhvb2tEZWxpdmVyaWVzUmVzcG9uc2USTgoLRm9yY2VMb2dvdXQSHi5hbnRjbGF3LnYxLkZvcmNlTG9nb3V0UmVxdWVzdBofLmFudGNsYXcudjEuRm9yY2VMb2dvdXRSZXNwb25zZRJvChZBZG1pblJlc2V0VXNlclBhc3N3b3JkEikuYW50Y2xhdy52MS5BZG1pblJlc2V0VXNlclBhc3N3b3JkUmVxdWVzdBoqLmFudGNsYXcudjEuQWRtaW5SZXNldFVzZXJQYXNzd29yZFJlc3BvbnNlElQKDVNldFVzZXJDb2RlSUQSIC5hbnRjbGF3LnYxLlNldFVzZXJDb2RlSURSZXF1ZXN0GiEuYW50Y2xhdy52MS5TZXRVc2VyQ29kZUlEUmVzcG9uc2USRQoIU2VuZFB1c2gSGy5hbnRjbGF3LnYxLlNlbmRQdXNoUmVxdWVzdBocLmFudGNsYXcudjEuU2VuZFB1c2hSZXNwb25zZRJXCg5HZXRQdXNoSGlzdG9yeRIhLmFudGNsYXcudjEuR2V0UHVzaEhpc3RvcnlSZXF1ZXN0GiIuYW50Y2xhdy52MS5HZXRQdXNoSGlzdG9yeVJlc3BvbnNlQp0BCg5jb20uYW50Y2xhdy52MUIKQWRtaW5Qcm90b1ABWjZnaXRodWIuY29tL2FudGNsYXcvYW50Y2xhdy9nZW4vZ28vYW50Y2xhdy92MTthbnRjbGF3djGiAgNBWFiqAgpBbnRjbGF3LlYxygIKQW50Y2xhd1xWMeICFkFudGNsYXdcVjFcR1BCTWV0YWRhdGHqAgtBbnRjbGF3OjpWMWIGcHJvdG8z", [file_antclaw_v1_common, file_antclaw_v1_user]);
 
 /**
  * ListUsers request
@@ -716,6 +716,194 @@ export const SetUserCodeIDResponseSchema: GenMessage<SetUserCodeIDResponse> = /*
   messageDesc(file_antclaw_v1_admin, 26);
 
 /**
+ * @generated from message antclaw.v1.SendPushRequest
+ */
+export type SendPushRequest = Message<"antclaw.v1.SendPushRequest"> & {
+  /**
+   * 推送标题
+   *
+   * @generated from field: string title = 1;
+   */
+  title: string;
+
+  /**
+   * 推送正文（支持基本文本）
+   *
+   * @generated from field: string body = 2;
+   */
+  body: string;
+
+  /**
+   * low | normal | high | critical
+   *
+   * @generated from field: string severity = 3;
+   */
+  severity: string;
+
+  /**
+   * 目标用户 ID 列表；空 = 全部在线用户
+   *
+   * @generated from field: repeated string target_user_ids = 4;
+   */
+  targetUserIds: string[];
+
+  /**
+   * 默认 "system"
+   *
+   * @generated from field: string category = 5;
+   */
+  category: string;
+};
+
+/**
+ * Describes the message antclaw.v1.SendPushRequest.
+ * Use `create(SendPushRequestSchema)` to create a new message.
+ */
+export const SendPushRequestSchema: GenMessage<SendPushRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_admin, 27);
+
+/**
+ * @generated from message antclaw.v1.SendPushResponse
+ */
+export type SendPushResponse = Message<"antclaw.v1.SendPushResponse"> & {
+  /**
+   * 实际发送数
+   *
+   * @generated from field: int32 sent_count = 1;
+   */
+  sentCount: number;
+
+  /**
+   * 在线用户数（target 为空时有效）
+   *
+   * @generated from field: int32 online_count = 2;
+   */
+  onlineCount: number;
+
+  /**
+   * 日志记录 ID
+   *
+   * @generated from field: string push_log_id = 3;
+   */
+  pushLogId: string;
+};
+
+/**
+ * Describes the message antclaw.v1.SendPushResponse.
+ * Use `create(SendPushResponseSchema)` to create a new message.
+ */
+export const SendPushResponseSchema: GenMessage<SendPushResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_admin, 28);
+
+/**
+ * @generated from message antclaw.v1.PushHistoryEntry
+ */
+export type PushHistoryEntry = Message<"antclaw.v1.PushHistoryEntry"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string title = 2;
+   */
+  title: string;
+
+  /**
+   * @generated from field: string body = 3;
+   */
+  body: string;
+
+  /**
+   * @generated from field: string severity = 4;
+   */
+  severity: string;
+
+  /**
+   * 目标用户数
+   *
+   * @generated from field: int32 target_count = 5;
+   */
+  targetCount: number;
+
+  /**
+   * 实际发送数
+   *
+   * @generated from field: int32 sent_count = 6;
+   */
+  sentCount: number;
+
+  /**
+   * 操作管理员 ID
+   *
+   * @generated from field: string admin_user_id = 7;
+   */
+  adminUserId: string;
+
+  /**
+   * unix 秒
+   *
+   * @generated from field: int64 created_at = 8;
+   */
+  createdAt: bigint;
+};
+
+/**
+ * Describes the message antclaw.v1.PushHistoryEntry.
+ * Use `create(PushHistoryEntrySchema)` to create a new message.
+ */
+export const PushHistoryEntrySchema: GenMessage<PushHistoryEntry> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_admin, 29);
+
+/**
+ * @generated from message antclaw.v1.GetPushHistoryRequest
+ */
+export type GetPushHistoryRequest = Message<"antclaw.v1.GetPushHistoryRequest"> & {
+  /**
+   * 默认 50
+   *
+   * @generated from field: int32 page_size = 1;
+   */
+  pageSize: number;
+
+  /**
+   * 游标（created_at desc）
+   *
+   * @generated from field: string cursor = 2;
+   */
+  cursor: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetPushHistoryRequest.
+ * Use `create(GetPushHistoryRequestSchema)` to create a new message.
+ */
+export const GetPushHistoryRequestSchema: GenMessage<GetPushHistoryRequest> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_admin, 30);
+
+/**
+ * @generated from message antclaw.v1.GetPushHistoryResponse
+ */
+export type GetPushHistoryResponse = Message<"antclaw.v1.GetPushHistoryResponse"> & {
+  /**
+   * @generated from field: repeated antclaw.v1.PushHistoryEntry entries = 1;
+   */
+  entries: PushHistoryEntry[];
+
+  /**
+   * @generated from field: string next_cursor = 2;
+   */
+  nextCursor: string;
+};
+
+/**
+ * Describes the message antclaw.v1.GetPushHistoryResponse.
+ * Use `create(GetPushHistoryResponseSchema)` to create a new message.
+ */
+export const GetPushHistoryResponseSchema: GenMessage<GetPushHistoryResponse> = /*@__PURE__*/
+  messageDesc(file_antclaw_v1_admin, 31);
+
+/**
  * AdminService provides administrative operations.
  * See: AntClaw-重构解决方案.md §3.3
  * NOTE: Admin NEVER exposes GetUserAiKeyPlaintext - this is a hard boundary per §十二.A2
@@ -843,6 +1031,26 @@ export const AdminService: GenService<{
     methodKind: "unary";
     input: typeof SetUserCodeIDRequestSchema;
     output: typeof SetUserCodeIDResponseSchema;
+  },
+  /**
+   * 手动推送消息给指定用户（或全部在线用户）
+   *
+   * @generated from rpc antclaw.v1.AdminService.SendPush
+   */
+  sendPush: {
+    methodKind: "unary";
+    input: typeof SendPushRequestSchema;
+    output: typeof SendPushResponseSchema;
+  },
+  /**
+   * 查询手动推送历史
+   *
+   * @generated from rpc antclaw.v1.AdminService.GetPushHistory
+   */
+  getPushHistory: {
+    methodKind: "unary";
+    input: typeof GetPushHistoryRequestSchema;
+    output: typeof GetPushHistoryResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_antclaw_v1_admin, 0);

@@ -1523,6 +1523,346 @@ func (x *SetUserCodeIDResponse) GetCodeId() string {
 	return ""
 }
 
+type SendPushRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`                                        // 推送标题
+	Body          string                 `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`                                          // 推送正文（支持基本文本）
+	Severity      string                 `protobuf:"bytes,3,opt,name=severity,proto3" json:"severity,omitempty"`                                  // low | normal | high | critical
+	TargetUserIds []string               `protobuf:"bytes,4,rep,name=target_user_ids,json=targetUserIds,proto3" json:"target_user_ids,omitempty"` // 目标用户 ID 列表；空 = 全部在线用户
+	Category      string                 `protobuf:"bytes,5,opt,name=category,proto3" json:"category,omitempty"`                                  // 默认 "system"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendPushRequest) Reset() {
+	*x = SendPushRequest{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendPushRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendPushRequest) ProtoMessage() {}
+
+func (x *SendPushRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendPushRequest.ProtoReflect.Descriptor instead.
+func (*SendPushRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *SendPushRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *SendPushRequest) GetBody() string {
+	if x != nil {
+		return x.Body
+	}
+	return ""
+}
+
+func (x *SendPushRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *SendPushRequest) GetTargetUserIds() []string {
+	if x != nil {
+		return x.TargetUserIds
+	}
+	return nil
+}
+
+func (x *SendPushRequest) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+type SendPushResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SentCount     int32                  `protobuf:"varint,1,opt,name=sent_count,json=sentCount,proto3" json:"sent_count,omitempty"`       // 实际发送数
+	OnlineCount   int32                  `protobuf:"varint,2,opt,name=online_count,json=onlineCount,proto3" json:"online_count,omitempty"` // 在线用户数（target 为空时有效）
+	PushLogId     string                 `protobuf:"bytes,3,opt,name=push_log_id,json=pushLogId,proto3" json:"push_log_id,omitempty"`      // 日志记录 ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendPushResponse) Reset() {
+	*x = SendPushResponse{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendPushResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendPushResponse) ProtoMessage() {}
+
+func (x *SendPushResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendPushResponse.ProtoReflect.Descriptor instead.
+func (*SendPushResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *SendPushResponse) GetSentCount() int32 {
+	if x != nil {
+		return x.SentCount
+	}
+	return 0
+}
+
+func (x *SendPushResponse) GetOnlineCount() int32 {
+	if x != nil {
+		return x.OnlineCount
+	}
+	return 0
+}
+
+func (x *SendPushResponse) GetPushLogId() string {
+	if x != nil {
+		return x.PushLogId
+	}
+	return ""
+}
+
+type PushHistoryEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Body          string                 `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
+	Severity      string                 `protobuf:"bytes,4,opt,name=severity,proto3" json:"severity,omitempty"`
+	TargetCount   int32                  `protobuf:"varint,5,opt,name=target_count,json=targetCount,proto3" json:"target_count,omitempty"`  // 目标用户数
+	SentCount     int32                  `protobuf:"varint,6,opt,name=sent_count,json=sentCount,proto3" json:"sent_count,omitempty"`        // 实际发送数
+	AdminUserId   string                 `protobuf:"bytes,7,opt,name=admin_user_id,json=adminUserId,proto3" json:"admin_user_id,omitempty"` // 操作管理员 ID
+	CreatedAt     int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`        // unix 秒
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PushHistoryEntry) Reset() {
+	*x = PushHistoryEntry{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PushHistoryEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PushHistoryEntry) ProtoMessage() {}
+
+func (x *PushHistoryEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PushHistoryEntry.ProtoReflect.Descriptor instead.
+func (*PushHistoryEntry) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *PushHistoryEntry) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *PushHistoryEntry) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *PushHistoryEntry) GetBody() string {
+	if x != nil {
+		return x.Body
+	}
+	return ""
+}
+
+func (x *PushHistoryEntry) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *PushHistoryEntry) GetTargetCount() int32 {
+	if x != nil {
+		return x.TargetCount
+	}
+	return 0
+}
+
+func (x *PushHistoryEntry) GetSentCount() int32 {
+	if x != nil {
+		return x.SentCount
+	}
+	return 0
+}
+
+func (x *PushHistoryEntry) GetAdminUserId() string {
+	if x != nil {
+		return x.AdminUserId
+	}
+	return ""
+}
+
+func (x *PushHistoryEntry) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+type GetPushHistoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 默认 50
+	Cursor        string                 `protobuf:"bytes,2,opt,name=cursor,proto3" json:"cursor,omitempty"`                      // 游标（created_at desc）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPushHistoryRequest) Reset() {
+	*x = GetPushHistoryRequest{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPushHistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPushHistoryRequest) ProtoMessage() {}
+
+func (x *GetPushHistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPushHistoryRequest.ProtoReflect.Descriptor instead.
+func (*GetPushHistoryRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *GetPushHistoryRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *GetPushHistoryRequest) GetCursor() string {
+	if x != nil {
+		return x.Cursor
+	}
+	return ""
+}
+
+type GetPushHistoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Entries       []*PushHistoryEntry    `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	NextCursor    string                 `protobuf:"bytes,2,opt,name=next_cursor,json=nextCursor,proto3" json:"next_cursor,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPushHistoryResponse) Reset() {
+	*x = GetPushHistoryResponse{}
+	mi := &file_antclaw_v1_admin_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPushHistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPushHistoryResponse) ProtoMessage() {}
+
+func (x *GetPushHistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_admin_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPushHistoryResponse.ProtoReflect.Descriptor instead.
+func (*GetPushHistoryResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_admin_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *GetPushHistoryResponse) GetEntries() []*PushHistoryEntry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+func (x *GetPushHistoryResponse) GetNextCursor() string {
+	if x != nil {
+		return x.NextCursor
+	}
+	return ""
+}
+
 var File_antclaw_v1_admin_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_admin_proto_rawDesc = "" +
@@ -1639,7 +1979,36 @@ const file_antclaw_v1_admin_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x17\n" +
 	"\acode_id\x18\x02 \x01(\tR\x06codeId\"0\n" +
 	"\x15SetUserCodeIDResponse\x12\x17\n" +
-	"\acode_id\x18\x01 \x01(\tR\x06codeId2\xcb\a\n" +
+	"\acode_id\x18\x01 \x01(\tR\x06codeId\"\x9b\x01\n" +
+	"\x0fSendPushRequest\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
+	"\x04body\x18\x02 \x01(\tR\x04body\x12\x1a\n" +
+	"\bseverity\x18\x03 \x01(\tR\bseverity\x12&\n" +
+	"\x0ftarget_user_ids\x18\x04 \x03(\tR\rtargetUserIds\x12\x1a\n" +
+	"\bcategory\x18\x05 \x01(\tR\bcategory\"t\n" +
+	"\x10SendPushResponse\x12\x1d\n" +
+	"\n" +
+	"sent_count\x18\x01 \x01(\x05R\tsentCount\x12!\n" +
+	"\fonline_count\x18\x02 \x01(\x05R\vonlineCount\x12\x1e\n" +
+	"\vpush_log_id\x18\x03 \x01(\tR\tpushLogId\"\xed\x01\n" +
+	"\x10PushHistoryEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
+	"\x04body\x18\x03 \x01(\tR\x04body\x12\x1a\n" +
+	"\bseverity\x18\x04 \x01(\tR\bseverity\x12!\n" +
+	"\ftarget_count\x18\x05 \x01(\x05R\vtargetCount\x12\x1d\n" +
+	"\n" +
+	"sent_count\x18\x06 \x01(\x05R\tsentCount\x12\"\n" +
+	"\radmin_user_id\x18\a \x01(\tR\vadminUserId\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\b \x01(\x03R\tcreatedAt\"L\n" +
+	"\x15GetPushHistoryRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x16\n" +
+	"\x06cursor\x18\x02 \x01(\tR\x06cursor\"q\n" +
+	"\x16GetPushHistoryResponse\x126\n" +
+	"\aentries\x18\x01 \x03(\v2\x1c.antclaw.v1.PushHistoryEntryR\aentries\x12\x1f\n" +
+	"\vnext_cursor\x18\x02 \x01(\tR\n" +
+	"nextCursor2\xeb\b\n" +
 	"\fAdminService\x12H\n" +
 	"\tListUsers\x12\x1c.antclaw.v1.ListUsersRequest\x1a\x1d.antclaw.v1.ListUsersResponse\x12B\n" +
 	"\aSetRole\x12\x1a.antclaw.v1.SetRoleRequest\x1a\x1b.antclaw.v1.SetRoleResponse\x126\n" +
@@ -1652,7 +2021,9 @@ const file_antclaw_v1_admin_proto_rawDesc = "" +
 	"\x15ListWebhookDeliveries\x12(.antclaw.v1.ListWebhookDeliveriesRequest\x1a).antclaw.v1.ListWebhookDeliveriesResponse\x12N\n" +
 	"\vForceLogout\x12\x1e.antclaw.v1.ForceLogoutRequest\x1a\x1f.antclaw.v1.ForceLogoutResponse\x12o\n" +
 	"\x16AdminResetUserPassword\x12).antclaw.v1.AdminResetUserPasswordRequest\x1a*.antclaw.v1.AdminResetUserPasswordResponse\x12T\n" +
-	"\rSetUserCodeID\x12 .antclaw.v1.SetUserCodeIDRequest\x1a!.antclaw.v1.SetUserCodeIDResponseB\x9d\x01\n" +
+	"\rSetUserCodeID\x12 .antclaw.v1.SetUserCodeIDRequest\x1a!.antclaw.v1.SetUserCodeIDResponse\x12E\n" +
+	"\bSendPush\x12\x1b.antclaw.v1.SendPushRequest\x1a\x1c.antclaw.v1.SendPushResponse\x12W\n" +
+	"\x0eGetPushHistory\x12!.antclaw.v1.GetPushHistoryRequest\x1a\".antclaw.v1.GetPushHistoryResponseB\x9d\x01\n" +
 	"\x0ecom.antclaw.v1B\n" +
 	"AdminProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
@@ -1670,7 +2041,7 @@ func file_antclaw_v1_admin_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_admin_proto_rawDescData
 }
 
-var file_antclaw_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_antclaw_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
 var file_antclaw_v1_admin_proto_goTypes = []any{
 	(*ListUsersRequest)(nil),               // 0: antclaw.v1.ListUsersRequest
 	(*ListUsersResponse)(nil),              // 1: antclaw.v1.ListUsersResponse
@@ -1699,47 +2070,57 @@ var file_antclaw_v1_admin_proto_goTypes = []any{
 	(*AdminResetUserPasswordResponse)(nil), // 24: antclaw.v1.AdminResetUserPasswordResponse
 	(*SetUserCodeIDRequest)(nil),           // 25: antclaw.v1.SetUserCodeIDRequest
 	(*SetUserCodeIDResponse)(nil),          // 26: antclaw.v1.SetUserCodeIDResponse
-	nil,                                    // 27: antclaw.v1.RunJobRequest.ParamsEntry
-	(*User)(nil),                           // 28: antclaw.v1.User
-	(*TimeRange)(nil),                      // 29: antclaw.v1.TimeRange
+	(*SendPushRequest)(nil),                // 27: antclaw.v1.SendPushRequest
+	(*SendPushResponse)(nil),               // 28: antclaw.v1.SendPushResponse
+	(*PushHistoryEntry)(nil),               // 29: antclaw.v1.PushHistoryEntry
+	(*GetPushHistoryRequest)(nil),          // 30: antclaw.v1.GetPushHistoryRequest
+	(*GetPushHistoryResponse)(nil),         // 31: antclaw.v1.GetPushHistoryResponse
+	nil,                                    // 32: antclaw.v1.RunJobRequest.ParamsEntry
+	(*User)(nil),                           // 33: antclaw.v1.User
+	(*TimeRange)(nil),                      // 34: antclaw.v1.TimeRange
 }
 var file_antclaw_v1_admin_proto_depIdxs = []int32{
-	28, // 0: antclaw.v1.ListUsersResponse.users:type_name -> antclaw.v1.User
-	28, // 1: antclaw.v1.SetRoleResponse.user:type_name -> antclaw.v1.User
-	27, // 2: antclaw.v1.RunJobRequest.params:type_name -> antclaw.v1.RunJobRequest.ParamsEntry
+	33, // 0: antclaw.v1.ListUsersResponse.users:type_name -> antclaw.v1.User
+	33, // 1: antclaw.v1.SetRoleResponse.user:type_name -> antclaw.v1.User
+	32, // 2: antclaw.v1.RunJobRequest.params:type_name -> antclaw.v1.RunJobRequest.ParamsEntry
 	10, // 3: antclaw.v1.ListJobsResponse.jobs:type_name -> antclaw.v1.Job
-	29, // 4: antclaw.v1.ListAuditLogsRequest.time_range:type_name -> antclaw.v1.TimeRange
+	34, // 4: antclaw.v1.ListAuditLogsRequest.time_range:type_name -> antclaw.v1.TimeRange
 	15, // 5: antclaw.v1.ListAuditLogsResponse.entries:type_name -> antclaw.v1.AuditLogEntry
 	18, // 6: antclaw.v1.ListWebhookDeliveriesResponse.deliveries:type_name -> antclaw.v1.WebhookDelivery
-	0,  // 7: antclaw.v1.AdminService.ListUsers:input_type -> antclaw.v1.ListUsersRequest
-	2,  // 8: antclaw.v1.AdminService.SetRole:input_type -> antclaw.v1.SetRoleRequest
-	4,  // 9: antclaw.v1.AdminService.Ban:input_type -> antclaw.v1.BanRequest
-	6,  // 10: antclaw.v1.AdminService.Unban:input_type -> antclaw.v1.UnbanRequest
-	8,  // 11: antclaw.v1.AdminService.RunJob:input_type -> antclaw.v1.RunJobRequest
-	11, // 12: antclaw.v1.AdminService.ListJobs:input_type -> antclaw.v1.ListJobsRequest
-	13, // 13: antclaw.v1.AdminService.SetJobEnabled:input_type -> antclaw.v1.SetJobEnabledRequest
-	16, // 14: antclaw.v1.AdminService.ListAuditLogs:input_type -> antclaw.v1.ListAuditLogsRequest
-	19, // 15: antclaw.v1.AdminService.ListWebhookDeliveries:input_type -> antclaw.v1.ListWebhookDeliveriesRequest
-	21, // 16: antclaw.v1.AdminService.ForceLogout:input_type -> antclaw.v1.ForceLogoutRequest
-	23, // 17: antclaw.v1.AdminService.AdminResetUserPassword:input_type -> antclaw.v1.AdminResetUserPasswordRequest
-	25, // 18: antclaw.v1.AdminService.SetUserCodeID:input_type -> antclaw.v1.SetUserCodeIDRequest
-	1,  // 19: antclaw.v1.AdminService.ListUsers:output_type -> antclaw.v1.ListUsersResponse
-	3,  // 20: antclaw.v1.AdminService.SetRole:output_type -> antclaw.v1.SetRoleResponse
-	5,  // 21: antclaw.v1.AdminService.Ban:output_type -> antclaw.v1.BanResponse
-	7,  // 22: antclaw.v1.AdminService.Unban:output_type -> antclaw.v1.UnbanResponse
-	9,  // 23: antclaw.v1.AdminService.RunJob:output_type -> antclaw.v1.RunJobResponse
-	12, // 24: antclaw.v1.AdminService.ListJobs:output_type -> antclaw.v1.ListJobsResponse
-	14, // 25: antclaw.v1.AdminService.SetJobEnabled:output_type -> antclaw.v1.SetJobEnabledResponse
-	17, // 26: antclaw.v1.AdminService.ListAuditLogs:output_type -> antclaw.v1.ListAuditLogsResponse
-	20, // 27: antclaw.v1.AdminService.ListWebhookDeliveries:output_type -> antclaw.v1.ListWebhookDeliveriesResponse
-	22, // 28: antclaw.v1.AdminService.ForceLogout:output_type -> antclaw.v1.ForceLogoutResponse
-	24, // 29: antclaw.v1.AdminService.AdminResetUserPassword:output_type -> antclaw.v1.AdminResetUserPasswordResponse
-	26, // 30: antclaw.v1.AdminService.SetUserCodeID:output_type -> antclaw.v1.SetUserCodeIDResponse
-	19, // [19:31] is the sub-list for method output_type
-	7,  // [7:19] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	29, // 7: antclaw.v1.GetPushHistoryResponse.entries:type_name -> antclaw.v1.PushHistoryEntry
+	0,  // 8: antclaw.v1.AdminService.ListUsers:input_type -> antclaw.v1.ListUsersRequest
+	2,  // 9: antclaw.v1.AdminService.SetRole:input_type -> antclaw.v1.SetRoleRequest
+	4,  // 10: antclaw.v1.AdminService.Ban:input_type -> antclaw.v1.BanRequest
+	6,  // 11: antclaw.v1.AdminService.Unban:input_type -> antclaw.v1.UnbanRequest
+	8,  // 12: antclaw.v1.AdminService.RunJob:input_type -> antclaw.v1.RunJobRequest
+	11, // 13: antclaw.v1.AdminService.ListJobs:input_type -> antclaw.v1.ListJobsRequest
+	13, // 14: antclaw.v1.AdminService.SetJobEnabled:input_type -> antclaw.v1.SetJobEnabledRequest
+	16, // 15: antclaw.v1.AdminService.ListAuditLogs:input_type -> antclaw.v1.ListAuditLogsRequest
+	19, // 16: antclaw.v1.AdminService.ListWebhookDeliveries:input_type -> antclaw.v1.ListWebhookDeliveriesRequest
+	21, // 17: antclaw.v1.AdminService.ForceLogout:input_type -> antclaw.v1.ForceLogoutRequest
+	23, // 18: antclaw.v1.AdminService.AdminResetUserPassword:input_type -> antclaw.v1.AdminResetUserPasswordRequest
+	25, // 19: antclaw.v1.AdminService.SetUserCodeID:input_type -> antclaw.v1.SetUserCodeIDRequest
+	27, // 20: antclaw.v1.AdminService.SendPush:input_type -> antclaw.v1.SendPushRequest
+	30, // 21: antclaw.v1.AdminService.GetPushHistory:input_type -> antclaw.v1.GetPushHistoryRequest
+	1,  // 22: antclaw.v1.AdminService.ListUsers:output_type -> antclaw.v1.ListUsersResponse
+	3,  // 23: antclaw.v1.AdminService.SetRole:output_type -> antclaw.v1.SetRoleResponse
+	5,  // 24: antclaw.v1.AdminService.Ban:output_type -> antclaw.v1.BanResponse
+	7,  // 25: antclaw.v1.AdminService.Unban:output_type -> antclaw.v1.UnbanResponse
+	9,  // 26: antclaw.v1.AdminService.RunJob:output_type -> antclaw.v1.RunJobResponse
+	12, // 27: antclaw.v1.AdminService.ListJobs:output_type -> antclaw.v1.ListJobsResponse
+	14, // 28: antclaw.v1.AdminService.SetJobEnabled:output_type -> antclaw.v1.SetJobEnabledResponse
+	17, // 29: antclaw.v1.AdminService.ListAuditLogs:output_type -> antclaw.v1.ListAuditLogsResponse
+	20, // 30: antclaw.v1.AdminService.ListWebhookDeliveries:output_type -> antclaw.v1.ListWebhookDeliveriesResponse
+	22, // 31: antclaw.v1.AdminService.ForceLogout:output_type -> antclaw.v1.ForceLogoutResponse
+	24, // 32: antclaw.v1.AdminService.AdminResetUserPassword:output_type -> antclaw.v1.AdminResetUserPasswordResponse
+	26, // 33: antclaw.v1.AdminService.SetUserCodeID:output_type -> antclaw.v1.SetUserCodeIDResponse
+	28, // 34: antclaw.v1.AdminService.SendPush:output_type -> antclaw.v1.SendPushResponse
+	31, // 35: antclaw.v1.AdminService.GetPushHistory:output_type -> antclaw.v1.GetPushHistoryResponse
+	22, // [22:36] is the sub-list for method output_type
+	8,  // [8:22] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_admin_proto_init() }
@@ -1755,7 +2136,7 @@ func file_antclaw_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_admin_proto_rawDesc), len(file_antclaw_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   28,
+			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

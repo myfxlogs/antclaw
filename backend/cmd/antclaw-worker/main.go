@@ -63,10 +63,17 @@ func main() {
 	globalRedis = redisClient
 
 	// 初始化 CredentialResolver：支持运行时热加载
-	secretBox, err := cryptopkg.NewSecretBox(os.Getenv("ANTCLAW_SECRET_MASTER_KEY"))
+	var secretBox *cryptopkg.SecretBox
+	masterKey, err := cryptopkg.LoadOrCreateMasterKey()
 	if err != nil {
-		logger.Warn("SecretBox init failed; datasource encryption disabled", "error", err)
-		secretBox = nil
+		logger.Warn("master key load/create failed; datasource encryption disabled", "error", err)
+	}
+	if masterKey != "" {
+		secretBox, err = cryptopkg.NewSecretBox(masterKey)
+		if err != nil {
+			logger.Warn("SecretBox init failed; datasource encryption disabled", "error", err)
+			secretBox = nil
+		}
 	}
 	envFallback := datasource.BuildEnvFallback()
 	resolver := datasource.NewCredentialResolver(dbpool, secretBox, envFallback, logger)

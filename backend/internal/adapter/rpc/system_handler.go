@@ -8,19 +8,21 @@ import (
 	antclawv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/gen/go/antclaw/v1/antclawv1connect"
 	"github.com/antclaw/antclaw/internal/infra/redis"
+	"github.com/antclaw/antclaw/internal/service/presence"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // SystemHandler implements SystemService.
 type SystemHandler struct {
-	pg    *pgxpool.Pool
-	redis *redis.Client
-	boot  time.Time
+	pg       *pgxpool.Pool
+	redis    *redis.Client
+	boot     time.Time
+	presence *presence.Tracker
 }
 
-func NewSystemHandler(pg *pgxpool.Pool, r *redis.Client, boot time.Time) *SystemHandler {
-	return &SystemHandler{pg: pg, redis: r, boot: boot}
+func NewSystemHandler(pg *pgxpool.Pool, r *redis.Client, boot time.Time, pt *presence.Tracker) *SystemHandler {
+	return &SystemHandler{pg: pg, redis: r, boot: boot, presence: pt}
 }
 
 func (h *SystemHandler) Healthz(ctx context.Context, _ *connect.Request[antclawv1.HealthzRequest]) (*connect.Response[antclawv1.HealthzResponse], error) {
@@ -61,6 +63,57 @@ func (h *SystemHandler) Info(_ context.Context, _ *connect.Request[antclawv1.Inf
 		MaintenanceMode:  false,
 		ServerTimezone:   "UTC",
 		ServerTime:       time.Now().Unix(),
+	}), nil
+}
+
+func (h *SystemHandler) GetOnlineUsers(_ context.Context, _ *connect.Request[antclawv1.GetOnlineUsersRequest]) (*connect.Response[antclawv1.GetOnlineUsersResponse], error) {
+	list := h.presence.List()
+	users := make([]*antclawv1.OnlineUserInfo, 0, len(list))
+	for _, u := range list {
+		users = append(users, &antclawv1.OnlineUserInfo{
+			UserId:      u.UserID,
+			RemoteAddr:  u.RemoteAddr,
+			ConnectedAt: u.ConnectedAt.Unix(),
+		})
+	}
+	return connect.NewResponse(&antclawv1.GetOnlineUsersResponse{
+		Count: int32(len(users)),
+		Users: users,
+	}), nil
+}
+
+func (h *SystemHandler) GetPushStats(ctx context.Context, _ *connect.Request[antclawv1.GetPushStatsRequest]) (*connect.Response[antclawv1.GetPushStatsResponse], error) {
+	var totalNotif, totalPush, recent1h, recent24h int64
+	_ = h.pg.QueryRow(ctx, `SELECT COUNT(*) FROM notifications`).Scan(&totalNotif)
+	_ = h.pg.QueryRow(ctx, `SELECT COUNT(*) FROM notification_push_state`).Scan(&totalPush)
+	_ = h.pg.QueryRow(ctx, `SELECT COUNT(*) FROM notification_push_state WHERE last_sent_at >= NOW() - INTERVAL '1 hour'`).Scan(&recent1h)
+	_ = h.pg.QueryRow(ctx, `SELECT COUNT(*) FROM notification_push_state WHERE last_sent_at >= NOW() - INTERVAL '24 hours'`).Scan(&recent24h)
+
+	rows, err := h.pg.Query(ctx, `SELECT push_type, COUNT(*) as cnt FROM notification_push_state GROUP BY push_type ORDER BY cnt DESC LIMIT 20`)
+	if err != nil {
+		return connect.NewResponse(&antclawv1.GetPushStatsResponse{
+			TotalNotifications:     totalNotif,
+			TotalPushStateRecords:  totalPush,
+			Recent_1H:              recent1h,
+			Recent_24H:             recent24h,
+		}), nil
+	}
+	defer rows.Close()
+
+	var byType []*antclawv1.PushTypeStat
+	for rows.Next() {
+		var pt string
+		var cnt int32
+		if rows.Scan(&pt, &cnt) == nil {
+			byType = append(byType, &antclawv1.PushTypeStat{PushType: pt, Count: cnt})
+		}
+	}
+	return connect.NewResponse(&antclawv1.GetPushStatsResponse{
+		TotalNotifications:     totalNotif,
+		TotalPushStateRecords:  totalPush,
+		ByType:                 byType,
+		Recent_1H:              recent1h,
+		Recent_24H:             recent24h,
 	}), nil
 }
 

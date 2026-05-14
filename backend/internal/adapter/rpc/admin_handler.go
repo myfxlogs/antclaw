@@ -3,23 +3,33 @@ package rpc
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
+	"time"
 
 	"connectrpc.com/connect"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	adminv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/gen/go/antclaw/v1/antclawv1connect"
 	"github.com/antclaw/antclaw/internal/auth"
+	"github.com/antclaw/antclaw/internal/notify"
 	"github.com/antclaw/antclaw/internal/service/admin"
+	"github.com/antclaw/antclaw/internal/service/presence"
 )
 
 // AdminHandler implements antclawv1connect.AdminServiceHandler.
 type AdminHandler struct {
-	svc *admin.Service
+	svc      *admin.Service
+	notify   *notify.Service
+	presence *presence.Tracker
+	pg       *pgxpool.Pool
 }
 
 // NewAdminHandler creates a new AdminHandler.
-func NewAdminHandler(svc *admin.Service) *AdminHandler {
-	return &AdminHandler{svc: svc}
+func NewAdminHandler(svc *admin.Service, ns *notify.Service, pt *presence.Tracker, pg *pgxpool.Pool) *AdminHandler {
+	return &AdminHandler{svc: svc, notify: ns, presence: pt, pg: pg}
 }
 
 func (h *AdminHandler) ListUsers(ctx context.Context, req *connect.Request[adminv1.ListUsersRequest]) (*connect.Response[adminv1.ListUsersResponse], error) {
@@ -141,6 +151,114 @@ func (h *AdminHandler) AdminResetUserPassword(ctx context.Context, req *connect.
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return connect.NewResponse(resp), nil
+}
+
+func (h *AdminHandler) resolveTargets(req *connect.Request[adminv1.SendPushRequest]) []uuid.UUID {
+	if ids := req.Msg.GetTargetUserIds(); len(ids) > 0 {
+		return parseUUIDs(ids)
+	}
+	// 空 = 全部在线
+	online := h.presence.List()
+	out := make([]uuid.UUID, 0, len(online))
+	for _, u := range online {
+		if uid, err := uuid.Parse(u.UserID); err == nil {
+			out = append(out, uid)
+		}
+	}
+	return out
+}
+
+func parseUUIDs(ids []string) []uuid.UUID {
+	out := make([]uuid.UUID, 0, len(ids))
+	for _, id := range ids {
+		if uid, err := uuid.Parse(id); err == nil {
+			out = append(out, uid)
+		}
+	}
+	return out
+}
+
+func (h *AdminHandler) SendPush(ctx context.Context, req *connect.Request[adminv1.SendPushRequest]) (*connect.Response[adminv1.SendPushResponse], error) {
+	adminID, _ := auth.UserIDFromContext(ctx)
+	title := strings.TrimSpace(req.Msg.GetTitle())
+	if title == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("title required"))
+	}
+	sev := defaultStr(strings.ToLower(strings.TrimSpace(req.Msg.GetSeverity())), "normal")
+	cat := defaultStr(strings.ToLower(strings.TrimSpace(req.Msg.GetCategory())), "system")
+
+	targets := h.resolveTargets(req)
+	if len(targets) == 0 {
+		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("没有可推送的目标用户"))
+	}
+
+	sent := 0
+	dedup := fmt.Sprintf("manual:%s:%d", adminID, time.Now().Unix())
+	for _, uid := range targets {
+		if h.notify.Send(ctx, &notify.Notification{
+			UserID: uid, Category: cat, Title: title, Body: req.Msg.GetBody(),
+			Severity: sev, DedupKey: dedup,
+			Data: map[string]string{"kind": "manual_push", "admin_id": adminID},
+		}) == nil {
+			sent++
+		}
+	}
+
+	tids := make([]string, len(targets))
+	for i, u := range targets {
+		tids[i] = u.String()
+	}
+	var logID string
+	adminUID, _ := uuid.Parse(adminID)
+	_ = h.pg.QueryRow(ctx,
+		`INSERT INTO manual_push_log (title,body,severity,category,target_count,sent_count,admin_user_id,target_user_ids)
+		 VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
+		title, req.Msg.GetBody(), sev, cat, len(targets), sent, adminUID, tids,
+	).Scan(&logID)
+
+	return connect.NewResponse(&adminv1.SendPushResponse{
+		SentCount: int32(sent), OnlineCount: int32(len(targets)), PushLogId: logID,
+	}), nil
+}
+
+func (h *AdminHandler) GetPushHistory(ctx context.Context, req *connect.Request[adminv1.GetPushHistoryRequest]) (*connect.Response[adminv1.GetPushHistoryResponse], error) {
+	rows, err := h.pg.Query(ctx,
+		`SELECT id,title,body,severity,target_count,sent_count,admin_user_id,created_at
+		   FROM manual_push_log WHERE ($1='' OR created_at<$1::timestamptz)
+		   ORDER BY created_at DESC LIMIT $2`,
+		req.Msg.GetCursor(), clampPage32(req.Msg.GetPageSize())+1,
+	)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	defer rows.Close()
+
+	var entries []*adminv1.PushHistoryEntry
+	var next string
+	for rows.Next() {
+		var e adminv1.PushHistoryEntry
+		var t time.Time
+		if rows.Scan(&e.Id, &e.Title, &e.Body, &e.Severity, &e.TargetCount, &e.SentCount, &e.AdminUserId, &t) != nil {
+			continue
+		}
+		e.CreatedAt = t.Unix()
+		entries = append(entries, &e)
+	}
+	return connect.NewResponse(&adminv1.GetPushHistoryResponse{Entries: entries, NextCursor: next}), nil
+}
+
+func clampPage32(n int32) int32 {
+	if n <= 0 || n > 100 {
+		return 50
+	}
+	return n
+}
+
+func defaultStr(v, def string) string {
+	if v == "" {
+		return def
+	}
+	return v
 }
 
 var _ antclawv1connect.AdminServiceHandler = (*AdminHandler)(nil)

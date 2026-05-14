@@ -394,6 +394,326 @@ func (x *InfoResponse) GetServerTime() int64 {
 	return 0
 }
 
+type GetOnlineUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOnlineUsersRequest) Reset() {
+	*x = GetOnlineUsersRequest{}
+	mi := &file_antclaw_v1_system_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOnlineUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOnlineUsersRequest) ProtoMessage() {}
+
+func (x *GetOnlineUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_system_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOnlineUsersRequest.ProtoReflect.Descriptor instead.
+func (*GetOnlineUsersRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_system_proto_rawDescGZIP(), []int{7}
+}
+
+type OnlineUserInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	RemoteAddr    string                 `protobuf:"bytes,3,opt,name=remote_addr,json=remoteAddr,proto3" json:"remote_addr,omitempty"`
+	ConnectedAt   int64                  `protobuf:"varint,4,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"` // unix 秒
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OnlineUserInfo) Reset() {
+	*x = OnlineUserInfo{}
+	mi := &file_antclaw_v1_system_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OnlineUserInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnlineUserInfo) ProtoMessage() {}
+
+func (x *OnlineUserInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_system_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnlineUserInfo.ProtoReflect.Descriptor instead.
+func (*OnlineUserInfo) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_system_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *OnlineUserInfo) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *OnlineUserInfo) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *OnlineUserInfo) GetRemoteAddr() string {
+	if x != nil {
+		return x.RemoteAddr
+	}
+	return ""
+}
+
+func (x *OnlineUserInfo) GetConnectedAt() int64 {
+	if x != nil {
+		return x.ConnectedAt
+	}
+	return 0
+}
+
+type GetOnlineUsersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	Users         []*OnlineUserInfo      `protobuf:"bytes,2,rep,name=users,proto3" json:"users,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOnlineUsersResponse) Reset() {
+	*x = GetOnlineUsersResponse{}
+	mi := &file_antclaw_v1_system_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOnlineUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOnlineUsersResponse) ProtoMessage() {}
+
+func (x *GetOnlineUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_system_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOnlineUsersResponse.ProtoReflect.Descriptor instead.
+func (*GetOnlineUsersResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_system_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetOnlineUsersResponse) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *GetOnlineUsersResponse) GetUsers() []*OnlineUserInfo {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+type GetPushStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPushStatsRequest) Reset() {
+	*x = GetPushStatsRequest{}
+	mi := &file_antclaw_v1_system_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPushStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPushStatsRequest) ProtoMessage() {}
+
+func (x *GetPushStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_system_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPushStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetPushStatsRequest) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_system_proto_rawDescGZIP(), []int{10}
+}
+
+type PushTypeStat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PushType      string                 `protobuf:"bytes,1,opt,name=push_type,json=pushType,proto3" json:"push_type,omitempty"`
+	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PushTypeStat) Reset() {
+	*x = PushTypeStat{}
+	mi := &file_antclaw_v1_system_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PushTypeStat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PushTypeStat) ProtoMessage() {}
+
+func (x *PushTypeStat) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_system_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PushTypeStat.ProtoReflect.Descriptor instead.
+func (*PushTypeStat) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_system_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *PushTypeStat) GetPushType() string {
+	if x != nil {
+		return x.PushType
+	}
+	return ""
+}
+
+func (x *PushTypeStat) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type GetPushStatsResponse struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	TotalNotifications    int64                  `protobuf:"varint,1,opt,name=total_notifications,json=totalNotifications,proto3" json:"total_notifications,omitempty"`
+	TotalPushStateRecords int64                  `protobuf:"varint,2,opt,name=total_push_state_records,json=totalPushStateRecords,proto3" json:"total_push_state_records,omitempty"`
+	ByType                []*PushTypeStat        `protobuf:"bytes,3,rep,name=by_type,json=byType,proto3" json:"by_type,omitempty"`
+	Recent_1H             int64                  `protobuf:"varint,4,opt,name=recent_1h,json=recent1h,proto3" json:"recent_1h,omitempty"`
+	Recent_24H            int64                  `protobuf:"varint,5,opt,name=recent_24h,json=recent24h,proto3" json:"recent_24h,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *GetPushStatsResponse) Reset() {
+	*x = GetPushStatsResponse{}
+	mi := &file_antclaw_v1_system_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPushStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPushStatsResponse) ProtoMessage() {}
+
+func (x *GetPushStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_antclaw_v1_system_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPushStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetPushStatsResponse) Descriptor() ([]byte, []int) {
+	return file_antclaw_v1_system_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetPushStatsResponse) GetTotalNotifications() int64 {
+	if x != nil {
+		return x.TotalNotifications
+	}
+	return 0
+}
+
+func (x *GetPushStatsResponse) GetTotalPushStateRecords() int64 {
+	if x != nil {
+		return x.TotalPushStateRecords
+	}
+	return 0
+}
+
+func (x *GetPushStatsResponse) GetByType() []*PushTypeStat {
+	if x != nil {
+		return x.ByType
+	}
+	return nil
+}
+
+func (x *GetPushStatsResponse) GetRecent_1H() int64 {
+	if x != nil {
+		return x.Recent_1H
+	}
+	return 0
+}
+
+func (x *GetPushStatsResponse) GetRecent_24H() int64 {
+	if x != nil {
+		return x.Recent_24H
+	}
+	return 0
+}
+
 var File_antclaw_v1_system_proto protoreflect.FileDescriptor
 
 const file_antclaw_v1_system_proto_rawDesc = "" +
@@ -429,11 +749,34 @@ const file_antclaw_v1_system_proto_rawDesc = "" +
 	"\x10maintenance_mode\x18\x06 \x01(\bR\x0fmaintenanceMode\x12'\n" +
 	"\x0fserver_timezone\x18\a \x01(\tR\x0eserverTimezone\x12\x1f\n" +
 	"\vserver_time\x18\b \x01(\x03R\n" +
-	"serverTime2\xcf\x01\n" +
+	"serverTime\"\x17\n" +
+	"\x15GetOnlineUsersRequest\"\x90\x01\n" +
+	"\x0eOnlineUserInfo\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1f\n" +
+	"\vremote_addr\x18\x03 \x01(\tR\n" +
+	"remoteAddr\x12!\n" +
+	"\fconnected_at\x18\x04 \x01(\x03R\vconnectedAt\"`\n" +
+	"\x16GetOnlineUsersResponse\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count\x120\n" +
+	"\x05users\x18\x02 \x03(\v2\x1a.antclaw.v1.OnlineUserInfoR\x05users\"\x15\n" +
+	"\x13GetPushStatsRequest\"A\n" +
+	"\fPushTypeStat\x12\x1b\n" +
+	"\tpush_type\x18\x01 \x01(\tR\bpushType\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"\xef\x01\n" +
+	"\x14GetPushStatsResponse\x12/\n" +
+	"\x13total_notifications\x18\x01 \x01(\x03R\x12totalNotifications\x127\n" +
+	"\x18total_push_state_records\x18\x02 \x01(\x03R\x15totalPushStateRecords\x121\n" +
+	"\aby_type\x18\x03 \x03(\v2\x18.antclaw.v1.PushTypeStatR\x06byType\x12\x1b\n" +
+	"\trecent_1h\x18\x04 \x01(\x03R\brecent1h\x12\x1d\n" +
+	"\n" +
+	"recent_24h\x18\x05 \x01(\x03R\trecent24h2\xfb\x02\n" +
 	"\rSystemService\x12B\n" +
 	"\aHealthz\x12\x1a.antclaw.v1.HealthzRequest\x1a\x1b.antclaw.v1.HealthzResponse\x12?\n" +
 	"\x06Readyz\x12\x19.antclaw.v1.ReadyzRequest\x1a\x1a.antclaw.v1.ReadyzResponse\x129\n" +
-	"\x04Info\x12\x17.antclaw.v1.InfoRequest\x1a\x18.antclaw.v1.InfoResponseB\x9e\x01\n" +
+	"\x04Info\x12\x17.antclaw.v1.InfoRequest\x1a\x18.antclaw.v1.InfoResponse\x12W\n" +
+	"\x0eGetOnlineUsers\x12!.antclaw.v1.GetOnlineUsersRequest\x1a\".antclaw.v1.GetOnlineUsersResponse\x12Q\n" +
+	"\fGetPushStats\x12\x1f.antclaw.v1.GetPushStatsRequest\x1a .antclaw.v1.GetPushStatsResponseB\x9e\x01\n" +
 	"\x0ecom.antclaw.v1B\vSystemProtoP\x01Z6github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1\xa2\x02\x03AXX\xaa\x02\n" +
 	"Antclaw.V1\xca\x02\n" +
 	"Antclaw\\V1\xe2\x02\x16Antclaw\\V1\\GPBMetadata\xea\x02\vAntclaw::V1b\x06proto3"
@@ -450,34 +793,46 @@ func file_antclaw_v1_system_proto_rawDescGZIP() []byte {
 	return file_antclaw_v1_system_proto_rawDescData
 }
 
-var file_antclaw_v1_system_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_antclaw_v1_system_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_antclaw_v1_system_proto_goTypes = []any{
-	(*HealthzRequest)(nil),        // 0: antclaw.v1.HealthzRequest
-	(*HealthzResponse)(nil),       // 1: antclaw.v1.HealthzResponse
-	(*ComponentHealth)(nil),       // 2: antclaw.v1.ComponentHealth
-	(*ReadyzRequest)(nil),         // 3: antclaw.v1.ReadyzRequest
-	(*ReadyzResponse)(nil),        // 4: antclaw.v1.ReadyzResponse
-	(*InfoRequest)(nil),           // 5: antclaw.v1.InfoRequest
-	(*InfoResponse)(nil),          // 6: antclaw.v1.InfoResponse
-	nil,                           // 7: antclaw.v1.HealthzResponse.ComponentsEntry
-	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(*HealthzRequest)(nil),         // 0: antclaw.v1.HealthzRequest
+	(*HealthzResponse)(nil),        // 1: antclaw.v1.HealthzResponse
+	(*ComponentHealth)(nil),        // 2: antclaw.v1.ComponentHealth
+	(*ReadyzRequest)(nil),          // 3: antclaw.v1.ReadyzRequest
+	(*ReadyzResponse)(nil),         // 4: antclaw.v1.ReadyzResponse
+	(*InfoRequest)(nil),            // 5: antclaw.v1.InfoRequest
+	(*InfoResponse)(nil),           // 6: antclaw.v1.InfoResponse
+	(*GetOnlineUsersRequest)(nil),  // 7: antclaw.v1.GetOnlineUsersRequest
+	(*OnlineUserInfo)(nil),         // 8: antclaw.v1.OnlineUserInfo
+	(*GetOnlineUsersResponse)(nil), // 9: antclaw.v1.GetOnlineUsersResponse
+	(*GetPushStatsRequest)(nil),    // 10: antclaw.v1.GetPushStatsRequest
+	(*PushTypeStat)(nil),           // 11: antclaw.v1.PushTypeStat
+	(*GetPushStatsResponse)(nil),   // 12: antclaw.v1.GetPushStatsResponse
+	nil,                            // 13: antclaw.v1.HealthzResponse.ComponentsEntry
+	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
 }
 var file_antclaw_v1_system_proto_depIdxs = []int32{
-	7, // 0: antclaw.v1.HealthzResponse.components:type_name -> antclaw.v1.HealthzResponse.ComponentsEntry
-	8, // 1: antclaw.v1.HealthzResponse.checked_at:type_name -> google.protobuf.Timestamp
-	8, // 2: antclaw.v1.InfoResponse.built_at:type_name -> google.protobuf.Timestamp
-	2, // 3: antclaw.v1.HealthzResponse.ComponentsEntry.value:type_name -> antclaw.v1.ComponentHealth
-	0, // 4: antclaw.v1.SystemService.Healthz:input_type -> antclaw.v1.HealthzRequest
-	3, // 5: antclaw.v1.SystemService.Readyz:input_type -> antclaw.v1.ReadyzRequest
-	5, // 6: antclaw.v1.SystemService.Info:input_type -> antclaw.v1.InfoRequest
-	1, // 7: antclaw.v1.SystemService.Healthz:output_type -> antclaw.v1.HealthzResponse
-	4, // 8: antclaw.v1.SystemService.Readyz:output_type -> antclaw.v1.ReadyzResponse
-	6, // 9: antclaw.v1.SystemService.Info:output_type -> antclaw.v1.InfoResponse
-	7, // [7:10] is the sub-list for method output_type
-	4, // [4:7] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	13, // 0: antclaw.v1.HealthzResponse.components:type_name -> antclaw.v1.HealthzResponse.ComponentsEntry
+	14, // 1: antclaw.v1.HealthzResponse.checked_at:type_name -> google.protobuf.Timestamp
+	14, // 2: antclaw.v1.InfoResponse.built_at:type_name -> google.protobuf.Timestamp
+	8,  // 3: antclaw.v1.GetOnlineUsersResponse.users:type_name -> antclaw.v1.OnlineUserInfo
+	11, // 4: antclaw.v1.GetPushStatsResponse.by_type:type_name -> antclaw.v1.PushTypeStat
+	2,  // 5: antclaw.v1.HealthzResponse.ComponentsEntry.value:type_name -> antclaw.v1.ComponentHealth
+	0,  // 6: antclaw.v1.SystemService.Healthz:input_type -> antclaw.v1.HealthzRequest
+	3,  // 7: antclaw.v1.SystemService.Readyz:input_type -> antclaw.v1.ReadyzRequest
+	5,  // 8: antclaw.v1.SystemService.Info:input_type -> antclaw.v1.InfoRequest
+	7,  // 9: antclaw.v1.SystemService.GetOnlineUsers:input_type -> antclaw.v1.GetOnlineUsersRequest
+	10, // 10: antclaw.v1.SystemService.GetPushStats:input_type -> antclaw.v1.GetPushStatsRequest
+	1,  // 11: antclaw.v1.SystemService.Healthz:output_type -> antclaw.v1.HealthzResponse
+	4,  // 12: antclaw.v1.SystemService.Readyz:output_type -> antclaw.v1.ReadyzResponse
+	6,  // 13: antclaw.v1.SystemService.Info:output_type -> antclaw.v1.InfoResponse
+	9,  // 14: antclaw.v1.SystemService.GetOnlineUsers:output_type -> antclaw.v1.GetOnlineUsersResponse
+	12, // 15: antclaw.v1.SystemService.GetPushStats:output_type -> antclaw.v1.GetPushStatsResponse
+	11, // [11:16] is the sub-list for method output_type
+	6,  // [6:11] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_system_proto_init() }
@@ -491,7 +846,7 @@ func file_antclaw_v1_system_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_antclaw_v1_system_proto_rawDesc), len(file_antclaw_v1_system_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

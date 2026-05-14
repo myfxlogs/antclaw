@@ -39,6 +39,12 @@ const (
 	SystemServiceReadyzProcedure = "/antclaw.v1.SystemService/Readyz"
 	// SystemServiceInfoProcedure is the fully-qualified name of the SystemService's Info RPC.
 	SystemServiceInfoProcedure = "/antclaw.v1.SystemService/Info"
+	// SystemServiceGetOnlineUsersProcedure is the fully-qualified name of the SystemService's
+	// GetOnlineUsers RPC.
+	SystemServiceGetOnlineUsersProcedure = "/antclaw.v1.SystemService/GetOnlineUsers"
+	// SystemServiceGetPushStatsProcedure is the fully-qualified name of the SystemService's
+	// GetPushStats RPC.
+	SystemServiceGetPushStatsProcedure = "/antclaw.v1.SystemService/GetPushStats"
 )
 
 // SystemServiceClient is a client for the antclaw.v1.SystemService service.
@@ -46,6 +52,8 @@ type SystemServiceClient interface {
 	Healthz(context.Context, *connect.Request[v1.HealthzRequest]) (*connect.Response[v1.HealthzResponse], error)
 	Readyz(context.Context, *connect.Request[v1.ReadyzRequest]) (*connect.Response[v1.ReadyzResponse], error)
 	Info(context.Context, *connect.Request[v1.InfoRequest]) (*connect.Response[v1.InfoResponse], error)
+	GetOnlineUsers(context.Context, *connect.Request[v1.GetOnlineUsersRequest]) (*connect.Response[v1.GetOnlineUsersResponse], error)
+	GetPushStats(context.Context, *connect.Request[v1.GetPushStatsRequest]) (*connect.Response[v1.GetPushStatsResponse], error)
 }
 
 // NewSystemServiceClient constructs a client for the antclaw.v1.SystemService service. By default,
@@ -77,14 +85,28 @@ func NewSystemServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(systemServiceMethods.ByName("Info")),
 			connect.WithClientOptions(opts...),
 		),
+		getOnlineUsers: connect.NewClient[v1.GetOnlineUsersRequest, v1.GetOnlineUsersResponse](
+			httpClient,
+			baseURL+SystemServiceGetOnlineUsersProcedure,
+			connect.WithSchema(systemServiceMethods.ByName("GetOnlineUsers")),
+			connect.WithClientOptions(opts...),
+		),
+		getPushStats: connect.NewClient[v1.GetPushStatsRequest, v1.GetPushStatsResponse](
+			httpClient,
+			baseURL+SystemServiceGetPushStatsProcedure,
+			connect.WithSchema(systemServiceMethods.ByName("GetPushStats")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // systemServiceClient implements SystemServiceClient.
 type systemServiceClient struct {
-	healthz *connect.Client[v1.HealthzRequest, v1.HealthzResponse]
-	readyz  *connect.Client[v1.ReadyzRequest, v1.ReadyzResponse]
-	info    *connect.Client[v1.InfoRequest, v1.InfoResponse]
+	healthz        *connect.Client[v1.HealthzRequest, v1.HealthzResponse]
+	readyz         *connect.Client[v1.ReadyzRequest, v1.ReadyzResponse]
+	info           *connect.Client[v1.InfoRequest, v1.InfoResponse]
+	getOnlineUsers *connect.Client[v1.GetOnlineUsersRequest, v1.GetOnlineUsersResponse]
+	getPushStats   *connect.Client[v1.GetPushStatsRequest, v1.GetPushStatsResponse]
 }
 
 // Healthz calls antclaw.v1.SystemService.Healthz.
@@ -102,11 +124,23 @@ func (c *systemServiceClient) Info(ctx context.Context, req *connect.Request[v1.
 	return c.info.CallUnary(ctx, req)
 }
 
+// GetOnlineUsers calls antclaw.v1.SystemService.GetOnlineUsers.
+func (c *systemServiceClient) GetOnlineUsers(ctx context.Context, req *connect.Request[v1.GetOnlineUsersRequest]) (*connect.Response[v1.GetOnlineUsersResponse], error) {
+	return c.getOnlineUsers.CallUnary(ctx, req)
+}
+
+// GetPushStats calls antclaw.v1.SystemService.GetPushStats.
+func (c *systemServiceClient) GetPushStats(ctx context.Context, req *connect.Request[v1.GetPushStatsRequest]) (*connect.Response[v1.GetPushStatsResponse], error) {
+	return c.getPushStats.CallUnary(ctx, req)
+}
+
 // SystemServiceHandler is an implementation of the antclaw.v1.SystemService service.
 type SystemServiceHandler interface {
 	Healthz(context.Context, *connect.Request[v1.HealthzRequest]) (*connect.Response[v1.HealthzResponse], error)
 	Readyz(context.Context, *connect.Request[v1.ReadyzRequest]) (*connect.Response[v1.ReadyzResponse], error)
 	Info(context.Context, *connect.Request[v1.InfoRequest]) (*connect.Response[v1.InfoResponse], error)
+	GetOnlineUsers(context.Context, *connect.Request[v1.GetOnlineUsersRequest]) (*connect.Response[v1.GetOnlineUsersResponse], error)
+	GetPushStats(context.Context, *connect.Request[v1.GetPushStatsRequest]) (*connect.Response[v1.GetPushStatsResponse], error)
 }
 
 // NewSystemServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -134,6 +168,18 @@ func NewSystemServiceHandler(svc SystemServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(systemServiceMethods.ByName("Info")),
 		connect.WithHandlerOptions(opts...),
 	)
+	systemServiceGetOnlineUsersHandler := connect.NewUnaryHandler(
+		SystemServiceGetOnlineUsersProcedure,
+		svc.GetOnlineUsers,
+		connect.WithSchema(systemServiceMethods.ByName("GetOnlineUsers")),
+		connect.WithHandlerOptions(opts...),
+	)
+	systemServiceGetPushStatsHandler := connect.NewUnaryHandler(
+		SystemServiceGetPushStatsProcedure,
+		svc.GetPushStats,
+		connect.WithSchema(systemServiceMethods.ByName("GetPushStats")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.SystemService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SystemServiceHealthzProcedure:
@@ -142,6 +188,10 @@ func NewSystemServiceHandler(svc SystemServiceHandler, opts ...connect.HandlerOp
 			systemServiceReadyzHandler.ServeHTTP(w, r)
 		case SystemServiceInfoProcedure:
 			systemServiceInfoHandler.ServeHTTP(w, r)
+		case SystemServiceGetOnlineUsersProcedure:
+			systemServiceGetOnlineUsersHandler.ServeHTTP(w, r)
+		case SystemServiceGetPushStatsProcedure:
+			systemServiceGetPushStatsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -161,4 +211,12 @@ func (UnimplementedSystemServiceHandler) Readyz(context.Context, *connect.Reques
 
 func (UnimplementedSystemServiceHandler) Info(context.Context, *connect.Request[v1.InfoRequest]) (*connect.Response[v1.InfoResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SystemService.Info is not implemented"))
+}
+
+func (UnimplementedSystemServiceHandler) GetOnlineUsers(context.Context, *connect.Request[v1.GetOnlineUsersRequest]) (*connect.Response[v1.GetOnlineUsersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SystemService.GetOnlineUsers is not implemented"))
+}
+
+func (UnimplementedSystemServiceHandler) GetPushStats(context.Context, *connect.Request[v1.GetPushStatsRequest]) (*connect.Response[v1.GetPushStatsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.SystemService.GetPushStats is not implemented"))
 }

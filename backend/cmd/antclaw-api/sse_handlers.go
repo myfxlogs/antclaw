@@ -8,6 +8,8 @@ import (
 	"time"
 
 	redisv9 "github.com/redis/go-redis/v9"
+
+	"github.com/antclaw/antclaw/internal/service/presence"
 )
 
 // streamSSE 封装 Redis Streams 到 SSE 的通用推送逻辑：
@@ -100,16 +102,25 @@ func alertsEventsHandler(rdb *redisv9.Client, stream string) http.HandlerFunc {
 //
 // 鉴权：从 Authorization: Bearer 或 Cookie antclaw_at= 提取 access_token，校验后取 sub 作为 userID。
 // 失败 → 401，避免泄露推送频道。
-func userNotificationsSSE(rdb *redisv9.Client) http.HandlerFunc {
+func userNotificationsSSE(rdb *redisv9.Client, pt *presence.Tracker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID, err := extractUserIDFromRequest(r)
+		userID, role, err := extractUserIDFromRequest(r)
 		if err != nil {
 			log.Printf("SSE notifications: auth failed remote=%s", r.RemoteAddr)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		log.Printf("SSE notifications: connected user=%s remote=%s", userID, r.RemoteAddr)
-		defer log.Printf("SSE notifications: disconnected user=%s", userID)
+		log.Printf("SSE notifications: connected user=%s remote=%s role=%s", userID, r.RemoteAddr, role)
+		// 管理端用户不纳入在线统计
+		if role != "admin" && role != "super_admin" {
+			pt.Register(userID, r.RemoteAddr)
+			defer func() {
+				pt.Unregister(userID)
+				log.Printf("SSE notifications: disconnected user=%s", userID)
+			}()
+		} else {
+			defer log.Printf("SSE notifications: admin disconnected user=%s", userID)
+		}
 
 		flusher, ok := w.(http.Flusher)
 		if !ok {
