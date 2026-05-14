@@ -3,9 +3,9 @@ package com.antclaw.alfq.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -161,7 +161,7 @@ private fun PostActions(post: PostUi, onLike: () -> Unit, onComment: () -> Unit,
             onClick = onLike,
         )
         ActionButton(
-            icon = Icons.Default.ChatBubbleOutline,
+            icon = Icons.Default.Email,
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             count = post.commentCount,
             onClick = onComment,
@@ -194,6 +194,7 @@ private fun visibilityLabel(v: PostVisibility) = when (v) {
     else -> ""
 }
 
+@Composable
 private fun signalDirectionColor(dir: String) = when (dir) {
     "bullish" -> BullGreen
     "bearish" -> BearRed

@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,7 +30,7 @@ private data class NavTab(val route: String, val labelRes: Int, val icon: ImageV
 
 private val mainTabs = listOf(
     NavTab("feed", R.string.nav_home, Icons.Default.Home),
-    NavTab("social", R.string.nav_social, Icons.Default.People),
+    NavTab("social", R.string.nav_social, Icons.Default.Person),
     NavTab("discover", R.string.nav_discover, Icons.Default.Search),
 )
 
@@ -39,7 +38,6 @@ private val mainTabs = listOf(
 fun BottomNavBarWithFAB(
     navController: NavController,
     notificationCount: Int = 0,
-    onPostClick: () -> Unit = {},
     onChatClick: () -> Unit = {}
 ) {
     val backStack by navController.currentBackStackEntryAsState()
@@ -77,26 +75,9 @@ fun BottomNavBarWithFAB(
                 )
             }
 
-            // FAB post button
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .clickable(onClick = onPostClick),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.nav_post),
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
             // 消息
             NavigationItem(
-                selected = currentRoute == "notifications",
+                selected = currentRoute == "chat",
                 onClick = onChatClick,
                 icon = { Icon(Icons.Default.Email, contentDescription = stringResource(R.string.nav_messages)) },
                 label = stringResource(R.string.nav_messages),

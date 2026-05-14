@@ -10,9 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.antclaw.alfq.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antclaw.alfq.ui.components.PostCard
 import com.antclaw.alfq.ui.theme.SpacingMd
@@ -48,7 +50,7 @@ fun SocialFeedScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text("Social", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.social_title), fontWeight = FontWeight.Bold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
                     ),
@@ -66,8 +68,8 @@ fun SocialFeedScreen(
                             text = {
                                 Text(
                                     text = when (tab) {
-                                        FeedTab.FOLLOWING -> "Following"
-                                        FeedTab.FOR_YOU -> "For You"
+                                        FeedTab.FOLLOWING -> stringResource(R.string.social_tab_following)
+                                        FeedTab.FOR_YOU -> stringResource(R.string.social_tab_for_you)
                                     },
                                     fontWeight = if (state.currentTab == tab) FontWeight.Bold else FontWeight.Normal,
                                 )
@@ -83,7 +85,7 @@ fun SocialFeedScreen(
                 onClick = onPostCreate,
                 containerColor = MaterialTheme.colorScheme.primary,
             ) {
-                Icon(Icons.Default.Add, contentDescription = "New Post", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.social_new_post), tint = MaterialTheme.colorScheme.onPrimary)
             }
         },
     ) { padding ->
@@ -105,7 +107,7 @@ fun SocialFeedScreen(
                         Text(state.error!!, color = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.height(SpacingSm))
                         TextButton(onClick = { viewModel.refresh() }) {
-                            Text("Retry")
+                            Text(stringResource(R.string.common_retry))
                         }
                     }
                 }
@@ -118,8 +120,8 @@ fun SocialFeedScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = if (state.currentTab == FeedTab.FOLLOWING)
-                                "Follow some traders to see their posts"
-                            else "No recommended posts yet",
+                                stringResource(R.string.social_empty_following)
+                            else stringResource(R.string.social_empty_for_you),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -127,36 +129,28 @@ fun SocialFeedScreen(
                 }
             }
             else -> {
-                // Pull-to-refresh wrapping the LazyColumn
-                PullToRefreshBox(
-                    isRefreshing = state.isRefreshing,
-                    onRefresh = { viewModel.refresh() },
+                LazyColumn(
+                    state = listState,
                     modifier = Modifier.fillMaxSize().padding(padding),
+                    contentPadding = PaddingValues(horizontal = SpacingMd, vertical = SpacingSm),
+                    verticalArrangement = Arrangement.spacedBy(SpacingMd),
                 ) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = SpacingMd, vertical = SpacingSm),
-                        verticalArrangement = Arrangement.spacedBy(SpacingMd),
-                    ) {
-                        items(state.posts, key = { it.postId }) { post ->
-                            PostCard(
-                                post = post,
-                                onLikeClick = { viewModel.toggleLike(post.postId) },
-                                onCommentClick = { onPostClick(post.postId) },
-                                onShareClick = { viewModel.sharePost(post.postId) },
-                                onCardClick = { onPostClick(post.postId) },
-                            )
-                        }
-                        // Loading more indicator
-                        if (state.hasMore && state.posts.isNotEmpty()) {
-                            item {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = SpacingMd),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                                }
+                    items(state.posts, key = { it.postId }) { post ->
+                        PostCard(
+                            post = post,
+                            onLikeClick = { viewModel.toggleLike(post.postId) },
+                            onCommentClick = { onPostClick(post.postId) },
+                            onShareClick = { viewModel.sharePost(post.postId) },
+                            onCardClick = { onPostClick(post.postId) },
+                        )
+                    }
+                    if (state.hasMore && state.posts.isNotEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = SpacingMd),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                             }
                         }
                     }

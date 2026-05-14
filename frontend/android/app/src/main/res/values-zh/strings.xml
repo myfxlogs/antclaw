@@ -7,6 +7,7 @@
     <string name="nav_post">发布</string>
     <string name="nav_messages">消息</string>
     <string name="nav_me">我的</string>
+    <string name="nav_social">社交</string>
     <string name="login_title">Alpha</string>
     <string name="login_email">邮箱</string>
     <string name="login_password">密码</string>
@@ -40,6 +41,12 @@
     <string name="discover_action_view">查看</string>
     <string name="discover_empty_title">暂无推荐交易员</string>
     <string name="discover_empty_body">关注一些交易员后将在此显示</string>
+    <string name="social_title">社交</string>
+    <string name="social_tab_following">关注</string>
+    <string name="social_tab_for_you">推荐</string>
+    <string name="social_new_post">新帖子</string>
+    <string name="social_empty_following">关注一些交易员查看他们的帖子</string>
+    <string name="social_empty_for_you">暂无推荐帖子</string>
     <string name="post_close">关闭</string>
     <string name="post_publish">发布</string>
     <string name="post_hint">分享你的交易观点…</string>

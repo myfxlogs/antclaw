@@ -57,7 +57,7 @@ func (h *FeedHandler) GetFeed(ctx context.Context, req *connect.Request[alfqv1.G
 		       (SELECT COUNT(*) FROM alfq_comments WHERE post_id=p.id) as comment_count,
 		       created_at
 		FROM alfq_posts p
-		WHERE visibility='public' AND ($1='' OR created_at < (SELECT created_at FROM alfq_posts WHERE id=$1::uuid))
+		WHERE visibility='public' AND ($1='' OR id > $1::uuid)
 		ORDER BY created_at DESC LIMIT $2
 	`, r.Cursor, minInt(r.PageSize, 20))
 	if err != nil {

@@ -7,13 +7,14 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.antclaw.alfq.ui.feed.FeedScreen
+import com.antclaw.alfq.ui.chat.ChatScreen
 import com.antclaw.alfq.ui.feed.SignalDetailScreen
 import com.antclaw.alfq.ui.social.SocialFeedScreen
 import com.antclaw.alfq.ui.post.PostDetailScreen
@@ -74,7 +75,7 @@ fun AlfQApp() {
 @Composable
 fun MainContent(onLogout: () -> Unit) {
     val navController = rememberNavController()
-    val notifVm: NotificationViewModel = viewModel()
+    val notifVm: NotificationViewModel = hiltViewModel()
     val notifState by notifVm.state.collectAsState()
     LifecycleAware(notifVm::onForeground, notifVm::onBackground)
 
@@ -83,8 +84,7 @@ fun MainContent(onLogout: () -> Unit) {
             BottomNavBarWithFAB(
                 navController = navController,
                 notificationCount = notifState.unreadCount,
-                onPostClick = { navController.navigate("post") },
-                onChatClick = { navController.navigate("notifications") }
+                onChatClick = { navController.navigate("chat") }
             )
         }
     ) { padding ->
@@ -134,6 +134,7 @@ fun MainContent(onLogout: () -> Unit) {
             }
             composable("bind_mt_account") { BindMtAccountScreen(onBack = { navController.popBackStack() }) }
             composable("alerts") { AlertScreen(onBack = { navController.popBackStack() }) }
+            composable("chat") { ChatScreen(onBack = { navController.popBackStack() }) }
             composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
             composable("notification_prefs") { NotificationPrefsScreen(onBack = { navController.popBackStack() }) }
             composable("settings/language") { LanguagePickerScreen(onBack = { navController.popBackStack() }) }

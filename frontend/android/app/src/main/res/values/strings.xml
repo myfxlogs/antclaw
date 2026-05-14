@@ -55,6 +55,14 @@
     <string name="discover_empty_title">No recommended traders</string>
     <string name="discover_empty_body">Follow some traders and they’ll appear here</string>
 
+    <!-- Social -->
+    <string name="social_title">Social</string>
+    <string name="social_tab_following">Following</string>
+    <string name="social_tab_for_you">For You</string>
+    <string name="social_new_post">New Post</string>
+    <string name="social_empty_following">Follow some traders to see their posts</string>
+    <string name="social_empty_for_you">No recommended posts yet</string>
+
     <!-- Post -->
     <string name="post_close">Close</string>
     <string name="post_publish">Publish</string>
