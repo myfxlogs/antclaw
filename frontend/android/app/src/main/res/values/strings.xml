@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App -->
-    <string name="app_name">AlfQ</string>
+    <string name="app_name">Alpha</string>
     <string name="app_tagline">Trader’s Social Terminal</string>
 
     <!-- Bottom Navigation -->
@@ -12,7 +12,7 @@
     <string name="nav_me">Me</string>
 
     <!-- Login -->
-    <string name="login_title">AlfQ</string>
+    <string name="login_title">Alpha</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="login_button">Login</string>
@@ -21,7 +21,7 @@
     <string name="login_error_default">Login failed</string>
 
     <!-- Register -->
-    <string name="register_title">Register AlfQ</string>
+    <string name="register_title">Register Alpha</string>
     <string name="register_email">Email</string>
     <string name="register_username">Username</string>
     <string name="register_password">Password</string>

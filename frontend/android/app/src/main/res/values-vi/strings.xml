@@ -6,14 +6,14 @@
     <string name="nav_post">Đăng</string>
     <string name="nav_messages">Tin nhắn</string>
     <string name="nav_me">Tôi</string>
-    <string name="login_title">AlfQ</string>
+    <string name="login_title">Alpha</string>
     <string name="login_email">Email</string>
     <string name="login_password">Mật khẩu</string>
     <string name="login_button">Đăng nhập</string>
     <string name="login_register">Đăng ký</string>
     <string name="login_forgot_password">Quên mật khẩu</string>
     <string name="login_error_default">Đăng nhập thất bại</string>
-    <string name="register_title">Đăng ký AlfQ</string>
+    <string name="register_title">Đăng ký Alpha</string>
     <string name="register_email">Email</string>
     <string name="register_username">Tên người dùng</string>
     <string name="register_password">Mật khẩu</string>

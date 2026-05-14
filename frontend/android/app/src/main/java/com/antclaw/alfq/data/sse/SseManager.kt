@@ -66,8 +66,20 @@ class SseManager @Inject constructor() {
         CONNECTING, CONNECTED, DISCONNECTED, ERROR
     }
 
-    /** 登录成功后调用，建立 SSE 长连接。 */
+    /** 登录成功后调用，建立 SSE 长连接。线程安全，可在主线程调用。 */
     fun connect() {
+        scope.launch {
+            try {
+                connectInternal()
+            } catch (e: Exception) {
+                Log.e(TAG, "SSE connect failed", e)
+                _connectionState.emit(ConnectionState.ERROR)
+                scheduleReconnect()
+            }
+        }
+    }
+
+    private suspend fun connectInternal() {
         val token = ConnectTransportProvider.getToken()
         if (token.isNullOrEmpty()) {
             Log.w(TAG, "connect: no token available, skipping SSE")
@@ -76,14 +88,14 @@ class SseManager @Inject constructor() {
         reconnectJob?.cancel()
         disconnect()
 
-        scope.launch { _connectionState.emit(ConnectionState.CONNECTING) }
+        _connectionState.emit(ConnectionState.CONNECTING)
 
         val baseUrl = ConnectTransportProvider.baseUrl.trimEnd('/')
         val sseUrl = "$baseUrl/sse/notifications"
 
         val client = OkHttpClient.Builder()
             .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.MILLISECONDS) // 无限读超时（长连接）
+            .readTimeout(0, TimeUnit.MILLISECONDS)
             .build()
 
         val request = Request.Builder()

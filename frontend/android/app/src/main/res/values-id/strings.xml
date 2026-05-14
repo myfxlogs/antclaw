@@ -6,14 +6,14 @@
     <string name="nav_post">Posting</string>
     <string name="nav_messages">Pesan</string>
     <string name="nav_me">Saya</string>
-    <string name="login_title">AlfQ</string>
+    <string name="login_title">Alpha</string>
     <string name="login_email">Email</string>
     <string name="login_password">Kata Sandi</string>
     <string name="login_button">Masuk</string>
     <string name="login_register">Daftar</string>
     <string name="login_forgot_password">Lupa kata sandi</string>
     <string name="login_error_default">Login gagal</string>
-    <string name="register_title">Daftar AlfQ</string>
+    <string name="register_title">Daftar Alpha</string>
     <string name="register_email">Email</string>
     <string name="register_username">Nama Pengguna</string>
     <string name="register_password">Kata Sandi</string>

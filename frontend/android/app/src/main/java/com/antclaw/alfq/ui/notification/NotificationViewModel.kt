@@ -32,8 +32,12 @@ class NotificationViewModel @Inject constructor(
     val prefsLoading: StateFlow<Boolean> = _prefsLoading.asStateFlow()
 
     init {
-        loadInitial()
-        connectSse()
+        try {
+            loadInitial()
+            connectSse()
+        } catch (e: Exception) {
+            _state.update { it.copy(error = e.message) }
+        }
     }
 
     fun loadInitial() {
@@ -50,22 +54,28 @@ class NotificationViewModel @Inject constructor(
 
     private fun connectSse() {
         viewModelScope.launch {
-            sseManager.notifications.collect { notif ->
-                _state.update {
-                    it.copy(
-                        unreadCount = it.unreadCount + 1,
-                        items = listOf(notif) + it.items,
-                    )
+            try {
+                sseManager.notifications.collect { notif ->
+                    try {
+                        _state.update {
+                            it.copy(
+                                unreadCount = it.unreadCount + 1,
+                                items = listOf(notif) + it.items,
+                            )
+                        }
+                        if (!_isForeground.value) {
+                            systemNotifier.showNotificationForAppInBackground(notif)
+                        }
+                    } catch (_: Exception) { /* 单条通知处理失败不影响后续 */ }
                 }
-                if (!_isForeground.value) {
-                    systemNotifier.showNotificationForAppInBackground(notif)
-                }
-            }
+            } catch (_: Exception) { /* collect 被取消，正常 */ }
         }
         viewModelScope.launch {
-            sseManager.connected.collect { connected ->
-                _state.update { it.copy(connected = connected, error = if (!connected) null else it.error) }
-            }
+            try {
+                sseManager.connected.collect { connected ->
+                    _state.update { it.copy(connected = connected) }
+                }
+            } catch (_: Exception) { /* collect 被取消 */ }
         }
         sseManager.connect()
     }

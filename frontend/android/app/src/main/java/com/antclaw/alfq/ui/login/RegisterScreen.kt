@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
@@ -34,16 +33,9 @@ fun RegisterScreen(
             singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedTextField(value = state.username, onValueChange = { vm.updateUsername(it) },
-            label = { Text(stringResource(R.string.register_username)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            singleLine = true, modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(12.dp))
-
         OutlinedTextField(value = state.password, onValueChange = { vm.updatePassword(it) },
             label = { Text(stringResource(R.string.register_password)) },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
             singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(24.dp))
 

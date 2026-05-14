@@ -6,14 +6,14 @@
     <string name="nav_post">โพสต์</string>
     <string name="nav_messages">ข้อความ</string>
     <string name="nav_me">ฉัน</string>
-    <string name="login_title">AlfQ</string>
+    <string name="login_title">Alpha</string>
     <string name="login_email">อีเมล</string>
     <string name="login_password">รหัสผ่าน</string>
     <string name="login_button">เข้าสู่ระบบ</string>
     <string name="login_register">ลงทะเบียน</string>
     <string name="login_forgot_password">ลืมรหัสผ่าน</string>
     <string name="login_error_default">เข้าสู่ระบบล้มเหลว</string>
-    <string name="register_title">ลงทะเบียน AlfQ</string>
+    <string name="register_title">ลงทะเบียน Alpha</string>
     <string name="register_email">อีเมล</string>
     <string name="register_username">ชื่อผู้ใช้</string>
     <string name="register_password">รหัสผ่าน</string>

@@ -24,10 +24,20 @@ android {
         // buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("antclaw-release.jks")
+            storePassword = "android"
+            keyAlias = "antclaw"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs["release"]
         }
     }
 
@@ -69,7 +79,7 @@ dependencies {
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.material3)
     implementation(libs.compose.navigation)
-    implementation("androidx.compose.material:material-icons-extended")
+    // material-icons-extended 移除（20MB+ 未用）→ 各模块按需引用具体 icon 模块
 
     // Lifecycle
     implementation(libs.lifecycle.runtime)
@@ -97,9 +107,6 @@ dependencies {
 
     // DataStore
     implementation(libs.datastore.preferences)
-
-    // Image
-    implementation(libs.coil)
 
     // Coroutines
     implementation(libs.coroutines.core)

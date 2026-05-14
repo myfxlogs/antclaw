@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App -->
-    <string name="app_name">AlfQ</string>
+    <string name="app_name">Alpha</string>
     <string name="app_tagline">トレーダーのソーシャルターミナル</string>
 
     <!-- Bottom Navigation -->
@@ -12,7 +12,7 @@
     <string name="nav_me">マイ</string>
 
     <!-- Login -->
-    <string name="login_title">AlfQ</string>
+    <string name="login_title">Alpha</string>
     <string name="login_email">メールアドレス</string>
     <string name="login_password">パスワード</string>
     <string name="login_button">ログイン</string>
@@ -21,7 +21,7 @@
     <string name="login_error_default">ログインに失敗しました</string>
 
     <!-- Register -->
-    <string name="register_title">AlfQ 登録</string>
+    <string name="register_title">Alpha 登録</string>
     <string name="register_email">メールアドレス</string>
     <string name="register_username">ユーザー名</string>
     <string name="register_password">パスワード</string>

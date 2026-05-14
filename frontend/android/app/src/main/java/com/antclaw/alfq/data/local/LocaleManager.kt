@@ -48,20 +48,29 @@ object LocaleManager {
     }
 
     fun applyLocale(context: Context, languageTag: String): Context {
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Locale.forLanguageTag(languageTag)
-        } else {
-            Locale(languageTag)
-        }
+        val locale = buildLocale(languageTag)
         Locale.setDefault(locale)
+        
         val config = Configuration(context.resources.configuration)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale)
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            config.setLocales(android.os.LocaleList(locale))
         } else {
             @Suppress("DEPRECATION")
-            config.locale = locale
+            config.setLocale(locale)
         }
         return context.createConfigurationContext(config)
+    }
+
+    private fun buildLocale(languageTag: String): Locale {
+        // zh-TW 用 Locale("zh","TW") 确保匹配 values-zh-rTW
+        if (languageTag == "zh-TW") return Locale("zh", "TW")
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Locale.forLanguageTag(languageTag)
+        } else {
+            @Suppress("DEPRECATION")
+            Locale(languageTag)
+        }
     }
 
     fun getAvailableLanguages(): List<Pair<String, String>> = listOf(

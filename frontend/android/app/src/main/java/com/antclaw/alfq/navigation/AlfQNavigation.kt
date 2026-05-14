@@ -10,7 +10,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,12 +26,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.antclaw.alfq.R
 
-data class NavTab(val route: String, val label: String, val icon: ImageVector)
+private data class NavTab(val route: String, val labelRes: Int, val icon: ImageVector)
 
-val tabs = listOf(
-    NavTab("feed", "Home", Icons.Default.Home),
-    NavTab("discover", "Discover", Icons.Default.Search),
-    NavTab("me", "Me", Icons.Default.Person),
+private val mainTabs = listOf(
+    NavTab("feed", R.string.nav_home, Icons.Default.Home),
+    NavTab("discover", R.string.nav_discover, Icons.Default.Search),
 )
 
 @Composable
@@ -43,6 +42,16 @@ fun BottomNavBarWithFAB(
 ) {
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route ?: "feed"
+
+    val navigateTab: (String) -> Unit = { route ->
+        if (currentRoute != route) {
+            navController.navigate(route) {
+                popUpTo("feed") { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
 
     Surface(
         color = MaterialTheme.colorScheme.background,
@@ -56,36 +65,17 @@ fun BottomNavBarWithFAB(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            NavigationItem(
-                selected = currentRoute == "feed",
-                onClick = {
-                    if (currentRoute != "feed") {
-                        navController.navigate("feed") {
-                            popUpTo("feed") { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
-                icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.nav_home)) },
-                label = stringResource(R.string.nav_home)
-            )
+            // Order: 首页 发现 +
+            mainTabs.forEach { tab ->
+                NavigationItem(
+                    selected = currentRoute == tab.route,
+                    onClick = { navigateTab(tab.route) },
+                    icon = { Icon(tab.icon, contentDescription = stringResource(tab.labelRes)) },
+                    label = stringResource(tab.labelRes)
+                )
+            }
 
-            NavigationItem(
-                selected = currentRoute == "discover",
-                onClick = {
-                    if (currentRoute != "discover") {
-                        navController.navigate("discover") {
-                            popUpTo("feed") { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
-                icon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.nav_discover)) },
-                label = stringResource(R.string.nav_discover)
-            )
-
+            // FAB post button
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -102,49 +92,20 @@ fun BottomNavBarWithFAB(
                 )
             }
 
-            Box(modifier = Modifier.width(56.dp).clickable(onClick = onChatClick).padding(vertical = 8.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.ChatBubbleOutline, contentDescription = stringResource(R.string.nav_messages))
-                    }
-                    Text(
-                        stringResource(R.string.nav_messages),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (notificationCount > 0) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 6.dp, y = (-2).dp)
-                            .background(Color(0xFFE53935), RoundedCornerShape(10.dp))
-                            .padding(horizontal = 5.dp, vertical = 1.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = if (notificationCount > 99) "99+" else notificationCount.toString(),
-                            color = Color.White,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-            }
+            // 消息
+            NavigationItem(
+                selected = currentRoute == "notifications",
+                onClick = onChatClick,
+                icon = { Icon(Icons.Default.Email, contentDescription = stringResource(R.string.nav_messages)) },
+                label = stringResource(R.string.nav_messages),
+            )
 
+            // 我的
             NavigationItem(
                 selected = currentRoute == "me",
-                onClick = {
-                    if (currentRoute != "me") {
-                        navController.navigate("me") {
-                            popUpTo("feed") { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
+                onClick = { navigateTab("me") },
                 icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.nav_me)) },
-                label = stringResource(R.string.nav_me)
+                label = stringResource(R.string.nav_me),
             )
         }
     }
@@ -176,7 +137,3 @@ private fun NavigationItem(
     }
 }
 
-@Composable
-fun BottomNavBar(navController: NavController, notificationCount: Int = 0) {
-    BottomNavBarWithFAB(navController = navController, notificationCount = notificationCount)
-}

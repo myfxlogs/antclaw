@@ -19,6 +19,7 @@ import com.antclaw.alfq.ui.discover.DiscoverScreen
 import com.antclaw.alfq.ui.post.PostScreen
 import com.antclaw.alfq.ui.profile.MeScreen
 import com.antclaw.alfq.ui.profile.MTAccountsScreen
+import com.antclaw.alfq.ui.profile.ProfileScreen
 import com.antclaw.alfq.ui.alerts.AlertScreen
 import com.antclaw.alfq.ui.login.LoginScreen
 import com.antclaw.alfq.ui.login.RegisterScreen
@@ -26,9 +27,15 @@ import com.antclaw.alfq.ui.notification.NotificationCenterScreen
 import com.antclaw.alfq.ui.notification.NotificationPrefsScreen
 import com.antclaw.alfq.ui.notification.NotificationViewModel
 import com.antclaw.alfq.ui.settings.LanguagePickerScreen
+import com.antclaw.alfq.ui.device.DeviceInfoScreen
+import com.antclaw.alfq.ui.mt.BindMtAccountScreen
 import com.antclaw.alfq.ui.theme.AlfQTheme
 import com.antclaw.alfq.navigation.BottomNavBarWithFAB
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+
+// ── Constants ──
+private const val DEFAULT_PAIR = "EURUSD"
+private const val DEFAULT_USER_ID = "me"
 
 @Composable
 fun AlfQApp() {
@@ -39,14 +46,20 @@ fun AlfQApp() {
             NavHost(navController = authNavController, startDestination = "login") {
                 composable("login") {
                     LoginScreen(
-                        onLoginSuccess = { token -> ConnectTransportProvider.setToken(token); isLoggedIn.value = true },
+                        onLoginSuccess = { token ->
+                            ConnectTransportProvider.setToken(token)
+                            isLoggedIn.value = true
+                        },
                         onRegisterClick = { authNavController.navigate("register") },
                     )
                 }
                 composable("register") {
                     RegisterScreen(
                         onBack = { authNavController.popBackStack() },
-                        onRegisterSuccess = { token -> ConnectTransportProvider.setToken(token); isLoggedIn.value = true },
+                        onRegisterSuccess = { token ->
+                            ConnectTransportProvider.setToken(token)
+                            isLoggedIn.value = true
+                        },
                     )
                 }
             }
@@ -61,18 +74,7 @@ fun MainContent(onLogout: () -> Unit) {
     val navController = rememberNavController()
     val notifVm: NotificationViewModel = viewModel()
     val notifState by notifVm.state.collectAsState()
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> notifVm.onForeground()
-                Lifecycle.Event.ON_STOP -> notifVm.onBackground()
-                else -> {}
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
+    LifecycleAware(notifVm::onForeground, notifVm::onBackground)
 
     Scaffold(
         bottomBar = {
@@ -88,46 +90,72 @@ fun MainContent(onLogout: () -> Unit) {
             navController = navController,
             startDestination = "feed",
             modifier = Modifier.padding(padding),
-            builder = {
-                composable("feed") {
-                    FeedScreen(
-                        notificationCount = notifState.unreadCount,
-                        onSignalClick = { pair -> navController.navigate("signal/$pair") },
-                        onNotificationClick = { navController.navigate("notifications") },
-                        onSearchClick = { navController.navigate("discover") },
-                    )
-                }
-                composable("discover") {
-                    DiscoverScreen(onTraderClick = { userId -> navController.navigate("profile/$userId") })
-                }
-                composable("post") { PostScreen(onClose = { navController.popBackStack() }) }
-                composable("me") {
-                    MeScreen(
-                        onLogout = onLogout,
-                        onNavigateToMTAccounts = { navController.navigate("mt_accounts") },
-                        onNavigateToAlerts = { navController.navigate("alerts") },
-                        onNavigateToSettings = { navController.navigate("settings/language") },
-                    )
-                }
-                composable("mt_accounts") {
-                    MTAccountsScreen(onBack = { navController.popBackStack() }, onBindClick = { navController.navigate("bind_mt_account") })
-                }
-                composable("bind_mt_account") {
-                    com.antclaw.alfq.ui.mt.BindMtAccountScreen(onBack = { navController.popBackStack() })
-                }
-                composable("alerts") { AlertScreen(onBack = { navController.popBackStack() }) }
-                composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
-                composable("notification_prefs") { NotificationPrefsScreen(onBack = { navController.popBackStack() }) }
-                composable("settings/language") { LanguagePickerScreen(onBack = { navController.popBackStack() }) }
-                composable(route = "signal/{pair}", arguments = listOf(navArgument("pair") { type = NavType.StringType })) { backStackEntry ->
-                    val pair = backStackEntry.arguments?.getString("pair") ?: "EURUSD"
-                    SignalDetailScreen(pair = pair, onBack = { navController.popBackStack() })
-                }
-                composable(route = "profile/{userId}", arguments = listOf(navArgument("userId") { type = NavType.StringType })) { backStackEntry ->
-                    val userId = backStackEntry.arguments?.getString("userId") ?: "me"
-                    com.antclaw.alfq.ui.profile.ProfileScreen(userId = userId, onBack = { navController.popBackStack() })
-                }
+        ) {
+            composable("feed") {
+                FeedScreen(
+                    notificationCount = notifState.unreadCount,
+                    onSignalClick = { pair -> navController.navigate("signal/$pair") },
+                    onNotificationClick = { navController.navigate("notifications") },
+                    onSearchClick = { navController.navigate("discover") },
+                )
             }
-        )
+            composable("discover") {
+                DiscoverScreen(onTraderClick = { userId -> navController.navigate("profile/$userId") })
+            }
+            composable("post") { PostScreen(onClose = { navController.popBackStack() }) }
+            composable("me") {
+                MeScreen(
+                    onLogout = onLogout,
+                    onNavigateToMTAccounts = { navController.navigate("mt_accounts") },
+                    onNavigateToAlerts = { navController.navigate("alerts") },
+                    onNavigateToSettings = { navController.navigate("settings/language") },
+                )
+            }
+            composable("mt_accounts") {
+                MTAccountsScreen(
+                    onBack = { navController.popBackStack() },
+                    onBindClick = { navController.navigate("bind_mt_account") }
+                )
+            }
+            composable("bind_mt_account") { BindMtAccountScreen(onBack = { navController.popBackStack() }) }
+            composable("alerts") { AlertScreen(onBack = { navController.popBackStack() }) }
+            composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
+            composable("notification_prefs") { NotificationPrefsScreen(onBack = { navController.popBackStack() }) }
+            composable("settings/language") { LanguagePickerScreen(onBack = { navController.popBackStack() }) }
+            composable("device_info") { DeviceInfoScreen() }
+            composable(
+                route = "signal/{pair}",
+                arguments = listOf(navArgument("pair") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val pair = backStackEntry.arguments?.getString("pair") ?: DEFAULT_PAIR
+                SignalDetailScreen(pair = pair, onBack = { navController.popBackStack() })
+            }
+            composable(
+                route = "profile/{userId}",
+                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId") ?: DEFAULT_USER_ID
+                ProfileScreen(userId = userId, onBack = { navController.popBackStack() })
+            }
+        }
+    }
+}
+
+/**
+ * Reusable lifecycle-aware effect — observes START/STOP for foreground/background callbacks.
+ */
+@Composable
+private fun LifecycleAware(onStart: () -> Unit, onStop: () -> Unit) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> onStart()
+                Lifecycle.Event.ON_STOP -> onStop()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 }

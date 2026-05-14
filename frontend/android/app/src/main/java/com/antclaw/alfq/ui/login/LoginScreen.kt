@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
@@ -41,8 +40,7 @@ fun LoginScreen(
 
         OutlinedTextField(value = state.password, onValueChange = viewModel::onPasswordChange,
             label = { Text(stringResource(R.string.login_password)) },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
             singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(24.dp))
 
