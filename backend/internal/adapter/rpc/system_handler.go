@@ -66,14 +66,38 @@ func (h *SystemHandler) Info(_ context.Context, _ *connect.Request[antclawv1.Inf
 	}), nil
 }
 
-func (h *SystemHandler) GetOnlineUsers(_ context.Context, _ *connect.Request[antclawv1.GetOnlineUsersRequest]) (*connect.Response[antclawv1.GetOnlineUsersResponse], error) {
+func (h *SystemHandler) GetOnlineUsers(ctx context.Context, _ *connect.Request[antclawv1.GetOnlineUsersRequest]) (*connect.Response[antclawv1.GetOnlineUsersResponse], error) {
 	list := h.presence.List()
+
+	// 批量查询 code_id 以替代 UUID 展示
+	codeIDMap := make(map[string]string, len(list))
+	if len(list) > 0 && h.pg != nil {
+		ids := make([]string, 0, len(list))
+		for _, u := range list {
+			ids = append(ids, u.UserID)
+		}
+		rows, err := h.pg.Query(ctx,
+			`SELECT id::text, COALESCE(code_id, '') FROM users WHERE id::text = ANY($1)`,
+			ids,
+		)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var uid, cid string
+				if err := rows.Scan(&uid, &cid); err == nil {
+					codeIDMap[uid] = cid
+				}
+			}
+		}
+	}
+
 	users := make([]*antclawv1.OnlineUserInfo, 0, len(list))
 	for _, u := range list {
 		users = append(users, &antclawv1.OnlineUserInfo{
 			UserId:      u.UserID,
 			RemoteAddr:  u.RemoteAddr,
 			ConnectedAt: u.ConnectedAt.Unix(),
+			CodeId:      codeIDMap[u.UserID],
 		})
 	}
 	return connect.NewResponse(&antclawv1.GetOnlineUsersResponse{

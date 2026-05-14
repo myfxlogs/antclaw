@@ -59,5 +59,7 @@ SELECT u.id AS user_id,
   LEFT JOIN user_alert_preferences ap ON ap.user_id = u.id
   LEFT JOIN user_notification_prefs np ON np.user_id = u.id
  WHERE u.id > $1   -- 游标分页（按 UUID 升序），避免 OFFSET 扫描膨胀
+   AND u.role != 'admin'
+   AND u.deleted_at IS NULL
  ORDER BY u.id
  LIMIT $2;

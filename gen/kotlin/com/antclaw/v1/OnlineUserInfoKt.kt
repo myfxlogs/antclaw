@@ -104,6 +104,31 @@ public object OnlineUserInfoKt {
     public fun clearConnectedAt() {
       _builder.clearConnectedAt()
     }
+
+    /**
+     * ```
+     * 5 位数字 ID（用户可见）
+     * ```
+     *
+     * `string code_id = 5 [json_name = "codeId"];`
+     */
+    public var codeId: kotlin.String
+      @kotlin.jvm.JvmName("getCodeId")
+        get() = _builder.codeId
+      @kotlin.jvm.JvmName("setCodeId")
+        set(value) {
+        _builder.codeId = value
+      }
+    /**
+     * ```
+     * 5 位数字 ID（用户可见）
+     * ```
+     *
+     * `string code_id = 5 [json_name = "codeId"];`
+     */
+    public fun clearCodeId() {
+      _builder.clearCodeId()
+    }
   }
 }
 @kotlin.jvm.JvmSynthetic

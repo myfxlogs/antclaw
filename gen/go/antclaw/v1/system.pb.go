@@ -436,6 +436,7 @@ type OnlineUserInfo struct {
 	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	RemoteAddr    string                 `protobuf:"bytes,3,opt,name=remote_addr,json=remoteAddr,proto3" json:"remote_addr,omitempty"`
 	ConnectedAt   int64                  `protobuf:"varint,4,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"` // unix 秒
+	CodeId        string                 `protobuf:"bytes,5,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`                 // 5 位数字 ID（用户可见）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -496,6 +497,13 @@ func (x *OnlineUserInfo) GetConnectedAt() int64 {
 		return x.ConnectedAt
 	}
 	return 0
+}
+
+func (x *OnlineUserInfo) GetCodeId() string {
+	if x != nil {
+		return x.CodeId
+	}
+	return ""
 }
 
 type GetOnlineUsersResponse struct {
@@ -750,13 +758,14 @@ const file_antclaw_v1_system_proto_rawDesc = "" +
 	"\x0fserver_timezone\x18\a \x01(\tR\x0eserverTimezone\x12\x1f\n" +
 	"\vserver_time\x18\b \x01(\x03R\n" +
 	"serverTime\"\x17\n" +
-	"\x15GetOnlineUsersRequest\"\x90\x01\n" +
+	"\x15GetOnlineUsersRequest\"\xa9\x01\n" +
 	"\x0eOnlineUserInfo\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1f\n" +
 	"\vremote_addr\x18\x03 \x01(\tR\n" +
 	"remoteAddr\x12!\n" +
-	"\fconnected_at\x18\x04 \x01(\x03R\vconnectedAt\"`\n" +
+	"\fconnected_at\x18\x04 \x01(\x03R\vconnectedAt\x12\x17\n" +
+	"\acode_id\x18\x05 \x01(\tR\x06codeId\"`\n" +
 	"\x16GetOnlineUsersResponse\x12\x14\n" +
 	"\x05count\x18\x01 \x01(\x05R\x05count\x120\n" +
 	"\x05users\x18\x02 \x03(\v2\x1a.antclaw.v1.OnlineUserInfoR\x05users\"\x15\n" +

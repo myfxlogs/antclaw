@@ -175,6 +175,7 @@ export async function getSystemHealth() {
 
 export interface OnlineUser {
   userId: string
+  codeId: string
   displayName: string
   remoteAddr: string
   connectedAt: number
@@ -289,7 +290,8 @@ export async function getOnlineUsers(): Promise<{ count: number; users: OnlineUs
     count: res.count,
     users: (res.users || []).map(u => ({
       userId: u.userId,
-      displayName: u.displayName || u.userId.substring(0, 8),
+      codeId: u.codeId || '',
+      displayName: u.displayName || '',
       remoteAddr: u.remoteAddr,
       connectedAt: Number(u.connectedAt),
     })),

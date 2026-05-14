@@ -18,8 +18,10 @@ import (
 //
 // 推送链路："逐用户匹配 → 发送"——传输层是 SSE，分发由 Redis Pub/Sub 完成。
 func evaluateAlerts(ctx context.Context, pool *pgxpool.Pool, logger *slog.Logger) error {
-	rows, err := pool.Query(ctx, `SELECT id,user_id,alert_type,symbol,params::text,COALESCE(last_fired_at,'1970-01-01'::timestamptz),cooldown_seconds
-FROM user_signal_alerts WHERE enabled=true AND deleted_at IS NULL`)
+	rows, err := pool.Query(ctx, `SELECT a.id,a.user_id,a.alert_type,a.symbol,a.params::text,COALESCE(a.last_fired_at,'1970-01-01'::timestamptz),a.cooldown_seconds
+FROM user_signal_alerts a
+JOIN users u ON u.id = a.user_id
+WHERE a.enabled=true AND a.deleted_at IS NULL AND u.role != 'admin' AND u.deleted_at IS NULL`)
 	if err != nil {
 		return fmt.Errorf("alert evaluator query: %w", err)
 	}

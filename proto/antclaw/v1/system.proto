@@ -48,6 +48,7 @@ message OnlineUserInfo {
   string display_name = 2;
   string remote_addr = 3;
   int64 connected_at = 4;         // unix 秒
+  string code_id = 5;             // 5 位数字 ID（用户可见）
 }
 
 message GetOnlineUsersResponse {
