@@ -1,0 +1,50 @@
+syntax = "proto3";
+package antclaw.v1;
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+service DeviceService {
+  rpc ReportDeviceInfo(ReportDeviceInfoRequest) returns (ReportDeviceInfoResponse);
+  rpc DeleteDeviceInfo(DeleteDeviceInfoRequest) returns (DeleteDeviceInfoResponse);
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+}
+
+message DeviceInfo {
+  string device_id = 1;
+  string model = 2;
+  string brand = 3;
+  string os_version = 4;
+  string os_type = 5;
+  string app_version = 6;
+  string build_number = 7;
+  int32 screen_width = 8;
+  int32 screen_height = 9;
+  string network_type = 10;
+  string timezone = 11;
+  string locale = 12;
+  string manufacturer = 13;
+  string fingerprint = 14;
+  string user_id = 15;
+  string display_name = 18;  // 用户显示名
+  string username = 19;       // 用户登录名
+  string code_id = 20;        // 用户数字 ID
+  int64 created_at = 16;
+  int64 updated_at = 17;
+}
+
+message ReportDeviceInfoRequest { DeviceInfo device_info = 1; }
+message ReportDeviceInfoResponse { bool success = 1; }
+
+message ListDevicesRequest {
+  int32 page_size = 1;
+  string cursor = 2;
+  string os_type_filter = 3;
+}
+
+message ListDevicesResponse {
+  repeated DeviceInfo devices = 1;
+  string next_cursor = 2;
+  int32 total = 3;
+}
+
+message DeleteDeviceInfoRequest { string device_id = 1; }
+message DeleteDeviceInfoResponse { bool success = 1; }
