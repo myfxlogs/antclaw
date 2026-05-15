@@ -5,10 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"connectrpc.com/connect"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
+	"github.com/antclaw/antclaw/internal/service"
 )
 
 // Service holds the feed business logic.
@@ -18,17 +20,6 @@ type Service struct {
 
 func NewService(repo postgres.FeedRepository) *Service {
 	return &Service{repo: repo}
-}
-
-// clampPageSize returns ps clamped to [defaultVal, maxVal]. Zero or negative uses defaultVal.
-func clampPageSize(ps, defaultVal, maxVal int32) int32 {
-	if ps <= 0 {
-		return defaultVal
-	}
-	if ps > maxVal {
-		return maxVal
-	}
-	return ps
 }
 
 // normalizeFilter returns the canonical filter: all / signals_only / posts_only / shares.
@@ -76,7 +67,11 @@ func (s *Service) CreatePost(ctx context.Context, userID string, req *alfqv1.Cre
 	if req.Visibility != "public" && req.Visibility != "followers" {
 		req.Visibility = "public"
 	}
-	name, _ := s.repo.GetUserName(ctx, userID)
+	name, err := s.repo.GetUserName(ctx, userID)
+	if err != nil {
+		log.Printf("feed: GetUserName(%s): %v", userID, err)
+		name = ""
+	}
 
 	row, err := s.repo.CreatePost(ctx, &postgres.FeedPostRow{
 		AuthorID:         userID,
@@ -91,14 +86,14 @@ func (s *Service) CreatePost(ctx context.Context, userID string, req *alfqv1.Cre
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create post: %w", err))
 	}
-	return feedPostRowToProto(row, nil), nil
+	return PostRowToProto(row, nil), nil
 }
 
 // ----- Feed listing -----
 
 func (s *Service) GetFeed(ctx context.Context, userID string, req *alfqv1.GetFeedRequest) (*alfqv1.FeedResponse, error) {
 	filter := normalizeFilter(req.Filter)
-	limit := clampPageSize(req.PageSize, 20, 50)
+	limit := service.ClampPageSize(req.PageSize, 20, 50)
 	cursor, err := postgres.DecodeSocialCursor(req.Cursor)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid cursor: %w", err))
@@ -121,7 +116,7 @@ func (s *Service) GetPost(ctx context.Context, userID string, req *alfqv1.GetPos
 	if err := s.checkPostAccessible(ctx, req.PostId, userID); err != nil {
 		return nil, err
 	}
-	return feedPostRowToProto(row, likedBy), nil
+	return PostRowToProto(row, likedBy), nil
 }
 
 func (s *Service) ListUserPosts(ctx context.Context, currentUserID string, req *alfqv1.ListUserPostsRequest) (*alfqv1.FeedResponse, error) {
@@ -129,7 +124,7 @@ func (s *Service) ListUserPosts(ctx context.Context, currentUserID string, req *
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("user_id is required"))
 	}
 	filter := normalizeFilter(req.Filter)
-	limit := clampPageSize(req.PageSize, 20, 50)
+	limit := service.ClampPageSize(req.PageSize, 20, 50)
 	cursor, err := postgres.DecodeSocialCursor(req.Cursor)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid cursor: %w", err))
@@ -187,7 +182,11 @@ func (s *Service) CommentOnPost(ctx context.Context, userID string, req *alfqv1.
 	if err := s.checkPostAccessible(ctx, req.PostId, userID); err != nil {
 		return nil, err
 	}
-	name, _ := s.repo.GetUserName(ctx, userID)
+	name, err := s.repo.GetUserName(ctx, userID)
+	if err != nil {
+		log.Printf("feed: GetUserName(%s): %v", userID, err)
+		name = ""
+	}
 	row := &postgres.FeedCommentRow{
 		PostID:     req.PostId,
 		AuthorID:   userID,
@@ -195,10 +194,17 @@ func (s *Service) CommentOnPost(ctx context.Context, userID string, req *alfqv1.
 		Content:    req.Content,
 	}
 	if req.ParentCommentId != "" {
+		ok, err := s.repo.CheckCommentPostID(ctx, req.ParentCommentId, req.PostId)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("check parent comment: %w", err))
+		}
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("parent_comment_id does not belong to the same post"))
+		}
 		pid := req.ParentCommentId
 		row.ParentCommentID = &pid
 	}
-	row, err := s.repo.CreateComment(ctx, row)
+	row, err = s.repo.CreateComment(ctx, row)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create comment: %w", err))
 	}
@@ -209,7 +215,7 @@ func (s *Service) ListComments(ctx context.Context, userID string, req *alfqv1.L
 	if err := s.checkPostAccessible(ctx, req.PostId, userID); err != nil {
 		return nil, err
 	}
-	limit := clampPageSize(req.PageSize, 50, 100)
+	limit := service.ClampPageSize(req.PageSize, 50, 100)
 	cursor, err := postgres.DecodeSocialCursor(req.Cursor)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid cursor: %w", err))
@@ -237,7 +243,11 @@ func (s *Service) SharePost(ctx context.Context, userID string, req *alfqv1.Shar
 	if err := s.checkPostAccessible(ctx, req.PostId, userID); err != nil {
 		return nil, err
 	}
-	name, _ := s.repo.GetUserName(ctx, userID)
+	name, err := s.repo.GetUserName(ctx, userID)
+	if err != nil {
+		log.Printf("feed: GetUserName(%s): %v", userID, err)
+		name = ""
+	}
 	opid := req.PostId
 	row, err := s.repo.CreatePost(ctx, &postgres.FeedPostRow{
 		AuthorID:       userID,
@@ -250,12 +260,13 @@ func (s *Service) SharePost(ctx context.Context, userID string, req *alfqv1.Shar
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("share post: %w", err))
 	}
-	return feedPostRowToProto(row, nil), nil
+	return PostRowToProto(row, nil), nil
 }
 
 // ----- Proto mapping -----
 
-func feedPostRowToProto(row *postgres.FeedPostRow, likedBy []string) *alfqv1.Post {
+// PostRowToProto maps a repository row to a proto Post message.
+func PostRowToProto(row *postgres.FeedPostRow, likedBy []string) *alfqv1.Post {
 	p := &alfqv1.Post{
 		Id:               row.ID,
 		AuthorId:         row.AuthorID,
@@ -290,7 +301,7 @@ func feedPostRowsToProto(rows []*postgres.FeedPostRow, likedByList [][]string) [
 		if i < len(likedByList) {
 			lb = likedByList[i]
 		}
-		posts[i] = feedPostRowToProto(r, lb)
+		posts[i] = PostRowToProto(r, lb)
 	}
 	return posts
 }

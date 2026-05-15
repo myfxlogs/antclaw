@@ -349,6 +349,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 - 当前用户：获取 `me`。
 - Feed 列表：推荐/关注至少一个真实列表。
 - 帖子详情：查看单条内容和回复列表。
+- 个人主页内容 Tab：至少展示该用户真实帖子列表。
 - 发布帖子：文本发布。
 - 点赞：乐观更新和失败回滚。
 - 关注/取关：Profile 和 Feed 作者卡可用。
@@ -360,7 +361,6 @@ Feed 和通知是高频页面，应支持本地缓存：
 - 评论回复树或对话串。
 - 搜索用户、帖子、品种。
 - 趋势话题和热门品种。
-- 个人主页内容 Tab。
 - 关联信号发帖。
 - 下拉刷新和分页。
 
@@ -509,3 +509,374 @@ Feed 和通知是高频页面，应支持本地缓存：
 - 补全 Compose UI 测试。
 - 补全 ViewModel / Repository 单测。
 - 性能优化、无障碍、深色模式、弱网体验。
+
+## 十三、后端依赖与接口矩阵
+
+Android Agent 开工前必须先确认后端分支已同步 `09-服务端配套改造优化文档.md` 的 P0 基线。客户端不得在服务端能力缺失时伪造数据。
+
+| 客户端能力 | 后端依赖 | Android 接入层 | P0/P1 | 失败处理 |
+|---|---|---|---|---|
+| Feed 首页列表 | `FeedService/GetFeed` | `FeedRpc.getFeed` -> `FeedRepository.getFeed` | P0 | 显示错误态和重试，不填充假帖子 |
+| Feed Tab 过滤 | `GetFeedRequest.filter` | `FeedTab.toFilter()` | P0 | 后端不支持时隐藏对应 Tab 或提示暂不可用 |
+| 帖子详情 | `FeedService/GetPost` | `SocialRpc.getPost` -> `PostDetailViewModel` | P0 | `NotFound` 显示内容不存在 |
+| 评论列表 | `FeedService/ListComments` | `CommentRpc.listComments` 或 `SocialRpc.listComments` | P0 | 失败仅影响评论区，不清空帖子详情 |
+| 发布评论 | `FeedService/CommentOnPost` | `SocialRepository.commentOnPost` | P0 | 保留输入内容并 Snackbar 提示 |
+| 用户帖子 Tab | `FeedService/ListUserPosts` | `ProfileRepository.listUserPosts` | P0 | Profile 资料仍显示，帖子 Tab 显示错误态 |
+| 发布帖子 | `FeedService/CreatePost` | `ComposePostViewModel` | P0 | 保留草稿，不伪造发布成功 |
+| 点赞 / 取消点赞 | `LikePost` / `UnlikePost` | `FeedViewModel.toggleLike` | P0 | 乐观更新失败回滚 |
+| 关注 / 取关 | `TraderService/Follow` / `Unfollow` | `ProfileViewModel.toggleFollow` | P0 | 乐观更新失败回滚 |
+| 关注状态 | `TraderProfile.is_following` | `ProfileRepository.getProfile` | P0 | 未返回时显示未知状态并禁用按钮 |
+| 未读通知 | `NotificationService/UnreadCount` | `NotificationViewModel` | P0 | Badge 隐藏或显示重试状态 |
+| 实时通知 | `/sse/notifications` | `SseManager` / session layer | P1 | 断线指数退避，前台补拉 |
+| 搜索 | `SearchService/Search` | `DiscoverRepository.search` | P1 | 搜索页错误态 |
+| 趋势 | `TrendService/ListTrendingTopics`、`ListHotSymbols` | `DiscoverRepository` | P1 | 模块级错误态 |
+| 推荐交易员 | `TraderService/ListRecommendedTraders` | `DiscoverRepository` | P2 | 未实现时隐藏模块 |
+
+## 十四、详细实施步骤
+
+### 14.1 开工前检查
+
+每次实现社交功能前执行：
+
+1. 确认当前分支已拉取最新代码。
+2. 检查 `proto/antclaw/v1/alfq_feed.proto` 是否包含：
+   - `ListComments`
+   - `ListUserPosts`
+   - `Comment.parent_comment_id`
+   - `Post.original_post_id`
+3. 检查 `proto/antclaw/v1/alfq_trader.proto` 是否包含：
+   - `TraderProfile.is_following`
+4. 执行或确认 Android proto 生成链路可用。
+5. 检查 `BuildConfig.BASE_URL` 是否指向：
+
+```text
+https://api.alfq.org/
+```
+
+6. 确认没有新增 `fetch`、`axios`、Retrofit 或 WebSocket 主业务通道。
+
+### 14.2 Feed 首页实施步骤
+
+目标：Feed 首页使用真实社交流，不使用硬编码数据。
+
+实施顺序：
+
+1. 在 `data/rpc/` 建立或补齐 `FeedRpc` / `SocialRpc` 封装。
+2. 在 `data/repository/` 建立或补齐 `FeedRepository`。
+3. 建立 `FeedItemUiModel`，统一承载：
+   - 帖子 ID
+   - 作者 ID
+   - 作者名
+   - 内容
+   - 类型
+   - 关联信号
+   - 点赞数
+   - 评论数
+   - 转发数
+   - 当前用户是否点赞
+   - 创建时间
+   - 原帖 ID
+4. `FeedViewModel` 只调用 Repository，不直接拼 RPC path。
+5. `FeedScreen` 渲染：
+   - 首屏 loading
+   - 空态
+   - 错误态
+   - 成功列表
+   - 底部分页 loading / error
+6. Tab 切换时映射 filter：
+
+| Tab | filter |
+|---|---|
+| 推荐 | `all` |
+| 信号 | `signals_only` |
+| 最新 | `all`，由服务端时间倒序返回 |
+
+关注 Tab 只有在后端提供关注流或明确 filter 时才展示。未实现前不得显示无效 Tab。
+
+### 14.3 帖子详情与评论实施步骤
+
+目标：帖子详情页展示真实帖子和真实评论列表。
+
+实施顺序：
+
+1. `PostDetailViewModel.load(postId)` 并发或串行调用：
+   - `GetPost`
+   - `ListComments`
+2. 评论区使用独立分页状态：
+   - `initialLoadState`
+   - `comments`
+   - `nextCursor`
+   - `appendState`
+3. 发布评论调用 `CommentOnPost`。
+4. 发布成功后：
+   - 将返回评论插入本地列表，或重新刷新评论第一页。
+   - 清空输入框。
+5. 发布失败后：
+   - 保留输入内容。
+   - Snackbar 显示错误。
+
+P0 评论可以先扁平展示。P1 再按 `parent_comment_id` 组装回复树。
+
+### 14.4 个人主页实施步骤
+
+目标：Profile 页面展示真实资料、关注状态和该用户内容 Tab。
+
+实施顺序：
+
+1. `ProfileRepository.getProfile(userId)` 调用 `TraderService/GetProfile`。
+2. `ProfileRepository.listUserPosts(userId, filter, cursor)` 调用 `FeedService/ListUserPosts`。
+3. `ProfileViewModel` 页面状态拆分：
+   - `profileState`
+   - `postsState`
+   - `selectedTab`
+   - `followActionState`
+4. 关注按钮使用乐观更新：
+
+```text
+保存 previous state
+立即切换 isFollowing 与 followerCount
+调用 Follow / Unfollow
+失败则恢复 previous state 并 Snackbar
+```
+
+5. Profile 内容 Tab P0 至少包含：
+   - 帖子
+   - 信号
+
+回复、账户、交易指标可作为 P1/P2。
+
+### 14.5 发布入口实施步骤
+
+目标：用户可以发布真实文本帖子。
+
+实施顺序：
+
+1. 建立 `ComposePostScreen` 和 `ComposePostViewModel`。
+2. 输入框支持：
+   - 自动聚焦
+   - 字数统计
+   - 空内容禁用发布按钮
+   - 提交中禁用重复点击
+3. 调用 `FeedService/CreatePost`。
+4. 成功后：
+   - 返回 Feed 并触发刷新，或把返回的 Post 插入 Feed 顶部。
+5. 失败后：
+   - 保留草稿。
+   - 显示错误。
+
+P0 只做文本帖。关联信号、引用、可见性高级配置放到 P1。
+
+### 14.6 通知与 SSE 实施步骤
+
+目标：未读数准确，前台通知实时更新。
+
+实施顺序：
+
+1. `NotificationViewModel` 在 App 前台调用 `UnreadCount`。
+2. `SseManager` 由 Session 层统一管理，不由页面重复创建。
+3. 登录后连接 SSE，登出后断开。
+4. 前台收到事件后：
+   - 更新未读数。
+   - 必要时刷新通知列表。
+5. App 回前台时补拉未读数，修正 SSE 断线期间的状态。
+6. 401 时停止重连并触发重新登录事件。
+
+禁止使用 `setInterval` 轮询替代 SSE。
+
+## 十五、关键集成点
+
+### 15.1 Session 与 Token
+
+必须保证：
+
+- access token 注入所有 Connect-RPC 请求。
+- refresh token 加密存储。
+- 当前用户 ID 在登录 / 注册成功后保存，用于 `liked_by` 映射和“我的主页”。
+- 401 refresh 必须串行化，避免多个请求同时刷新 token。
+- refresh 失败后清理会话并跳转登录。
+
+### 15.2 Connect-RPC 客户端
+
+必须保证：
+
+- RPC 客户端可注入、可替换、可测试。
+- OkHttpClient 单例复用。
+- Repository 只依赖 RPC 封装，不依赖 Compose。
+- ViewModel 不直接构造 RPC path。
+
+### 15.3 Navigation
+
+至少定义以下路由：
+
+```text
+feed
+postDetail/{postId}
+composePost
+profile/{userId}
+notifications
+discover
+settings
+```
+
+点击行为：
+
+- Feed item 正文：进入 `postDetail/{postId}`。
+- 作者头像 / 名称：进入 `profile/{userId}`。
+- 评论按钮：进入详情并定位评论区。
+- 发布按钮：进入 `composePost`。
+- 通知 item：按通知类型进入帖子、Profile、告警或系统页面。
+
+### 15.4 UI 状态和错误文案
+
+推荐错误映射：
+
+| 场景 | 用户文案 |
+|---|---|
+| `Unauthenticated` | 登录已过期，请重新登录 |
+| `PermissionDenied` | 你没有权限执行此操作 |
+| `NotFound` | 内容不存在或已被删除 |
+| `InvalidArgument` | 请求参数无效，请重试 |
+| 网络失败 | 网络连接失败，请检查后重试 |
+| 服务端错误 | 服务暂时不可用，请稍后再试 |
+
+调试日志可以记录原始异常，但不得记录 token、密码、refresh token。
+
+## 十六、测试流程
+
+### 16.1 本地构建
+
+Android 修改后必须执行：
+
+```bash
+cd frontend/android
+./gradlew :app:compileDebugKotlin
+```
+
+涉及资源、Manifest、依赖或打包时执行：
+
+```bash
+cd frontend/android
+./gradlew :app:assembleDebug
+```
+
+### 16.2 单元测试
+
+新增或修改 ViewModel / Repository 后执行：
+
+```bash
+cd frontend/android
+./gradlew :app:testDebugUnitTest --no-daemon --max-workers=2
+```
+
+最低测试覆盖：
+
+- Feed 首屏加载成功。
+- Feed 首屏加载失败。
+- Feed 刷新失败不清空旧数据。
+- Feed 分页失败只影响 append 状态。
+- 点赞乐观更新成功。
+- 点赞失败回滚。
+- 关注乐观更新成功。
+- 关注失败回滚。
+- 评论发布失败保留草稿。
+- 401 触发登录过期事件。
+
+### 16.3 手工联调测试
+
+P0 手工验收步骤：
+
+1. 使用真实账号登录。
+2. 打开 Feed，确认不是硬编码数据。
+3. 下拉刷新，确认数据稳定。
+4. 滑到底部触发分页，确认不重复、不跳项。
+5. 点赞一条帖子，退出重进后状态仍正确。
+6. 打开帖子详情，确认评论列表来自后端。
+7. 发布评论，刷新后评论仍存在。
+8. 点击作者进入 Profile。
+9. 关注 / 取关作者，确认粉丝数和状态变化。
+10. 打开 Profile 内容 Tab，确认显示该用户真实帖子。
+11. 打开通知中心，确认未读数与 Badge 一致。
+12. 断网后重试，确认有明确错误态而不是假数据。
+
+### 16.4 回归检查
+
+每次提交前检查：
+
+- 没有新增硬编码社交数据。
+- 没有 `catch (_: Exception) {}`。
+- 没有 ViewModel 直接拼 RPC path。
+- 没有新增无效 Tab 或无效按钮。
+- 没有把服务端缺口在客户端用假数据绕过。
+- 文档 checklist 与实际代码一致。
+
+## 十七、故障排查指南
+
+### 17.1 Feed 为空
+
+排查顺序：
+
+1. 确认账号已登录且 token 有效。
+2. 确认 `BASE_URL` 是 `https://api.alfq.org/`。
+3. 查看 `GetFeed` 是否返回错误。
+4. 检查 filter 是否为后端支持值。
+5. 若后端返回空列表，显示空态，不造数据。
+
+### 17.2 点赞状态不准确
+
+排查顺序：
+
+1. 确认登录 / 注册后已保存当前 `userId`。
+2. 确认 `Post.liked_by` 是否包含当前用户 ID。
+3. 确认 Repository 映射 `isLiked` 时使用当前用户 ID。
+4. 确认乐观更新失败时有回滚。
+
+### 17.3 Profile 关注状态不准确
+
+排查顺序：
+
+1. 确认 `TraderProfile.is_following` 已生成到 Android proto。
+2. 确认 `GetProfile` 请求携带 Authorization。
+3. 确认 Follow / Unfollow 返回真实 `follower_count`。
+4. 确认失败时恢复 previous state。
+
+### 17.4 评论无法显示
+
+排查顺序：
+
+1. 确认 Android proto 包含 `ListComments`。
+2. 确认后端已注册 `FeedService/ListComments`。
+3. 确认 `post_id` 正确。
+4. 确认评论区错误不会覆盖帖子详情。
+
+### 17.5 SSE 重复连接或断线
+
+排查顺序：
+
+1. 确认 SSE 由 Session 层统一管理。
+2. 确认页面没有在每次重组时创建连接。
+3. 确认后台断开、前台重连。
+4. 确认 401 不无限重连。
+5. 确认日志不输出 token。
+
+### 17.6 编译找不到 proto 方法
+
+排查顺序：
+
+1. 确认后端 proto 已更新并推送。
+2. 确认 Android 已拉取最新 proto。
+3. 清理并重新生成 proto。
+4. 重新执行：
+
+```bash
+cd frontend/android
+./gradlew :app:compileDebugKotlin
+```
+
+### 17.7 页面出现假数据或演示数据
+
+处理要求：
+
+1. 立即移除硬编码 fallback。
+2. 改为 loading / empty / error 状态。
+3. 如果是后端缺口，记录到 `09-服务端配套改造优化文档.md` 对应项。
+4. 不允许为了通过 UI 验收保留假数据。

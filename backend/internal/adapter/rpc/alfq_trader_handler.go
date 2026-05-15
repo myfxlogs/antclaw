@@ -79,4 +79,13 @@ func (h *TraderHandler) GetFollowing(ctx context.Context, req *connect.Request[a
 	return connect.NewResponse(resp), nil
 }
 
+// ListRecommendedTraders returns traders ranked by follower count (P2).
+func (h *TraderHandler) ListRecommendedTraders(ctx context.Context, req *connect.Request[alfqv1.ListRecommendedTradersRequest]) (*connect.Response[alfqv1.UserList], error) {
+	resp, err := h.svc.ListRecommendedTraders(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
+}
+
 var _ antclawv1connect.TraderServiceHandler = (*TraderHandler)(nil)

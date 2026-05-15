@@ -5,10 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"connectrpc.com/connect"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
+	"github.com/antclaw/antclaw/internal/service"
 )
 
 // Service holds the trader business logic.
@@ -18,17 +20,6 @@ type Service struct {
 
 func NewService(repo postgres.TraderRepository) *Service {
 	return &Service{repo: repo}
-}
-
-// clampPageSize returns ps clamped to [defaultVal, maxVal].
-func clampPageSize(ps, defaultVal, maxVal int32) int32 {
-	if ps <= 0 {
-		return defaultVal
-	}
-	if ps > maxVal {
-		return maxVal
-	}
-	return ps
 }
 
 // ----- Profile -----
@@ -42,7 +33,11 @@ func (s *Service) GetProfile(ctx context.Context, currentUserID string, req *alf
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get profile: %w", err))
 	}
 	if currentUserID != "" && currentUserID != req.UserId {
-		row.IsFollowing, _ = s.repo.IsFollowing(ctx, currentUserID, req.UserId)
+		if isFollowing, err := s.repo.IsFollowing(ctx, currentUserID, req.UserId); err != nil {
+			log.Printf("trader: IsFollowing(%s, %s): %v", currentUserID, req.UserId, err)
+		} else {
+			row.IsFollowing = isFollowing
+		}
 	}
 	return traderProfileRowToProto(row), nil
 }
@@ -72,7 +67,10 @@ func (s *Service) Follow(ctx context.Context, userID string, req *alfqv1.FollowR
 	if err := s.repo.Follow(ctx, userID, req.TargetUserId); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("follow: %w", err))
 	}
-	cnt, _ := s.repo.GetFollowerCount(ctx, req.TargetUserId)
+	cnt, err := s.repo.GetFollowerCount(ctx, req.TargetUserId)
+	if err != nil {
+		log.Printf("trader: GetFollowerCount(%s): %v", req.TargetUserId, err)
+	}
 	return &alfqv1.FollowResponse{Success: true, FollowerCount: cnt}, nil
 }
 
@@ -83,7 +81,10 @@ func (s *Service) Unfollow(ctx context.Context, userID string, req *alfqv1.Unfol
 	if err := s.repo.Unfollow(ctx, userID, req.TargetUserId); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("unfollow: %w", err))
 	}
-	cnt, _ := s.repo.GetFollowerCount(ctx, req.TargetUserId)
+	cnt, err := s.repo.GetFollowerCount(ctx, req.TargetUserId)
+	if err != nil {
+		log.Printf("trader: GetFollowerCount(%s): %v", req.TargetUserId, err)
+	}
 	return &alfqv1.FollowResponse{Success: true, FollowerCount: cnt}, nil
 }
 
@@ -100,12 +101,38 @@ func (s *Service) GetFollowing(ctx context.Context, req *alfqv1.GetFollowingRequ
 // listUsersFactor is the function shape for GetFollowers/GetFollowing repository calls.
 type listUsersFunc func(ctx context.Context, userID string, cursor *postgres.SocialCursor, limit int32) ([]*postgres.UserInfoRow, *postgres.SocialCursor, error)
 
+// ListRecommendedTraders returns traders ranked by follower count (P2, algorithm option 1).
+func (s *Service) ListRecommendedTraders(ctx context.Context, req *alfqv1.ListRecommendedTradersRequest) (*alfqv1.UserList, error) {
+	limit := service.ClampPageSize(req.PageSize, 20, 50)
+	cursor, err := postgres.DecodeSocialCursor(req.Cursor)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid cursor: %w", err))
+	}
+	rows, nextCursor, err := s.repo.ListRecommendedTraders(ctx, cursor, limit)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("list recommended traders: %w", err))
+	}
+	users := make([]*alfqv1.UserInfo, len(rows))
+	for i, r := range rows {
+		users[i] = &alfqv1.UserInfo{
+			UserId:        r.UserID,
+			DisplayName:   r.DisplayName,
+			Tier:          r.Tier,
+			FollowerCount: r.FollowerCount,
+		}
+	}
+	return &alfqv1.UserList{
+		Users:      users,
+		NextCursor: postgres.EncodeSocialCursor(nextCursor),
+	}, nil
+}
+
 // listUsers centralizes "decode cursor → paginate → map rows" for follower/following lists.
 func (s *Service) listUsers(ctx context.Context, userID, rawCursor string, pageSize int32, fn listUsersFunc) (*alfqv1.UserList, error) {
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("user_id is required"))
 	}
-	limit := clampPageSize(pageSize, 20, 50)
+	limit := service.ClampPageSize(pageSize, 20, 50)
 	cursor, err := postgres.DecodeSocialCursor(rawCursor)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid cursor: %w", err))

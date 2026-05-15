@@ -12,6 +12,7 @@ service TraderService {
   rpc Unfollow(UnfollowRequest) returns (FollowResponse);
   rpc GetFollowers(GetFollowersRequest) returns (UserList);
   rpc GetFollowing(GetFollowingRequest) returns (UserList);
+  rpc ListRecommendedTraders(ListRecommendedTradersRequest) returns (UserList);
 }
 
 message TraderProfile {
@@ -50,6 +51,11 @@ message UnfollowRequest { string target_user_id = 1; }
 
 message GetFollowersRequest { string user_id = 1; string cursor = 2; int32 page_size = 3; }
 message GetFollowingRequest { string user_id = 1; string cursor = 2; int32 page_size = 3; }
+
+message ListRecommendedTradersRequest {
+  string cursor = 1;
+  int32 page_size = 2;   // default 20, max 50
+}
 
 message UserList {
   repeated UserInfo users = 1;

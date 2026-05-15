@@ -49,6 +49,9 @@ const (
 	// TraderServiceGetFollowingProcedure is the fully-qualified name of the TraderService's
 	// GetFollowing RPC.
 	TraderServiceGetFollowingProcedure = "/antclaw.v1.TraderService/GetFollowing"
+	// TraderServiceListRecommendedTradersProcedure is the fully-qualified name of the TraderService's
+	// ListRecommendedTraders RPC.
+	TraderServiceListRecommendedTradersProcedure = "/antclaw.v1.TraderService/ListRecommendedTraders"
 )
 
 // TraderServiceClient is a client for the antclaw.v1.TraderService service.
@@ -59,6 +62,7 @@ type TraderServiceClient interface {
 	Unfollow(context.Context, *connect.Request[v1.UnfollowRequest]) (*connect.Response[v1.FollowResponse], error)
 	GetFollowers(context.Context, *connect.Request[v1.GetFollowersRequest]) (*connect.Response[v1.UserList], error)
 	GetFollowing(context.Context, *connect.Request[v1.GetFollowingRequest]) (*connect.Response[v1.UserList], error)
+	ListRecommendedTraders(context.Context, *connect.Request[v1.ListRecommendedTradersRequest]) (*connect.Response[v1.UserList], error)
 }
 
 // NewTraderServiceClient constructs a client for the antclaw.v1.TraderService service. By default,
@@ -108,17 +112,24 @@ func NewTraderServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(traderServiceMethods.ByName("GetFollowing")),
 			connect.WithClientOptions(opts...),
 		),
+		listRecommendedTraders: connect.NewClient[v1.ListRecommendedTradersRequest, v1.UserList](
+			httpClient,
+			baseURL+TraderServiceListRecommendedTradersProcedure,
+			connect.WithSchema(traderServiceMethods.ByName("ListRecommendedTraders")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // traderServiceClient implements TraderServiceClient.
 type traderServiceClient struct {
-	getProfile    *connect.Client[v1.GetTraderProfileRequest, v1.TraderProfile]
-	updateProfile *connect.Client[v1.UpdateTraderProfileRequest, v1.TraderProfile]
-	follow        *connect.Client[v1.FollowRequest, v1.FollowResponse]
-	unfollow      *connect.Client[v1.UnfollowRequest, v1.FollowResponse]
-	getFollowers  *connect.Client[v1.GetFollowersRequest, v1.UserList]
-	getFollowing  *connect.Client[v1.GetFollowingRequest, v1.UserList]
+	getProfile             *connect.Client[v1.GetTraderProfileRequest, v1.TraderProfile]
+	updateProfile          *connect.Client[v1.UpdateTraderProfileRequest, v1.TraderProfile]
+	follow                 *connect.Client[v1.FollowRequest, v1.FollowResponse]
+	unfollow               *connect.Client[v1.UnfollowRequest, v1.FollowResponse]
+	getFollowers           *connect.Client[v1.GetFollowersRequest, v1.UserList]
+	getFollowing           *connect.Client[v1.GetFollowingRequest, v1.UserList]
+	listRecommendedTraders *connect.Client[v1.ListRecommendedTradersRequest, v1.UserList]
 }
 
 // GetProfile calls antclaw.v1.TraderService.GetProfile.
@@ -151,6 +162,11 @@ func (c *traderServiceClient) GetFollowing(ctx context.Context, req *connect.Req
 	return c.getFollowing.CallUnary(ctx, req)
 }
 
+// ListRecommendedTraders calls antclaw.v1.TraderService.ListRecommendedTraders.
+func (c *traderServiceClient) ListRecommendedTraders(ctx context.Context, req *connect.Request[v1.ListRecommendedTradersRequest]) (*connect.Response[v1.UserList], error) {
+	return c.listRecommendedTraders.CallUnary(ctx, req)
+}
+
 // TraderServiceHandler is an implementation of the antclaw.v1.TraderService service.
 type TraderServiceHandler interface {
 	GetProfile(context.Context, *connect.Request[v1.GetTraderProfileRequest]) (*connect.Response[v1.TraderProfile], error)
@@ -159,6 +175,7 @@ type TraderServiceHandler interface {
 	Unfollow(context.Context, *connect.Request[v1.UnfollowRequest]) (*connect.Response[v1.FollowResponse], error)
 	GetFollowers(context.Context, *connect.Request[v1.GetFollowersRequest]) (*connect.Response[v1.UserList], error)
 	GetFollowing(context.Context, *connect.Request[v1.GetFollowingRequest]) (*connect.Response[v1.UserList], error)
+	ListRecommendedTraders(context.Context, *connect.Request[v1.ListRecommendedTradersRequest]) (*connect.Response[v1.UserList], error)
 }
 
 // NewTraderServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -204,6 +221,12 @@ func NewTraderServiceHandler(svc TraderServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(traderServiceMethods.ByName("GetFollowing")),
 		connect.WithHandlerOptions(opts...),
 	)
+	traderServiceListRecommendedTradersHandler := connect.NewUnaryHandler(
+		TraderServiceListRecommendedTradersProcedure,
+		svc.ListRecommendedTraders,
+		connect.WithSchema(traderServiceMethods.ByName("ListRecommendedTraders")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/antclaw.v1.TraderService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TraderServiceGetProfileProcedure:
@@ -218,6 +241,8 @@ func NewTraderServiceHandler(svc TraderServiceHandler, opts ...connect.HandlerOp
 			traderServiceGetFollowersHandler.ServeHTTP(w, r)
 		case TraderServiceGetFollowingProcedure:
 			traderServiceGetFollowingHandler.ServeHTTP(w, r)
+		case TraderServiceListRecommendedTradersProcedure:
+			traderServiceListRecommendedTradersHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -249,4 +274,8 @@ func (UnimplementedTraderServiceHandler) GetFollowers(context.Context, *connect.
 
 func (UnimplementedTraderServiceHandler) GetFollowing(context.Context, *connect.Request[v1.GetFollowingRequest]) (*connect.Response[v1.UserList], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.TraderService.GetFollowing is not implemented"))
+}
+
+func (UnimplementedTraderServiceHandler) ListRecommendedTraders(context.Context, *connect.Request[v1.ListRecommendedTradersRequest]) (*connect.Response[v1.UserList], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.TraderService.ListRecommendedTraders is not implemented"))
 }

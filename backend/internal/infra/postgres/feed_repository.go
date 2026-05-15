@@ -3,6 +3,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -54,6 +55,7 @@ type FeedRepository interface {
 
 	CreateComment(ctx context.Context, row *FeedCommentRow) (*FeedCommentRow, error)
 	ListComments(ctx context.Context, postID string, cursor *SocialCursor, limit int32) ([]*FeedCommentRow, *SocialCursor, error)
+	CheckCommentPostID(ctx context.Context, commentID, postID string) (bool, error)
 
 	GetUserName(ctx context.Context, userID string) (string, error)
 }
@@ -116,6 +118,9 @@ func (r *feedRepo) executePaginatedFeed(ctx context.Context, query string, args 
 		}
 		posts = append(posts, row)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, nil, err
+	}
 	hasMore := len(posts) > int(limit)
 	if hasMore {
 		posts = posts[:limit]
@@ -150,9 +155,13 @@ func (r *feedRepo) loadLikedByBatch(ctx context.Context, posts []*FeedPostRow, c
 	likedSet := make(map[string]bool, len(posts))
 	for rows.Next() {
 		var pid string
-		if err := rows.Scan(&pid); err == nil {
-			likedSet[pid] = true
+		if err := rows.Scan(&pid); err != nil {
+			return nil, err
 		}
+		likedSet[pid] = true
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	result := make([][]string, len(posts))
 	for i, p := range posts {
@@ -184,7 +193,11 @@ func (r *feedRepo) GetPost(ctx context.Context, postID string, currentUserID str
 	}
 	var likedBy []string
 	if currentUserID != "" {
-		if liked, _ := r.GetLikedByUser(ctx, postID, currentUserID); liked {
+		liked, err := r.GetLikedByUser(ctx, postID, currentUserID)
+		if err != nil {
+			return nil, nil, fmt.Errorf("get liked by user: %w", err)
+		}
+		if liked {
 			likedBy = []string{currentUserID}
 		}
 	}
@@ -247,9 +260,18 @@ func (r *feedRepo) GetFeed(ctx context.Context, filter string, cursor *SocialCur
 
 func (r *feedRepo) ListUserPosts(ctx context.Context, userID, filter string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error) {
 	args := []interface{}{limit + 1, userID}
+	base := 3
 	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p WHERE p.author_id = $2`
+	// Visibility: author sees all; authenticated visitors see public + followers(if following); unauthenticated see only public.
+	if currentUserID == "" {
+		query += ` AND p.visibility = 'public'`
+	} else if currentUserID != userID {
+		query += ` AND (p.visibility = 'public' OR (p.visibility = 'followers' AND EXISTS(SELECT 1 FROM alfq_follows WHERE follower_id = $3 AND following_id = $2)))`
+		args = append(args, currentUserID)
+		base = 4
+	}
 	query = appendFeedFilter(query, filter)
-	query, args = AppendCursor(query, args, cursor, "p.created_at, p.id", CursorDesc, 3)
+	query, args = AppendCursor(query, args, cursor, "p.created_at, p.id", CursorDesc, base)
 	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT $1`
 	return r.executePaginatedFeed(ctx, query, args, limit, currentUserID)
 }
@@ -307,6 +329,9 @@ func (r *feedRepo) ListComments(ctx context.Context, postID string, cursor *Soci
 		}
 		comments = append(comments, c)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, err
+	}
 	hasMore := len(comments) > int(limit)
 	if hasMore {
 		comments = comments[:limit]
@@ -317,4 +342,13 @@ func (r *feedRepo) ListComments(ctx context.Context, postID string, cursor *Soci
 		nextCursor = &SocialCursor{CreatedAt: last.CreatedAt, ID: last.ID}
 	}
 	return comments, nextCursor, nil
+}
+
+// CheckCommentPostID returns true if commentID exists and belongs to postID.
+func (r *feedRepo) CheckCommentPostID(ctx context.Context, commentID, postID string) (bool, error) {
+	var exists bool
+	err := r.pool.QueryRow(ctx,
+		`SELECT EXISTS(SELECT 1 FROM alfq_comments WHERE id=$1 AND post_id=$2)`,
+		commentID, postID).Scan(&exists)
+	return exists, err
 }

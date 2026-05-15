@@ -51,6 +51,7 @@ type TraderRepository interface {
 
 	GetFollowers(ctx context.Context, userID string, cursor *SocialCursor, limit int32) ([]*UserInfoRow, *SocialCursor, error)
 	GetFollowing(ctx context.Context, userID string, cursor *SocialCursor, limit int32) ([]*UserInfoRow, *SocialCursor, error)
+	ListRecommendedTraders(ctx context.Context, cursor *SocialCursor, limit int32) ([]*UserInfoRow, *SocialCursor, error)
 
 	IsFollowing(ctx context.Context, currentUserID, targetUserID string) (bool, error)
 }
@@ -85,6 +86,9 @@ func (r *traderRepo) executePaginatedUserList(ctx context.Context, query string,
 			return nil, nil, err
 		}
 		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, err
 	}
 	hasMore := len(users) > int(limit)
 	if hasMore {
@@ -210,4 +214,55 @@ func (r *traderRepo) GetFollowing(ctx context.Context, userID string, cursor *So
 	query, args = AppendCursor(query, args, cursor, "f.created_at, f.following_id", CursorDesc, 3)
 	query += ` ORDER BY f.created_at DESC, f.following_id DESC LIMIT $1`
 	return r.executePaginatedUserList(ctx, query, args, limit)
+}
+
+// ListRecommendedTraders returns traders ordered by follower_count DESC, user_id DESC (P2).
+// Algorithm: simple popularity rank (document option 1).
+// Cursor reuses SocialCursor — follower_count stored as Unix seconds in CreatedAt.
+func (r *traderRepo) ListRecommendedTraders(ctx context.Context, cursor *SocialCursor, limit int32) ([]*UserInfoRow, *SocialCursor, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	if limit > 50 {
+		limit = 50
+	}
+	query := `SELECT ` + userInfoSelect + `
+		FROM users u`
+	args := []interface{}{limit + 1}
+	if cursor != nil && cursor.ID != "" {
+		query += ` WHERE ((SELECT COUNT(*) FROM alfq_follows WHERE following_id = u.id), u.id) < ($2, $3)`
+		args = append(args, cursor.CreatedAt, cursor.ID)
+	}
+	query += ` ORDER BY (SELECT COUNT(*) FROM alfq_follows WHERE following_id = u.id) DESC, u.id DESC LIMIT $1`
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	var users []*UserInfoRow
+	for rows.Next() {
+		u, err := scanUserInfo(rows)
+		if err != nil {
+			return nil, nil, err
+		}
+		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, err
+	}
+	hasMore := len(users) > int(limit)
+	if hasMore {
+		users = users[:limit]
+	}
+	var nextCursor *SocialCursor
+	if hasMore && len(users) > 0 {
+		last := users[len(users)-1]
+		nextCursor = &SocialCursor{
+			CreatedAt: time.Unix(int64(last.FollowerCount), 0),
+			ID:        last.UserID,
+		}
+	}
+	return users, nextCursor, nil
 }

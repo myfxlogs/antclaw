@@ -44,9 +44,11 @@ import (
 	"github.com/antclaw/antclaw/internal/service/sentiment"
 	signalssvc "github.com/antclaw/antclaw/internal/service/signals"
 	"github.com/antclaw/antclaw/internal/service/regime"
+	searchpkg "github.com/antclaw/antclaw/internal/service/search"
 	strategysvc "github.com/antclaw/antclaw/internal/service/strategy"
 	systemaisvc "github.com/antclaw/antclaw/internal/service/systemai"
 	traderpkg "github.com/antclaw/antclaw/internal/service/trader"
+	trendpkg "github.com/antclaw/antclaw/internal/service/trend"
 	"github.com/antclaw/antclaw/internal/service/ta"
 	"github.com/antclaw/antclaw/internal/service/user"
 	"github.com/antclaw/antclaw/internal/service/vol"
@@ -187,6 +189,12 @@ if err := auth.LoadKeys(); err != nil {
 	chatHandler := rpc.NewChatHandler(pgPool)
 	circleHandler := rpc.NewCircleHandler(pgPool)
 	marketplaceHandler := rpc.NewMarketplaceHandler(pgPool)
+	searchRepo := infrapq.NewSearchRepository(pgPool)
+	searchSvc := searchpkg.NewService(searchRepo)
+	searchHandler := rpc.NewSearchHandler(searchSvc)
+	trendRepo := infrapq.NewTrendRepository(pgPool)
+	trendSvc := trendpkg.NewService(trendRepo)
+	trendHandler := rpc.NewTrendHandler(trendSvc)
 
 	// AuthHandler with real PostgreSQL store
 	authHandler := rpc.NewAuthHandler(userStore, nil, auditSvc, pgPool)
@@ -248,6 +256,8 @@ if err := auth.LoadKeys(); err != nil {
 	mux.Handle(antclawv1connect.NewChatServiceHandler(chatHandler))
 	mux.Handle(antclawv1connect.NewCircleServiceHandler(circleHandler))
 	mux.Handle(antclawv1connect.NewMarketplaceServiceHandler(marketplaceHandler))
+	mux.Handle(antclawv1connect.NewSearchServiceHandler(searchHandler))
+	mux.Handle(antclawv1connect.NewTrendServiceHandler(trendHandler))
 	mux.Handle(antclawv1connect.NewNotificationServiceHandler(notificationHandler, authInterceptor))
 
 	// CORS middleware
