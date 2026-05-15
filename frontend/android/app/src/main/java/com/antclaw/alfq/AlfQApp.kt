@@ -77,7 +77,7 @@ fun MainContent(onLogout: () -> Unit) {
     val navController = rememberNavController()
     val notifVm: NotificationViewModel = hiltViewModel()
     val notifState by notifVm.state.collectAsState()
-    LifecycleAware(notifVm::onForeground, notifVm::onBackground)
+    LifecycleAware({ notifVm.setForeground(true) }, { notifVm.setForeground(false) })
 
     Scaffold(
         bottomBar = {

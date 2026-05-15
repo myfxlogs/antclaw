@@ -24,7 +24,6 @@ class NotificationViewModel @Inject constructor(
     private val _isForeground = MutableStateFlow(true)
     val isForeground: StateFlow<Boolean> = _isForeground.asStateFlow()
 
-    // 偏好设置
     private val _prefs = MutableStateFlow(AlertPrefs())
     val prefs: StateFlow<AlertPrefs> = _prefs.asStateFlow()
 
@@ -32,27 +31,8 @@ class NotificationViewModel @Inject constructor(
     val prefsLoading: StateFlow<Boolean> = _prefsLoading.asStateFlow()
 
     init {
-        try {
-            loadInitial()
-            connectSse()
-        } catch (e: Exception) {
-            _state.update { it.copy(error = e.message) }
-        }
-    }
-
-    fun loadInitial() {
-        viewModelScope.launch {
-            try {
-                val count = notifRepo.unreadCount()
-                val items = notifRepo.listUnread()
-                _state.update { it.copy(unreadCount = count.toInt(), items = items) }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
-            }
-        }
-    }
-
-    private fun connectSse() {
+        loadInitial()
+        // SSE 连接由 SessionViewModel 统一管理，此处仅被动订阅事件
         viewModelScope.launch {
             sseManager.notifications.collect { notif ->
                 _state.update {
@@ -71,18 +51,24 @@ class NotificationViewModel @Inject constructor(
                 _state.update { it.copy(connected = connected, error = if (!connected) null else it.error) }
             }
         }
-        sseManager.connect()
     }
 
-    fun onForeground() {
-        _isForeground.value = true
-        loadInitial()
-        sseManager.reconnect()
+    fun loadInitial() {
+        viewModelScope.launch {
+            try {
+                val count = notifRepo.unreadCount()
+                val items = notifRepo.listUnread()
+                _state.update { it.copy(unreadCount = count.toInt(), items = items) }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message) }
+            }
+        }
     }
 
-    fun onBackground() {
-        _isForeground.value = false
-        sseManager.disconnect()
+    /** 前后台切换通知，由 Activity/Fragment 转发给 SessionViewModel。 */
+    fun setForeground(fg: Boolean) {
+        _isForeground.value = fg
+        if (fg) loadInitial()
     }
 
     fun markRead(id: String) {
@@ -128,7 +114,6 @@ class NotificationViewModel @Inject constructor(
             try {
                 _prefs.value = notifRepo.getAlertPrefs()
             } catch (_: Exception) {
-                // 保留默认值
             } finally {
                 _prefsLoading.value = false
             }
@@ -146,7 +131,7 @@ class NotificationViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        sseManager.disconnect()
         systemNotifier.cancelAll()
+        // SSE disconnect 由 SessionViewModel 管理，此处不再调用
     }
 }

@@ -85,11 +85,8 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    /**
-     * 登录 / 注册成功后：建立 SSE 连接 + 异步上报设备信息。
-     */
+    /** 登录 / 注册成功后：异步上报设备信息。SSE 由 SessionViewModel 统一管理。 */
     private fun onLoginSuccess() {
-        sseManager.connect()
         scope.launch {
             deviceRepository.reportDeviceInfo()
         }
@@ -120,7 +117,6 @@ class AuthRepository @Inject constructor(
                 Auth.LogoutRequest::class, Auth.LogoutResponse::class, StreamType.UNARY)
             client.unary(Auth.LogoutRequest.getDefaultInstance(), emptyMap(), spec)
         } catch (_: Exception) { } finally {
-            sseManager.disconnect()
             ConnectTransportProvider.clearToken()
             tokenStore.clearTokens()
         }
