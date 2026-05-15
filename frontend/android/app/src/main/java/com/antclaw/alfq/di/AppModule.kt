@@ -30,6 +30,5 @@ object AppModule {
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "alfq.db")
             .addMigrations()
-            .fallbackToDestructiveMigrationOnDowngrade()
             .build()
 }

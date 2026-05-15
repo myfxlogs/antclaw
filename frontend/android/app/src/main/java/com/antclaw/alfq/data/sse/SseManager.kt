@@ -41,12 +41,14 @@ class SseManager @Inject constructor() : SseClient {
 
     companion object {
         private const val TAG = "SseManager"
-        private const val RECONNECT_DELAY_MS = 3000L
+        private const val BASE_DELAY_MS = 1000L
+        private const val MAX_DELAY_MS = 30000L
         private const val CONNECT_TIMEOUT_SEC = 30L
     }
 
     private var eventSource: EventSource? = null
     private var reconnectJob: Job? = null
+    private var retryCount = 0
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     // 原始通知 JSON 流（向后兼容）
@@ -116,6 +118,7 @@ class SseManager @Inject constructor() : SseClient {
         eventSource = factory.newEventSource(request, object : EventSourceListener() {
             override fun onOpen(eventSource: EventSource, response: Response) {
                 Log.i(TAG, "SSE connected: ${response.code}")
+                retryCount = 0
                 scope.launch { _connectionState.emit(ConnectionState.CONNECTED) }
             }
 
@@ -163,8 +166,10 @@ class SseManager @Inject constructor() : SseClient {
     private fun scheduleReconnect() {
         reconnectJob?.cancel()
         reconnectJob = scope.launch {
-            delay(RECONNECT_DELAY_MS)
-            Log.i(TAG, "SSE reconnecting...")
+            retryCount++
+            val delayMs = (BASE_DELAY_MS * (1 shl (retryCount - 1))).coerceAtMost(MAX_DELAY_MS)
+            Log.i(TAG, "SSE reconnecting in ${delayMs}ms (retry #$retryCount)")
+            delay(delayMs)
             connect()
         }
     }

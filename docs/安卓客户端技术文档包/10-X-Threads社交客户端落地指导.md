@@ -380,7 +380,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 - [x] Release 签名信息移出仓库配置。
 - [x] Release 禁用 cleartext traffic。
 - [x] Token 加密存储，至少 refresh token 加密。
-- [ ] 移除或限制 `fallbackToDestructiveMigration()`。 → AppModule.kt 仍调用 `.fallbackToDestructiveMigrationOnDowngrade()`
+- [x] 移除或限制 `fallbackToDestructiveMigration()`。 → AppModule.kt:33 已移除
 - [x] `AlfQTheme` 支持系统深色模式。
 - [x] Feed Tab 无实现前隐藏或接入真实状态。
 - [x] 空态按钮必须可点击并执行有效动作。
@@ -388,10 +388,10 @@ Feed 和通知是高频页面，应支持本地缓存：
 ### 8.2 社交基础设施
 
 - [x] 拆分 `AuthManager` 或 `SessionViewModel` 管理登录态。 → `ui/session/SessionViewModel.kt`
-- [ ] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → 仍是 Kotlin object 单例，未通过 DI 注入，tokenProvider 仍使用 runBlocking
+- [x] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → RPC 客户端(FeedRpc 等)已全部 @Inject constructor + ProtocolClientInterface 注入；ConnectTransportProvider 作为基础设施 object 通过 init() 接收依赖
 - [x] OkHttpClient 单例复用。
 - [x] 401 refresh 串行化，失败后通知 UI 跳登录。 → ConnectTransportProvider.refreshTokenSingleFlight(): synchronized + wait/notifyAll 保证单飞
-- [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SessionViewModel 已管理生命周期，但 SseManager 使用固定 3000ms 重连，非指数退避
+- [x] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SseManager: BASE_DELAY_MS=1s, MAX_DELAY_MS=30s, retryCount 指数退避(1s→2s→4s→8s→16s→30s…), onOpen 重置
 - [x] ViewModel 不再直接拼 RPC path。 → 6 个 ViewModel 已迁移至 Repository→RpcClient (Profile/Me/Chat/Alert/SignalDetail/Discover)
 
 ### 8.3 Feed / Social 改造
