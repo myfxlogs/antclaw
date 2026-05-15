@@ -33,7 +33,9 @@ data class MtAccountsUiState(
 )
 
 @HiltViewModel
-class MTAccountsViewModel @Inject constructor() : ViewModel() {
+class MTAccountsViewModel @Inject constructor(
+    private val mtRpc: MtRpcClient,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MtAccountsUiState())
     val uiState: StateFlow<MtAccountsUiState> = _uiState.asStateFlow()
 
@@ -54,11 +56,11 @@ class MTAccountsViewModel @Inject constructor() : ViewModel() {
             try {
                 when (account.type) {
                     "MT4" -> {
-                        val info = MtRpcClient.getMt4AccountInfo(account.id)
+                        val info = mtRpc.getMt4AccountInfo(account.id)
                         account.copy(balance = info.balance, equity = info.equity)
                     }
                     "MT5" -> {
-                        val info = MtRpcClient.getMt5AccountInfo(account.id)
+                        val info = mtRpc.getMt5AccountInfo(account.id)
                         account.copy(balance = info.balance, equity = info.equity)
                     }
                     else -> account
@@ -73,7 +75,7 @@ class MTAccountsViewModel @Inject constructor() : ViewModel() {
             _uiState.value = _uiState.value.copy(binding = true, bindError = null)
             try {
                 val req = AddMt4Request(server, account, password, label, isDemo)
-                val a = MtRpcClient.addMt4Account(req)
+                val a = mtRpc.addMt4Account(req)
                 val item = MtAccountItem(
                     a.id, a.server, a.account, a.label, "MT4",
                     a.isDemo, a.connected, 0.0, 0.0, a.createdAt
@@ -97,7 +99,7 @@ class MTAccountsViewModel @Inject constructor() : ViewModel() {
             _uiState.value = _uiState.value.copy(binding = true, bindError = null)
             try {
                 val req = AddMt5Request(server, account, password, label, isDemo)
-                val a = MtRpcClient.addMt5Account(req)
+                val a = mtRpc.addMt5Account(req)
                 val item = MtAccountItem(
                     a.id, a.server, a.account, a.label, "MT5",
                     a.isDemo, a.connected, 0.0, 0.0, a.createdAt
@@ -119,7 +121,7 @@ class MTAccountsViewModel @Inject constructor() : ViewModel() {
     fun removeMt4Account(id: String) {
         viewModelScope.launch {
             try {
-                MtRpcClient.removeMt4Account(id)
+                mtRpc.removeMt4Account(id)
                 _uiState.value = _uiState.value.copy(
                     accounts = _uiState.value.accounts.filter { it.id != id }
                 )
@@ -130,7 +132,7 @@ class MTAccountsViewModel @Inject constructor() : ViewModel() {
     fun removeMt5Account(id: String) {
         viewModelScope.launch {
             try {
-                MtRpcClient.removeMt5Account(id)
+                mtRpc.removeMt5Account(id)
                 _uiState.value = _uiState.value.copy(
                     accounts = _uiState.value.accounts.filter { it.id != id }
                 )
