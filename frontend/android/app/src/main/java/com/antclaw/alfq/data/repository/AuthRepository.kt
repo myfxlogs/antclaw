@@ -4,7 +4,7 @@ import antclaw.v1.Auth
 import com.antclaw.alfq.data.device.DeviceInfoCollector
 import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
-import com.antclaw.alfq.data.sse.SseManager
+import com.antclaw.alfq.data.sse.SseClient
 import com.connectrpc.MethodSpec
 import com.connectrpc.ResponseMessage
 import com.connectrpc.StreamType
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class AuthRepository @Inject constructor(
     private val tokenStore: TokenStore,
     private val deviceInfoCollector: DeviceInfoCollector,
-    private val sseManager: SseManager,
+    private val sseManager: SseClient,
     private val deviceRepository: DeviceRepository,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())

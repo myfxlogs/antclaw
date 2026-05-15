@@ -18,6 +18,14 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** SSE 客户端接口 — 允许测试注入 fake 实现。 */
+interface SseClient {
+    fun connect()
+    fun disconnect()
+    fun reconnect()
+    fun destroy()
+}
+
 /**
  * 统一 SSE 管理器
  *
@@ -29,7 +37,7 @@ import javax.inject.Singleton
  * 合并前身：SseManager + NotificationSseClient（消除双 SSE 连接）
  */
 @Singleton
-class SseManager @Inject constructor() {
+class SseManager @Inject constructor() : SseClient {
 
     companion object {
         private const val TAG = "SseManager"
@@ -67,7 +75,7 @@ class SseManager @Inject constructor() {
     }
 
     /** 登录成功后调用，建立 SSE 长连接。线程安全，可在主线程调用。 */
-    fun connect() {
+    override fun connect() {
         scope.launch {
             try {
                 connectInternal()
@@ -138,7 +146,7 @@ class SseManager @Inject constructor() {
     }
 
     /** 登出/前台→后台切换时调用。 */
-    fun disconnect() {
+    override fun disconnect() {
         reconnectJob?.cancel()
         reconnectJob = null
         eventSource?.cancel()
@@ -147,7 +155,7 @@ class SseManager @Inject constructor() {
     }
 
     /** 断开后立即重连（前后台切换用）。 */
-    fun reconnect() {
+    override fun reconnect() {
         disconnect()
         connect()
     }
@@ -162,7 +170,7 @@ class SseManager @Inject constructor() {
     }
 
     /** 生命周期清理。 */
-    fun destroy() {
+    override fun destroy() {
         disconnect()
         scope.cancel()
     }

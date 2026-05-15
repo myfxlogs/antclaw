@@ -25,20 +25,20 @@ class SocialRepository @Inject constructor(
     private val profileRpc: ProfileRpc,
     private val tokenStore: TokenStore,
 ) {
-    private val currentUserId get() = tokenStore.getUserId().orEmpty()
+    private suspend fun currentUserId() = tokenStore.getUserId().orEmpty()
 
     // ══════ Feed ══════
 
     suspend fun getFeed(cursor: String = "", pageSize: Int = 20, filter: String = "all"): Pair<List<PostUi>, String?> {
         val resp = feedRpc.getFeed(cursor, pageSize, filter)
-        val posts = resp.postsList.map { it.toPostUi(currentUserId) }
+        val posts = resp.postsList.map { it.toPostUi(currentUserId()) }
         return posts to resp.nextCursor.takeIf { it.isNotBlank() }
     }
 
     // ══════ Post ══════
 
     suspend fun getPost(postId: String): PostUi =
-        feedRpc.getPost(postId).toPostUi(currentUserId)
+        feedRpc.getPost(postId).toPostUi(currentUserId())
 
     suspend fun createPost(content: String, signalPair: String = "", signalDirection: String = "",
                            signalConfidence: Int = 0, visibility: String = "public"): PostUi {
@@ -50,23 +50,23 @@ class SocialRepository @Inject constructor(
             .setSignalConfidence(signalConfidence)
             .setVisibility(visibility)
             .build()
-        return feedRpc.createPost(req).toPostUi(currentUserId)
+        return feedRpc.createPost(req).toPostUi(currentUserId())
     }
 
     suspend fun listUserPosts(userId: String, cursor: String = "", pageSize: Int = 20,
                               filter: String = "all"): Pair<List<PostUi>, String?> {
         val resp = feedRpc.listUserPosts(userId, cursor, pageSize, filter)
-        val posts = resp.postsList.map { it.toPostUi(currentUserId) }
+        val posts = resp.postsList.map { it.toPostUi(currentUserId()) }
         return posts to resp.nextCursor.takeIf { it.isNotBlank() }
     }
 
     // ══════ Like / Unlike ══════
 
     suspend fun likePost(postId: String): PostUi =
-        feedRpc.likePost(postId).toPostUi(currentUserId)
+        feedRpc.likePost(postId).toPostUi(currentUserId())
 
     suspend fun unlikePost(postId: String): PostUi =
-        feedRpc.unlikePost(postId).toPostUi(currentUserId)
+        feedRpc.unlikePost(postId).toPostUi(currentUserId())
 
     // ══════ Comment ══════
 
@@ -86,7 +86,7 @@ class SocialRepository @Inject constructor(
     // ══════ Share ══════
 
     suspend fun sharePost(postId: String, comment: String = ""): PostUi =
-        feedRpc.sharePost(postId, comment).toPostUi(currentUserId)
+        feedRpc.sharePost(postId, comment).toPostUi(currentUserId())
 
     // ══════ Profile ══════
 

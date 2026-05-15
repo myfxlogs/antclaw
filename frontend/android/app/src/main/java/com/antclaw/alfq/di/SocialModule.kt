@@ -4,7 +4,6 @@ import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.FeedRpc
 import com.antclaw.alfq.data.rpc.ProfileRpc
-import com.antclaw.alfq.data.rpc.NotificationRpc
 import com.antclaw.alfq.data.rpc.SearchRpc
 import com.antclaw.alfq.data.rpc.TrendRpc
 import com.connectrpc.ProtocolClientInterface
@@ -25,10 +24,6 @@ object SocialModule {
     @Provides
     @Singleton
     fun provideProfileRpc(client: ProtocolClientInterface): ProfileRpc = ProfileRpc(client)
-
-    @Provides
-    @Singleton
-    fun provideNotificationRpc(client: ProtocolClientInterface): NotificationRpc = NotificationRpc(client)
 
     @Provides
     @Singleton

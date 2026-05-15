@@ -39,7 +39,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    fun loadComments(postId: String = _state.value.post?.postId ?: return) {
+    fun loadComments(postId: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoadingComments = true, commentError = null) }
             try {

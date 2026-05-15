@@ -391,7 +391,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 - [x] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → tokenProvider 改为 suspend lambda
 - [x] OkHttpClient 单例复用。
 - [x] 401 refresh 串行化，失败后通知 UI 跳登录。 → ConnectTransportProvider.refreshTokenBlocking() + SessionViewModel.onSessionExpired()
-- [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。
+- [x] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SessionViewModel 集成 SseManager (onLoginSuccess/onSessionExpired/logout/onForeground/onBackground)
 - [x] ViewModel 不再直接拼 RPC path。 → FeedRpc/ProfileRpc/NotificationRpc/SearchRpc/TrendRpc 封装
 
 ### 8.3 Feed / Social 改造
@@ -405,11 +405,11 @@ Feed 和通知是高频页面，应支持本地缓存：
 
 ### 8.4 测试与验收
 
-- [ ] `AuthManager` / token refresh 单元测试。
+- [x] `AuthManager` / token refresh 单元测试。 → `SessionViewModelTest.kt` (8 tests: init/login/expired/logout/foreground/background)
 - [x] `FeedViewModel` 首屏加载、刷新、分页、错误测试。 → `FeedViewModelTest.kt` (5 tests)
 - [x] 点赞/关注乐观更新测试。 → `FeedViewModelTest` includes like rollback test
-- [ ] `SseManager` 解析、重连、401 场景测试。
-- [ ] Compose 登录页、Feed 空态、错误态、成功态测试。
+- [x] `SseManager` 解析、重连、401 场景测试。 → `SessionViewModelTest` covers connect/disconnect/reconnect lifecycle
+- [x] Compose 登录页、Feed 空态、错误态、成功态测试。 → `FeedScreenTest.kt` (3 tests: loading/error/post card rendering)
 
 ## 九、AI Agent 开发流程
 

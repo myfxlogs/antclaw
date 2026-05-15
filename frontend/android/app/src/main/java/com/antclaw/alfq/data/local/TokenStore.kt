@@ -18,7 +18,7 @@ import javax.inject.Singleton
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "alfq_tokens")
 
 @Singleton
-class TokenStore @Inject constructor(
+open class TokenStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     companion object {
@@ -42,7 +42,7 @@ class TokenStore @Inject constructor(
         )
     }
 
-    suspend fun saveTokens(accessToken: String, refreshToken: String, userId: String = "") {
+    open suspend fun saveTokens(accessToken: String, refreshToken: String, userId: String = "") {
         context.dataStore.edit { prefs ->
             prefs[KEY_ACCESS_TOKEN] = accessToken
             if (userId.isNotBlank()) prefs[KEY_USER_ID] = userId
@@ -50,26 +50,42 @@ class TokenStore @Inject constructor(
         encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, refreshToken).apply()
     }
 
-    suspend fun saveAccessToken(token: String) {
+    open suspend fun saveAccessToken(token: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_ACCESS_TOKEN] = token
         }
     }
 
-    suspend fun getAccessToken(): String? {
+    open suspend fun getAccessToken(): String? {
         return context.dataStore.data.map { it[KEY_ACCESS_TOKEN] }.first()
     }
 
-    suspend fun getRefreshToken(): String? {
+    open suspend fun getRefreshToken(): String? {
         return encryptedPrefs.getString(KEY_REFRESH_TOKEN, null)
     }
 
-    suspend fun getUserId(): String? {
+    open suspend fun getUserId(): String? {
         return context.dataStore.data.map { it[KEY_USER_ID] }.first()
     }
 
-    suspend fun clearTokens() {
+    open suspend fun clearTokens() {
         context.dataStore.edit { it.clear() }
         encryptedPrefs.edit().clear().apply()
+    }
+
+    open suspend fun saveRefreshToken(token: String) {
+        encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+    }
+
+    open suspend fun saveUserId(userId: String) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_USER_ID] = userId
+        }
+    }
+
+    open suspend fun clearUserId() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(KEY_USER_ID)
+        }
     }
 }
