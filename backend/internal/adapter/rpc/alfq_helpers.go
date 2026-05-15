@@ -8,6 +8,14 @@ import (
 	"github.com/antclaw/antclaw/internal/auth"
 )
 
+// minInt returns the minimum of a and b, with special handling for zero a.
+func minInt(a, b int32) int32 {
+	if a == 0 || a > b {
+		return b
+	}
+	return a
+}
+
 // userIDFromHTTP extracts authenticated userID.
 // Priority: context (if auth interceptor ran) → Authorization header JWT.
 func userIDFromHTTP(ctx context.Context, req connect.AnyRequest) string {

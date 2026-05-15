@@ -46,8 +46,14 @@ const (
 	// FeedServiceCommentOnPostProcedure is the fully-qualified name of the FeedService's CommentOnPost
 	// RPC.
 	FeedServiceCommentOnPostProcedure = "/antclaw.v1.FeedService/CommentOnPost"
+	// FeedServiceListCommentsProcedure is the fully-qualified name of the FeedService's ListComments
+	// RPC.
+	FeedServiceListCommentsProcedure = "/antclaw.v1.FeedService/ListComments"
 	// FeedServiceSharePostProcedure is the fully-qualified name of the FeedService's SharePost RPC.
 	FeedServiceSharePostProcedure = "/antclaw.v1.FeedService/SharePost"
+	// FeedServiceListUserPostsProcedure is the fully-qualified name of the FeedService's ListUserPosts
+	// RPC.
+	FeedServiceListUserPostsProcedure = "/antclaw.v1.FeedService/ListUserPosts"
 )
 
 // FeedServiceClient is a client for the antclaw.v1.FeedService service.
@@ -58,7 +64,9 @@ type FeedServiceClient interface {
 	LikePost(context.Context, *connect.Request[v1.LikePostRequest]) (*connect.Response[v1.Post], error)
 	UnlikePost(context.Context, *connect.Request[v1.UnlikePostRequest]) (*connect.Response[v1.Post], error)
 	CommentOnPost(context.Context, *connect.Request[v1.CommentRequest]) (*connect.Response[v1.Comment], error)
+	ListComments(context.Context, *connect.Request[v1.ListCommentsRequest]) (*connect.Response[v1.ListCommentsResponse], error)
 	SharePost(context.Context, *connect.Request[v1.SharePostRequest]) (*connect.Response[v1.Post], error)
+	ListUserPosts(context.Context, *connect.Request[v1.ListUserPostsRequest]) (*connect.Response[v1.FeedResponse], error)
 }
 
 // NewFeedServiceClient constructs a client for the antclaw.v1.FeedService service. By default, it
@@ -108,10 +116,22 @@ func NewFeedServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(feedServiceMethods.ByName("CommentOnPost")),
 			connect.WithClientOptions(opts...),
 		),
+		listComments: connect.NewClient[v1.ListCommentsRequest, v1.ListCommentsResponse](
+			httpClient,
+			baseURL+FeedServiceListCommentsProcedure,
+			connect.WithSchema(feedServiceMethods.ByName("ListComments")),
+			connect.WithClientOptions(opts...),
+		),
 		sharePost: connect.NewClient[v1.SharePostRequest, v1.Post](
 			httpClient,
 			baseURL+FeedServiceSharePostProcedure,
 			connect.WithSchema(feedServiceMethods.ByName("SharePost")),
+			connect.WithClientOptions(opts...),
+		),
+		listUserPosts: connect.NewClient[v1.ListUserPostsRequest, v1.FeedResponse](
+			httpClient,
+			baseURL+FeedServiceListUserPostsProcedure,
+			connect.WithSchema(feedServiceMethods.ByName("ListUserPosts")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -125,7 +145,9 @@ type feedServiceClient struct {
 	likePost      *connect.Client[v1.LikePostRequest, v1.Post]
 	unlikePost    *connect.Client[v1.UnlikePostRequest, v1.Post]
 	commentOnPost *connect.Client[v1.CommentRequest, v1.Comment]
+	listComments  *connect.Client[v1.ListCommentsRequest, v1.ListCommentsResponse]
 	sharePost     *connect.Client[v1.SharePostRequest, v1.Post]
+	listUserPosts *connect.Client[v1.ListUserPostsRequest, v1.FeedResponse]
 }
 
 // CreatePost calls antclaw.v1.FeedService.CreatePost.
@@ -158,9 +180,19 @@ func (c *feedServiceClient) CommentOnPost(ctx context.Context, req *connect.Requ
 	return c.commentOnPost.CallUnary(ctx, req)
 }
 
+// ListComments calls antclaw.v1.FeedService.ListComments.
+func (c *feedServiceClient) ListComments(ctx context.Context, req *connect.Request[v1.ListCommentsRequest]) (*connect.Response[v1.ListCommentsResponse], error) {
+	return c.listComments.CallUnary(ctx, req)
+}
+
 // SharePost calls antclaw.v1.FeedService.SharePost.
 func (c *feedServiceClient) SharePost(ctx context.Context, req *connect.Request[v1.SharePostRequest]) (*connect.Response[v1.Post], error) {
 	return c.sharePost.CallUnary(ctx, req)
+}
+
+// ListUserPosts calls antclaw.v1.FeedService.ListUserPosts.
+func (c *feedServiceClient) ListUserPosts(ctx context.Context, req *connect.Request[v1.ListUserPostsRequest]) (*connect.Response[v1.FeedResponse], error) {
+	return c.listUserPosts.CallUnary(ctx, req)
 }
 
 // FeedServiceHandler is an implementation of the antclaw.v1.FeedService service.
@@ -171,7 +203,9 @@ type FeedServiceHandler interface {
 	LikePost(context.Context, *connect.Request[v1.LikePostRequest]) (*connect.Response[v1.Post], error)
 	UnlikePost(context.Context, *connect.Request[v1.UnlikePostRequest]) (*connect.Response[v1.Post], error)
 	CommentOnPost(context.Context, *connect.Request[v1.CommentRequest]) (*connect.Response[v1.Comment], error)
+	ListComments(context.Context, *connect.Request[v1.ListCommentsRequest]) (*connect.Response[v1.ListCommentsResponse], error)
 	SharePost(context.Context, *connect.Request[v1.SharePostRequest]) (*connect.Response[v1.Post], error)
+	ListUserPosts(context.Context, *connect.Request[v1.ListUserPostsRequest]) (*connect.Response[v1.FeedResponse], error)
 }
 
 // NewFeedServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -217,10 +251,22 @@ func NewFeedServiceHandler(svc FeedServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(feedServiceMethods.ByName("CommentOnPost")),
 		connect.WithHandlerOptions(opts...),
 	)
+	feedServiceListCommentsHandler := connect.NewUnaryHandler(
+		FeedServiceListCommentsProcedure,
+		svc.ListComments,
+		connect.WithSchema(feedServiceMethods.ByName("ListComments")),
+		connect.WithHandlerOptions(opts...),
+	)
 	feedServiceSharePostHandler := connect.NewUnaryHandler(
 		FeedServiceSharePostProcedure,
 		svc.SharePost,
 		connect.WithSchema(feedServiceMethods.ByName("SharePost")),
+		connect.WithHandlerOptions(opts...),
+	)
+	feedServiceListUserPostsHandler := connect.NewUnaryHandler(
+		FeedServiceListUserPostsProcedure,
+		svc.ListUserPosts,
+		connect.WithSchema(feedServiceMethods.ByName("ListUserPosts")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/antclaw.v1.FeedService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -237,8 +283,12 @@ func NewFeedServiceHandler(svc FeedServiceHandler, opts ...connect.HandlerOption
 			feedServiceUnlikePostHandler.ServeHTTP(w, r)
 		case FeedServiceCommentOnPostProcedure:
 			feedServiceCommentOnPostHandler.ServeHTTP(w, r)
+		case FeedServiceListCommentsProcedure:
+			feedServiceListCommentsHandler.ServeHTTP(w, r)
 		case FeedServiceSharePostProcedure:
 			feedServiceSharePostHandler.ServeHTTP(w, r)
+		case FeedServiceListUserPostsProcedure:
+			feedServiceListUserPostsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -272,6 +322,14 @@ func (UnimplementedFeedServiceHandler) CommentOnPost(context.Context, *connect.R
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.FeedService.CommentOnPost is not implemented"))
 }
 
+func (UnimplementedFeedServiceHandler) ListComments(context.Context, *connect.Request[v1.ListCommentsRequest]) (*connect.Response[v1.ListCommentsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.FeedService.ListComments is not implemented"))
+}
+
 func (UnimplementedFeedServiceHandler) SharePost(context.Context, *connect.Request[v1.SharePostRequest]) (*connect.Response[v1.Post], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.FeedService.SharePost is not implemented"))
+}
+
+func (UnimplementedFeedServiceHandler) ListUserPosts(context.Context, *connect.Request[v1.ListUserPostsRequest]) (*connect.Response[v1.FeedResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("antclaw.v1.FeedService.ListUserPosts is not implemented"))
 }

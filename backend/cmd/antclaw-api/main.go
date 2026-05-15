@@ -37,6 +37,7 @@ import (
 	"github.com/antclaw/antclaw/internal/service/calendar"
 	"github.com/antclaw/antclaw/internal/service/cot"
 	"github.com/antclaw/antclaw/internal/service/datasource"
+	feedpkg "github.com/antclaw/antclaw/internal/service/feed"
 	"github.com/antclaw/antclaw/internal/service/macro"
 	"github.com/antclaw/antclaw/internal/service/price"
 	reportsvc "github.com/antclaw/antclaw/internal/service/report"
@@ -45,6 +46,7 @@ import (
 	"github.com/antclaw/antclaw/internal/service/regime"
 	strategysvc "github.com/antclaw/antclaw/internal/service/strategy"
 	systemaisvc "github.com/antclaw/antclaw/internal/service/systemai"
+	traderpkg "github.com/antclaw/antclaw/internal/service/trader"
 	"github.com/antclaw/antclaw/internal/service/ta"
 	"github.com/antclaw/antclaw/internal/service/user"
 	"github.com/antclaw/antclaw/internal/service/vol"
@@ -176,8 +178,12 @@ if err := auth.LoadKeys(); err != nil {
 	dataSourceHandler := rpc.NewDataSourceConnectHandler(dataSourceSvc)
 	mt4Handler := rpc.NewMT4Handler()
 	mt5Handler := rpc.NewMT5Handler()
-	feedHandler := rpc.NewFeedHandler(pgPool)
-	traderHandler := rpc.NewTraderHandler(pgPool)
+	feedRepo := infrapq.NewFeedRepository(pgPool)
+	feedSvc := feedpkg.NewService(feedRepo)
+	feedHandler := rpc.NewFeedHandler(feedSvc)
+	traderRepo := infrapq.NewTraderRepository(pgPool)
+	traderSvc := traderpkg.NewService(traderRepo)
+	traderHandler := rpc.NewTraderHandler(traderSvc)
 	chatHandler := rpc.NewChatHandler(pgPool)
 	circleHandler := rpc.NewCircleHandler(pgPool)
 	marketplaceHandler := rpc.NewMarketplaceHandler(pgPool)

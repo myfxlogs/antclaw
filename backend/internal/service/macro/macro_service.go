@@ -56,6 +56,9 @@ func NewMacroService(repo postgres.MacroRepository, fredKey string, logger *slog
 // SetFredKey updates the FRED API key dynamically.
 // Called by CredentialResolver when the key is hot-reloaded.
 func (s *MacroService) SetFredKey(key string) {
+	if key == "" {
+		s.logger.Warn("fred key is empty; FRED API calls will fail. 请检查: 1) /datasources 中是否保存了 fred 密钥 2) master key 是否与加密时一致（容器重启可能漂移）")
+	}
 	s.fred.SetAPIKey(key)
 }
 

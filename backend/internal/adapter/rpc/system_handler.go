@@ -55,11 +55,11 @@ func (h *SystemHandler) Readyz(ctx context.Context, _ *connect.Request[antclawv1
 
 func (h *SystemHandler) Info(_ context.Context, _ *connect.Request[antclawv1.InfoRequest]) (*connect.Response[antclawv1.InfoResponse], error) {
 	return connect.NewResponse(&antclawv1.InfoResponse{
-		Version:          "0.1.0",
-		GitCommit:        "dev",
+		Version:          Version,
+		GitCommit:        GitCommit,
 		BuiltAt:          timestamppb.New(h.boot),
-		ProtoVersion:     "1.0.0",
-		MinClientVersion: "1.0.0",
+		ProtoVersion:     ProtoVersion,
+		MinClientVersion: MinClientVersion,
 		MaintenanceMode:  false,
 		ServerTimezone:   "UTC",
 		ServerTime:       time.Now().Unix(),

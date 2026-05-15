@@ -370,7 +370,7 @@ func runMacroCollection(ctx context.Context, svc *macro.MacroService, logger *sl
 		return fmt.Errorf("macro sync: %w", err)
 	}
 	if result.Inserted == 0 {
-		return fmt.Errorf("macro sync inserted 0 records: 检查 FRED API Key 是否已在 /datasources 配置")
+		return fmt.Errorf("macro sync inserted 0 records: 可能原因 1) FRED API Key 未在 /datasources 配置 2) 密钥解密失败（master key 漂移，需重新保存密钥） 3) FRED API 网络不可达 4) 无新数据（查看 worker 日志中的 FRED series 警告）")
 	}
 	logger.Info("Macro sync completed", "inserted", result.Inserted)
 	return nil

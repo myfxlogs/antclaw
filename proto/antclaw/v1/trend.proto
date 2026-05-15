@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+// TrendService provides trending topics and hot symbols (P1).
+service TrendService {
+  rpc ListTrendingTopics(ListTrendingTopicsRequest) returns (ListTrendingTopicsResponse);
+  rpc ListHotSymbols(ListHotSymbolsRequest) returns (ListHotSymbolsResponse);
+}
+
+message ListTrendingTopicsRequest {
+  string window = 1; // 1h / 24h / 7d
+  int32 limit = 2;
+}
+
+message TrendingTopic {
+  string topic = 1;
+  int32 post_count = 2;
+  int32 engagement_count = 3;
+}
+
+message ListTrendingTopicsResponse {
+  repeated TrendingTopic topics = 1;
+}
+
+message ListHotSymbolsRequest {
+  string window = 1; // 1h / 24h / 7d
+  int32 limit = 2;
+}
+
+message HotSymbol {
+  string symbol = 1;
+  int32 post_count = 2;
+  int32 signal_count = 3;
+  int32 engagement_count = 4;
+}
+
+message ListHotSymbolsResponse {
+  repeated HotSymbol symbols = 1;
+}

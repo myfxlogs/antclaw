@@ -12,7 +12,9 @@ service FeedService {
   rpc LikePost(LikePostRequest) returns (Post);
   rpc UnlikePost(UnlikePostRequest) returns (Post);
   rpc CommentOnPost(CommentRequest) returns (Comment);
+  rpc ListComments(ListCommentsRequest) returns (ListCommentsResponse);
   rpc SharePost(SharePostRequest) returns (Post);
+  rpc ListUserPosts(ListUserPostsRequest) returns (FeedResponse);
 }
 
 message Post {
@@ -20,7 +22,7 @@ message Post {
   string author_id = 2;
   string author_name = 3;
   string content = 4;
-  string post_type = 5;       // text / signal_card / chart_share
+  string post_type = 5;       // text / signal_card / chart_share / share
   string signal_pair = 6;     // optional, for signal_card
   string signal_direction = 7;
   int32 signal_confidence = 8;
@@ -31,6 +33,7 @@ message Post {
   int32 share_count = 13;
   repeated string liked_by = 14;
   int64 created_at = 15;
+  string original_post_id = 16; // for share / quote
 }
 
 message CreatePostRequest {
@@ -45,8 +48,8 @@ message CreatePostRequest {
 
 message GetFeedRequest {
   string cursor = 1;
-  int32 page_size = 2;   // default 20
-  string filter = 3;     // all / signals_only / posts_only
+  int32 page_size = 2;   // default 20, max 50
+  string filter = 3;     // all / signals_only / posts_only / shares
 }
 
 message FeedResponse {
@@ -66,14 +69,34 @@ message Comment {
   string author_name = 4;
   string content = 5;
   int64 created_at = 6;
+  string parent_comment_id = 7;
 }
 
 message CommentRequest {
   string post_id = 1;
   string content = 2;
+  string parent_comment_id = 3;
+}
+
+message ListCommentsRequest {
+  string post_id = 1;
+  string cursor = 2;
+  int32 page_size = 3;   // default 50, max 100
+}
+
+message ListCommentsResponse {
+  repeated Comment comments = 1;
+  string next_cursor = 2;
 }
 
 message SharePostRequest {
   string post_id = 1;
   string comment = 2;    // optional quote
+}
+
+message ListUserPostsRequest {
+  string user_id = 1;
+  string cursor = 2;
+  int32 page_size = 3;   // default 20, max 50
+  string filter = 4;     // all / signals_only / posts_only / shares
 }

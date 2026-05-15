@@ -138,19 +138,29 @@ func userNotificationsSSE(rdb *redisv9.Client, pt *presence.Tracker) http.Handle
 		channel := "user:" + userID + ":notifications"
 		ctx := r.Context()
 		pubsub := rdb.Subscribe(ctx, channel)
-		defer pubsub.Close()
+		defer func() {
+			pubsub.Close()
+			log.Printf("SSE notifications: redis unsubscribed user=%s channel=%s", userID, channel)
+		}()
+		// Wait for subscription confirmation
+		if _, err := pubsub.Receive(ctx); err != nil {
+			log.Printf("SSE notifications: redis subscribe error user=%s channel=%s err=%v", userID, channel, err)
+			return
+		}
 		ch := pubsub.Channel()
 		heartbeat := time.NewTicker(15 * time.Second)
 		defer heartbeat.Stop()
 		for {
 			select {
 			case <-ctx.Done():
+				log.Printf("SSE notifications: context done user=%s reason=%v", userID, ctx.Err())
 				return
 			case <-heartbeat.C:
 				fmt.Fprintf(w, ": ping %d\n\n", time.Now().Unix())
 				flusher.Flush()
 			case m, ok := <-ch:
 				if !ok {
+					log.Printf("SSE notifications: redis channel closed user=%s", userID)
 					return
 				}
 				fmt.Fprintf(w, "event: notification\ndata: %s\n\n", m.Payload)

@@ -31,6 +31,7 @@ message TraderProfile {
   int32 follower_count = 13;
   int32 following_count = 14;
   int64 created_at = 15;
+  bool is_following = 16;      // Whether the current user follows this trader
 }
 
 message GetTraderProfileRequest { string user_id = 1; }

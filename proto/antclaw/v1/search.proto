@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/alfq_feed.proto";
+
+// SearchService provides cross-entity search (P1).
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResponse);
+}
+
+message SearchRequest {
+  string query = 1;
+  string cursor = 2;
+  int32 page_size = 3;
+  repeated string scopes = 4; // users / posts / symbols
+}
+
+message SearchResponse {
+  repeated UserSearchResult users = 1;
+  repeated Post posts = 2;
+  repeated SymbolSearchResult symbols = 3;
+  string next_cursor = 4;
+}
+
+message UserSearchResult {
+  string user_id = 1;
+  string display_name = 2;
+  string tier = 3;
+  int32 follower_count = 4;
+}
+
+message SymbolSearchResult {
+  string symbol = 1;
+  string display_name = 2;
+  string market = 3;
+}

@@ -15,12 +15,30 @@ RUN cd backend && go mod download 2>/dev/null || true
 
 COPY backend/ ./backend/
 
-# Build all binaries
+# Build all binaries with version info from ldflags
+ARG VERSION=0.1.0
+ARG GIT_COMMIT=dev
+ARG PROTO_VERSION=1.0.0
+ARG MIN_CLIENT_VERSION=1.0.0
 WORKDIR /app/backend
-RUN go build -o ../bin/antclaw-api ./cmd/antclaw-api
-RUN go build -o ../bin/antclaw-worker ./cmd/antclaw-worker
-RUN go build -o ../bin/antclaw-backtest-runner ./cmd/antclaw-backtest-runner
-RUN go build -o ../bin/antclaw-cli ./cmd/antclaw-cli
+RUN go build -ldflags "\
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT} \
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.ProtoVersion=${PROTO_VERSION} \
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.MinClientVersion=${MIN_CLIENT_VERSION}" \
+  -o ../bin/antclaw-api ./cmd/antclaw-api
+RUN go build -ldflags "\
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT}" \
+  -o ../bin/antclaw-worker ./cmd/antclaw-worker
+RUN go build -ldflags "\
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT}" \
+  -o ../bin/antclaw-backtest-runner ./cmd/antclaw-backtest-runner
+RUN go build -ldflags "\
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
+  -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT}" \
+  -o ../bin/antclaw-cli ./cmd/antclaw-cli
 
 # Final stage
 FROM alpine:3.19
