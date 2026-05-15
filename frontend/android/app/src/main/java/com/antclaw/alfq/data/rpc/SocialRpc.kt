@@ -12,13 +12,21 @@ import com.google.protobuf.MessageLite
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Feed RPC 客户端 — FeedService。
- */
+/** 公共 RPC 基类 — 封装 Connect unary 调用，消除子类重复。 */
+abstract class BaseRpcClient(protected val client: ProtocolClientInterface) {
+    @Suppress("UNCHECKED_CAST")
+    protected suspend inline fun <reified Req : MessageLite, reified Res : MessageLite> unary(
+        method: String, req: Req, reqClass: kotlin.reflect.KClass<Req>, resClass: kotlin.reflect.KClass<Res>,
+    ): Res {
+        val spec = MethodSpec("antclaw.v1.$method", reqClass, resClass, StreamType.UNARY)
+        return client.unary(req, emptyMap(), spec).getOrThrow() as Res
+    }
+}
+
+// ══════ FeedService ══════
+
 @Singleton
-class FeedRpc @Inject constructor(
-    private val client: ProtocolClientInterface,
-) {
+class FeedRpc @Inject constructor(client: ProtocolClientInterface) : BaseRpcClient(client) {
     suspend fun getFeed(cursor: String = "", pageSize: Int = 20, filter: String = "all") =
         unary("FeedService/GetFeed",
             AlfqFeed.GetFeedRequest.newBuilder().setCursor(cursor).setPageSize(pageSize).setFilter(filter).build(),
@@ -30,8 +38,7 @@ class FeedRpc @Inject constructor(
             AlfqFeed.GetPostRequest::class, AlfqFeed.Post::class)
 
     suspend fun createPost(req: AlfqFeed.CreatePostRequest) =
-        unary("FeedService/CreatePost", req,
-            AlfqFeed.CreatePostRequest::class, AlfqFeed.Post::class)
+        unary("FeedService/CreatePost", req, AlfqFeed.CreatePostRequest::class, AlfqFeed.Post::class)
 
     suspend fun likePost(postId: String) =
         unary("FeedService/LikePost",
@@ -44,8 +51,7 @@ class FeedRpc @Inject constructor(
             AlfqFeed.UnlikePostRequest::class, AlfqFeed.Post::class)
 
     suspend fun commentOnPost(req: AlfqFeed.CommentRequest) =
-        unary("FeedService/CommentOnPost", req,
-            AlfqFeed.CommentRequest::class, AlfqFeed.Comment::class)
+        unary("FeedService/CommentOnPost", req, AlfqFeed.CommentRequest::class, AlfqFeed.Comment::class)
 
     suspend fun listComments(postId: String, cursor: String = "", pageSize: Int = 50) =
         unary("FeedService/ListComments",
@@ -61,23 +67,12 @@ class FeedRpc @Inject constructor(
         unary("FeedService/ListUserPosts",
             AlfqFeed.ListUserPostsRequest.newBuilder().setUserId(userId).setCursor(cursor).setPageSize(pageSize).setFilter(filter).build(),
             AlfqFeed.ListUserPostsRequest::class, AlfqFeed.FeedResponse::class)
-
-    @Suppress("UNCHECKED_CAST")
-    private suspend inline fun <reified Req : MessageLite, reified Res : MessageLite> unary(
-        method: String, req: Req, reqClass: kotlin.reflect.KClass<Req>, resClass: kotlin.reflect.KClass<Res>,
-    ): Res {
-        val spec = MethodSpec("antclaw.v1.$method", reqClass, resClass, StreamType.UNARY)
-        return client.unary(req, emptyMap(), spec).getOrThrow() as Res
-    }
 }
 
-/**
- * Profile RPC 客户端 — TraderService。
- */
+// ══════ TraderService ══════
+
 @Singleton
-class ProfileRpc @Inject constructor(
-    private val client: ProtocolClientInterface,
-) {
+class ProfileRpc @Inject constructor(client: ProtocolClientInterface) : BaseRpcClient(client) {
     suspend fun getProfile(userId: String) =
         unary("TraderService/GetProfile",
             AlfqTrader.GetTraderProfileRequest.newBuilder().setUserId(userId).build(),
@@ -112,44 +107,22 @@ class ProfileRpc @Inject constructor(
         unary("TraderService/ListRecommendedTraders",
             AlfqTrader.ListRecommendedTradersRequest.newBuilder().setCursor(cursor).setPageSize(pageSize).build(),
             AlfqTrader.ListRecommendedTradersRequest::class, AlfqTrader.UserList::class)
-
-    @Suppress("UNCHECKED_CAST")
-    private suspend inline fun <reified Req : MessageLite, reified Res : MessageLite> unary(
-        method: String, req: Req, reqClass: kotlin.reflect.KClass<Req>, resClass: kotlin.reflect.KClass<Res>,
-    ): Res {
-        val spec = MethodSpec("antclaw.v1.$method", reqClass, resClass, StreamType.UNARY)
-        return client.unary(req, emptyMap(), spec).getOrThrow() as Res
-    }
 }
 
-/**
- * Search RPC 客户端 — SearchService。
- */
+// ══════ SearchService ══════
+
 @Singleton
-class SearchRpc @Inject constructor(
-    private val client: ProtocolClientInterface,
-) {
+class SearchRpc @Inject constructor(client: ProtocolClientInterface) : BaseRpcClient(client) {
     suspend fun search(query: String, cursor: String = "", pageSize: Int = 10, scopes: List<String> = emptyList()) =
         unary("SearchService/Search",
             Search.SearchRequest.newBuilder().setQuery(query).setCursor(cursor).setPageSize(pageSize).addAllScopes(scopes).build(),
             Search.SearchRequest::class, Search.SearchResponse::class)
-
-    @Suppress("UNCHECKED_CAST")
-    private suspend inline fun <reified Req : MessageLite, reified Res : MessageLite> unary(
-        method: String, req: Req, reqClass: kotlin.reflect.KClass<Req>, resClass: kotlin.reflect.KClass<Res>,
-    ): Res {
-        val spec = MethodSpec("antclaw.v1.$method", reqClass, resClass, StreamType.UNARY)
-        return client.unary(req, emptyMap(), spec).getOrThrow() as Res
-    }
 }
 
-/**
- * Trend RPC 客户端 — TrendService。
- */
+// ══════ TrendService ══════
+
 @Singleton
-class TrendRpc @Inject constructor(
-    private val client: ProtocolClientInterface,
-) {
+class TrendRpc @Inject constructor(client: ProtocolClientInterface) : BaseRpcClient(client) {
     suspend fun listTrendingTopics(window: String = "24h", limit: Int = 10) =
         unary("TrendService/ListTrendingTopics",
             Trend.ListTrendingTopicsRequest.newBuilder().setWindow(window).setLimit(limit).build(),
@@ -159,12 +132,4 @@ class TrendRpc @Inject constructor(
         unary("TrendService/ListHotSymbols",
             Trend.ListHotSymbolsRequest.newBuilder().setWindow(window).setLimit(limit).build(),
             Trend.ListHotSymbolsRequest::class, Trend.ListHotSymbolsResponse::class)
-
-    @Suppress("UNCHECKED_CAST")
-    private suspend inline fun <reified Req : MessageLite, reified Res : MessageLite> unary(
-        method: String, req: Req, reqClass: kotlin.reflect.KClass<Req>, resClass: kotlin.reflect.KClass<Res>,
-    ): Res {
-        val spec = MethodSpec("antclaw.v1.$method", reqClass, resClass, StreamType.UNARY)
-        return client.unary(req, emptyMap(), spec).getOrThrow() as Res
-    }
 }
