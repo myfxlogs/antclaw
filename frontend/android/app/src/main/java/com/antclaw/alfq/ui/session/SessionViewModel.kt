@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,6 +34,7 @@ sealed class SessionEvent {
 class SessionViewModel @Inject constructor(
     private val tokenStore: TokenStore,
     private val sseClient: SseClient,
+    private val sessionNotifier: SessionExpiredNotifier,
 ) : ViewModel() {
 
     private val _session = MutableStateFlow(SessionInfo())
@@ -42,6 +44,12 @@ class SessionViewModel @Inject constructor(
     val events: SharedFlow<SessionEvent> = _events.asSharedFlow()
 
     init {
+        // Subscribe to session-expired events from the RPC layer
+        viewModelScope.launch {
+            sessionNotifier.events.collect {
+                if (isAuthenticated()) onSessionExpired()
+            }
+        }
         viewModelScope.launch {
             val (token, userId) = tokenStore.getAccessToken() to tokenStore.getUserId().orEmpty()
             if (token != null && userId.isNotBlank()) {
@@ -51,7 +59,7 @@ class SessionViewModel @Inject constructor(
                 setSession(SessionState.UNAUTHENTICATED)
             }
         }
-        ConnectTransportProvider.init(tokenStore)
+        ConnectTransportProvider.init(tokenStore, sessionNotifier)
     }
 
     fun onLoginSuccess(userId: String, accessToken: String, refreshToken: String, displayName: String = "") {

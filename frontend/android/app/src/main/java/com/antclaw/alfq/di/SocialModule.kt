@@ -3,6 +3,7 @@ package com.antclaw.alfq.di
 import com.antclaw.alfq.data.repository.*
 import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.*
+import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
 import com.antclaw.alfq.data.sse.SseManager
 import com.connectrpc.ProtocolClientInterface

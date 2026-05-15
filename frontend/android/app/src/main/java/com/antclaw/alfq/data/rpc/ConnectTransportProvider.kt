@@ -24,6 +24,7 @@ object ConnectTransportProvider {
 
     private var tokenProvider: (() -> String?)? = null
     private var tokenStore: TokenStore? = null
+    private var sessionExpiredNotifier: com.antclaw.alfq.data.session.SessionExpiredNotifier? = null
 
     // ── Single-flight refresh ──
     private val refreshLock = Any()
@@ -80,8 +81,9 @@ object ConnectTransportProvider {
         )
     }
 
-    fun init(tokenStore: TokenStore) {
+    fun init(tokenStore: TokenStore, notifier: com.antclaw.alfq.data.session.SessionExpiredNotifier? = null) {
         this.tokenStore = tokenStore
+        this.sessionExpiredNotifier = notifier
         val persistedToken = runBlocking { tokenStore.getAccessToken() }
         if (persistedToken != null) {
             tokenProvider = { runBlocking { tokenStore.getAccessToken() } }
@@ -148,6 +150,7 @@ object ConnectTransportProvider {
                 } catch (_: Exception) {
                     clearToken()
                     store.clearTokens()
+                    sessionExpiredNotifier?.notifySessionExpired()
                     null
                 }
             }
