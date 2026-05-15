@@ -33,6 +33,7 @@ fun FeedScreen(
     notificationCount: Int = 0,
     onSignalClick: (pair: String) -> Unit = {},
     onPostClick: (postId: String) -> Unit = {},
+    onAuthorClick: (userId: String) -> Unit = {},
     onNotificationClick: () -> Unit = {},
     onSearchClick: () -> Unit = {},
 ) {
@@ -74,6 +75,7 @@ fun FeedScreen(
                 onRetry = { viewModel.load() },
                 onAppendRetry = { viewModel.loadMore() },
                 onPostClick = onPostClick,
+                onAuthorClick = onAuthorClick,
                 onLikeClick = { viewModel.toggleLike(it) },
                 onShareClick = { viewModel.sharePost(it) },
             )
@@ -158,6 +160,7 @@ private fun FeedContent(
     onRetry: () -> Unit,
     onAppendRetry: () -> Unit,
     onPostClick: (String) -> Unit,
+    onAuthorClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
 ) {
@@ -194,6 +197,7 @@ private fun FeedContent(
                         onCommentClick = { onPostClick(post.postId) },
                         onShareClick = { onShareClick(post.postId) },
                         onCardClick = { onPostClick(post.postId) },
+                        onAuthorClick = onAuthorClick,
                     )
                 }
                 if (isAppending) {

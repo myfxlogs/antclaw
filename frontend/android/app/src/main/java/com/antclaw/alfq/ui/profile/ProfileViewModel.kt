@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import antclaw.v1.AlfqTrader
 import com.antclaw.alfq.data.rpc.RpcHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.antclaw.alfq.ui.social.UiEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +28,8 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     fun load(userId: String) {
         currentUserId = userId
@@ -48,9 +54,14 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
 
     fun toggleFollow() {
         viewModelScope.launch {
-            val isFollowing = _uiState.value.isFollowing
+            val previous = _uiState.value
+            val willFollow = !previous.isFollowing
+            _uiState.value = previous.copy(
+                isFollowing = willFollow,
+                followerCount = if (willFollow) previous.followerCount + 1 else (previous.followerCount - 1).coerceAtLeast(0),
+            )
             try {
-                if (isFollowing) {
+                if (previous.isFollowing) {
                     val req = AlfqTrader.UnfollowRequest.newBuilder().setTargetUserId(currentUserId).build()
                     val resp = RpcHelper.unary(
                         "antclaw.v1.TraderService/Unfollow", req,
@@ -63,7 +74,10 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                         AlfqTrader.FollowRequest::class, AlfqTrader.FollowResponse::class)
                     _uiState.value = _uiState.value.copy(isFollowing = true, followerCount = resp.followerCount)
                 }
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                _uiState.value = previous
+                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "关注操作失败，已回滚"))
+            }
         }
     }
 }

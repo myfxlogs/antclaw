@@ -23,6 +23,7 @@ class TokenStore @Inject constructor(
 ) {
     companion object {
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
+        private val KEY_USER_ID = stringPreferencesKey("user_id")
         private const val ENCRYPTED_PREFS_FILE_NAME = "alfq_encrypted_tokens"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
     }
@@ -41,9 +42,10 @@ class TokenStore @Inject constructor(
         )
     }
 
-    suspend fun saveTokens(accessToken: String, refreshToken: String) {
+    suspend fun saveTokens(accessToken: String, refreshToken: String, userId: String = "") {
         context.dataStore.edit { prefs ->
             prefs[KEY_ACCESS_TOKEN] = accessToken
+            if (userId.isNotBlank()) prefs[KEY_USER_ID] = userId
         }
         encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, refreshToken).apply()
     }
@@ -60,6 +62,10 @@ class TokenStore @Inject constructor(
 
     suspend fun getRefreshToken(): String? {
         return encryptedPrefs.getString(KEY_REFRESH_TOKEN, null)
+    }
+
+    suspend fun getUserId(): String? {
+        return context.dataStore.data.map { it[KEY_USER_ID] }.first()
     }
 
     suspend fun clearTokens() {

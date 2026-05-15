@@ -1,6 +1,7 @@
 package com.antclaw.alfq.di
 
 import com.antclaw.alfq.data.repository.SocialRepository
+import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.SocialRpc
 import com.connectrpc.ProtocolClientInterface
 import dagger.Module
@@ -19,5 +20,5 @@ object SocialModule {
 
     @Provides
     @Singleton
-    fun provideSocialRepository(rpc: SocialRpc): SocialRepository = SocialRepository(rpc)
+    fun provideSocialRepository(rpc: SocialRpc, tokenStore: TokenStore): SocialRepository = SocialRepository(rpc, tokenStore)
 }

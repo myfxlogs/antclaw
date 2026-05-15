@@ -46,7 +46,7 @@ class AuthRepository @Inject constructor(
             val accessToken = resp.accessToken
             val refreshToken = resp.refreshToken
             ConnectTransportProvider.setToken(accessToken)
-            tokenStore.saveTokens(accessToken, refreshToken)
+            tokenStore.saveTokens(accessToken, refreshToken, resp.userId)
             onLoginSuccess()
             Result.success(accessToken)
         } catch (e: Exception) {
@@ -77,7 +77,7 @@ class AuthRepository @Inject constructor(
             val res: ResponseMessage<Auth.RegisterResponse> = client.unary(request, emptyMap(), spec)
             val resp = res.getOrThrow()
             ConnectTransportProvider.setToken(resp.accessToken)
-            tokenStore.saveTokens(resp.accessToken, resp.refreshToken)
+            tokenStore.saveTokens(resp.accessToken, resp.refreshToken, resp.userId)
             onLoginSuccess()
             Result.success(resp.accessToken)
         } catch (e: Exception) {

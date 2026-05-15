@@ -1,6 +1,7 @@
 package com.antclaw.alfq.data.repository
 
 import antclaw.v1.AlfqFeed
+import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.SocialRpc
 import com.antclaw.alfq.ui.social.CommentUi
 import com.antclaw.alfq.ui.social.PostType
@@ -17,12 +18,14 @@ import javax.inject.Singleton
 @Singleton
 class SocialRepository @Inject constructor(
     private val rpc: SocialRpc,
+    private val tokenStore: TokenStore,
 ) {
     // ── Feed ──
 
     suspend fun getFeed(cursor: String = "", pageSize: Int = 20, filter: String = "all"): Pair<List<PostUi>, String?> {
         val resp = rpc.getFeed(cursor, pageSize, filter)
-        val posts = resp.postsList.map { it.toPostUi() }
+        val currentUserId = tokenStore.getUserId().orEmpty()
+        val posts = resp.postsList.map { it.toPostUi(currentUserId) }
         val nextCursor = resp.nextCursor.ifEmpty { null }
         return posts to nextCursor
     }
@@ -30,7 +33,7 @@ class SocialRepository @Inject constructor(
     // ── Post ──
 
     suspend fun getPost(postId: String): PostUi =
-        rpc.getPost(postId).toPostUi()
+        rpc.getPost(postId).toPostUi(tokenStore.getUserId().orEmpty())
 
     suspend fun createPost(content: String, signalPair: String = "", signalDirection: String = "",
                            signalConfidence: Int = 0, visibility: String = "public"): PostUi {
@@ -42,16 +45,16 @@ class SocialRepository @Inject constructor(
             .setSignalConfidence(signalConfidence)
             .setVisibility(visibility)
             .build()
-        return rpc.createPost(req).toPostUi()
+        return rpc.createPost(req).toPostUi(tokenStore.getUserId().orEmpty())
     }
 
     // ── Like / Unlike ──
 
     suspend fun likePost(postId: String): PostUi =
-        rpc.likePost(postId).toPostUi()
+        rpc.likePost(postId).toPostUi(tokenStore.getUserId().orEmpty())
 
     suspend fun unlikePost(postId: String): PostUi =
-        rpc.unlikePost(postId).toPostUi()
+        rpc.unlikePost(postId).toPostUi(tokenStore.getUserId().orEmpty())
 
     // ── Comment ──
 
@@ -61,11 +64,11 @@ class SocialRepository @Inject constructor(
     // ── Share ──
 
     suspend fun sharePost(postId: String, comment: String = ""): PostUi =
-        rpc.sharePost(postId, comment).toPostUi()
+        rpc.sharePost(postId, comment).toPostUi(tokenStore.getUserId().orEmpty())
 
     // ── Proto → UI Mapping ──
 
-    private fun AlfqFeed.Post.toPostUi(): PostUi = PostUi(
+    private fun AlfqFeed.Post.toPostUi(currentUserId: String): PostUi = PostUi(
         postId = id,
         authorId = authorId,
         authorName = authorName,
@@ -80,7 +83,7 @@ class SocialRepository @Inject constructor(
         likeCount = likeCount,
         commentCount = commentCount,
         shareCount = shareCount,
-        isLiked = false, // resolved by ViewModel against current user
+        isLiked = currentUserId.isNotBlank() && likedByList.contains(currentUserId),
         createdAt = Instant.ofEpochSecond(createdAt),
     )
 

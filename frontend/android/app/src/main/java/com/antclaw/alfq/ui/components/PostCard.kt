@@ -2,6 +2,7 @@ package com.antclaw.alfq.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -36,6 +37,7 @@ fun PostCard(
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onCardClick: () -> Unit = {},
+    onAuthorClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -44,7 +46,7 @@ fun PostCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
         Column(modifier = Modifier.padding(SpacingMd)) {
-            PostHeader(post.authorName, post.createdAt.timeAgo(), post.visibility)
+            PostHeader(post.authorId, post.authorName, post.createdAt.timeAgo(), post.visibility, onAuthorClick)
             Spacer(modifier = Modifier.height(SpacingSm))
             PostBody(post)
             Spacer(modifier = Modifier.height(SpacingMd))
@@ -56,10 +58,16 @@ fun PostCard(
 // ── Sub-composables ──
 
 @Composable
-private fun PostHeader(authorName: String, timeAgo: String, visibility: PostVisibility) {
+private fun PostHeader(
+    authorId: String,
+    authorName: String,
+    timeAgo: String,
+    visibility: PostVisibility,
+    onAuthorClick: (String) -> Unit,
+) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Surface(
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(36.dp).clickable { onAuthorClick(authorId) },
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
         ) {
@@ -69,7 +77,7 @@ private fun PostHeader(authorName: String, timeAgo: String, visibility: PostVisi
             }
         }
         Spacer(modifier = Modifier.width(SpacingSm))
-        Column {
+        Column(modifier = Modifier.clickable { onAuthorClick(authorId) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(authorName, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 if (visibility != PostVisibility.PUBLIC) {

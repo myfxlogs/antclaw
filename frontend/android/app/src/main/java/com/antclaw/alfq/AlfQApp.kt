@@ -95,7 +95,9 @@ fun MainContent(onLogout: () -> Unit) {
         ) {
             composable("feed") {
                 FeedScreen(
+                    notificationCount = notifState.unreadCount,
                     onPostClick = { postId -> navController.navigate("postDetail/$postId") },
+                    onAuthorClick = { userId -> navController.navigate("profile/$userId") },
                     onNotificationClick = { navController.navigate("notifications") },
                     onSearchClick = { navController.navigate("discover") },
                 )
@@ -105,7 +107,9 @@ fun MainContent(onLogout: () -> Unit) {
             }
             composable("social") {
                 FeedScreen(
+                    notificationCount = notifState.unreadCount,
                     onPostClick = { postId -> navController.navigate("postDetail/$postId") },
+                    onAuthorClick = { userId -> navController.navigate("profile/$userId") },
                     onNotificationClick = { navController.navigate("notifications") },
                     onSearchClick = { navController.navigate("discover") },
                 )

@@ -389,7 +389,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 
 - [ ] 拆分 `AuthManager` 或 `SessionViewModel` 管理登录态。
 - [ ] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。
-- [ ] OkHttpClient 单例复用。
+- [x] OkHttpClient 单例复用。
 - [ ] 401 refresh 串行化，失败后通知 UI 跳登录。
 - [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。
 - [ ] ViewModel 不再直接拼 RPC path。
@@ -398,9 +398,9 @@ Feed 和通知是高频页面，应支持本地缓存：
 
 - [ ] 建立 `FeedRepository` 和 `FeedRpc`。
 - [ ] 建立统一 `FeedItemUiModel`。
-- [ ] 首页支持真实 Tab 状态。
-- [ ] 支持刷新、分页、错误重试。
-- [ ] 点赞/关注操作有乐观更新和失败回滚。
+- [x] 首页支持真实 Tab 状态。
+- [x] 支持刷新、分页、错误重试。
+- [x] 点赞/关注操作有乐观更新和失败回滚。
 - [ ] 帖子详情页展示回复与关联信号。
 
 ### 8.4 测试与验收
