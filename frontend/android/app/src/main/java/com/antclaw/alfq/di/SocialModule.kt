@@ -6,6 +6,8 @@ import com.antclaw.alfq.data.rpc.FeedRpc
 import com.antclaw.alfq.data.rpc.ProfileRpc
 import com.antclaw.alfq.data.rpc.SearchRpc
 import com.antclaw.alfq.data.rpc.TrendRpc
+import com.antclaw.alfq.data.sse.SseClient
+import com.antclaw.alfq.data.sse.SseManager
 import com.connectrpc.ProtocolClientInterface
 import dagger.Module
 import dagger.Provides
@@ -32,6 +34,10 @@ object SocialModule {
     @Provides
     @Singleton
     fun provideTrendRpc(client: ProtocolClientInterface): TrendRpc = TrendRpc(client)
+
+    @Provides
+    @Singleton
+    fun provideSseClient(sseManager: SseManager): SseClient = sseManager
 
     @Provides
     @Singleton
