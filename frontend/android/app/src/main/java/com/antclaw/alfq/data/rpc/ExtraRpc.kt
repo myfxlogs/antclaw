@@ -2,6 +2,7 @@ package com.antclaw.alfq.data.rpc
 
 import antclaw.v1.Alerts
 import antclaw.v1.AlfqChat
+import antclaw.v1.NotificationOuterClass
 import antclaw.v1.Price
 import antclaw.v1.Signals
 import antclaw.v1.UserOuterClass
@@ -61,4 +62,37 @@ class PriceRpc @Inject constructor(client: ProtocolClientInterface) : BaseRpcCli
         unary("PriceService/GetPrice",
             Price.GetPriceRequest.newBuilder().setPair(pair).setTimeframe(timeframe).setCount(count).build(),
             Price.GetPriceRequest::class, Price.GetPriceResponse::class)
+}
+
+/** NotificationService */
+@Singleton
+class NotificationRpc @Inject constructor(client: ProtocolClientInterface) : BaseRpcClient(client) {
+    suspend fun unreadCount() =
+        unary("NotificationService/UnreadCount",
+            NotificationOuterClass.UnreadCountRequest.getDefaultInstance(),
+            NotificationOuterClass.UnreadCountRequest::class, NotificationOuterClass.UnreadCountResponse::class)
+
+    suspend fun listUnread(limit: Int = 100) =
+        unary("NotificationService/ListUnread",
+            NotificationOuterClass.ListUnreadRequest.newBuilder().setLimit(limit).build(),
+            NotificationOuterClass.ListUnreadRequest::class, NotificationOuterClass.ListUnreadResponse::class)
+
+    suspend fun markRead(id: String) =
+        unary("NotificationService/MarkRead",
+            NotificationOuterClass.MarkReadRequest.newBuilder().setId(id).build(),
+            NotificationOuterClass.MarkReadRequest::class, NotificationOuterClass.MarkReadResponse::class)
+
+    suspend fun markAllRead() =
+        unary("NotificationService/MarkAllRead",
+            NotificationOuterClass.MarkAllReadRequest.getDefaultInstance(),
+            NotificationOuterClass.MarkAllReadRequest::class, NotificationOuterClass.MarkAllReadResponse::class)
+
+    suspend fun getAlertPrefs() =
+        unary("NotificationService/GetAlertPrefs",
+            NotificationOuterClass.GetAlertPrefsRequest.getDefaultInstance(),
+            NotificationOuterClass.GetAlertPrefsRequest::class, NotificationOuterClass.GetAlertPrefsResponse::class)
+
+    suspend fun updateAlertPrefs(req: NotificationOuterClass.UpdateAlertPrefsRequest) =
+        unary("NotificationService/UpdateAlertPrefs", req,
+            NotificationOuterClass.UpdateAlertPrefsRequest::class, NotificationOuterClass.UpdateAlertPrefsResponse::class)
 }

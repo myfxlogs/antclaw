@@ -1,5 +1,6 @@
 package com.antclaw.alfq.di
 
+import com.antclaw.alfq.data.notification.NotificationRepository
 import com.antclaw.alfq.data.repository.*
 import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.local.TokenStoreApi
@@ -28,6 +29,7 @@ object SocialModule {
     @Provides @Singleton fun provideUserRpc(c: ProtocolClientInterface): UserRpc = UserRpc(c)
     @Provides @Singleton fun provideSignalRpc(c: ProtocolClientInterface): SignalRpc = SignalRpc(c)
     @Provides @Singleton fun providePriceRpc(c: ProtocolClientInterface): PriceRpc = PriceRpc(c)
+    @Provides @Singleton fun provideNotificationRpc(c: ProtocolClientInterface): NotificationRpc = NotificationRpc(c)
 
     // Token
     @Provides @Singleton fun provideTokenStoreApi(store: TokenStore): TokenStoreApi = store
@@ -59,6 +61,10 @@ object SocialModule {
     @Provides @Singleton fun provideDiscoverRepository(
         profile: ProfileRpc, search: SearchRpc, trend: TrendRpc,
     ): DiscoverRepository = DiscoverRepository(profile, search, trend)
+
+    @Provides @Singleton fun provideNotificationRepo(
+        rpc: NotificationRpc,
+    ): NotificationRepository = NotificationRepository(rpc)
 
     @Provides @Singleton fun provideSignalRepository(
         signal: SignalRpc, price: PriceRpc,

@@ -52,6 +52,7 @@ class SseManager @Inject constructor() : SseClient {
     private var eventSource: EventSource? = null
     private var reconnectJob: Job? = null
     private var retryCount = 0
+    private var lastConnectAttempt = 0L // anti-jitter
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     // 原始通知 JSON 流（向后兼容）
@@ -93,6 +94,14 @@ class SseManager @Inject constructor() : SseClient {
     }
 
     private suspend fun connectInternal() {
+        // Anti-jitter: skip if called within 500ms of last attempt
+        val now = System.currentTimeMillis()
+        if (now - lastConnectAttempt < 500) {
+            Log.d(TAG, "connect: skipping (anti-jitter, ${now - lastConnectAttempt}ms since last)")
+            return
+        }
+        lastConnectAttempt = now
+
         val token = ConnectTransportProvider.getToken()
         if (token.isNullOrEmpty()) {
             Log.w(TAG, "connect: no token available, skipping SSE")
