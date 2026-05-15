@@ -4,6 +4,8 @@ import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.data.rpc.FeedRpc
 import com.antclaw.alfq.data.rpc.ProfileRpc
+import com.connectrpc.ProtocolClientInterface
+import io.mockk.mockk
 import com.antclaw.alfq.ui.social.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,8 +89,8 @@ class StubSocialRepo(
     var failLike: Boolean = false,
     var failShare: Boolean = false,
 ) : SocialRepository(
-    FeedRpc(object : com.connectrpc.ProtocolClientInterface {}),
-    ProfileRpc(object : com.connectrpc.ProtocolClientInterface {}),
+    FeedRpc(mockk<ProtocolClientInterface>(relaxed = true)),
+    ProfileRpc(mockk<ProtocolClientInterface>(relaxed = true)),
     null as TokenStore,
 ) {
     override suspend fun getFeed(c: String, ps: Int, f: String) = if (fail) throw RuntimeException("err") else if (c.isEmpty()) posts to cursor else posts to null
