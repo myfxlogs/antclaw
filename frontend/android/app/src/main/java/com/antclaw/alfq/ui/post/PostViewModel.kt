@@ -2,8 +2,7 @@ package com.antclaw.alfq.ui.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import antclaw.v1.AlfqFeed
-import com.antclaw.alfq.data.rpc.SocialRpc
+import com.antclaw.alfq.data.repository.SocialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +25,7 @@ sealed class PostState {
  */
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val socialRpc: SocialRpc,
+    private val repository: SocialRepository,
 ) : ViewModel() {
 
     private val _postState = MutableStateFlow<PostState>(PostState.Idle)
@@ -37,14 +36,7 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             _postState.value = PostState.Loading
             try {
-                socialRpc.createPost(AlfqFeed.CreatePostRequest.newBuilder()
-                    .setContent(content)
-                    .setPostType(if (signalPair.isBlank()) "text" else "signal_card")
-                    .setSignalPair(signalPair)
-                    .setSignalDirection(signalDirection)
-                    .setSignalConfidence(signalConfidence)
-                    .setVisibility(visibility)
-                    .build())
+                repository.createPost(content, signalPair, signalDirection, signalConfidence, visibility)
                 _postState.value = PostState.Success
             } catch (e: Exception) {
                 _postState.value = PostState.Error(e.message ?: "发布失败，请重试")

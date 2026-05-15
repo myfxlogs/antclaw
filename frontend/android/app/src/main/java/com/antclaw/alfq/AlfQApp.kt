@@ -15,8 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.antclaw.alfq.ui.chat.ChatScreen
+import com.antclaw.alfq.ui.feed.FeedScreen
 import com.antclaw.alfq.ui.feed.SignalDetailScreen
-import com.antclaw.alfq.ui.social.SocialFeedScreen
 import com.antclaw.alfq.ui.post.PostDetailScreen
 import com.antclaw.alfq.ui.discover.DiscoverScreen
 import com.antclaw.alfq.ui.post.PostScreen
@@ -94,18 +94,20 @@ fun MainContent(onLogout: () -> Unit) {
             modifier = Modifier.padding(padding),
         ) {
             composable("feed") {
-                SocialFeedScreen(
+                FeedScreen(
                     onPostClick = { postId -> navController.navigate("postDetail/$postId") },
-                    onPostCreate = { navController.navigate("post") },
+                    onNotificationClick = { navController.navigate("notifications") },
+                    onSearchClick = { navController.navigate("discover") },
                 )
             }
             composable("discover") {
                 DiscoverScreen(onTraderClick = { userId -> navController.navigate("profile/$userId") })
             }
             composable("social") {
-                SocialFeedScreen(
+                FeedScreen(
                     onPostClick = { postId -> navController.navigate("postDetail/$postId") },
-                    onPostCreate = { navController.navigate("post") },
+                    onNotificationClick = { navController.navigate("notifications") },
+                    onSearchClick = { navController.navigate("discover") },
                 )
             }
             composable(

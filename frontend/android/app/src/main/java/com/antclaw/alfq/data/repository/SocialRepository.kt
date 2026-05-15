@@ -20,8 +20,8 @@ class SocialRepository @Inject constructor(
 ) {
     // ── Feed ──
 
-    suspend fun getFeed(cursor: String = "", pageSize: Int = 20): Pair<List<PostUi>, String?> {
-        val resp = rpc.getFeed(cursor, pageSize)
+    suspend fun getFeed(cursor: String = "", pageSize: Int = 20, filter: String = "all"): Pair<List<PostUi>, String?> {
+        val resp = rpc.getFeed(cursor, pageSize, filter)
         val posts = resp.postsList.map { it.toPostUi() }
         val nextCursor = resp.nextCursor.ifEmpty { null }
         return posts to nextCursor

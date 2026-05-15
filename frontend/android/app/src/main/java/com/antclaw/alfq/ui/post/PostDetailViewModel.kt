@@ -4,9 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.ui.social.CommentUi
+import com.antclaw.alfq.ui.social.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +23,8 @@ class PostDetailViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(PostDetailState())
     val state: StateFlow<PostDetailState> = _state.asStateFlow()
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     fun loadPost(postId: String) {
         viewModelScope.launch {
@@ -35,24 +41,39 @@ class PostDetailViewModel @Inject constructor(
     fun toggleLike() {
         val post = _state.value.post ?: return
         viewModelScope.launch {
+            val willLike = !post.isLiked
+            _state.update {
+                it.copy(post = it.post?.copy(
+                    isLiked = willLike,
+                    likeCount = if (willLike) post.likeCount + 1 else (post.likeCount - 1).coerceAtLeast(0),
+                ))
+            }
             try {
                 val updated = if (post.isLiked) {
                     repository.unlikePost(post.postId)
                 } else {
                     repository.likePost(post.postId)
                 }
-                _state.update { it.copy(post = it.post?.copy(isLiked = !post.isLiked, likeCount = updated.likeCount)) }
-            } catch (_: Exception) { }
+                _state.update { it.copy(post = it.post?.copy(likeCount = updated.likeCount)) }
+            } catch (e: Exception) {
+                android.util.Log.e("PostDetail", "Like/unlike failed: ${e.message}", e)
+                _state.update { it.copy(post = post) }
+                _uiEvent.emit(UiEvent.Snackbar("操作失败，已回滚"))
+            }
         }
     }
 
     fun sharePost() {
         val post = _state.value.post ?: return
         viewModelScope.launch {
+            _state.update { it.copy(post = it.post?.copy(shareCount = post.shareCount + 1)) }
             try {
                 repository.sharePost(post.postId)
-                _state.update { it.copy(post = it.post?.copy(shareCount = post.shareCount + 1)) }
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                android.util.Log.e("PostDetail", "Share failed: ${e.message}", e)
+                _state.update { it.copy(post = post) }
+                _uiEvent.emit(UiEvent.Snackbar("分享失败"))
+            }
         }
     }
 
@@ -67,7 +88,10 @@ class PostDetailViewModel @Inject constructor(
                         post = it.post?.copy(commentCount = it.post!!.commentCount + 1),
                     )
                 }
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                android.util.Log.e("PostDetail", "Send comment failed: ${e.message}", e)
+                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "评论失败"))
+            }
         }
     }
 }

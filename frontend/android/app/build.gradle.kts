@@ -8,6 +8,7 @@ plugins {
 }
 
 import java.util.Properties
+import com.google.protobuf.gradle.*
 
 android {
     namespace = "com.antclaw.alfq"
@@ -78,6 +79,14 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    sourceSets {
+        getByName("main") {
+            proto {
+                srcDir("../../../proto")
+            }
+        }
     }
 }
 

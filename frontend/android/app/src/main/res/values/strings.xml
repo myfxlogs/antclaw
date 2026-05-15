@@ -36,6 +36,7 @@
     <string name="feed_tab_hot">Hot</string>
     <string name="feed_tab_recommended">Recommended</string>
     <string name="feed_tab_signals">Signals</string>
+    <string name="feed_tab_latest">Latest</string>
     <string name="feed_tab_following">Following</string>
     <string name="feed_empty_title">Follow traders for real-time signals</string>
     <string name="feed_empty_action">Go Discover</string>

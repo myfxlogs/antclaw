@@ -129,14 +129,7 @@ class DeviceInfoCollector @Inject constructor(
 
     // 获取显示指标
     private fun getDisplayMetrics(): DisplayMetrics {
-        val displayMetrics = DisplayMetrics()
-        return try {
-            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-                .defaultDisplay.getMetrics(displayMetrics)
-            displayMetrics
-        } catch (_: Exception) {
-            displayMetrics
-        }
+        return context.resources.displayMetrics
     }
 
     // 获取设备类型

@@ -7,11 +7,11 @@ Generates optimized launcher icons for all Android screen densities
 from PIL import Image, ImageOps
 import os
 
-# Source image path
-source_path = "AlfQ app logo设计.png"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
 
-# Target directory
-target_dir = "/home/mluser/code/antclaw/frontend/android/app/src/main/res"
+source_path = os.path.join(project_dir, "design-assets", "AlfQ app logo设计.png")
+target_dir = os.path.join(project_dir, "app", "src", "main", "res")
 
 # Android mipmap densities and their sizes
 # Using square icons as per Android guidelines

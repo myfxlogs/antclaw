@@ -1,10 +1,9 @@
 package com.antclaw.alfq.ui.feed
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -18,8 +17,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antclaw.alfq.R
-import com.antclaw.alfq.ui.components.SignalCard
+import com.antclaw.alfq.ui.components.PostCard
+import com.antclaw.alfq.ui.social.PostUi
+import com.antclaw.alfq.ui.social.UiEvent
 import com.antclaw.alfq.ui.theme.*
 
 // ── FeedScreen (≤60 lines) ──
@@ -30,21 +32,52 @@ fun FeedScreen(
     viewModel: FeedViewModel = hiltViewModel(),
     notificationCount: Int = 0,
     onSignalClick: (pair: String) -> Unit = {},
+    onPostClick: (postId: String) -> Unit = {},
     onNotificationClick: () -> Unit = {},
     onSearchClick: () -> Unit = {},
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        FeedTopBar(notificationCount, onSearchClick, onNotificationClick)
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-        FeedTabs()
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-        if (state.signalBar.isNotEmpty()) {
-            SignalBar(state.signalBar, onSignalClick)
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.Snackbar) snackbarHostState.showSnackbar(event.message)
         }
-        FeedContent(state.cards, state.loading, state.error, onRetry = { viewModel.load() }, onSignalClick)
+    }
+
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            totalItems > 0 && lastVisible >= totalItems - 3 && state.hasMore && !state.isAppending
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) viewModel.loadMore()
+    }
+
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+            FeedTopBar(notificationCount, onSearchClick, onNotificationClick)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+            FeedTabs(state.currentTab, onTabClick = { viewModel.load(it) })
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+            FeedContent(
+                posts = state.posts,
+                isLoading = state.isLoading,
+                isAppending = state.isAppending,
+                error = state.error,
+                appendError = state.appendError,
+                listState = listState,
+                onRetry = { viewModel.load() },
+                onAppendRetry = { viewModel.loadMore() },
+                onPostClick = onPostClick,
+                onLikeClick = { viewModel.toggleLike(it) },
+                onShareClick = { viewModel.sharePost(it) },
+            )
+        }
     }
 }
 
@@ -80,34 +113,56 @@ private fun FeedTopBar(notificationCount: Int, onSearch: () -> Unit, onNotify: (
 }
 
 @Composable
-private fun FeedTabs() {
+private fun FeedTabs(currentTab: HomeFeedTab, onTabClick: (HomeFeedTab) -> Unit) {
+    val tabs = HomeFeedTab.entries
     ScrollableTabRow(
-        selectedTabIndex = 0,
+        selectedTabIndex = currentTab.ordinal,
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         edgePadding = SpacingMd,
         indicator = { tabPositions ->
             TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
+                modifier = Modifier.tabIndicatorOffset(tabPositions[currentTab.ordinal]),
                 color = MaterialTheme.colorScheme.primary
             )
         },
         modifier = Modifier.shadow(2.dp)
     ) {
-        Tab(selected = true, onClick = {}, text = { Text(stringResource(R.string.feed_tab_hot), fontWeight = FontWeight.Bold) })
-        Tab(selected = false, onClick = {}, text = { Text(stringResource(R.string.feed_tab_recommended), fontWeight = FontWeight.Normal) })
-        Tab(selected = false, onClick = {}, text = { Text(stringResource(R.string.feed_tab_signals), fontWeight = FontWeight.Normal) })
-        Tab(selected = false, onClick = {}, text = { Text(stringResource(R.string.feed_tab_following), fontWeight = FontWeight.Normal) })
+        tabs.forEach { tab ->
+            Tab(
+                selected = currentTab == tab,
+                onClick = { onTabClick(tab) },
+                text = {
+                    Text(
+                        text = when (tab) {
+                            HomeFeedTab.RECOMMENDED -> stringResource(R.string.feed_tab_recommended)
+                            HomeFeedTab.SIGNALS -> stringResource(R.string.feed_tab_signals)
+                            HomeFeedTab.LATEST -> stringResource(R.string.feed_tab_latest)
+                        },
+                        fontWeight = if (currentTab == tab) FontWeight.Bold else FontWeight.Normal,
+                    )
+                },
+            )
+        }
     }
 }
 
 @Composable
 private fun FeedContent(
-    cards: List<FeedCard>, loading: Boolean, error: String?,
-    onRetry: () -> Unit, onSignalClick: (String) -> Unit,
+    posts: List<PostUi>,
+    isLoading: Boolean,
+    isAppending: Boolean,
+    error: String?,
+    appendError: String?,
+    listState: androidx.compose.foundation.lazy.LazyListState,
+    onRetry: () -> Unit,
+    onAppendRetry: () -> Unit,
+    onPostClick: (String) -> Unit,
+    onLikeClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
 ) {
     when {
-        loading ->
+        isLoading && posts.isEmpty() ->
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         error != null ->
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -117,7 +172,7 @@ private fun FeedContent(
                     TextButton(onClick = onRetry) { Text(stringResource(R.string.feed_retry)) }
                 }
             }
-        cards.isEmpty() ->
+        posts.isEmpty() ->
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.feed_empty_title), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -127,45 +182,34 @@ private fun FeedContent(
             }
         else ->
             LazyColumn(
-                Modifier.fillMaxSize(),
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = SpacingMd, vertical = SpacingSm),
                 verticalArrangement = Arrangement.spacedBy(SpacingMd),
             ) {
-                items(cards, key = { it.id }) { card ->
-                    SignalCard(card, onDetailClick = { card.pair?.let { onSignalClick(it) } })
+                items(posts, key = { it.postId }) { post ->
+                    PostCard(
+                        post = post,
+                        onLikeClick = { onLikeClick(post.postId) },
+                        onCommentClick = { onPostClick(post.postId) },
+                        onShareClick = { onShareClick(post.postId) },
+                        onCardClick = { onPostClick(post.postId) },
+                    )
+                }
+                if (isAppending) {
+                    item {
+                        Box(Modifier.fillMaxWidth().padding(vertical = SpacingMd), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        }
+                    }
+                }
+                if (appendError != null) {
+                    item {
+                        TextButton(onClick = onAppendRetry, modifier = Modifier.fillMaxWidth()) {
+                            Text(stringResource(R.string.feed_retry))
+                        }
+                    }
                 }
             }
-    }
-}
-
-@Composable
-private fun SignalBar(items: List<SignalBarItem>, onSignalClick: (String) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
-            .padding(horizontal = SpacingMd, vertical = SpacingSm),
-        horizontalArrangement = Arrangement.spacedBy(SpacingSm),
-    ) {
-        items.forEach { item -> SignalChip(item, onClick = { onSignalClick(item.pair) }) }
-    }
-}
-
-@Composable
-fun SignalChip(item: SignalBarItem, onClick: () -> Unit) {
-    val textColor = when (item.direction) {
-        "bullish" -> BullGreen; "bearish" -> BearRed
-        else -> MaterialTheme.colorScheme.onSurface
-    }
-    val directionIcon = when (item.direction) {
-        "bullish" -> stringResource(R.string.direction_bullish)
-        "bearish" -> stringResource(R.string.direction_bearish)
-        else -> stringResource(R.string.direction_neutral)
-    }
-    Surface(onClick = onClick, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant) {
-        Column(Modifier.padding(horizontal = SpacingSm, vertical = SpacingXs),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(item.pair, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = textColor)
-            Text("$directionIcon ${item.confidence}%", style = MaterialTheme.typography.labelMedium, color = textColor)
-            Text(item.price, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-        }
     }
 }

@@ -7,8 +7,11 @@ For Android 8.0 (API 26) and above
 from PIL import Image, ImageDraw
 import os
 
-source_path = "/home/mluser/code/antclaw/frontend/android/app/src/main/res/drawable/ic_launcher_display.png"
-target_dir = "/home/mluser/code/antclaw/frontend/android/app/src/main/res"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
+
+target_dir = os.path.join(project_dir, "app", "src", "main", "res")
+source_path = os.path.join(target_dir, "drawable", "ic_launcher_display.png")
 
 # Adaptive icon sizes (108dp with 18dp safe zone = 72dp foreground)
 # Final icon canvas: 108x108, Foreground safe zone: 72x72

@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antclaw.alfq.ui.components.PostCard
 import com.antclaw.alfq.ui.social.CommentSection
 import com.antclaw.alfq.ui.social.CommentUi
+import com.antclaw.alfq.ui.social.UiEvent
 import com.antclaw.alfq.ui.theme.SpacingMd
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,10 +23,17 @@ fun PostDetailScreen(
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(postId) { viewModel.loadPost(postId) }
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.Snackbar) snackbarHostState.showSnackbar(event.message)
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Post", fontWeight = FontWeight.Bold) },

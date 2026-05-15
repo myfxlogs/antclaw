@@ -24,6 +24,53 @@ object ConnectTransportProvider {
 
     private var tokenProvider: (() -> String?)? = null
     private var tokenStore: TokenStore? = null
+    private val noAuthOkHttpClient by lazy { OkHttpClient() }
+    private val authOkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val token = tokenProvider?.invoke()
+                val request = if (token != null) {
+                    chain.request().newBuilder()
+                        .header("Authorization", "Bearer $token").build()
+                } else chain.request()
+
+                val response: Response = try {
+                    chain.proceed(request)
+                } catch (e: IOException) { throw e }
+
+                if (response.code == 401) {
+                    response.close()
+                    val newToken = refreshToken()
+                    if (newToken != null) {
+                        val retryRequest = chain.request().newBuilder()
+                            .header("Authorization", "Bearer $newToken").build()
+                        chain.proceed(retryRequest)
+                    } else {
+                        chain.proceed(request)
+                    }
+                } else {
+                    response
+                }
+            }.build()
+    }
+    private val noAuthProtocolClient: ProtocolClientInterface by lazy {
+        ProtocolClient(
+            httpClient = ConnectOkHttpClient(unaryClient = noAuthOkHttpClient),
+            config = ProtocolClientConfig(
+                host = baseUrl,
+                serializationStrategy = GoogleJavaProtobufStrategy(),
+            ),
+        )
+    }
+    private val authProtocolClient: ProtocolClientInterface by lazy {
+        ProtocolClient(
+            httpClient = ConnectOkHttpClient(unaryClient = authOkHttpClient),
+            config = ProtocolClientConfig(
+                host = baseUrl,
+                serializationStrategy = GoogleJavaProtobufStrategy(),
+            ),
+        )
+    }
 
     fun init(tokenStore: TokenStore) {
         this.tokenStore = tokenStore
@@ -66,55 +113,11 @@ object ConnectTransportProvider {
     }
 
     /** 创建不带 Auth 头的 client（用于 refresh/healthz 等公共接口）。 */
-    private fun createProtocolClientNoAuth(): ProtocolClientInterface {
-        return ProtocolClient(
-            httpClient = ConnectOkHttpClient(unaryClient = OkHttpClient()),
-            config = ProtocolClientConfig(
-                host = baseUrl,
-                serializationStrategy = GoogleJavaProtobufStrategy(),
-            ),
-        )
-    }
+    private fun createProtocolClientNoAuth(): ProtocolClientInterface = noAuthProtocolClient
 
-    fun create(): ConnectOkHttpClient {
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val token = tokenProvider?.invoke()
-                val request = if (token != null) {
-                    chain.request().newBuilder()
-                        .header("Authorization", "Bearer $token").build()
-                } else chain.request()
+    fun create(): ConnectOkHttpClient = ConnectOkHttpClient(unaryClient = authOkHttpClient)
 
-                val response: Response = try {
-                    chain.proceed(request)
-                } catch (e: IOException) { throw e }
-
-                if (response.code == 401) {
-                    response.close()
-                    val newToken = refreshToken()
-                    if (newToken != null) {
-                        val retryRequest = chain.request().newBuilder()
-                            .header("Authorization", "Bearer $newToken").build()
-                        chain.proceed(retryRequest)
-                    } else {
-                        chain.proceed(request)
-                    }
-                } else {
-                    response
-                }
-            }.build()
-        return ConnectOkHttpClient(unaryClient = okHttpClient)
-    }
-
-    fun createProtocolClient(): ProtocolClientInterface {
-        return ProtocolClient(
-            httpClient = create(),
-            config = ProtocolClientConfig(
-                host = baseUrl,
-                serializationStrategy = GoogleJavaProtobufStrategy(),
-            ),
-        )
-    }
+    fun createProtocolClient(): ProtocolClientInterface = authProtocolClient
 
     // ===== Healthz =====
 
