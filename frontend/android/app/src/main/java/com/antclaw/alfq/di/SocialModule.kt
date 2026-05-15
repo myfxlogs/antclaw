@@ -2,7 +2,11 @@ package com.antclaw.alfq.di
 
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.data.local.TokenStore
-import com.antclaw.alfq.data.rpc.SocialRpc
+import com.antclaw.alfq.data.rpc.FeedRpc
+import com.antclaw.alfq.data.rpc.ProfileRpc
+import com.antclaw.alfq.data.rpc.NotificationRpc
+import com.antclaw.alfq.data.rpc.SearchRpc
+import com.antclaw.alfq.data.rpc.TrendRpc
 import com.connectrpc.ProtocolClientInterface
 import dagger.Module
 import dagger.Provides
@@ -16,9 +20,29 @@ object SocialModule {
 
     @Provides
     @Singleton
-    fun provideSocialRpc(client: ProtocolClientInterface): SocialRpc = SocialRpc(client)
+    fun provideFeedRpc(client: ProtocolClientInterface): FeedRpc = FeedRpc(client)
 
     @Provides
     @Singleton
-    fun provideSocialRepository(rpc: SocialRpc, tokenStore: TokenStore): SocialRepository = SocialRepository(rpc, tokenStore)
+    fun provideProfileRpc(client: ProtocolClientInterface): ProfileRpc = ProfileRpc(client)
+
+    @Provides
+    @Singleton
+    fun provideNotificationRpc(client: ProtocolClientInterface): NotificationRpc = NotificationRpc(client)
+
+    @Provides
+    @Singleton
+    fun provideSearchRpc(client: ProtocolClientInterface): SearchRpc = SearchRpc(client)
+
+    @Provides
+    @Singleton
+    fun provideTrendRpc(client: ProtocolClientInterface): TrendRpc = TrendRpc(client)
+
+    @Provides
+    @Singleton
+    fun provideSocialRepository(
+        feedRpc: FeedRpc,
+        profileRpc: ProfileRpc,
+        tokenStore: TokenStore,
+    ): SocialRepository = SocialRepository(feedRpc, profileRpc, tokenStore)
 }

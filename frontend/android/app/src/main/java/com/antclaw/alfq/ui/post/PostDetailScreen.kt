@@ -73,6 +73,10 @@ data class PostDetailState(
     val comments: List<CommentUi> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
+    val isLoadingComments: Boolean = false,
+    val isAppendingComments: Boolean = false,
+    val commentError: String? = null,
+    val commentCursor: String? = null,
 )
 
 // ── Shared views ──

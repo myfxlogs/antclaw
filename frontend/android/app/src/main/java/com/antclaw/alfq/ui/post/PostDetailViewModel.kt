@@ -35,6 +35,46 @@ class PostDetailViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message ?: "Failed to load post", isLoading = false) }
             }
+            loadComments(postId)
+        }
+    }
+
+    fun loadComments(postId: String = _state.value.post?.postId ?: return) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoadingComments = true, commentError = null) }
+            try {
+                val (comments, next) = repository.listComments(postId)
+                _state.update {
+                    it.copy(comments = comments, commentCursor = next, isLoadingComments = false)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("PostDetail", "Load comments failed: ${e.message}", e)
+                _state.update { it.copy(commentError = e.message, isLoadingComments = false) }
+            }
+        }
+    }
+
+    fun loadMoreComments() {
+        val state = _state.value
+        val cursor = state.commentCursor ?: return
+        val postId = state.post?.postId ?: return
+        if (state.isAppendingComments) return
+        viewModelScope.launch {
+            _state.update { it.copy(isAppendingComments = true) }
+            try {
+                val (comments, next) = repository.listComments(postId, cursor)
+                _state.update {
+                    it.copy(
+                        comments = it.comments + comments,
+                        commentCursor = next,
+                        isAppendingComments = false,
+                    )
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("PostDetail", "Append comments failed: ${e.message}", e)
+                _state.update { it.copy(isAppendingComments = false) }
+                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "加载更多评论失败"))
+            }
         }
     }
 

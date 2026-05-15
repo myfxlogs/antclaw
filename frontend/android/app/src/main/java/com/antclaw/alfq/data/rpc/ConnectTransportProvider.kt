@@ -13,6 +13,10 @@ import com.connectrpc.extensions.GoogleJavaProtobufStrategy
 import com.connectrpc.getOrThrow
 import com.connectrpc.impl.ProtocolClient
 import com.connectrpc.okhttp.ConnectOkHttpClient
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -22,17 +26,17 @@ object ConnectTransportProvider {
 
     val baseUrl: String = BuildConfig.BASE_URL
 
-    private var tokenProvider: (() -> String?)? = null
+    private var tokenProvider: (suspend () -> String?)? = null
     private var tokenStore: TokenStore? = null
     private val noAuthOkHttpClient by lazy { OkHttpClient() }
     private val authOkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor { chain ->
-                val token = tokenProvider?.invoke()
-                val request = if (token != null) {
-                    chain.request().newBuilder()
-                        .header("Authorization", "Bearer $token").build()
-                } else chain.request()
+                val request = chain.request().newBuilder()
+                    .header("Authorization", "Bearer ${tokenProvider?.invoke().let {
+                        runBlocking { it?.invoke() } ?: ""
+                    }}")
+                    .build()
 
                 val response: Response = try {
                     chain.proceed(request)
@@ -40,7 +44,7 @@ object ConnectTransportProvider {
 
                 if (response.code == 401) {
                     response.close()
-                    val newToken = refreshToken()
+                    val newToken = refreshTokenBlocking()
                     if (newToken != null) {
                         val retryRequest = chain.request().newBuilder()
                             .header("Authorization", "Bearer $newToken").build()
@@ -53,6 +57,7 @@ object ConnectTransportProvider {
                 }
             }.build()
     }
+
     private val noAuthProtocolClient: ProtocolClientInterface by lazy {
         ProtocolClient(
             httpClient = ConnectOkHttpClient(unaryClient = noAuthOkHttpClient),
@@ -62,6 +67,7 @@ object ConnectTransportProvider {
             ),
         )
     }
+
     private val authProtocolClient: ProtocolClientInterface by lazy {
         ProtocolClient(
             httpClient = ConnectOkHttpClient(unaryClient = authOkHttpClient),
@@ -76,21 +82,23 @@ object ConnectTransportProvider {
         this.tokenStore = tokenStore
         val persistedToken = runBlocking { tokenStore.getAccessToken() }
         if (persistedToken != null) {
-            tokenProvider = { runBlocking { tokenStore.getAccessToken() } }
+            tokenProvider = {
+                tokenStore.getAccessToken()
+            }
         }
     }
 
     fun setToken(token: String) { tokenProvider = { token } }
     fun clearToken() { tokenProvider = null }
-    fun getToken(): String? = tokenProvider?.invoke()
+    suspend fun getToken(): String? = tokenProvider?.invoke()
 
-    /** 自动刷新 access token（由 401 拦截器触发）。 */
-    private fun refreshToken(): String? {
+    /** 同步 token 刷新（在 OkHttp 拦截器中调用，不在协程上下文中）。 */
+    private fun refreshTokenBlocking(): String? {
         val store = tokenStore ?: return null
         return runBlocking {
             try {
                 val refreshToken = store.getRefreshToken() ?: return@runBlocking null
-                val client = createProtocolClientNoAuth()
+                val client = noAuthProtocolClient
                 val request = Auth.RefreshRequest.newBuilder()
                     .setRefreshToken(refreshToken).build()
                 val spec = MethodSpec(
@@ -112,19 +120,12 @@ object ConnectTransportProvider {
         }
     }
 
-    /** 创建不带 Auth 头的 client（用于 refresh/healthz 等公共接口）。 */
-    private fun createProtocolClientNoAuth(): ProtocolClientInterface = noAuthProtocolClient
-
-    fun create(): ConnectOkHttpClient = ConnectOkHttpClient(unaryClient = authOkHttpClient)
-
     fun createProtocolClient(): ProtocolClientInterface = authProtocolClient
-
-    // ===== Healthz =====
 
     fun healthz(): Result<String> {
         return runBlocking {
             try {
-                val client = createProtocolClientNoAuth()
+                val client = noAuthProtocolClient
                 val spec = MethodSpec(
                     path = "antclaw.v1.SystemService/Healthz",
                     requestClass = System.HealthzRequest::class,

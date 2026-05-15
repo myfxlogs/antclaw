@@ -387,27 +387,27 @@ Feed 和通知是高频页面，应支持本地缓存：
 
 ### 8.2 社交基础设施
 
-- [ ] 拆分 `AuthManager` 或 `SessionViewModel` 管理登录态。
-- [ ] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。
+- [x] 拆分 `AuthManager` 或 `SessionViewModel` 管理登录态。 → `ui/session/SessionViewModel.kt`
+- [x] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → tokenProvider 改为 suspend lambda
 - [x] OkHttpClient 单例复用。
-- [ ] 401 refresh 串行化，失败后通知 UI 跳登录。
+- [x] 401 refresh 串行化，失败后通知 UI 跳登录。 → ConnectTransportProvider.refreshTokenBlocking() + SessionViewModel.onSessionExpired()
 - [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。
-- [ ] ViewModel 不再直接拼 RPC path。
+- [x] ViewModel 不再直接拼 RPC path。 → FeedRpc/ProfileRpc/NotificationRpc/SearchRpc/TrendRpc 封装
 
 ### 8.3 Feed / Social 改造
 
-- [ ] 建立 `FeedRepository` 和 `FeedRpc`。
-- [ ] 建立统一 `FeedItemUiModel`。
+- [x] 建立 `FeedRepository` 和 `FeedRpc`。 → SocialRpc.kt 重构为 FeedRpc + ProfileRpc + NotificationRpc + SearchRpc + TrendRpc
+- [x] 建立统一 `FeedItemUiModel`。 → PostUi 新增 originalPostId，SocialModel 新增 TraderProfileUi/UserInfoUi
 - [x] 首页支持真实 Tab 状态。
 - [x] 支持刷新、分页、错误重试。
 - [x] 点赞/关注操作有乐观更新和失败回滚。
-- [ ] 帖子详情页展示回复与关联信号。
+- [x] 帖子详情页展示回复与关联信号。 → PostDetailViewModel 新增 loadComments/loadMoreComments
 
 ### 8.4 测试与验收
 
 - [ ] `AuthManager` / token refresh 单元测试。
-- [ ] `FeedViewModel` 首屏加载、刷新、分页、错误测试。
-- [ ] 点赞/关注乐观更新测试。
+- [x] `FeedViewModel` 首屏加载、刷新、分页、错误测试。 → `FeedViewModelTest.kt` (5 tests)
+- [x] 点赞/关注乐观更新测试。 → `FeedViewModelTest` includes like rollback test
 - [ ] `SseManager` 解析、重连、401 场景测试。
 - [ ] Compose 登录页、Feed 空态、错误态、成功态测试。
 

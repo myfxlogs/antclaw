@@ -37,6 +37,7 @@ data class PostUi(
     val isLiked: Boolean = false,
     val isBookmarked: Boolean = false,
     val createdAt: Instant = Instant.EPOCH,
+    val originalPostId: String? = null,
 )
 
 // ── Comment UI Model ──
@@ -79,3 +80,33 @@ sealed class UiEvent {
 enum class PostType { TEXT, SIGNAL_CARD, CHART_SHARE, SHARE }
 
 enum class PostVisibility { PUBLIC, FOLLOWERS_ONLY, CIRCLE_ONLY }
+
+// ── Trader Profile UI Model ──
+
+data class TraderProfileUi(
+    val userId: String,
+    val displayName: String,
+    val bio: String = "",
+    val tier: String = "normal",
+    val followerCount: Int = 0,
+    val followingCount: Int = 0,
+    val isFollowing: Boolean = false,
+    val showWinRate: Boolean = false,
+    val showProfitFactor: Boolean = false,
+    val showSharpe: Boolean = false,
+    val showTotalTrades: Boolean = false,
+    val winRate: Double = 0.0,
+    val profitFactor: Double = 0.0,
+    val sharpeRatio: Double = 0.0,
+    val totalTrades: Int = 0,
+    val createdAt: Instant = Instant.EPOCH,
+)
+
+// ── User Info (follower/following list item) ──
+
+data class UserInfoUi(
+    val userId: String,
+    val displayName: String,
+    val tier: String = "normal",
+    val followerCount: Int = 0,
+)
