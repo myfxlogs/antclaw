@@ -392,7 +392,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 - [x] OkHttpClient 单例复用。
 - [ ] 401 refresh 串行化，失败后通知 UI 跳登录。 → refreshTokenBlocking() 无 Mutex，并发 401 可能重复刷新
 - [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SessionViewModel 已管理生命周期，但 SseManager 使用固定 3000ms 重连，非指数退避
-- [ ] ViewModel 不再直接拼 RPC path。 → DiscoverViewModel/AlertViewModel/ChatViewModel/SignalDetailViewModel/MeViewModel/ProfileViewModel 仍使用 RpcHelper.unary() 或 MethodSpec 直接拼路径
+- [x] ViewModel 不再直接拼 RPC path。 → 6 个 ViewModel 已迁移至 Repository→RpcClient (Profile/Me/Chat/Alert/SignalDetail/Discover)
 
 ### 8.3 Feed / Social 改造
 

@@ -2,10 +2,9 @@ package com.antclaw.alfq.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import antclaw.v1.AlfqTrader
-import antclaw.v1.UserOuterClass
 import com.antclaw.alfq.data.repository.AuthRepository
-import com.antclaw.alfq.data.rpc.RpcHelper
+import com.antclaw.alfq.data.repository.ProfileRepository
+import com.antclaw.alfq.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +21,11 @@ data class MeUiState(
 )
 
 @HiltViewModel
-class MeViewModel @Inject constructor(private val authRepo: AuthRepository) : ViewModel() {
+class MeViewModel @Inject constructor(
+    private val authRepo: AuthRepository,
+    private val userRepo: UserRepository,
+    private val profileRepo: ProfileRepository,
+) : ViewModel() {
     private val _state = MutableStateFlow(MeUiState())
     val state: StateFlow<MeUiState> = _state.asStateFlow()
 
@@ -32,17 +35,12 @@ class MeViewModel @Inject constructor(private val authRepo: AuthRepository) : Vi
         viewModelScope.launch {
             _state.value = _state.value.copy(loading = true)
             try {
-                val me = RpcHelper.unary("antclaw.v1.UserService/GetMe",
-                    UserOuterClass.GetMeRequest.getDefaultInstance(),
-                    UserOuterClass.GetMeRequest::class, UserOuterClass.GetMeResponse::class).user
-
-                var dp = me.displayName.ifEmpty { me.username }; var bio = ""; var tier = "normal"
+                val me = userRepo.getMe()
+                var dp = me.displayName; var bio = ""; var tier = "normal"
                 var fc = 0; var ing = 0; var wr = 0.0; var pf = 0.0; var sr = 0.0; var tt = 0
 
                 try {
-                    val p = RpcHelper.unary("antclaw.v1.TraderService/GetProfile",
-                        AlfqTrader.GetTraderProfileRequest.newBuilder().setUserId(me.userId).build(),
-                        AlfqTrader.GetTraderProfileRequest::class, AlfqTrader.TraderProfile::class)
+                    val p = profileRepo.getProfile(me.userId)
                     dp = p.displayName.ifEmpty { dp }; bio = p.bio; tier = p.tier
                     fc = p.followerCount; ing = p.followingCount
                     wr = p.winRate; pf = p.profitFactor; sr = p.sharpeRatio; tt = p.totalTrades

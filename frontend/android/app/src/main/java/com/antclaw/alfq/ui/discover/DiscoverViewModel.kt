@@ -2,8 +2,7 @@ package com.antclaw.alfq.ui.discover
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import antclaw.v1.AlfqTrader
-import com.antclaw.alfq.data.rpc.RpcHelper
+import com.antclaw.alfq.data.repository.DiscoverRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +14,9 @@ data class TraderItem(val userId: String, val displayName: String, val tier: Str
 data class DiscoverUiState(val traders: List<TraderItem> = emptyList(), val loading: Boolean = false, val error: String? = null)
 
 @HiltViewModel
-class DiscoverViewModel @Inject constructor() : ViewModel() {
+class DiscoverViewModel @Inject constructor(
+    private val discoverRepo: DiscoverRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(DiscoverUiState())
     val uiState: StateFlow<DiscoverUiState> = _uiState.asStateFlow()
 
@@ -23,16 +24,12 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
 
     fun load() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true, error = null)
+            _uiState.value = DiscoverUiState(loading = true)
             try {
-                val resp = RpcHelper.unary(
-                    "antclaw.v1.TraderService/GetFollowing",
-                    AlfqTrader.GetFollowingRequest.newBuilder().setPageSize(20).build(),
-                    AlfqTrader.GetFollowingRequest::class, AlfqTrader.UserList::class)
-                _uiState.value = DiscoverUiState(traders = resp.usersList.map {
+                _uiState.value = DiscoverUiState(traders = discoverRepo.listFollowing().map {
                     TraderItem(it.userId, it.displayName, it.tier, it.followerCount)
                 })
-            } catch (e: Exception) { _uiState.value = _uiState.value.copy(loading = false, error = e.message) }
+            } catch (e: Exception) { _uiState.value = DiscoverUiState(error = e.message) }
         }
     }
 }

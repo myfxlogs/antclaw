@@ -2,8 +2,7 @@ package com.antclaw.alfq.ui.alerts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import antclaw.v1.Alerts
-import com.antclaw.alfq.data.rpc.RpcHelper
+import com.antclaw.alfq.data.repository.AlertRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +20,9 @@ data class AlertSubItem(
 )
 
 @HiltViewModel
-class AlertViewModel @Inject constructor() : ViewModel() {
+class AlertViewModel @Inject constructor(
+    private val alertRepo: AlertRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(AlertUiState())
     val uiState: StateFlow<AlertUiState> = _uiState.asStateFlow()
 
@@ -31,41 +32,25 @@ class AlertViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true, error = null)
             try {
-                val resp = RpcHelper.unary(
-                    "antclaw.v1.AlertService/ListSubscriptions",
-                    Alerts.ListSubscriptionsRequest.getDefaultInstance(),
-                    Alerts.ListSubscriptionsRequest::class,
-                    Alerts.ListSubscriptionsResponse::class)
-                val items = resp.subscriptionsList.map { s ->
-                    AlertSubItem(s.subscriptionId, s.pair, s.condition, s.threshold, s.alertType, s.active)
+                val items = alertRepo.listSubscriptions().map { s ->
+                    AlertSubItem(s.id, s.pair, s.condition, s.threshold, s.type, s.active)
                 }
-                _uiState.value = _uiState.value.copy(loading = false, subscriptions = items)
+                _uiState.value = AlertUiState(subscriptions = items)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(loading = false, error = e.message)
+                _uiState.value = AlertUiState(error = e.message)
             }
         }
     }
 
     fun subscribe(type: String, pair: String, condition: String, threshold: String) {
         viewModelScope.launch {
-            try {
-                val req = Alerts.SubscribeRequest.newBuilder()
-                    .setAlertType(type).setPair(pair).setCondition(condition).setThreshold(threshold).build()
-                RpcHelper.unary("antclaw.v1.AlertService/Subscribe", req,
-                    Alerts.SubscribeRequest::class, Alerts.SubscribeResponse::class)
-                load()
-            } catch (_: Exception) {}
+            try { alertRepo.subscribe(type, pair, condition, threshold); load() } catch (_: Exception) {}
         }
     }
 
     fun unsubscribe(id: String) {
         viewModelScope.launch {
-            try {
-                val req = Alerts.UnsubscribeRequest.newBuilder().setSubscriptionId(id).build()
-                RpcHelper.unary("antclaw.v1.AlertService/Unsubscribe", req,
-                    Alerts.UnsubscribeRequest::class, Alerts.UnsubscribeResponse::class)
-                load()
-            } catch (_: Exception) {}
+            try { alertRepo.unsubscribe(id); load() } catch (_: Exception) {}
         }
     }
 }

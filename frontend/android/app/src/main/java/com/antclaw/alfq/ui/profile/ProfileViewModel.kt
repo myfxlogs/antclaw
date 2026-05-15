@@ -2,10 +2,9 @@ package com.antclaw.alfq.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import antclaw.v1.AlfqTrader
-import com.antclaw.alfq.data.rpc.RpcHelper
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.antclaw.alfq.data.repository.ProfileRepository
 import com.antclaw.alfq.ui.social.UiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,7 +22,9 @@ data class ProfileUiState(
 )
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor() : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    private val profileRepo: ProfileRepository,
+) : ViewModel() {
     private var currentUserId = ""
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -36,10 +37,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
             try {
-                val req = AlfqTrader.GetTraderProfileRequest.newBuilder().setUserId(userId).build()
-                val p = RpcHelper.unary(
-                    "antclaw.v1.TraderService/GetProfile", req,
-                    AlfqTrader.GetTraderProfileRequest::class, AlfqTrader.TraderProfile::class)
+                val p = profileRepo.getProfile(userId)
                 _uiState.value = ProfileUiState(
                     displayName = p.displayName, bio = p.bio, tier = p.tier,
                     winRate = p.winRate, profitFactor = p.profitFactor, sharpeRatio = p.sharpeRatio,
@@ -61,19 +59,8 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                 followerCount = if (willFollow) previous.followerCount + 1 else (previous.followerCount - 1).coerceAtLeast(0),
             )
             try {
-                if (previous.isFollowing) {
-                    val req = AlfqTrader.UnfollowRequest.newBuilder().setTargetUserId(currentUserId).build()
-                    val resp = RpcHelper.unary(
-                        "antclaw.v1.TraderService/Unfollow", req,
-                        AlfqTrader.UnfollowRequest::class, AlfqTrader.FollowResponse::class)
-                    _uiState.value = _uiState.value.copy(isFollowing = false, followerCount = resp.followerCount)
-                } else {
-                    val req = AlfqTrader.FollowRequest.newBuilder().setTargetUserId(currentUserId).build()
-                    val resp = RpcHelper.unary(
-                        "antclaw.v1.TraderService/Follow", req,
-                        AlfqTrader.FollowRequest::class, AlfqTrader.FollowResponse::class)
-                    _uiState.value = _uiState.value.copy(isFollowing = true, followerCount = resp.followerCount)
-                }
+                val fc = if (previous.isFollowing) profileRepo.unfollow(currentUserId) else profileRepo.follow(currentUserId)
+                _uiState.value = _uiState.value.copy(isFollowing = !previous.isFollowing, followerCount = fc)
             } catch (e: Exception) {
                 _uiState.value = previous
                 _uiEvent.emit(UiEvent.Snackbar(e.message ?: "关注操作失败，已回滚"))
