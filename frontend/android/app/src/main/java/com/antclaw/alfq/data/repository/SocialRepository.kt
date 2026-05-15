@@ -20,7 +20,7 @@ import javax.inject.Singleton
  * P0 负责 Feed 内容流和社交交互，P1 扩展搜索/趋势。
  */
 @Singleton
-class SocialRepository @Inject constructor(
+open class SocialRepository @Inject constructor(
     private val feedRpc: FeedRpc,
     private val profileRpc: ProfileRpc,
     private val tokenStore: TokenStore,
@@ -29,7 +29,7 @@ class SocialRepository @Inject constructor(
 
     // ══════ Feed ══════
 
-    suspend fun getFeed(cursor: String = "", pageSize: Int = 20, filter: String = "all"): Pair<List<PostUi>, String?> {
+    open suspend fun getFeed(cursor: String = "", pageSize: Int = 20, filter: String = "all"): Pair<List<PostUi>, String?> {
         val resp = feedRpc.getFeed(cursor, pageSize, filter)
         val posts = resp.postsList.map { it.toPostUi(currentUserId()) }
         return posts to resp.nextCursor.takeIf { it.isNotBlank() }
@@ -37,10 +37,10 @@ class SocialRepository @Inject constructor(
 
     // ══════ Post ══════
 
-    suspend fun getPost(postId: String): PostUi =
+    open suspend fun getPost(postId: String): PostUi =
         feedRpc.getPost(postId).toPostUi(currentUserId())
 
-    suspend fun createPost(content: String, signalPair: String = "", signalDirection: String = "",
+    open suspend fun createPost(content: String, signalPair: String = "", signalDirection: String = "",
                            signalConfidence: Int = 0, visibility: String = "public"): PostUi {
         val req = AlfqFeed.CreatePostRequest.newBuilder()
             .setContent(content)
@@ -53,7 +53,7 @@ class SocialRepository @Inject constructor(
         return feedRpc.createPost(req).toPostUi(currentUserId())
     }
 
-    suspend fun listUserPosts(userId: String, cursor: String = "", pageSize: Int = 20,
+    open suspend fun listUserPosts(userId: String, cursor: String = "", pageSize: Int = 20,
                               filter: String = "all"): Pair<List<PostUi>, String?> {
         val resp = feedRpc.listUserPosts(userId, cursor, pageSize, filter)
         val posts = resp.postsList.map { it.toPostUi(currentUserId()) }
@@ -62,22 +62,22 @@ class SocialRepository @Inject constructor(
 
     // ══════ Like / Unlike ══════
 
-    suspend fun likePost(postId: String): PostUi =
+    open suspend fun likePost(postId: String): PostUi =
         feedRpc.likePost(postId).toPostUi(currentUserId())
 
-    suspend fun unlikePost(postId: String): PostUi =
+    open suspend fun unlikePost(postId: String): PostUi =
         feedRpc.unlikePost(postId).toPostUi(currentUserId())
 
     // ══════ Comment ══════
 
-    suspend fun commentOnPost(postId: String, content: String, parentCommentId: String? = null): CommentUi {
+    open suspend fun commentOnPost(postId: String, content: String, parentCommentId: String? = null): CommentUi {
         val req = AlfqFeed.CommentRequest.newBuilder()
             .setPostId(postId).setContent(content)
         if (!parentCommentId.isNullOrBlank()) req.parentCommentId = parentCommentId
         return feedRpc.commentOnPost(req.build()).toCommentUi()
     }
 
-    suspend fun listComments(postId: String, cursor: String = "", pageSize: Int = 50): Pair<List<CommentUi>, String?> {
+    open suspend fun listComments(postId: String, cursor: String = "", pageSize: Int = 50): Pair<List<CommentUi>, String?> {
         val resp = feedRpc.listComments(postId, cursor, pageSize)
         val comments = resp.commentsList.map { it.toCommentUi() }
         return comments to resp.nextCursor.takeIf { it.isNotBlank() }
@@ -85,12 +85,12 @@ class SocialRepository @Inject constructor(
 
     // ══════ Share ══════
 
-    suspend fun sharePost(postId: String, comment: String = ""): PostUi =
+    open suspend fun sharePost(postId: String, comment: String = ""): PostUi =
         feedRpc.sharePost(postId, comment).toPostUi(currentUserId())
 
     // ══════ Profile ══════
 
-    suspend fun getProfile(userId: String): TraderProfileUi {
+    open suspend fun getProfile(userId: String): TraderProfileUi {
         val p = profileRpc.getProfile(userId)
         return TraderProfileUi(
             userId = p.userId,
@@ -112,12 +112,12 @@ class SocialRepository @Inject constructor(
         )
     }
 
-    suspend fun follow(userId: String): Int {
+    open suspend fun follow(userId: String): Int {
         val resp = profileRpc.follow(userId)
         return resp.followerCount
     }
 
-    suspend fun unfollow(userId: String): Int {
+    open suspend fun unfollow(userId: String): Int {
         val resp = profileRpc.unfollow(userId)
         return resp.followerCount
     }

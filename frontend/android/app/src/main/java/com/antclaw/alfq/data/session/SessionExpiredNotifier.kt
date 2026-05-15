@@ -14,11 +14,11 @@ import javax.inject.Singleton
  *   SessionViewModel 订阅 → 收到事件 → onSessionExpired() → emit(RequireLogin)
  */
 @Singleton
-class SessionExpiredNotifier @Inject constructor() {
+open class SessionExpiredNotifier @Inject constructor() {
     private val _events = MutableSharedFlow<Unit>(extraBufferCapacity = 4)
     val events: SharedFlow<Unit> = _events.asSharedFlow()
 
-    fun notifySessionExpired() {
+    open fun notifySessionExpired() {
         _events.tryEmit(Unit)
     }
 }

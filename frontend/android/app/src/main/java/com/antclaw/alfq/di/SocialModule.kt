@@ -2,6 +2,7 @@ package com.antclaw.alfq.di
 
 import com.antclaw.alfq.data.repository.*
 import com.antclaw.alfq.data.local.TokenStore
+import com.antclaw.alfq.data.local.TokenStoreApi
 import com.antclaw.alfq.data.rpc.*
 import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
@@ -27,6 +28,9 @@ object SocialModule {
     @Provides @Singleton fun provideUserRpc(c: ProtocolClientInterface): UserRpc = UserRpc(c)
     @Provides @Singleton fun provideSignalRpc(c: ProtocolClientInterface): SignalRpc = SignalRpc(c)
     @Provides @Singleton fun providePriceRpc(c: ProtocolClientInterface): PriceRpc = PriceRpc(c)
+
+    // Token
+    @Provides @Singleton fun provideTokenStoreApi(store: TokenStore): TokenStoreApi = store
 
     // SSE
     @Provides @Singleton fun provideSseClient(mgr: SseManager): SseClient = mgr

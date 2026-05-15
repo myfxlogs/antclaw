@@ -17,10 +17,22 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "alfq_tokens")
 
+interface TokenStoreApi {
+    suspend fun getAccessToken(): String?
+    suspend fun getRefreshToken(): String?
+    suspend fun getUserId(): String?
+    suspend fun saveAccessToken(token: String)
+    suspend fun saveRefreshToken(token: String)
+    suspend fun saveUserId(userId: String)
+    suspend fun saveTokens(accessToken: String, refreshToken: String, userId: String = "")
+    suspend fun clearTokens()
+    suspend fun clearUserId()
+}
+
 @Singleton
 class TokenStore @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : TokenStoreApi {
     companion object {
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val KEY_USER_ID = stringPreferencesKey("user_id")
@@ -42,7 +54,7 @@ class TokenStore @Inject constructor(
         )
     }
 
-    suspend fun saveTokens(accessToken: String, refreshToken: String, userId: String = "") {
+    override suspend fun saveTokens(accessToken: String, refreshToken: String, userId: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_ACCESS_TOKEN] = accessToken
             if (userId.isNotBlank()) prefs[KEY_USER_ID] = userId
@@ -50,40 +62,40 @@ class TokenStore @Inject constructor(
         encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, refreshToken).apply()
     }
 
-    suspend fun saveAccessToken(token: String) {
+    override suspend fun saveAccessToken(token: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_ACCESS_TOKEN] = token
         }
     }
 
-    suspend fun getAccessToken(): String? {
+    override suspend fun getAccessToken(): String? {
         return context.dataStore.data.map { it[KEY_ACCESS_TOKEN] }.first()
     }
 
-    suspend fun getRefreshToken(): String? {
+    override suspend fun getRefreshToken(): String? {
         return encryptedPrefs.getString(KEY_REFRESH_TOKEN, null)
     }
 
-    suspend fun getUserId(): String? {
+    override suspend fun getUserId(): String? {
         return context.dataStore.data.map { it[KEY_USER_ID] }.first()
     }
 
-    suspend fun clearTokens() {
+    override suspend fun clearTokens() {
         context.dataStore.edit { it.clear() }
         encryptedPrefs.edit().clear().apply()
     }
 
-    suspend fun saveRefreshToken(token: String) {
+    override suspend fun saveRefreshToken(token: String) {
         encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
     }
 
-    suspend fun saveUserId(userId: String) {
+    override suspend fun saveUserId(userId: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_USER_ID] = userId
         }
     }
 
-    suspend fun clearUserId() {
+    override suspend fun clearUserId() {
         context.dataStore.edit { prefs ->
             prefs.remove(KEY_USER_ID)
         }

@@ -2,7 +2,7 @@ package com.antclaw.alfq.ui.session
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.antclaw.alfq.data.local.TokenStore
+import com.antclaw.alfq.data.local.TokenStoreApi
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
 import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
@@ -32,7 +32,7 @@ sealed class SessionEvent {
 /** 集中管理登录态、Token、用户身份、SSE 连接。 */
 @HiltViewModel
 class SessionViewModel @Inject constructor(
-    private val tokenStore: TokenStore,
+    private val tokenStore: TokenStoreApi,
     private val sseClient: SseClient,
     private val sessionNotifier: SessionExpiredNotifier,
 ) : ViewModel() {

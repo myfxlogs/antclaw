@@ -3,7 +3,7 @@ package com.antclaw.alfq.data.rpc
 import antclaw.v1.Auth
 import antclaw.v1.System
 import com.antclaw.alfq.BuildConfig
-import com.antclaw.alfq.data.local.TokenStore
+import com.antclaw.alfq.data.local.TokenStoreApi
 import com.connectrpc.MethodSpec
 import com.connectrpc.ProtocolClientConfig
 import com.connectrpc.ProtocolClientInterface
@@ -23,7 +23,7 @@ object ConnectTransportProvider {
     val baseUrl: String = BuildConfig.BASE_URL
 
     private var tokenProvider: (() -> String?)? = null
-    private var tokenStore: TokenStore? = null
+    private var tokenStore: TokenStoreApi? = null
     private var sessionExpiredNotifier: com.antclaw.alfq.data.session.SessionExpiredNotifier? = null
 
     // ── Single-flight refresh ──
@@ -81,7 +81,7 @@ object ConnectTransportProvider {
         )
     }
 
-    fun init(tokenStore: TokenStore, notifier: com.antclaw.alfq.data.session.SessionExpiredNotifier? = null) {
+    fun init(tokenStore: TokenStoreApi, notifier: com.antclaw.alfq.data.session.SessionExpiredNotifier? = null) {
         this.tokenStore = tokenStore
         this.sessionExpiredNotifier = notifier
         val persistedToken = runBlocking { tokenStore.getAccessToken() }
