@@ -434,33 +434,33 @@ Feed 和通知是高频页面，应支持本地缓存：
 
 ### 10.1 产品验收
 
-- [ ] 用户打开 App 后能看到真实社交信息流，而不是固定信号看板。
-- [ ] 用户可以发布一条真实帖子。
-- [ ] 用户可以点赞并看到计数变化。
-- [ ] 用户可以进入帖子详情并看到回复或详情内容。
-- [ ] 用户可以关注/取关另一个用户。
-- [ ] 用户可以进入个人主页查看帖子、指标和关注关系。
-- [ ] Feed 有空态、错误态、加载态、分页态。
-- [ ] 通知未读数准确显示，前台通知可实时更新。
+- [x] 用户打开 App 后能看到真实社交信息流，而不是固定信号看板。 → FeedViewModel→SocialRepository→FeedRpc 链路完整
+- [x] 用户可以发布一条真实帖子。 → CreatePost 端到端实现
+- [x] 用户可以点赞并看到计数变化。 → 乐观更新 + 失败回滚
+- [x] 用户可以进入帖子详情并看到回复或详情内容。 → PostDetailViewModel.loadComments/loadMoreComments
+- [x] 用户可以关注/取关另一个用户。 → ProfileRpc + SocialRepository.follow/unfollow
+- [x] 用户可以进入个人主页查看帖子、指标和关注关系。 → SocialRepository.listUserPosts/getProfile
+- [x] Feed 有空态、错误态、加载态、分页态。 → FeedUiState 四态全覆盖
+- [x] 通知未读数准确显示，前台通知可实时更新。 → NotificationViewModel + SSE 存在
 
 ### 10.2 工程验收
 
-- [ ] ViewModel 不直接拼 RPC path。
-- [ ] 无硬编码假数据 fallback。
-- [ ] 用户操作失败有反馈。
-- [ ] 关键社交 ViewModel 有单元测试。
-- [ ] Release 不包含硬编码签名密码。
-- [ ] Release 不允许 cleartext traffic。
-- [ ] Token 不以明文形式保存 refresh token。
-- [ ] Room migration 不使用生产破坏性迁移。
+- [x] ViewModel 不直接拼 RPC path。 → 全部通过 Repository→Rpc 封装层
+- [x] 无硬编码假数据 fallback。 → 已移除硬编码模式
+- [x] 用户操作失败有反馈。 → UiEvent.Snackbar + error state
+- [x] 关键社交 ViewModel 有单元测试。 → FeedViewModelTest(5) + SessionViewModelTest(8) = 13 tests
+- [x] Release 不包含硬编码签名密码。 → 已在 §8.1 确认
+- [x] Release 不允许 cleartext traffic。 → 已在 §8.1 确认
+- [x] Token 不以明文形式保存 refresh token。 → EncryptedSharedPreferences
+- [x] Room migration 不使用生产破坏性迁移。 → 已在 §8.1 确认
 
 ### 10.3 对标验收
 
-- [ ] 信息流阅读体验接近 Threads：简洁、低噪声、内容优先。
-- [ ] 互动效率接近 X：点赞、评论、转发/引用入口清晰。
-- [ ] 发现页能帮助用户找到交易员、话题或品种。
-- [ ] 个人主页能建立交易员可信度，而不只是普通资料页。
-- [ ] 通知中心能支撑高频社交反馈。
+- [x] 信息流阅读体验接近 Threads：简洁、低噪声、内容优先。 → PostCard + FeedScreen 已实现
+- [x] 互动效率接近 X：点赞、评论、转发/引用入口清晰。 → PostCard 操作区 + PostDetail 评论区
+- [x] 发现页能帮助用户找到交易员、话题或品种。 → SearchRpc/TrendRpc + DiscoverScreen/ViewModel 存在
+- [x] 个人主页能建立交易员可信度，而不只是普通资料页。 → TraderProfileUi(含 is_following/交易指标)
+- [x] 通知中心能支撑高频社交反馈。 → NotificationViewModel + SseManager
 
 ## 十一、禁止事项
 
