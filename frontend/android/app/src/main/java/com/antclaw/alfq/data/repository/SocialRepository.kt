@@ -155,14 +155,14 @@ class SocialRepository @Inject constructor(
 
 // ── Mapping helpers ──
 
-private fun mapPostType(raw: String): PostType = when (raw) {
+fun mapPostType(raw: String): PostType = when (raw) {
     "signal_card" -> PostType.SIGNAL_CARD
     "chart_share" -> PostType.CHART_SHARE
     "share" -> PostType.SHARE
     else -> PostType.TEXT
 }
 
-private fun mapVisibility(raw: String): PostVisibility = when (raw) {
+fun mapVisibility(raw: String): PostVisibility = when (raw) {
     "followers" -> PostVisibility.FOLLOWERS_ONLY
     "circle" -> PostVisibility.CIRCLE_ONLY
     else -> PostVisibility.PUBLIC

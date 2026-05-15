@@ -44,6 +44,9 @@ class SseManager @Inject constructor() : SseClient {
         private const val BASE_DELAY_MS = 3000L
         private const val MAX_DELAY_MS = 30000L
         private const val CONNECT_TIMEOUT_SEC = 30L
+
+        fun backoffDelay(retry: Int, baseMs: Long = BASE_DELAY_MS, maxMs: Long = MAX_DELAY_MS): Long =
+            (baseMs * (1L shl (retry - 1))).coerceAtMost(maxMs)
     }
 
     private var eventSource: EventSource? = null
@@ -167,7 +170,7 @@ class SseManager @Inject constructor() : SseClient {
         reconnectJob?.cancel()
         reconnectJob = scope.launch {
             retryCount++
-            val delayMs = (BASE_DELAY_MS * (1 shl (retryCount - 1))).coerceAtMost(MAX_DELAY_MS)
+            val delayMs = backoffDelay(retryCount)
             Log.i(TAG, "SSE reconnecting in ${delayMs}ms (retry #$retryCount)")
             delay(delayMs)
             connect()
