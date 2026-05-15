@@ -380,7 +380,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 - [x] Release 签名信息移出仓库配置。
 - [x] Release 禁用 cleartext traffic。
 - [x] Token 加密存储，至少 refresh token 加密。
-- [x] 移除或限制 `fallbackToDestructiveMigration()`。
+- [ ] 移除或限制 `fallbackToDestructiveMigration()`。 → AppModule.kt 仍调用 `.fallbackToDestructiveMigrationOnDowngrade()`
 - [x] `AlfQTheme` 支持系统深色模式。
 - [x] Feed Tab 无实现前隐藏或接入真实状态。
 - [x] 空态按钮必须可点击并执行有效动作。
@@ -388,11 +388,11 @@ Feed 和通知是高频页面，应支持本地缓存：
 ### 8.2 社交基础设施
 
 - [x] 拆分 `AuthManager` 或 `SessionViewModel` 管理登录态。 → `ui/session/SessionViewModel.kt`
-- [x] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → tokenProvider 改为 suspend lambda
+- [ ] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → 仍是 Kotlin object 单例，未通过 DI 注入，tokenProvider 仍使用 runBlocking
 - [x] OkHttpClient 单例复用。
-- [x] 401 refresh 串行化，失败后通知 UI 跳登录。 → ConnectTransportProvider.refreshTokenBlocking() + SessionViewModel.onSessionExpired()
-- [x] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SessionViewModel 集成 SseManager (onLoginSuccess/onSessionExpired/logout/onForeground/onBackground)
-- [x] ViewModel 不再直接拼 RPC path。 → FeedRpc/ProfileRpc/NotificationRpc/SearchRpc/TrendRpc 封装
+- [ ] 401 refresh 串行化，失败后通知 UI 跳登录。 → refreshTokenBlocking() 无 Mutex，并发 401 可能重复刷新
+- [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SessionViewModel 已管理生命周期，但 SseManager 使用固定 3000ms 重连，非指数退避
+- [ ] ViewModel 不再直接拼 RPC path。 → DiscoverViewModel/AlertViewModel/ChatViewModel/SignalDetailViewModel/MeViewModel/ProfileViewModel 仍使用 RpcHelper.unary() 或 MethodSpec 直接拼路径
 
 ### 8.3 Feed / Social 改造
 
