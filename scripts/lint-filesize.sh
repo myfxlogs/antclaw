@@ -14,7 +14,8 @@ FILES=$(
          -o -name "*.ts" -o -name "*.tsx" -o -name "*.vue" \
          -o -name "*.sh" -o -name "*.py" -o -name "*.sql" \) \
       ! -path "*/node_modules/*" ! -path "*/dist/*" ! -path "*/build/*" \
-      ! -path "*/postgres/db/models.go" ! -path "*/postgres/db/*.sql.go"
+      ! -path "*/postgres/db/models.go" ! -path "*/postgres/db/*.sql.go" \
+      ! -path "proto/third_party/*"
   done
 )
 VIOLATIONS=$(echo "$FILES" | xargs -r wc -l 2>/dev/null | awk -v t=$THRESHOLD '$1 > t && $2 != "total" {print $0}')

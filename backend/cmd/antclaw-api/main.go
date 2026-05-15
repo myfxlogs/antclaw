@@ -48,6 +48,7 @@ import (
 	strategysvc "github.com/antclaw/antclaw/internal/service/strategy"
 	systemaisvc "github.com/antclaw/antclaw/internal/service/systemai"
 	traderpkg "github.com/antclaw/antclaw/internal/service/trader"
+	mtsvc "github.com/antclaw/antclaw/internal/service/mt"
 	trendpkg "github.com/antclaw/antclaw/internal/service/trend"
 	"github.com/antclaw/antclaw/internal/service/ta"
 	"github.com/antclaw/antclaw/internal/service/user"
@@ -178,8 +179,15 @@ if err := auth.LoadKeys(); err != nil {
 	systemAIHandler := rpc.NewSystemAIConnectHandler(systemAISvc)
 	dataSourceSvc := datasource.NewService(pgPool, secretBox, redisClient.Raw())
 	dataSourceHandler := rpc.NewDataSourceConnectHandler(dataSourceSvc)
-	mt4Handler := rpc.NewMT4Handler()
-	mt5Handler := rpc.NewMT5Handler()
+	mtRepo := infrapq.NewMTAccountRepository(pgPool)
+	mtConnMgr := mtsvc.NewConnectionManager(
+		getEnv("MT4_GATEWAY_URL", "http://localhost:8080"),
+		getEnv("MT5_GATEWAY_URL", "http://localhost:8080"),
+	)
+	mtSvc := mtsvc.NewService(mtRepo, mtConnMgr)
+	mt4Handler := rpc.NewMT4Handler(mtSvc)
+	mt5Handler := rpc.NewMT5Handler(mtSvc)
+	_ = mtConnMgr // retained for lifecycle; shutdown in graceful stop
 	feedRepo := infrapq.NewFeedRepository(pgPool)
 	feedSvc := feedpkg.NewService(feedRepo)
 	feedHandler := rpc.NewFeedHandler(feedSvc)
@@ -306,4 +314,12 @@ if err := auth.LoadKeys(); err != nil {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	server.Shutdown(ctx)
+}
+
+// getEnv returns the environment variable value or a default.
+func getEnv(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }
