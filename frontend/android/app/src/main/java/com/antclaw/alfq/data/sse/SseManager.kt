@@ -41,7 +41,7 @@ class SseManager @Inject constructor() : SseClient {
 
     companion object {
         private const val TAG = "SseManager"
-        private const val BASE_DELAY_MS = 1000L
+        private const val BASE_DELAY_MS = 3000L
         private const val MAX_DELAY_MS = 30000L
         private const val CONNECT_TIMEOUT_SEC = 30L
     }
