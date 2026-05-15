@@ -376,14 +376,14 @@ Feed 和通知是高频页面，应支持本地缓存：
 
 ### 8.1 必须先整改
 
-- [ ] 登录/注册密码输入按产品要求保持明文可见，禁止改为默认隐藏；安全性依赖 HTTPS/TLS 传输、服务端哈希存储、禁止客户端日志采集密码。
-- [ ] Release 签名信息移出仓库配置。
-- [ ] Release 禁用 cleartext traffic。
-- [ ] Token 加密存储，至少 refresh token 加密。
-- [ ] 移除或限制 `fallbackToDestructiveMigration()`。
-- [ ] `AlfQTheme` 支持系统深色模式。
-- [ ] Feed Tab 无实现前隐藏或接入真实状态。
-- [ ] 空态按钮必须可点击并执行有效动作。
+- [x] 登录/注册密码输入按产品要求保持明文可见，禁止改为默认隐藏；安全性依赖 HTTPS/TLS 传输、服务端哈希存储、禁止客户端日志采集密码。
+- [x] Release 签名信息移出仓库配置。
+- [x] Release 禁用 cleartext traffic。
+- [x] Token 加密存储，至少 refresh token 加密。
+- [x] 移除或限制 `fallbackToDestructiveMigration()`。
+- [x] `AlfQTheme` 支持系统深色模式。
+- [x] Feed Tab 无实现前隐藏或接入真实状态。
+- [x] 空态按钮必须可点击并执行有效动作。
 
 ### 8.2 社交基础设施
 
