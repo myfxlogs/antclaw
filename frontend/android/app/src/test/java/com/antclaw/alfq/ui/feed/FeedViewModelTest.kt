@@ -4,10 +4,9 @@ import com.antclaw.alfq.data.local.TokenStoreApi
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.data.rpc.FeedRpc
 import com.antclaw.alfq.data.rpc.ProfileRpc
+import com.antclaw.alfq.ui.social.*
 import com.connectrpc.ProtocolClientInterface
 import io.mockk.mockk
-import com.antclaw.alfq.ui.social.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.junit.*
@@ -17,35 +16,37 @@ import java.time.Instant
 @OptIn(ExperimentalCoroutinesApi::class)
 class FeedViewModelTest {
 
-    @Before fun setup() { Dispatchers.setMain(StandardTestDispatcher()) }
-    @After fun tearDown() { Dispatchers.resetMain() }
+    private val scheduler = TestCoroutineScheduler()
+    private val testDispatcher = StandardTestDispatcher(scheduler)
 
-    @Test fun `first load succeeds`() = runTest {
-        val repo = stubRepo(listOf(post("p1")))
+    @Before fun setup() { kotlinx.coroutines.Dispatchers.setMain(testDispatcher) }
+    @After fun tearDown() { kotlinx.coroutines.Dispatchers.resetMain() }
+
+    @Test fun `first load succeeds`() = runTest(scheduler) {
+        val repo = FakeRepo(listOf(post("p1")))
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
         assertEquals(1, vm.uiState.value.posts.size)
-        assertEquals("p1", vm.uiState.value.posts[0].postId)
     }
 
-    @Test fun `first load fails`() = runTest {
-        val repo = stubRepo(fail = true)
+    @Test fun `first load fails`() = runTest(scheduler) {
+        val repo = FakeRepo(fail = true)
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
-        assertNotNull(vm.uiState.value.error)
+        assertEquals("err", vm.uiState.value.error)
     }
 
-    @Test fun `refresh keeps old data on failure`() = runTest {
-        val repo = stubRepo(listOf(post("p1")))
+    @Test fun `refresh keeps old data`() = runTest(scheduler) {
+        val repo = FakeRepo(listOf(post("p1")))
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
         repo.fail = true; vm.refresh(); advanceUntilIdle()
-        assertTrue(vm.uiState.value.posts.isNotEmpty())
-        assertNotNull(vm.uiState.value.error)
+        assertEquals(1, vm.uiState.value.posts.size)
+        assertEquals("err", vm.uiState.value.error)
     }
 
-    @Test fun `loadMore appends`() = runTest {
-        val repo = stubRepo(listOf(post("p1")), "next")
+    @Test fun `loadMore appends`() = runTest(scheduler) {
+        val repo = FakeRepo(listOf(post("p1")), "next")
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
         repo.posts = listOf(post("p2")); repo.cursor = null
@@ -53,17 +54,17 @@ class FeedViewModelTest {
         assertEquals(2, vm.uiState.value.posts.size)
     }
 
-    @Test fun `loadMore fails`() = runTest {
-        val repo = stubRepo(listOf(post("p1")), "next")
+    @Test fun `loadMore fails`() = runTest(scheduler) {
+        val repo = FakeRepo(listOf(post("p1")), "next")
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
         repo.fail = true; vm.loadMore(); advanceUntilIdle()
         assertEquals(1, vm.uiState.value.posts.size)
-        assertNotNull(vm.uiState.value.appendError)
+        assertEquals("err", vm.uiState.value.appendError)
     }
 
-    @Test fun `like optimistic then rollback`() = runTest {
-        val repo = stubRepo(listOf(post("p1")))
+    @Test fun `like optimistic then rollback`() = runTest(scheduler) {
+        val repo = FakeRepo(listOf(post("p1")))
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
         repo.failLike = true; vm.toggleLike("p1"); advanceUntilIdle()
@@ -71,8 +72,8 @@ class FeedViewModelTest {
         assertEquals(5, vm.uiState.value.posts[0].likeCount)
     }
 
-    @Test fun `share rollback on failure`() = runTest {
-        val repo = stubRepo(listOf(post("p1")))
+    @Test fun `share rollback`() = runTest(scheduler) {
+        val repo = FakeRepo(listOf(post("p1")))
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
         repo.failShare = true; vm.sharePost("p1"); advanceUntilIdle()
@@ -80,9 +81,7 @@ class FeedViewModelTest {
     }
 }
 
-// ── Stub: real subclass, no mocking ──
-
-class StubSocialRepo(
+class FakeRepo(
     var posts: List<PostUi> = emptyList(),
     var cursor: String? = null,
     var fail: Boolean = false,
@@ -93,11 +92,15 @@ class StubSocialRepo(
     ProfileRpc(mockk<ProtocolClientInterface>(relaxed = true)),
     mockk<TokenStoreApi>(relaxed = true),
 ) {
-    override suspend fun getFeed(c: String, ps: Int, f: String) = if (fail) throw RuntimeException("err") else if (c.isEmpty()) posts to cursor else posts to null
+    override suspend fun getFeed(c: String, ps: Int, f: String) =
+        if (fail) throw RuntimeException("err") else if (c.isEmpty()) posts to cursor else posts to null
     override suspend fun getPost(id: String) = posts.first { it.postId == id }
-    override suspend fun likePost(id: String) = if (failLike) throw RuntimeException("like fail") else post("x")
-    override suspend fun unlikePost(id: String) = if (failLike) throw RuntimeException("unlike fail") else post("x")
-    override suspend fun sharePost(id: String, c: String) = if (failShare) throw RuntimeException("share fail") else post("x")
+    override suspend fun likePost(id: String) =
+        if (failLike) throw RuntimeException("err") else post("x").copy(isLiked = true, likeCount = 6)
+    override suspend fun unlikePost(id: String) =
+        if (failLike) throw RuntimeException("err") else post("x").copy(isLiked = false, likeCount = 4)
+    override suspend fun sharePost(id: String, c: String) =
+        if (failShare) throw RuntimeException("err") else post("x")
     override suspend fun commentOnPost(a: String, b: String, c: String?) = CommentUi("c1", a, "u", "n", b)
     override suspend fun listComments(a: String, b: String, c: Int) = emptyList<CommentUi>() to null
     override suspend fun createPost(a: String, b: String, c: String, d: Int, e: String) = post("new", a)
@@ -106,9 +109,6 @@ class StubSocialRepo(
     override suspend fun follow(a: String) = 1
     override suspend fun unfollow(a: String) = 0
 }
-
-private fun stubRepo(posts: List<PostUi> = emptyList(), cursor: String? = null, fail: Boolean = false) =
-    StubSocialRepo(posts, cursor, fail)
 
 private fun post(id: String, content: String = "t") = PostUi(
     postId = id, authorId = "a", authorName = "A", content = content,

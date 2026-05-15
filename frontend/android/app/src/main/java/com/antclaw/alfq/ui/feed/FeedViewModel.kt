@@ -86,7 +86,6 @@ class FeedViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                android.util.Log.e("FeedViewModel", "Append feed failed: ${e.message}", e)
                 _uiState.update { it.copy(isAppending = false, appendError = e.message ?: "加载更多失败") }
                 _uiEvent.emit(UiEvent.Snackbar(e.message ?: "加载更多失败"))
             }
@@ -107,7 +106,6 @@ class FeedViewModel @Inject constructor(
                 val updated = if (willLike) repository.likePost(postId) else repository.unlikePost(postId)
                 updatePost(postId) { it.copy(likeCount = updated.likeCount) }
             } catch (e: Exception) {
-                android.util.Log.e("FeedViewModel", "Like/unlike failed: ${e.message}", e)
                 updatePost(postId) { post }
                 _uiEvent.emit(UiEvent.Snackbar("操作失败，已回滚"))
             }
@@ -121,7 +119,6 @@ class FeedViewModel @Inject constructor(
             try {
                 repository.sharePost(postId)
             } catch (e: Exception) {
-                android.util.Log.e("FeedViewModel", "Share failed: ${e.message}", e)
                 updatePost(postId) { post }
                 _uiEvent.emit(UiEvent.Snackbar("分享失败"))
             }
@@ -142,7 +139,6 @@ class FeedViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                android.util.Log.e("FeedViewModel", "Load feed failed: ${e.message}", e)
                 _uiState.update {
                     it.copy(
                         error = e.message ?: "加载失败",
