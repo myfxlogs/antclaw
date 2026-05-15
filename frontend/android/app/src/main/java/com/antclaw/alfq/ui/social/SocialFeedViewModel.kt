@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.repository.SocialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,6 +21,9 @@ class SocialFeedViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SocialFeedState())
     val state: StateFlow<SocialFeedState> = _state.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     init { loadFeed(FeedTab.FOLLOWING) }
 
@@ -55,7 +61,9 @@ class SocialFeedViewModel @Inject constructor(
                 val (posts, next) = repository.getFeed(cursor, 20)
                 onSuccess(posts, next)
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Load failed", isLoading = false, isRefreshing = false) }
+                android.util.Log.e("SocialFeed", "Fetch feed failed: ${e.message}", e)
+                _state.update { it.copy(error = e.message ?: "加载失败", isLoading = false, isRefreshing = false) }
+                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "加载失败"))
             }
         }
     }
@@ -65,19 +73,30 @@ class SocialFeedViewModel @Inject constructor(
     fun toggleLike(postId: String) {
         viewModelScope.launch {
             val post = _state.value.posts.find { it.postId == postId } ?: return@launch
+            val willLike = !post.isLiked
+            updatePost(postId) { it.copy(isLiked = willLike, likeCount = if (willLike) it.likeCount + 1 else (it.likeCount - 1).coerceAtLeast(0)) }
             try {
-                val updated = if (post.isLiked) repository.unlikePost(postId) else repository.likePost(postId)
-                updatePost(postId) { it.copy(isLiked = !it.isLiked, likeCount = updated.likeCount) }
-            } catch (_: Exception) { }
+                val updated = if (willLike) repository.likePost(postId) else repository.unlikePost(postId)
+                updatePost(postId) { it.copy(likeCount = updated.likeCount) }
+            } catch (e: Exception) {
+                android.util.Log.e("SocialFeed", "Like/unlike failed: ${e.message}", e)
+                _uiEvent.emit(UiEvent.Snackbar("操作失败，已回滚"))
+                updatePost(postId) { it.copy(isLiked = !willLike, likeCount = if (!willLike) it.likeCount + 1 else (it.likeCount - 1).coerceAtLeast(0)) }
+            }
         }
     }
 
     fun sharePost(postId: String) {
         viewModelScope.launch {
+            val post = _state.value.posts.find { it.postId == postId } ?: return@launch
+            updatePost(postId) { it.copy(shareCount = it.shareCount + 1) }
             try {
                 repository.sharePost(postId)
-                updatePost(postId) { it.copy(shareCount = it.shareCount + 1) }
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                android.util.Log.e("SocialFeed", "Share failed: ${e.message}", e)
+                _uiEvent.emit(UiEvent.Snackbar("分享失败"))
+                updatePost(postId) { it.copy(shareCount = (it.shareCount - 1).coerceAtLeast(0)) }
+            }
         }
     }
 

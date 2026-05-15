@@ -1,11 +1,14 @@
 package com.antclaw.alfq.data.local
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -20,14 +23,29 @@ class TokenStore @Inject constructor(
 ) {
     companion object {
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
-        private val KEY_REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        private const val ENCRYPTED_PREFS_FILE_NAME = "alfq_encrypted_tokens"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
+    }
+
+    private val encryptedPrefs: SharedPreferences by lazy {
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        EncryptedSharedPreferences.create(
+            context,
+            ENCRYPTED_PREFS_FILE_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_ACCESS_TOKEN] = accessToken
-            prefs[KEY_REFRESH_TOKEN] = refreshToken
         }
+        encryptedPrefs.edit().putString(KEY_REFRESH_TOKEN, refreshToken).apply()
     }
 
     suspend fun saveAccessToken(token: String) {
@@ -41,10 +59,11 @@ class TokenStore @Inject constructor(
     }
 
     suspend fun getRefreshToken(): String? {
-        return context.dataStore.data.map { it[KEY_REFRESH_TOKEN] }.first()
+        return encryptedPrefs.getString(KEY_REFRESH_TOKEN, null)
     }
 
     suspend fun clearTokens() {
         context.dataStore.edit { it.clear() }
+        encryptedPrefs.edit().clear().apply()
     }
 }

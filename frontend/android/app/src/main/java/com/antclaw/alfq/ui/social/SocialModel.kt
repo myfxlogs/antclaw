@@ -67,6 +67,13 @@ data class ChartShareUi(
     val chartUrl: String? = null,
 )
 
+// ── One-time UI Events ──
+
+sealed class UiEvent {
+    data class Snackbar(val message: String) : UiEvent()
+    data class Navigate(val route: String) : UiEvent()
+}
+
 // ── Enums ──
 
 enum class PostType { TEXT, SIGNAL_CARD, CHART_SHARE, SHARE }

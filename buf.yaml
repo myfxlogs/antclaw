@@ -1,7 +1,5 @@
-version: v2
-modules:
-  - path: proto
-    name: buf.build/antclaw/antclaw
+version: v1
+name: buf.build/antclaw/antclaw
 deps:
   - buf.build/bufbuild/protovalidate
 breaking:

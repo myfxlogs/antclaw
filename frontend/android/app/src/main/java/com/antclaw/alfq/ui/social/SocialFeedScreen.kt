@@ -32,6 +32,17 @@ fun SocialFeedScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Consume one-time UI events
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.Snackbar -> snackbarHostState.showSnackbar(event.message)
+                else -> { /* no-op */ }
+            }
+        }
+    }
 
     // Load more when reaching the bottom
     val shouldLoadMore = remember {
@@ -47,6 +58,7 @@ fun SocialFeedScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column {
                 TopAppBar(

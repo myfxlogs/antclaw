@@ -2,6 +2,7 @@ package com.antclaw.alfq
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
@@ -13,7 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.antclaw.alfq.ui.feed.FeedScreen
 import com.antclaw.alfq.ui.chat.ChatScreen
 import com.antclaw.alfq.ui.feed.SignalDetailScreen
 import com.antclaw.alfq.ui.social.SocialFeedScreen
@@ -43,7 +43,7 @@ private const val DEFAULT_USER_ID = "me"
 @Composable
 fun AlfQApp() {
     val isLoggedIn = remember { mutableStateOf(ConnectTransportProvider.getToken() != null) }
-    AlfQTheme(darkTheme = false) {
+    AlfQTheme(darkTheme = isSystemInDarkTheme()) {
         if (!isLoggedIn.value) {
             val authNavController = rememberNavController()
             NavHost(navController = authNavController, startDestination = "login") {
@@ -94,11 +94,9 @@ fun MainContent(onLogout: () -> Unit) {
             modifier = Modifier.padding(padding),
         ) {
             composable("feed") {
-                FeedScreen(
-                    notificationCount = notifState.unreadCount,
-                    onSignalClick = { pair -> navController.navigate("signal/$pair") },
-                    onNotificationClick = { navController.navigate("notifications") },
-                    onSearchClick = { navController.navigate("discover") },
+                SocialFeedScreen(
+                    onPostClick = { postId -> navController.navigate("postDetail/$postId") },
+                    onPostCreate = { navController.navigate("post") },
                 )
             }
             composable("discover") {

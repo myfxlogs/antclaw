@@ -62,7 +62,10 @@ class FeedViewModel @Inject constructor() : ViewModel() {
                 Price.GetPriceRequest::class, Price.GetPriceResponse::class)
             SignalBarItem(pair, bias?.direction ?: "neutral",
                 ((bias?.confidence ?: 0.0) * 100).toInt(), priceResp.current.ifEmpty { "--" })
-        } catch (_: Exception) { SignalBarItem(pair) }
+        } catch (e: Exception) {
+            android.util.Log.w("FeedViewModel", "loadSignalBar failed for $pair: ${e.message}")
+            SignalBarItem(pair)
+        }
     }
 
     private suspend fun loadFeedCards(): List<FeedCard> = defaultPairs.take(3).mapNotNull { pair ->
@@ -75,6 +78,9 @@ class FeedViewModel @Inject constructor() : ViewModel() {
             FeedCard("signal_$pair", authorSystem, resp.signal.pair, resp.signal.direction,
                 ((resp.signal.confidence) * 100).toInt(),
                 resp.signal.contributingFactorsList.joinToString(" \u00b7 "), timeJustNow)
-        } catch (_: Exception) { null }
+        } catch (e: Exception) {
+            android.util.Log.w("FeedViewModel", "loadFeedCards failed for $pair: ${e.message}")
+            null
+        }
     }
 }

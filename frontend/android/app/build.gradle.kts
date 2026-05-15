@@ -7,6 +7,8 @@ plugins {
     id("com.google.protobuf")
 }
 
+import java.util.Properties
+
 android {
     namespace = "com.antclaw.alfq"
     compileSdk = 35
@@ -26,10 +28,28 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("antclaw-release.jks")
-            storePassword = "android"
-            keyAlias = "antclaw"
-            keyPassword = "android"
+            // 签名信息从环境变量读取，不在仓库中硬编码
+            // 示例：在 local.properties 中配置：
+            // RELEASE_STORE_FILE=/path/to/release.jks
+            // RELEASE_STORE_PASSWORD=your_password
+            // RELEASE_KEY_ALIAS=your_alias
+            // RELEASE_KEY_PASSWORD=your_password
+            val propsFile = file("../local.properties")
+            if (propsFile.exists()) {
+                val props = Properties()
+                props.load(propsFile.inputStream())
+                val storeFilePath = props.getProperty("RELEASE_STORE_FILE")
+                val storePass = props.getProperty("RELEASE_STORE_PASSWORD")
+                val keyAlias = props.getProperty("RELEASE_KEY_ALIAS")
+                val keyPass = props.getProperty("RELEASE_KEY_PASSWORD")
+                
+                if (storeFilePath != null && storePass != null && keyAlias != null && keyPass != null) {
+                    storeFile = file(storeFilePath)
+                    storePassword = storePass
+                    this.keyAlias = keyAlias
+                    this.keyPassword = keyPass
+                }
+            }
         }
     }
 
@@ -37,7 +57,12 @@ android {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs["release"]
+            // 仅在配置了签名信息时才签名
+            signingConfig = if (signingConfigs["release"].storeFile?.exists() == true) {
+                signingConfigs["release"]
+            } else {
+                null
+            }
         }
     }
 
@@ -107,6 +132,9 @@ dependencies {
 
     // DataStore
     implementation(libs.datastore.preferences)
+
+    // Jetpack Security (for token encryption)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Coroutines
     implementation(libs.coroutines.core)

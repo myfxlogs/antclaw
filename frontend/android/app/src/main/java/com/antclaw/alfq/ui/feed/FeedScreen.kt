@@ -122,7 +122,7 @@ private fun FeedContent(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.feed_empty_title), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(SpacingSm))
-                    Button(onClick = {}) { Text(stringResource(R.string.feed_empty_action)) }
+                    TextButton(onClick = onRetry) { Text(stringResource(R.string.feed_empty_action)) }
                 }
             }
         else ->
