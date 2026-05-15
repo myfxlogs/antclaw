@@ -390,7 +390,7 @@ Feed 和通知是高频页面，应支持本地缓存：
 - [x] 拆分 `AuthManager` 或 `SessionViewModel` 管理登录态。 → `ui/session/SessionViewModel.kt`
 - [ ] `ConnectTransportProvider` 改为可注入、可测试的 RPC 客户端工厂。 → 仍是 Kotlin object 单例，未通过 DI 注入，tokenProvider 仍使用 runBlocking
 - [x] OkHttpClient 单例复用。
-- [ ] 401 refresh 串行化，失败后通知 UI 跳登录。 → refreshTokenBlocking() 无 Mutex，并发 401 可能重复刷新
+- [x] 401 refresh 串行化，失败后通知 UI 跳登录。 → ConnectTransportProvider.refreshTokenSingleFlight(): synchronized + wait/notifyAll 保证单飞
 - [ ] SSE 连接由会话统一管理，支持幂等 connect 和指数退避。 → SessionViewModel 已管理生命周期，但 SseManager 使用固定 3000ms 重连，非指数退避
 - [x] ViewModel 不再直接拼 RPC path。 → 6 个 ViewModel 已迁移至 Repository→RpcClient (Profile/Me/Chat/Alert/SignalDetail/Discover)
 

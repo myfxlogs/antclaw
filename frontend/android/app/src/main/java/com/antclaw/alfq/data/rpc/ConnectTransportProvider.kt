@@ -24,6 +24,12 @@ object ConnectTransportProvider {
 
     private var tokenProvider: (() -> String?)? = null
     private var tokenStore: TokenStore? = null
+
+    // ── Single-flight refresh ──
+    private val refreshLock = Any()
+    @Volatile private var isRefreshing = false
+    @Volatile private var lastRefreshResult: String? = null
+
     private val noAuthOkHttpClient by lazy { OkHttpClient() }
     private val authOkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -40,7 +46,7 @@ object ConnectTransportProvider {
 
                 if (response.code == 401) {
                     response.close()
-                    val newToken = refreshTokenBlocking()
+                    val newToken = refreshTokenSingleFlight()
                     if (newToken != null) {
                         val retryRequest = chain.request().newBuilder()
                             .header("Authorization", "Bearer $newToken").build()
@@ -86,30 +92,71 @@ object ConnectTransportProvider {
     fun clearToken() { tokenProvider = null }
     fun getToken(): String? = tokenProvider?.invoke()
 
-    /** 同步 token 刷新（在 OkHttp 拦截器中调用，不在协程上下文中）。 */
-    private fun refreshTokenBlocking(): String? {
+    /**
+     * Single-flight token refresh — 多个并发 401 只发起一次刷新。
+     * 第一个请求执行刷新，后续请求等待并复用结果。
+     * 在 OkHttp 拦截器（非协程线程）中调用，使用 synchronized + wait/notifyAll。
+     */
+    private fun refreshTokenSingleFlight(): String? {
         val store = tokenStore ?: return null
-        return runBlocking {
-            try {
-                val refreshToken = store.getRefreshToken() ?: return@runBlocking null
-                val client = noAuthProtocolClient
-                val request = Auth.RefreshRequest.newBuilder()
-                    .setRefreshToken(refreshToken).build()
-                val spec = MethodSpec(
-                    path = "antclaw.v1.AuthService/Refresh",
-                    requestClass = Auth.RefreshRequest::class,
-                    responseClass = Auth.RefreshResponse::class,
-                    streamType = StreamType.UNARY,
-                )
-                val resp: ResponseMessage<Auth.RefreshResponse> = client.unary(request, emptyMap(), spec)
-                val newAccess = resp.getOrThrow().accessToken
-                setToken(newAccess)
-                store.saveAccessToken(newAccess)
-                newAccess
-            } catch (_: Exception) {
-                clearToken()
-                store.clearTokens()
-                null
+
+        // Fast path: another thread already finished refreshing
+        if (!isRefreshing && lastRefreshResult != null) {
+            val cached = lastRefreshResult
+            lastRefreshResult = null
+            return cached
+        }
+
+        // Wait if another thread is refreshing
+        if (isRefreshing) {
+            synchronized(refreshLock) {
+                while (isRefreshing) {
+                    (refreshLock as java.lang.Object).wait(5000)
+                }
+            }
+            val cached = lastRefreshResult
+            lastRefreshResult = null
+            return cached
+        }
+
+        // Acquire the refresh lock and execute
+        synchronized(refreshLock) {
+            if (isRefreshing) {
+                while (isRefreshing) (refreshLock as java.lang.Object).wait(5000)
+                val cached = lastRefreshResult; lastRefreshResult = null; return cached
+            }
+            isRefreshing = true
+        }
+
+        try {
+            val result = runBlocking {
+                try {
+                    val refreshToken = store.getRefreshToken() ?: return@runBlocking null
+                    val request = Auth.RefreshRequest.newBuilder()
+                        .setRefreshToken(refreshToken).build()
+                    val spec = MethodSpec(
+                        path = "antclaw.v1.AuthService/Refresh",
+                        requestClass = Auth.RefreshRequest::class,
+                        responseClass = Auth.RefreshResponse::class,
+                        streamType = StreamType.UNARY,
+                    )
+                    val resp: ResponseMessage<Auth.RefreshResponse> = noAuthProtocolClient.unary(request, emptyMap(), spec)
+                    val newAccess = resp.getOrThrow().accessToken
+                    setToken(newAccess)
+                    store.saveAccessToken(newAccess)
+                    newAccess
+                } catch (_: Exception) {
+                    clearToken()
+                    store.clearTokens()
+                    null
+                }
+            }
+            lastRefreshResult = result
+            return result
+        } finally {
+            synchronized(refreshLock) {
+                isRefreshing = false
+                (refreshLock as java.lang.Object).notifyAll()
             }
         }
     }
