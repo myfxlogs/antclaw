@@ -89,7 +89,9 @@ android {
         }
     }
 
-
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 // ── Protobuf code generation ──
@@ -160,6 +162,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.robolectric:robolectric:4.14.1")
 
     // Android Test (Compose UI)
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
