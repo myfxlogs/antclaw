@@ -87,8 +87,8 @@ class StubSocialRepo(
     var failLike: Boolean = false,
     var failShare: Boolean = false,
 ) : SocialRepository(
-    FeedRpc(null as com.connectrpc.ProtocolClientInterface),
-    ProfileRpc(null as com.connectrpc.ProtocolClientInterface),
+    FeedRpc(object : com.connectrpc.ProtocolClientInterface {}),
+    ProfileRpc(object : com.connectrpc.ProtocolClientInterface {}),
     null as TokenStore,
 ) {
     override suspend fun getFeed(c: String, ps: Int, f: String) = if (fail) throw RuntimeException("err") else if (c.isEmpty()) posts to cursor else posts to null
