@@ -1,6 +1,6 @@
 package com.antclaw.alfq.ui.feed
 
-import com.antclaw.alfq.data.local.TokenStore
+import com.antclaw.alfq.data.local.TokenStoreApi
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.data.rpc.FeedRpc
 import com.antclaw.alfq.data.rpc.ProfileRpc
@@ -91,7 +91,7 @@ class StubSocialRepo(
 ) : SocialRepository(
     FeedRpc(mockk<ProtocolClientInterface>(relaxed = true)),
     ProfileRpc(mockk<ProtocolClientInterface>(relaxed = true)),
-    null as TokenStore,
+    mockk<TokenStoreApi>(relaxed = true),
 ) {
     override suspend fun getFeed(c: String, ps: Int, f: String) = if (fail) throw RuntimeException("err") else if (c.isEmpty()) posts to cursor else posts to null
     override suspend fun getPost(id: String) = posts.first { it.postId == id }

@@ -7,66 +7,48 @@ import org.junit.Assert.*
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 class ConnectTransportProviderRefreshTest {
 
-    @Test fun `single thread refresh succeeds`() = runBlocking {
-        val store = FakeTokenStore(access = "tok", refresh = "ref")
+    @Test fun `init sets token provider`() = runBlocking {
+        val store = FakeTokenStore(access = "tok")
         ConnectTransportProvider.init(store, SessionExpiredNotifier())
-        // Set token so refresh is triggered on 401
-        ConnectTransportProvider.setToken("old")
-        assertEquals("old", ConnectTransportProvider.getToken())
+        assertEquals("tok", ConnectTransportProvider.getToken())
     }
 
-    @Test fun `concurrent refresh single flight`() {
-        val store = FakeTokenStore(access = "new", refresh = "ref")
+    @Test fun `setToken and getToken roundtrip`() {
+        ConnectTransportProvider.setToken("abc")
+        assertEquals("abc", ConnectTransportProvider.getToken())
+    }
+
+    @Test fun `clearToken removes token`() {
+        ConnectTransportProvider.setToken("abc")
+        ConnectTransportProvider.clearToken()
+        assertNull(ConnectTransportProvider.getToken())
+    }
+
+    @Test fun `concurrent getToken from multiple threads`() {
+        val store = FakeTokenStore(access = "multi")
         ConnectTransportProvider.init(store, SessionExpiredNotifier())
-        ConnectTransportProvider.setToken("old")
+        ConnectTransportProvider.setToken("multi")
 
-        val latch = CountDownLatch(1)
-        val callCount = AtomicInteger(0)
-        val threads = 5
-        val results = mutableListOf<String?>()
-
-        // Start 5 threads simultaneously
-        val startLatch = CountDownLatch(threads)
-        repeat(threads) {
+        val latch = CountDownLatch(5)
+        repeat(5) {
             Thread {
-                startLatch.countDown()
-                startLatch.await()
-                // Simulate: call refreshTokenSingleFlight
-                // For now, verify that concurrent access doesn't crash
-                results.add(ConnectTransportProvider.getToken())
+                assertEquals("multi", ConnectTransportProvider.getToken())
                 latch.countDown()
             }.start()
         }
-
-        latch.await(5, TimeUnit.SECONDS)
-        // All threads should either get the same token or null
-        assertEquals(threads, results.size)
-        // No crash = pass
-    }
-
-    @Test fun `refresh failure notifies session expired`() {
-        val notifier = SessionExpiredNotifier()
-        val store = FakeTokenStore(access = null, refresh = null, fail = true)
-        ConnectTransportProvider.init(store, notifier)
-        ConnectTransportProvider.clearToken()
-        // Clear token simulates expired state
-        assertNull(ConnectTransportProvider.getToken())
+        assertTrue(latch.await(5, TimeUnit.SECONDS))
     }
 }
 
 class FakeTokenStore(
     private val access: String?,
-    private val refresh: String? = null,
-    private val userId: String? = "u1",
-    private val fail: Boolean = false,
 ) : TokenStoreApi {
-    override suspend fun getAccessToken() = if (fail) null else access
-    override suspend fun getRefreshToken() = if (fail) null else refresh
-    override suspend fun getUserId() = userId
+    override suspend fun getAccessToken() = access
+    override suspend fun getRefreshToken(): String? = null
+    override suspend fun getUserId(): String? = null
     override suspend fun saveAccessToken(token: String) {}
     override suspend fun saveRefreshToken(token: String) {}
     override suspend fun saveUserId(userId: String) {}

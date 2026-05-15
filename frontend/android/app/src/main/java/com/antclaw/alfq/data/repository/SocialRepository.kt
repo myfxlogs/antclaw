@@ -1,7 +1,7 @@
 package com.antclaw.alfq.data.repository
 
 import antclaw.v1.AlfqFeed
-import com.antclaw.alfq.data.local.TokenStore
+import com.antclaw.alfq.data.local.TokenStoreApi
 import com.antclaw.alfq.data.rpc.FeedRpc
 import com.antclaw.alfq.ui.social.CommentUi
 import com.antclaw.alfq.ui.social.PostType
@@ -23,7 +23,7 @@ import javax.inject.Singleton
 open class SocialRepository @Inject constructor(
     private val feedRpc: FeedRpc,
     private val profileRpc: ProfileRpc,
-    private val tokenStore: TokenStore,
+    private val tokenStore: TokenStoreApi,
 ) {
     private suspend fun currentUserId() = tokenStore.getUserId().orEmpty()
 

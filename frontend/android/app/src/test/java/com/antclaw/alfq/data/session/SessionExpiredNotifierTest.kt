@@ -1,25 +1,30 @@
 package com.antclaw.alfq.data.session
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.*
+import org.junit.*
 import org.junit.Assert.*
-import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SessionExpiredNotifierTest {
 
-    @Test fun `notify emits to subscribers`() = runTest {
+    private val testDispatcher = StandardTestDispatcher()
+
+    @Before fun setup() { Dispatchers.setMain(testDispatcher) }
+    @After fun tearDown() { Dispatchers.resetMain() }
+
+    @Test fun `notify emits to subscriber`() = runTest {
         val notifier = SessionExpiredNotifier()
         var received = false
-        backgroundScope.launch(StandardTestDispatcher(testScheduler)) {
+        val job = launch(Dispatchers.Main) {
             notifier.events.collect { received = true }
         }
+        runCurrent() // let subscriber start
         notifier.notifySessionExpired()
         advanceUntilIdle()
         assertTrue(received)
+        job.cancel()
     }
 
     @Test fun `no subscribers does not crash`() = runTest {
@@ -31,14 +36,15 @@ class SessionExpiredNotifierTest {
     @Test fun `multiple subscribers all receive`() = runTest {
         val notifier = SessionExpiredNotifier()
         var count = 0
-        val td = StandardTestDispatcher(testScheduler)
-        repeat(3) {
-            backgroundScope.launch(td) {
+        val jobs = (1..3).map {
+            launch(Dispatchers.Main) {
                 notifier.events.collect { count++ }
             }
         }
+        runCurrent() // let subscribers start
         notifier.notifySessionExpired()
         advanceUntilIdle()
         assertEquals(3, count)
+        jobs.forEach { it.cancel() }
     }
 }
