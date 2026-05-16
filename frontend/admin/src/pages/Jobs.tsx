@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
-import { Play, RotateCw } from 'lucide-react'
+import { RotateCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { listJobs, runJob, setJobEnabled } from '../lib/api'
 
