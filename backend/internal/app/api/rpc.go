@@ -72,4 +72,7 @@ func registerHandlers(mux *http.ServeMux, inf *Infra, svc *Services, boot time.T
 	mux.Handle(antclawv1connect.NewNotificationServiceHandler(
 		rpc.NewNotificationHandler(svc.Notify, inf.Queries),
 		connect.WithInterceptors(auth.AuthInterceptor(true))))
+
+	// ── Streaming (protobuf binary, replaces SSE) ──
+	mux.Handle(antclawv1connect.NewStreamServiceHandler(rpc.NewStreamHandler(inf.RDB.Raw())))
 }

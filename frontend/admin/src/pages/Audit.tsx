@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
-import { FileText, Download } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { createClient } from '@connectrpc/connect'
+import { StreamService } from '@antclaw/proto/antclaw/v1/stream_pb'
+import { transport } from '../lib/transport'
 import { listAuditLogs } from '../lib/api'
 
 interface AuditEntry {
@@ -13,6 +16,18 @@ interface AuditEntry {
   ip_address: string
 }
 
+function structToObject(s: any): Record<string, unknown> {
+  const obj: Record<string, unknown> = {}
+  if (s?.fields) {
+    for (const [k, v] of Object.entries(s.fields)) {
+      obj[k] = (v as any).kind?.value ?? (v as any).stringValue ?? null
+    }
+  }
+  return obj
+}
+
+const streamClient = createClient(StreamService, transport)
+
 export default function Audit() {
   const { t } = useTranslation()
   const [entries, setEntries] = useState<AuditEntry[]>([])
@@ -21,40 +36,32 @@ export default function Audit() {
   useEffect(() => {
     loadAuditLogs()
 
-    // 订阅审计日志 SSE，实现实时追加
-    const evtSource = new EventSource('/sse/audit')
-    evtSource.onmessage = (event) => {
+    // Subscribe to Connect server-streaming (protobuf binary)
+    const ac = new AbortController()
+    ;(async () => {
       try {
-        const data = JSON.parse(event.data) as {
-          user_id?: string
-          action: string
-          resource: string
-          details: string
-          ip_address?: string
-          timestamp: number
+        const stream = await streamClient.subscribeEvents({ channel: 'audit' }, { signal: ac.signal })
+        for await (const event of stream) {
+          if (event.type === 'system.heartbeat' || !event.payload) continue
+          const data = structToObject(event.payload)
+          setEntries((prev) => [
+            {
+              log_id: `stream-${Date.now()}`,
+              user_id: String(data.user_id || ''),
+              action: String(data.action),
+              resource: String(data.resource),
+              details: String(data.details),
+              created_at: Number(data.timestamp),
+              ip_address: String(data.ip_address || ''),
+            },
+            ...prev,
+          ])
         }
-        setEntries((prev) => [
-          {
-            log_id: `sse-${Date.now()}`,
-            user_id: data.user_id || '',
-            action: data.action,
-            resource: data.resource,
-            details: data.details,
-            created_at: data.timestamp,
-            ip_address: data.ip_address || '',
-          },
-          ...prev,
-        ])
       } catch {
-        // ignore malformed events
+        // stream closed
       }
-    }
-    evtSource.onerror = () => {
-      evtSource.close()
-    }
-    return () => {
-      evtSource.close()
-    }
+    })()
+    return () => ac.abort()
   }, [])
 
   const loadAuditLogs = async () => {
@@ -68,8 +75,17 @@ export default function Audit() {
     }
   }
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleString('zh-CN')
+  const handleExport = () => {
+    const json = JSON.stringify(entries, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `audit_${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   if (loading) {
@@ -80,9 +96,13 @@ export default function Audit() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">{t('audit.title')}</h1>
-        <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+        <button
+          onClick={handleExport}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700"
+          disabled={entries.length === 0}
+        >
           <Download className="w-4 h-4" />
-          导出
+          {t('audit.export') || '导出'}
         </button>
       </div>
 
@@ -90,26 +110,29 @@ export default function Audit() {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.time')}</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.action')}</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.userId')}</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.resource')}</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.createdAt')}</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.ipAddress')}</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.details')}</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">{t('audit.user')}</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">IP</th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {entries.map((entry) => (
               <tr key={entry.log_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  <span className="inline-flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="font-medium">{entry.action}</span>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {new Date(entry.created_at * 1000).toLocaleString('zh-CN', { hour12: false })}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">
+                    {entry.action}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm">{entry.user_id}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{entry.resource}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{formatDate(entry.created_at)}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{entry.ip_address}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-mono">{entry.resource}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{entry.details}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 font-mono">{entry.user_id || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 font-mono">{entry.ip_address || '-'}</td>
               </tr>
             ))}
           </tbody>

@@ -1,6 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
-import { Play, RotateCw } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { createClient } from '@connectrpc/connect'
+import { StreamService } from '@antclaw/proto/antclaw/v1/stream_pb'
+import { transport } from '../lib/transport'
 import { listJobs, runJob, setJobEnabled } from '../lib/api'
 
 interface Job {
@@ -24,6 +27,19 @@ function formatTime(isoTime: string): string {
   }
 }
 
+/** Convert protobuf Struct payload to plain object */
+function structToObject(s: any): Record<string, unknown> {
+  const obj: Record<string, unknown> = {}
+  if (s?.fields) {
+    for (const [k, v] of Object.entries(s.fields)) {
+      obj[k] = (v as any).kind?.value ?? (v as any).stringValue ?? null
+    }
+  }
+  return obj
+}
+
+const streamClient = createClient(StreamService, transport)
+
 export default function Jobs() {
   const { t } = useTranslation()
   const [jobs, setJobs] = useState<Job[]>([])
@@ -39,44 +55,34 @@ export default function Jobs() {
 
   useEffect(() => {
     loadJobs()
-    // 订阅后端 SSE 事件，实现实时 Job 状态更新
-    const evtSource = new EventSource('/sse/jobs')
-    evtSource.onmessage = (event) => {
+    // Subscribe to Connect server-streaming (protobuf binary)
+    const ac = new AbortController()
+    ;(async () => {
       try {
-        const data = JSON.parse(event.data) as {
-          job_id: string
-          name?: string
-          status?: string
-          started_at?: number
-          finished_at?: number
-          error?: string
+        const stream = await streamClient.subscribeEvents({ channel: 'jobs' }, { signal: ac.signal })
+        for await (const event of stream) {
+          if (event.type === 'system.heartbeat' || !event.payload) continue
+          const data = structToObject(event.payload)
+          setJobs((prev) => {
+            const idx = prev.findIndex((j) => j.job_id === data.job_id)
+            if (idx === -1) return prev
+            const updated = [...prev]
+            const job = updated[idx]
+            updated[idx] = {
+              ...job,
+              job_name: String(data.name || job.job_name),
+              status: String(data.status || job.status),
+              last_run: data.finished_at ? new Date(Number(data.finished_at) * 1000).toISOString() : job.last_run,
+              last_error: data.status === 'failed' ? String(data.error || job.last_error) : (data.status === 'succeeded' ? '' : job.last_error),
+            }
+            return updated
+          })
         }
-        setJobs((prev) => {
-          const idx = prev.findIndex((j) => j.job_id === data.job_id)
-          if (idx === -1) {
-            return prev
-          }
-          const updated = [...prev]
-          const job = updated[idx]
-          updated[idx] = {
-            ...job,
-            job_name: data.name || job.job_name,
-            status: data.status || job.status,
-            last_run: data.finished_at ? new Date(data.finished_at * 1000).toISOString() : job.last_run,
-            last_error: data.status === 'failed' ? (data.error || job.last_error) : (data.status === 'succeeded' ? '' : job.last_error),
-          }
-          return updated
-        })
       } catch {
-        // ignore malformed events
+        // stream closed
       }
-    }
-    evtSource.onerror = () => {
-      evtSource.close()
-    }
-    return () => {
-      evtSource.close()
-    }
+    })()
+    return () => ac.abort()
   }, [])
 
   const loadJobs = async () => {
@@ -93,7 +99,6 @@ export default function Jobs() {
   const handleRunJob = async (jobId: string) => {
     try {
       await runJob(jobId)
-      // 立即把该行状态切到 running，等 SSE 推送最终状态（succeeded/failed）
       setJobs((prev) => prev.map((j) => (j.job_id === jobId ? { ...j, status: 'running' } : j)))
       showToast(`已触发：${jobId}`, 'ok')
     } catch (err) {
@@ -198,60 +203,39 @@ export default function Jobs() {
                     onClick={() => handleToggleEnabled(job.job_id, job.enabled)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
                       job.enabled ? 'bg-green-500' : 'bg-gray-300'
-                    } ${toggling === job.job_id ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
-                    title={job.enabled ? t('jobs.disable') : t('jobs.enable')}
+                    }`}
                   >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                        job.enabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${job.enabled ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
                 </td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-                      job.status === 'running'
-                        ? 'bg-blue-100 text-blue-700'
-                        : job.status === 'succeeded'
-                          ? 'bg-green-100 text-green-700'
-                          : job.status === 'scheduled' || job.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : job.status === 'failed'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {job.status === 'running'
-                      ? t('jobs.running')
-                      : job.status === 'succeeded'
-                        ? t('jobs.succeeded')
-                        : job.status === 'scheduled' || job.status === 'pending'
-                          ? t('jobs.pending')
-                          : job.status === 'failed'
-                            ? t('jobs.failed')
-                            : t('jobs.unknown')}
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    job.status === 'succeeded' ? 'bg-green-100 text-green-700' :
+                    job.status === 'failed' ? 'bg-red-100 text-red-700' :
+                    job.status === 'running' ? 'bg-blue-100 text-blue-700' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {job.status || 'unknown'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{formatTime(job.last_run)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{formatTime(job.next_run)}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">{formatTime(job.last_run)}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">{formatTime(job.next_run)}</td>
                 <td className="px-6 py-4">
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleRunJob(job.job_id)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                      title={t('jobs.run')}
+                      className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600"
+                      title={t('jobs.run') || '运行'}
                     >
-                      <RotateCw className="w-4 h-4" />
+                      <Play className="w-4 h-4" />
                     </button>
                   </div>
                 </td>
               </tr>
               {job.last_error && (
-                <tr className="bg-red-50">
-                  <td colSpan={7} className="px-6 py-2 text-xs text-red-700">
-                    <span className="font-semibold mr-2">最近错误:</span>
-                    <span className="break-all">{job.last_error}</span>
+                <tr key={`${job.job_id}-err`}>
+                  <td colSpan={7} className="px-6 py-2 bg-red-50">
+                    <pre className="text-xs text-red-700 whitespace-pre-wrap">{job.last_error}</pre>
                   </td>
                 </tr>
               )}
