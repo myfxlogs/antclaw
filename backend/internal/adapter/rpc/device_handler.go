@@ -85,7 +85,7 @@ func (h *DeviceHandler) ListDevices(ctx context.Context, req *connect.Request[de
 		return nil, err
 	}
 	filter := req.Msg.GetOsTypeFilter()
-	limit := clampPage(req.Msg.GetPageSize()) + 1
+	limit := clampPage(req.Msg.GetPageSize())
 
 	rows, err := h.pg.Query(ctx, `
 		SELECT d.device_id, d.model, d.brand, d.os_version, d.os_type, d.app_version, d.build_number,

@@ -749,27 +749,20 @@ export async function updateNotificationPrefs(p: NotificationPrefsItem): Promise
 }
 
 // 个人通知 SSE：返回 EventSource，调用方负责绑定 onmessage / 关闭。
+// SSE payload 为 base64 编码的 Notification protobuf 消息。
 export function openNotificationsSSE(onEvent: (n: NotificationItem) => void): () => void {
   const token = localStorage.getItem('token') || ''
-  // 去掉末尾斜杠，避免 API_BASE_URL='/' 时拼出 '//sse/...'，被浏览器解析为 host='sse' (ERR_NAME_NOT_RESOLVED)。
   const base = API_BASE_URL.replace(/\/+$/, '')
   const url = `${base}/sse/notifications?access_token=${encodeURIComponent(token)}`
   const es = new EventSource(url)
   es.addEventListener('notification', (ev: MessageEvent) => {
     try {
-      const raw = JSON.parse(ev.data)
-      onEvent({
-        id: '',
-        type: String(raw.type || 'in_app'),
-        category: String(raw.category || 'system'),
-        severity: String(raw.severity || 'normal'),
-        title: String(raw.title || ''),
-        body: String(raw.body || ''),
-        data: raw.data || {},
-        is_read: false,
-        created_at: Math.floor(Date.now() / 1000),
-        read_at: 0,
-      })
+      // 动态导入 proto，避免阻塞首屏加载
+      import('@antclaw/proto/antclaw/v1/notification_pb').then(({ Notification }) => {
+        const bytes = Uint8Array.from(atob(ev.data), c => c.charCodeAt(0))
+        const proto = Notification.fromBinary(bytes)
+        onEvent(notifFromProto(proto))
+      }).catch(() => {})
     } catch {}
   })
   return () => es.close()

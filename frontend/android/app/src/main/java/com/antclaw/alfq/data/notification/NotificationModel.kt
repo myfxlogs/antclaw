@@ -1,5 +1,6 @@
 package com.antclaw.alfq.data.notification
 
+import antclaw.v1.NotificationOuterClass
 import java.time.Instant
 
 // 对应 proto antclaw.v1.Notification，客户端本地模型。
@@ -15,7 +16,23 @@ data class ClientNotification(
     val isRead: Boolean = false,
     val createdAt: Instant = Instant.now(),
     val readAt: Instant? = null,
-)
+) {
+    companion object {
+        fun fromProto(proto: NotificationOuterClass.Notification): ClientNotification = ClientNotification(
+            id = proto.id,
+            userId = proto.userId,
+            type = proto.type,
+            category = proto.category,
+            severity = proto.severity,
+            title = proto.title,
+            body = proto.body,
+            data = proto.dataMap,
+            isRead = proto.isRead,
+            createdAt = Instant.ofEpochSecond(proto.createdAt),
+            readAt = if (proto.readAt > 0) Instant.ofEpochSecond(proto.readAt) else null,
+        )
+    }
+}
 
 // 通知 UI 状态。
 data class NotificationUiState(

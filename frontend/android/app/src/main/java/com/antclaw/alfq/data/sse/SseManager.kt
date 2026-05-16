@@ -1,6 +1,7 @@
 package com.antclaw.alfq.data.sse
 
 import android.util.Log
+import antclaw.v1.NotificationOuterClass
 import com.antclaw.alfq.data.notification.ClientNotification
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
 import kotlinx.coroutines.*
@@ -12,8 +13,6 @@ import okhttp3.Response
 import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
-import org.json.JSONObject
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -192,24 +191,13 @@ class SseManager @Inject constructor() : SseClient {
         scope.cancel()
     }
 
-    // ── JSON 解析 ──
+    // ── Protobuf 解析 ──
 
     private suspend fun parseAndEmit(data: String) {
         try {
-            val json = JSONObject(data)
-            val notif = ClientNotification(
-                id = json.optString("id", ""),
-                category = json.optString("category", "system"),
-                type = json.optString("type", "in_app"),
-                title = json.optString("title", ""),
-                body = json.optString("body", ""),
-                severity = json.optString("severity", "normal"),
-                data = emptyMap(),
-                createdAt = Instant.parse(
-                    json.optString("created_at", Instant.now().toString())
-                ),
-            )
-            _notifications.emit(notif)
+            val bytes = android.util.Base64.decode(data, android.util.Base64.DEFAULT)
+            val proto = NotificationOuterClass.Notification.parseFrom(bytes)
+            _notifications.emit(ClientNotification.fromProto(proto))
         } catch (e: Exception) {
             Log.e(TAG, "Parse SSE notification failed", e)
         }
