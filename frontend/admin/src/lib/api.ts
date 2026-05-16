@@ -758,10 +758,12 @@ export function openNotificationsSSE(onEvent: (n: NotificationItem) => void): ()
   es.addEventListener('notification', (ev: MessageEvent) => {
     try {
       // 动态导入 proto，避免阻塞首屏加载
-      import('@antclaw/proto/antclaw/v1/notification_pb').then(({ Notification }) => {
-        const bytes = Uint8Array.from(atob(ev.data), c => c.charCodeAt(0))
-        const proto = Notification.fromBinary(bytes)
-        onEvent(notifFromProto(proto))
+      import('@antclaw/proto/antclaw/v1/notification_pb').then(({ NotificationSchema }) => {
+        import('@bufbuild/protobuf').then(({ fromBinary }) => {
+          const bytes = Uint8Array.from(atob(ev.data), c => c.charCodeAt(0))
+          const proto = fromBinary(NotificationSchema, bytes)
+          onEvent(notifFromProto(proto))
+        }).catch(() => {})
       }).catch(() => {})
     } catch {}
   })
