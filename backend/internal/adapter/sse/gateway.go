@@ -8,6 +8,7 @@ import (
 
 	"github.com/antclaw/antclaw/internal/auth"
 	streamv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Gateway implements SSE streaming server.
@@ -62,7 +63,10 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.sendEvent(w, &streamv1.SubscribeEventsResponse{
 		Id:        fmt.Sprintf("evt-%d", time.Now().Unix()),
 		Type:      "system.connected",
-		Payload:   fmt.Sprintf(`{"client_id":"%s","channel":"%s"}`, client.id, channel),
+		Payload:   mustNewStruct(map[string]interface{}{
+			"client_id": client.id,
+			"channel":   channel,
+		}),
 		Timestamp: time.Now().Format(time.RFC3339),
 	})
 	
@@ -85,7 +89,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			g.sendEvent(w, &streamv1.SubscribeEventsResponse{
 				Id:        fmt.Sprintf("hb-%d", time.Now().Unix()),
 				Type:      "system.heartbeat",
-				Payload:   "{}",
+				Payload:   mustNewStruct(map[string]interface{}{}),
 				Timestamp: time.Now().Format(time.RFC3339),
 			})
 			flusher.Flush()
@@ -100,9 +104,14 @@ func (g *Gateway) sendEvent(w http.ResponseWriter, event *streamv1.SubscribeEven
 	fmt.Fprintf(w, "id: %s\n", event.Id)
 	fmt.Fprintf(w, "event: %s\n", event.Type)
 	
-	payload, _ := json.Marshal(event.Payload)
+	payload, _ := json.Marshal(event.Payload.AsMap())
 	fmt.Fprintf(w, "data: %s\n", string(payload))
 	fmt.Fprintf(w, "\n")
+}
+
+func mustNewStruct(m map[string]interface{}) *structpb.Struct {
+	s, _ := structpb.NewStruct(m)
+	return s
 }
 
 func generateClientID() string {

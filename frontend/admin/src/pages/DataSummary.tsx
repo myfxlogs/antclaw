@@ -31,9 +31,9 @@ export default function DataSummary() {
   const load = async () => {
     setLoading(true)
     try {
-      const json = await getDataSummary()
-      setItems(json.items || [])
-      setUpdatedAt(json.updated_at || null)
+      const data = await getDataSummary()
+      setItems(data.items || [])
+      setUpdatedAt(data.updated_at || null)
     } catch (err) {
       console.error('failed to load data summary', err)
     } finally {

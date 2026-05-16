@@ -4,7 +4,7 @@ package antclaw.v1;
 
 option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
 
-// AdminDataService 管理端采集数据汇总与预览（原 /admin/data/* JSON）。
+// AdminDataService 管理端采集数据汇总与预览。
 service AdminDataService {
   rpc GetDataSummary(GetDataSummaryRequest) returns (GetDataSummaryResponse);
   rpc GetDataPreview(GetDataPreviewRequest) returns (GetDataPreviewResponse);
@@ -36,7 +36,7 @@ message GetDataPreviewResponse {
   string table = 2;
   string time_col = 3;
   repeated string columns = 4;
-  // JSON 数组，元素为对象（与旧 REST 预览 rows 一致），便于前端直接 JSON.parse。
+  // 动态列的预览数据（未来改为 repeated google.protobuf.Struct rows = 5）
   string rows_json = 5;
   int32 total_sampled = 6;
 }

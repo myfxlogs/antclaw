@@ -5,6 +5,8 @@ import (
 	"time"
 
 	streamv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const (
@@ -55,13 +57,17 @@ func NewEventQueue(config *BackpressureConfig) *EventQueue {
 // Push adds an event to the queue, applying backpressure if needed.
 func (eq *EventQueue) Push(event *streamv1.SubscribeEventsResponse) (*streamv1.SubscribeEventsResponse, error) {
 	// Check event size
-	size := len(event.Payload)
-	if size > eq.config.MaxEventSize {
+	eventSize := proto.Size(event)
+	if eventSize > eq.config.MaxEventSize {
 		// Event too large, push snapshot URI instead
+		oversizedPayload, _ := structpb.NewStruct(map[string]interface{}{
+			"snapshot_uri":  fmt.Sprintf("/snapshots/%s", event.Id),
+			"original_size": eventSize,
+		})
 		return &streamv1.SubscribeEventsResponse{
 			Id:        GenerateEventID(),
 			Type:      "system.oversized",
-			Payload:   fmt.Sprintf(`{"snapshot_uri":"/snapshots/%s","original_size":%d}`, event.Id, size),
+			Payload:   oversizedPayload,
 			Timestamp: time.Now().Format(time.RFC3339),
 		}, nil
 	}
@@ -80,10 +86,14 @@ func (eq *EventQueue) Push(event *streamv1.SubscribeEventsResponse) (*streamv1.S
 	
 	// Send dropped notice if needed
 	if eq.dropped > 0 && eq.shouldNotifyDrop() {
+		dropPayload, _ := structpb.NewStruct(map[string]interface{}{
+			"dropped": eq.dropped,
+			"reason":  "queue_full",
+		})
 		notice := &streamv1.SubscribeEventsResponse{
 			Id:        GenerateEventID(),
 			Type:      "system.notice.dropped",
-			Payload:   fmt.Sprintf(`{"dropped":%d,"reason":"queue_full"}`, eq.dropped),
+			Payload:   dropPayload,
 			Timestamp: time.Now().Format(time.RFC3339),
 		}
 		return notice, nil

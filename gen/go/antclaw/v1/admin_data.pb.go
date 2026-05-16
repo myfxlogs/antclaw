@@ -251,7 +251,7 @@ type GetDataPreviewResponse struct {
 	Table   string                 `protobuf:"bytes,2,opt,name=table,proto3" json:"table,omitempty"`
 	TimeCol string                 `protobuf:"bytes,3,opt,name=time_col,json=timeCol,proto3" json:"time_col,omitempty"`
 	Columns []string               `protobuf:"bytes,4,rep,name=columns,proto3" json:"columns,omitempty"`
-	// JSON 数组，元素为对象（与旧 REST 预览 rows 一致），便于前端直接 JSON.parse。
+	// 动态列的预览数据（未来改为 repeated google.protobuf.Struct rows = 5）
 	RowsJson      string `protobuf:"bytes,5,opt,name=rows_json,json=rowsJson,proto3" json:"rows_json,omitempty"`
 	TotalSampled  int32  `protobuf:"varint,6,opt,name=total_sampled,json=totalSampled,proto3" json:"total_sampled,omitempty"`
 	unknownFields protoimpl.UnknownFields

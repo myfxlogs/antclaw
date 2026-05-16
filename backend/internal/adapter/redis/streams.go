@@ -2,11 +2,13 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	streamv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // StreamsConsumer consumes events from Redis Streams.
@@ -113,7 +115,11 @@ func (c *StreamsConsumer) processMessage(ctx context.Context, stream string, msg
 		Type: msg.Values["type"].(string),
 	}
 	if payload, ok := msg.Values["payload"].(string); ok {
-		event.Payload = payload
+		var m map[string]interface{}
+		if err := json.Unmarshal([]byte(payload), &m); err == nil {
+			s, _ := structpb.NewStruct(m)
+			event.Payload = s
+		}
 	}
 	
 	// Call handler
@@ -124,9 +130,10 @@ func (c *StreamsConsumer) processMessage(ctx context.Context, stream string, msg
 func Publish(ctx context.Context, client *redis.Client, channel string, event *streamv1.SubscribeEventsResponse) error {
 	stream := fmt.Sprintf("events:%s", channel)
 	
+	payloadJSON, _ := json.Marshal(event.Payload.AsMap())
 	values := map[string]interface{}{
 		"type":    event.Type,
-		"payload": event.Payload,
+		"payload": string(payloadJSON),
 	}
 	
 	return client.XAdd(ctx, &redis.XAddArgs{

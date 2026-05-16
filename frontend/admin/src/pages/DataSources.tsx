@@ -22,8 +22,8 @@ export default function DataSources() {
   const load = async () => {
     setLoading(true)
     try {
-      const json = await listDataSources()
-      setItems(json.items || [])
+      const data = await listDataSources()
+      setItems(data.items || [])
     } catch (e: any) {
       setMessage({ kind: 'err', text: `加载失败: ${e.message}` })
     } finally {

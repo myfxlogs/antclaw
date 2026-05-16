@@ -12,8 +12,8 @@ export function useStrategies() {
   const load = async () => {
     setLoading(true)
     try {
-      const json = await listStrategies()
-      setItems(json.items || [])
+      const data = await listStrategies()
+      setItems(data.items || [])
     } catch (err) {
       console.error('failed to load strategies', err)
     } finally {
@@ -49,8 +49,8 @@ export function useStrategies() {
   const loadRuns = async (id: string) => {
     setPreviewStrategyId(id)
     try {
-      const json = await listStrategyRuns(id, 20)
-      setPreviewRuns(json.items || [])
+      const data = await listStrategyRuns(id, 20)
+      setPreviewRuns(data.items || [])
     } catch (err) {
       console.error('failed to load runs', err)
     }

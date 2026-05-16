@@ -9,6 +9,7 @@ package antclawv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -22,25 +23,25 @@ const (
 )
 
 // EventChannel enum for channel routing
-// See: AntClaw-重构解决方案.md Appendix B.1
-// Format: <domain>.<verb> or <domain>.<entity>.<attribute>
 type EventChannel int32
 
 const (
-	EventChannel_EVENT_CHANNEL_UNSPECIFIED EventChannel = 0
-	// Price and market data
-	EventChannel_EVENT_CHANNEL_PRICE      EventChannel = 1
-	EventChannel_EVENT_CHANNEL_PRICE_TICK EventChannel = 2
-	// Alerts and notifications
+	EventChannel_EVENT_CHANNEL_UNSPECIFIED     EventChannel = 0
+	EventChannel_EVENT_CHANNEL_PRICE           EventChannel = 1
+	EventChannel_EVENT_CHANNEL_PRICE_TICK      EventChannel = 2
 	EventChannel_EVENT_CHANNEL_ALERT           EventChannel = 10
 	EventChannel_EVENT_CHANNEL_ALERT_TRIGGERED EventChannel = 11
 	EventChannel_EVENT_CHANNEL_NOTIFY_NEW      EventChannel = 12
-	// Signals
-	EventChannel_EVENT_CHANNEL_SIGNAL_EMITTED EventChannel = 20
-	// Tasks and progress
-	EventChannel_EVENT_CHANNEL_TASK_PROGRESS EventChannel = 30
-	EventChannel_EVENT_CHANNEL_BACKTEST      EventChannel = 31
-	// Stream lifecycle
+	EventChannel_EVENT_CHANNEL_SIGNAL_EMITTED  EventChannel = 20
+	EventChannel_EVENT_CHANNEL_TASK_PROGRESS   EventChannel = 30
+	EventChannel_EVENT_CHANNEL_BACKTEST        EventChannel = 31
+	// Admin channels
+	EventChannel_EVENT_CHANNEL_JOBS             EventChannel = 40
+	EventChannel_EVENT_CHANNEL_AUDIT            EventChannel = 41
+	EventChannel_EVENT_CHANNEL_NOTIFICATIONS    EventChannel = 42
+	EventChannel_EVENT_CHANNEL_MACRO_ALERTS     EventChannel = 43
+	EventChannel_EVENT_CHANNEL_OPTIONS_ALERTS   EventChannel = 44
+	EventChannel_EVENT_CHANNEL_SIGNALS_ALERTS   EventChannel = 45
 	EventChannel_EVENT_CHANNEL_STREAM_KEEPALIVE EventChannel = 100
 	EventChannel_EVENT_CHANNEL_STREAM_CLOSED    EventChannel = 101
 )
@@ -57,6 +58,12 @@ var (
 		20:  "EVENT_CHANNEL_SIGNAL_EMITTED",
 		30:  "EVENT_CHANNEL_TASK_PROGRESS",
 		31:  "EVENT_CHANNEL_BACKTEST",
+		40:  "EVENT_CHANNEL_JOBS",
+		41:  "EVENT_CHANNEL_AUDIT",
+		42:  "EVENT_CHANNEL_NOTIFICATIONS",
+		43:  "EVENT_CHANNEL_MACRO_ALERTS",
+		44:  "EVENT_CHANNEL_OPTIONS_ALERTS",
+		45:  "EVENT_CHANNEL_SIGNALS_ALERTS",
 		100: "EVENT_CHANNEL_STREAM_KEEPALIVE",
 		101: "EVENT_CHANNEL_STREAM_CLOSED",
 	}
@@ -70,6 +77,12 @@ var (
 		"EVENT_CHANNEL_SIGNAL_EMITTED":   20,
 		"EVENT_CHANNEL_TASK_PROGRESS":    30,
 		"EVENT_CHANNEL_BACKTEST":         31,
+		"EVENT_CHANNEL_JOBS":             40,
+		"EVENT_CHANNEL_AUDIT":            41,
+		"EVENT_CHANNEL_NOTIFICATIONS":    42,
+		"EVENT_CHANNEL_MACRO_ALERTS":     43,
+		"EVENT_CHANNEL_OPTIONS_ALERTS":   44,
+		"EVENT_CHANNEL_SIGNALS_ALERTS":   45,
 		"EVENT_CHANNEL_STREAM_KEEPALIVE": 100,
 		"EVENT_CHANNEL_STREAM_CLOSED":    101,
 	}
@@ -102,7 +115,6 @@ func (EventChannel) EnumDescriptor() ([]byte, []int) {
 	return file_antclaw_v1_stream_proto_rawDescGZIP(), []int{0}
 }
 
-// Subscribe to events with optional filter
 type SubscribeEventsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Channel       string                 `protobuf:"bytes,1,opt,name=channel,proto3" json:"channel,omitempty"`
@@ -155,13 +167,13 @@ func (x *SubscribeEventsRequest) GetLastEventId() string {
 	return ""
 }
 
-// SubscribeEventsResponse represents a streaming event
 type SubscribeEventsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Payload       string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
-	Timestamp     string                 `protobuf:"bytes,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type  string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	// Structured payload (replaces legacy JSON string)
+	Payload       *structpb.Struct `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	Timestamp     string           `protobuf:"bytes,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,11 +222,11 @@ func (x *SubscribeEventsResponse) GetType() string {
 	return ""
 }
 
-func (x *SubscribeEventsResponse) GetPayload() string {
+func (x *SubscribeEventsResponse) GetPayload() *structpb.Struct {
 	if x != nil {
 		return x.Payload
 	}
-	return ""
+	return nil
 }
 
 func (x *SubscribeEventsResponse) GetTimestamp() string {
@@ -229,15 +241,15 @@ var File_antclaw_v1_stream_proto protoreflect.FileDescriptor
 const file_antclaw_v1_stream_proto_rawDesc = "" +
 	"\n" +
 	"\x17antclaw/v1/stream.proto\x12\n" +
-	"antclaw.v1\"V\n" +
+	"antclaw.v1\x1a\x1cgoogle/protobuf/struct.proto\"V\n" +
 	"\x16SubscribeEventsRequest\x12\x18\n" +
 	"\achannel\x18\x01 \x01(\tR\achannel\x12\"\n" +
-	"\rlast_event_id\x18\x02 \x01(\tR\vlastEventId\"u\n" +
+	"\rlast_event_id\x18\x02 \x01(\tR\vlastEventId\"\x8e\x01\n" +
 	"\x17SubscribeEventsResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04type\x18\x02 \x01(\tR\x04type\x12\x18\n" +
-	"\apayload\x18\x03 \x01(\tR\apayload\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\tR\ttimestamp*\xe2\x02\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x121\n" +
+	"\apayload\x18\x03 \x01(\v2\x17.google.protobuf.StructR\apayload\x12\x1c\n" +
+	"\ttimestamp\x18\x04 \x01(\tR\ttimestamp*\x98\x04\n" +
 	"\fEventChannel\x12\x1d\n" +
 	"\x19EVENT_CHANNEL_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13EVENT_CHANNEL_PRICE\x10\x01\x12\x1c\n" +
@@ -248,7 +260,13 @@ const file_antclaw_v1_stream_proto_rawDesc = "" +
 	"\x18EVENT_CHANNEL_NOTIFY_NEW\x10\f\x12 \n" +
 	"\x1cEVENT_CHANNEL_SIGNAL_EMITTED\x10\x14\x12\x1f\n" +
 	"\x1bEVENT_CHANNEL_TASK_PROGRESS\x10\x1e\x12\x1a\n" +
-	"\x16EVENT_CHANNEL_BACKTEST\x10\x1f\x12\"\n" +
+	"\x16EVENT_CHANNEL_BACKTEST\x10\x1f\x12\x16\n" +
+	"\x12EVENT_CHANNEL_JOBS\x10(\x12\x17\n" +
+	"\x13EVENT_CHANNEL_AUDIT\x10)\x12\x1f\n" +
+	"\x1bEVENT_CHANNEL_NOTIFICATIONS\x10*\x12\x1e\n" +
+	"\x1aEVENT_CHANNEL_MACRO_ALERTS\x10+\x12 \n" +
+	"\x1cEVENT_CHANNEL_OPTIONS_ALERTS\x10,\x12 \n" +
+	"\x1cEVENT_CHANNEL_SIGNALS_ALERTS\x10-\x12\"\n" +
 	"\x1eEVENT_CHANNEL_STREAM_KEEPALIVE\x10d\x12\x1f\n" +
 	"\x1bEVENT_CHANNEL_STREAM_CLOSED\x10e2m\n" +
 	"\rStreamService\x12\\\n" +
@@ -275,15 +293,17 @@ var file_antclaw_v1_stream_proto_goTypes = []any{
 	(EventChannel)(0),               // 0: antclaw.v1.EventChannel
 	(*SubscribeEventsRequest)(nil),  // 1: antclaw.v1.SubscribeEventsRequest
 	(*SubscribeEventsResponse)(nil), // 2: antclaw.v1.SubscribeEventsResponse
+	(*structpb.Struct)(nil),         // 3: google.protobuf.Struct
 }
 var file_antclaw_v1_stream_proto_depIdxs = []int32{
-	1, // 0: antclaw.v1.StreamService.SubscribeEvents:input_type -> antclaw.v1.SubscribeEventsRequest
-	2, // 1: antclaw.v1.StreamService.SubscribeEvents:output_type -> antclaw.v1.SubscribeEventsResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: antclaw.v1.SubscribeEventsResponse.payload:type_name -> google.protobuf.Struct
+	1, // 1: antclaw.v1.StreamService.SubscribeEvents:input_type -> antclaw.v1.SubscribeEventsRequest
+	2, // 2: antclaw.v1.StreamService.SubscribeEvents:output_type -> antclaw.v1.SubscribeEventsResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_antclaw_v1_stream_proto_init() }

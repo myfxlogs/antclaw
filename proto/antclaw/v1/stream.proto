@@ -4,50 +4,51 @@ package antclaw.v1;
 
 option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
 
-// StreamService provides SSE streaming for real-time updates.
-// See: AntClaw-重构解决方案.md §6.1
+import "google/protobuf/struct.proto";
+
+// StreamService provides real-time streaming via Connect server-streaming RPC.
+// Replaces legacy SSE text/event-stream with protobuf binary streaming.
 service StreamService {
-  // Server-streaming RPC for SSE
   rpc SubscribeEvents(SubscribeEventsRequest) returns (stream SubscribeEventsResponse);
 }
 
-// Subscribe to events with optional filter
 message SubscribeEventsRequest {
   string channel = 1;
   string last_event_id = 2;
 }
 
-// SubscribeEventsResponse represents a streaming event
 message SubscribeEventsResponse {
   string id = 1;
   string type = 2;
-  string payload = 3;
+  // Structured payload (replaces legacy JSON string)
+  google.protobuf.Struct payload = 3;
   string timestamp = 4;
 }
 
 // EventChannel enum for channel routing
-// See: AntClaw-重构解决方案.md Appendix B.1
-// Format: <domain>.<verb> or <domain>.<entity>.<attribute>
 enum EventChannel {
   EVENT_CHANNEL_UNSPECIFIED = 0;
 
-  // Price and market data
   EVENT_CHANNEL_PRICE = 1;
   EVENT_CHANNEL_PRICE_TICK = 2;
 
-  // Alerts and notifications
   EVENT_CHANNEL_ALERT = 10;
   EVENT_CHANNEL_ALERT_TRIGGERED = 11;
   EVENT_CHANNEL_NOTIFY_NEW = 12;
 
-  // Signals
   EVENT_CHANNEL_SIGNAL_EMITTED = 20;
 
-  // Tasks and progress
   EVENT_CHANNEL_TASK_PROGRESS = 30;
   EVENT_CHANNEL_BACKTEST = 31;
 
-  // Stream lifecycle
+  // Admin channels
+  EVENT_CHANNEL_JOBS = 40;
+  EVENT_CHANNEL_AUDIT = 41;
+  EVENT_CHANNEL_NOTIFICATIONS = 42;
+  EVENT_CHANNEL_MACRO_ALERTS = 43;
+  EVENT_CHANNEL_OPTIONS_ALERTS = 44;
+  EVENT_CHANNEL_SIGNALS_ALERTS = 45;
+
   EVENT_CHANNEL_STREAM_KEEPALIVE = 100;
   EVENT_CHANNEL_STREAM_CLOSED = 101;
 }

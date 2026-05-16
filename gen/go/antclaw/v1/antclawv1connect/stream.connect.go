@@ -40,7 +40,6 @@ const (
 
 // StreamServiceClient is a client for the antclaw.v1.StreamService service.
 type StreamServiceClient interface {
-	// Server-streaming RPC for SSE
 	SubscribeEvents(context.Context, *connect.Request[v1.SubscribeEventsRequest]) (*connect.ServerStreamForClient[v1.SubscribeEventsResponse], error)
 }
 
@@ -76,7 +75,6 @@ func (c *streamServiceClient) SubscribeEvents(ctx context.Context, req *connect.
 
 // StreamServiceHandler is an implementation of the antclaw.v1.StreamService service.
 type StreamServiceHandler interface {
-	// Server-streaming RPC for SSE
 	SubscribeEvents(context.Context, *connect.Request[v1.SubscribeEventsRequest], *connect.ServerStream[v1.SubscribeEventsResponse]) error
 }
 

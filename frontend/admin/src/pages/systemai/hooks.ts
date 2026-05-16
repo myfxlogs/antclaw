@@ -58,8 +58,8 @@ export function useSystemAIPage() {
   }
 
   const fetchConfigs = async (): Promise<AIConfig[]> => {
-    const json = await listSystemAIConfigs()
-    const items = (json.items || []) as AIConfig[]
+    const data = await listSystemAIConfigs()
+    const items = (data.items || []) as AIConfig[]
     setConfigs(items)
     return items
   }
