@@ -27,6 +27,27 @@ class NotificationViewModel @Inject constructor(
     private val _prefs = MutableStateFlow(AlertPrefs())
     val prefs: StateFlow<AlertPrefs> = _prefs.asStateFlow()
 
+    // 通知分类过滤：0=全部 1=互动 2=关注 3=信号
+    private val _selectedFilter = MutableStateFlow(0)
+    val selectedFilter: Int get() = _selectedFilter.value
+
+    private val _allItems = MutableStateFlow<List<ClientNotification>>(emptyList())
+    private fun filterItems(filter: Int) {
+        val items = _allItems.value
+        val filtered = when (filter) {
+            1 -> items.filter { it.category in setOf("like", "comment", "share") }
+            2 -> items.filter { it.category == "follow" }
+            3 -> items.filter { it.category == "signal" }
+            else -> items
+        }
+        _state.update { it.copy(items = filtered) }
+    }
+
+    fun setFilter(filter: Int) {
+        _selectedFilter.value = filter
+        filterItems(filter)
+    }
+
     private val _prefsLoading = MutableStateFlow(false)
     val prefsLoading: StateFlow<Boolean> = _prefsLoading.asStateFlow()
 
@@ -35,12 +56,9 @@ class NotificationViewModel @Inject constructor(
         // SSE 连接由 SessionViewModel 统一管理，此处仅被动订阅事件
         viewModelScope.launch {
             sseManager.notifications.collect { notif ->
-                _state.update {
-                    it.copy(
-                        unreadCount = it.unreadCount + 1,
-                        items = listOf(notif) + it.items,
-                    )
-                }
+                _allItems.update { listOf(notif) + it }
+                filterItems(_selectedFilter.value)
+                _state.update { it.copy(unreadCount = it.unreadCount + 1) }
                 if (!_isForeground.value) {
                     systemNotifier.showNotificationForAppInBackground(notif)
                 }
@@ -58,6 +76,7 @@ class NotificationViewModel @Inject constructor(
             try {
                 val count = notifRepo.unreadCount()
                 val items = notifRepo.listUnread()
+                _allItems.value = items
                 _state.update { it.copy(unreadCount = count.toInt(), items = items) }
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message) }

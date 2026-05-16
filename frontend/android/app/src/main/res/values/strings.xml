@@ -8,6 +8,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_discover">Discover</string>
     <string name="nav_post">Post</string>
+    <string name="nav_notifications">通知</string>
     <string name="nav_messages">Messages</string>
     <string name="nav_me">Me</string>
     <string name="nav_social">Social</string>
@@ -103,6 +104,8 @@
     <string name="profile_follow">Follow</string>
     <string name="profile_unfollow">Unfollow</string>
     <string name="profile_tab_posts">Posts</string>
+    <string name="profile_tab_media">Media</string>
+    <string name="profile_tab_likes">Likes</string>
     <string name="profile_tab_stats">Stats</string>
     <string name="profile_stats_title">Trading Record</string>
     <string name="profile_win_rate">Win Rate</string>

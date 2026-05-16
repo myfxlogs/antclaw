@@ -84,6 +84,11 @@ func (f *fakeFeedRepo) CheckPostVisibility(_ context.Context, postID, currentUse
 	return false, nil
 }
 
+func (f *fakeFeedRepo) GetFollowingFeed(_ context.Context, userID string, cursor *postgres.SocialCursor, limit int32, currentUserID string) ([]*postgres.FeedPostRow, [][]string, *postgres.SocialCursor, error) {
+	// In test mock, delegate to GetFeed (DB join logic is tested in integration)
+	return f.GetFeed(context.Background(), "", cursor, limit, currentUserID)
+}
+
 func (f *fakeFeedRepo) GetFeed(_ context.Context, filter string, cursor *postgres.SocialCursor, limit int32, currentUserID string) ([]*postgres.FeedPostRow, [][]string, *postgres.SocialCursor, error) {
 	var result []*postgres.FeedPostRow
 	for _, row := range f.posts {

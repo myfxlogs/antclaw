@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 enum class HomeFeedTab(val filter: String) {
+    FOLLOWING("following"),
     RECOMMENDED("all"),
     SIGNALS("signals_only"),
 }
@@ -27,6 +28,10 @@ class FeedViewModel @Inject constructor(
     val currentTab: HomeFeedTab get() = _currentTab
 
     init { load(HomeFeedTab.RECOMMENDED) }
+
+    fun selectTab(tab: HomeFeedTab) {
+        load(tab)
+    }
 
     fun load(tab: HomeFeedTab = _currentTab) {
         _currentTab = tab

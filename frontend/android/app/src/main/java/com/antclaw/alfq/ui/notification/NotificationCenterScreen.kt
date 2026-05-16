@@ -29,6 +29,7 @@ fun NotificationCenterScreen(
     vm: NotificationViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -40,24 +41,53 @@ fun NotificationCenterScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
-        if (state.error != null) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(stringResource(R.string.notif_load_failed), style = MaterialTheme.typography.bodyLarge)
-                    TextButton(onClick = { vm.refresh() }) { Text(stringResource(R.string.common_retry)) }
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            // X 风格分类过滤
+            NotificationFilterTabs(
+                selected = vm.selectedFilter,
+                onSelect = { vm.setFilter(it) },
+            )
+
+            when {
+                state.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(stringResource(R.string.notif_load_failed), style = MaterialTheme.typography.bodyLarge)
+                        TextButton(onClick = { vm.refresh() }) { Text(stringResource(R.string.common_retry)) }
+                    }
+                }
+                state.items.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(stringResource(R.string.notif_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                else -> LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(state.items, key = { it.id }) { notif ->
+                        NotificationCard(notif = notif, onClick = { if (!notif.isRead) vm.markRead(notif.id); onNotificationClick(notif) })
+                    }
                 }
             }
-        } else if (state.items.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.notif_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(state.items, key = { it.id }) { notif ->
-                    NotificationCard(notif = notif, onClick = { if (!notif.isRead) vm.markRead(notif.id); onNotificationClick(notif) })
-                }
-            }
+        }
+    }
+}
+
+@Composable
+private fun NotificationFilterTabs(selected: Int, onSelect: (Int) -> Unit) {
+    val filters = listOf("全部", "互动", "关注", "信号")
+    ScrollableTabRow(
+        selectedTabIndex = selected,
+        edgePadding = 0.dp,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) {
+        filters.forEachIndexed { idx, label ->
+            Tab(
+                selected = selected == idx,
+                onClick = { onSelect(idx) },
+                text = {
+                    Text(label,
+                        fontWeight = if (selected == idx) FontWeight.Bold else FontWeight.Normal,
+                        color = if (selected == idx) MaterialTheme.colorScheme.onSurface
+                               else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    )
+                },
+            )
         }
     }
 }
@@ -72,21 +102,20 @@ private fun NotificationCard(notif: ClientNotification, onClick: () -> Unit) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Box(modifier = Modifier.width(4.dp).fillMaxHeight().defaultMinSize(minHeight = 64.dp).background(severityColor))
             Column(modifier = Modifier.weight(1f).padding(12.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = notif.title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                        maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(notif.title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                     Spacer(Modifier.width(8.dp))
-                    Text(text = fmtTime(notif.createdAt), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                    Text(fmtTime(notif.createdAt), style = MaterialTheme.typography.labelSmall, color = TextMuted)
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(text = notif.body, style = MaterialTheme.typography.bodySmall, color = TextSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(notif.body, style = MaterialTheme.typography.bodySmall, color = TextSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     CategoryChip(notif.category)
-                    if (notif.category == "signal") { Text(text = notif.severity, fontSize = 11.sp, color = severityColor) }
+                    if (notif.category == "signal") { Text(notif.severity, fontSize = 11.sp, color = severityColor) }
                 }
             }
-            if (!notif.isRead) { Box(modifier = Modifier.padding(12.dp).size(8.dp).background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(4.dp))) }
+            if (!notif.isRead) { Box(Modifier.padding(12.dp).size(8.dp).background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))) }
         }
     }
 }
@@ -99,7 +128,7 @@ private fun CategoryChip(category: String) {
         "digest" -> Pair(InfoBlue.copy(alpha = 0.20f), InfoBlue)
         else -> Pair(TextSecondary.copy(alpha = 0.20f), TextSecondary)
     }
-    Box(modifier = Modifier.background(bg, RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)) {
+    Box(Modifier.background(bg, RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)) {
         Text(category, fontSize = 10.sp, color = text)
     }
 }

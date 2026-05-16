@@ -24,6 +24,7 @@ data class PostUi(
     val postId: String,
     val authorId: String,
     val authorName: String,
+    val authorCodeId: String = "",
     val authorAvatar: String? = null,
     val content: String,
     val postType: PostType,

@@ -1,13 +1,10 @@
 package com.antclaw.alfq.navigation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Email
@@ -15,30 +12,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.antclaw.alfq.R
 
-private data class NavTab(val route: String, val labelRes: Int, val icon: ImageVector)
-
-private val mainTabs = listOf(
-    NavTab("feed", R.string.nav_home, Icons.Default.Home),
-    NavTab("social", R.string.nav_social, Icons.Default.Person),
-    NavTab("discover", R.string.nav_discover, Icons.Default.Search),
-)
-
+/** X 风格底部栏：首页 | 发现 | 发贴 | 通知 | 消息 */
 @Composable
 fun BottomNavBar(
     navController: NavController,
     notificationCount: Int = 0,
-    onChatClick: () -> Unit = {}
+    onPostClick: () -> Unit = {},
 ) {
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route ?: "feed"
@@ -46,77 +32,45 @@ fun BottomNavBar(
     val navigateTab: (String) -> Unit = { route ->
         if (currentRoute != route) {
             navController.navigate(route) {
-                popUpTo("feed") { saveState = true }
+                popUpTo("feed") { inclusive = false; saveState = true }
                 launchSingleTop = true
                 restoreState = true
             }
         }
     }
 
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 8.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Order: 首页 发现 +
-            mainTabs.forEach { tab ->
-                NavigationItem(
-                    selected = currentRoute == tab.route,
-                    onClick = { navigateTab(tab.route) },
-                    icon = { Icon(tab.icon, contentDescription = stringResource(tab.labelRes)) },
-                    label = stringResource(tab.labelRes)
-                )
-            }
+            NavItem(Icons.Default.Home, stringResource(R.string.nav_home), currentRoute == "feed") { navigateTab("feed") }
+            NavItem(Icons.Default.Search, stringResource(R.string.nav_discover), currentRoute == "discover") { navigateTab("discover") }
 
-            // 消息
-            NavigationItem(
-                selected = currentRoute == "chat",
-                onClick = onChatClick,
-                icon = { Icon(Icons.Default.Email, contentDescription = stringResource(R.string.nav_messages)) },
-                label = stringResource(R.string.nav_messages),
-            )
+            // 发贴 FAB
+            SmallFloatingActionButton(
+                onClick = onPostClick,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(40.dp),
+            ) { Icon(Icons.Default.Add, contentDescription = stringResource(R.string.nav_post), modifier = Modifier.size(20.dp)) }
 
-            // 我的
-            NavigationItem(
-                selected = currentRoute == "me",
-                onClick = { navigateTab("me") },
-                icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.nav_me)) },
-                label = stringResource(R.string.nav_me),
-            )
+            NavItem(Icons.Default.Notifications, stringResource(R.string.nav_notifications), currentRoute == "notifications") { navigateTab("notifications") }
+            NavItem(Icons.Default.Email, stringResource(R.string.nav_messages), currentRoute == "chat") { navigateTab("chat") }
         }
     }
 }
 
 @Composable
-private fun NavigationItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit,
-    label: String
-) {
+private fun NavItem(icon: ImageVector, label: String, selected: Boolean, onClick: () -> Unit) {
     Column(
-        modifier = Modifier
-            .width(56.dp)
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.width(48.dp).clickable(onClick = onClick).padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = Modifier.size(24.dp),
-            contentAlignment = Alignment.Center
-        ) { icon() }
-        Text(
-            label,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Icon(icon, contentDescription = label, modifier = Modifier.size(24.dp),
+            tint = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(label, style = MaterialTheme.typography.labelSmall,
+            color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
-

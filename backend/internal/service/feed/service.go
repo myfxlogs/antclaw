@@ -3,12 +3,16 @@ package feed
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"connectrpc.com/connect"
+	"github.com/jackc/pgx/v5/pgxpool"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	infraredis "github.com/antclaw/antclaw/internal/infra/redis"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/service"
 )
@@ -16,10 +20,15 @@ import (
 // Service holds the feed business logic.
 type Service struct {
 	repo postgres.FeedRepository
+	rdb  *infraredis.Client
 }
 
 func NewService(repo postgres.FeedRepository) *Service {
 	return &Service{repo: repo}
+}
+
+func NewServiceWithRedis(repo postgres.FeedRepository, rdb *infraredis.Client) *Service {
+	return &Service{repo: repo, rdb: rdb}
 }
 
 // normalizeFilter returns the canonical filter: all / signals_only / posts_only / shares.
@@ -106,6 +115,59 @@ func (s *Service) GetFeed(ctx context.Context, userID string, req *alfqv1.GetFee
 		Posts:      feedPostRowsToProto(rows, likedByList),
 		NextCursor: postgres.EncodeSocialCursor(nextCursor),
 	}, nil
+}
+
+// GetCachedFeed returns feed with Redis caching (2min TTL).
+func (s *Service) GetCachedFeed(ctx context.Context, userID, filter, cursor string, limit int32, pg *pgxpool.Pool) ([]*alfqv1.Post, string, error) {
+	key := fmt.Sprintf("feed:%s:%s:%s:%d", userID, filter, cursor, limit)
+	if s.rdb != nil {
+		if cached, err := s.rdb.Get(ctx, key); err == nil && cached != "" {
+			var wrapper struct {
+				Posts []*alfqv1.Post `json:"posts"`
+				Next  string         `json:"next"`
+			}
+			if json.Unmarshal([]byte(cached), &wrapper) == nil && len(wrapper.Posts) > 0 {
+				return wrapper.Posts, wrapper.Next, nil
+			}
+		}
+	}
+	// Fetch + rank + filter
+	c, _ := postgres.DecodeSocialCursor(cursor)
+	rows, likedByList, nextCursor, err := s.repo.GetFeed(ctx, filter, c, limit, userID)
+	if err != nil {
+		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("get feed: %w", err))
+	}
+	rows = RankPosts(rows)
+	if pg != nil {
+		rows = ApplyFilters(ctx, pg, rows)
+	}
+	posts := feedPostRowsToProto(rows, likedByList)
+	next := postgres.EncodeSocialCursor(nextCursor)
+	// Write cache
+	if s.rdb != nil {
+		wrapper, _ := json.Marshal(struct {
+			Posts []*alfqv1.Post `json:"posts"`
+			Next  string         `json:"next"`
+		}{posts, next})
+		s.rdb.Set(ctx, key, string(wrapper), 2*time.Minute)
+	}
+	return posts, next, nil
+}
+
+func (s *Service) GetFollowingFeed(ctx context.Context, userID string, cursor string, pageSize int32) ([]*alfqv1.Post, string, error) {
+	if userID == "" {
+		return nil, "", connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
+	}
+	limit := service.ClampPageSize(pageSize, 20, 50)
+	c, err := postgres.DecodeSocialCursor(cursor)
+	if err != nil {
+		return nil, "", connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid cursor: %w", err))
+	}
+	rows, likedByList, nextCursor, err := s.repo.GetFollowingFeed(ctx, userID, c, limit, userID)
+	if err != nil {
+		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("get following feed: %w", err))
+	}
+	return feedPostRowsToProto(rows, likedByList), postgres.EncodeSocialCursor(nextCursor), nil
 }
 
 func (s *Service) GetPost(ctx context.Context, userID string, req *alfqv1.GetPostRequest) (*alfqv1.Post, error) {

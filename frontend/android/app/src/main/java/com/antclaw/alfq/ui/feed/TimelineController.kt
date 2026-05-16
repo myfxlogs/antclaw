@@ -28,7 +28,7 @@ data class TimelineState(
 
 /**
  * 信息流通用控制器 — 封装分页、刷新、点赞、分享逻辑。
- * 供 FeedViewModel / SocialFeedViewModel 复用。
+ * 供 FeedViewModel 复用。
  */
 class TimelineController(
     private val scope: CoroutineScope,

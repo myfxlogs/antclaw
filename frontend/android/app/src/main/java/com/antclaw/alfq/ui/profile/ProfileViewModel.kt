@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class ProfileTab { POSTS, STATS }
+enum class ProfileTab { POSTS, MEDIA, LIKES }
 
 data class ProfileUiState(
     val displayName: String = "", val username: String = "", val codeId: String = "",

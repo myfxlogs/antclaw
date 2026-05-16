@@ -123,6 +123,18 @@ func (s *Service) Send(ctx context.Context, n *Notification) error {
 		return fmt.Errorf("notify: persist: %w", err)
 	}
 
+	// 频率控制：同一 category 对同一用户 30 分钟内最多 3 条
+	if s.rdb != nil {
+		rateKey := "notify:rate:" + n.UserID.String() + ":" + n.Category
+		count := s.rdb.Incr(ctx, rateKey).Val()
+		if count == 1 {
+			s.rdb.Expire(ctx, rateKey, 30*time.Minute)
+		}
+		if count > 3 {
+			return nil // 频率限制，安静丢弃
+		}
+	}
+
 	// 4) 实时推送（受偏好约束）
 	if !s.shouldDeliverLive(prefs, hasPrefs, n) || s.rdb == nil {
 		return nil

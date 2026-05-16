@@ -93,6 +93,7 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
     val navController = rememberNavController()
     val notifVm: NotificationViewModel = hiltViewModel()
     val notifState by notifVm.state.collectAsState()
+    val session by sessionVm.session.collectAsStateWithLifecycle()
     LifecycleAware(
         onStart = {
             sessionVm.onForeground()
@@ -109,7 +110,7 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
             BottomNavBar(
                 navController = navController,
                 notificationCount = notifState.unreadCount,
-                onChatClick = { navController.navigate("chat") }
+                onPostClick = { navController.navigate("post") },
             )
         }
     ) { padding ->
@@ -125,19 +126,11 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
                     onAuthorClick = { userId -> navController.navigate("profile/$userId") },
                     onNotificationClick = { navController.navigate("notifications") },
                     onSearchClick = { navController.navigate("discover") },
+                    onMeClick = { navController.navigate("me") },
                 )
             }
             composable("discover") {
                 DiscoverScreen(onTraderClick = { userId -> navController.navigate("profile/$userId") })
-            }
-            composable("social") {
-                FeedScreen(
-                    notificationCount = notifState.unreadCount,
-                    onPostClick = { postId -> navController.navigate("postDetail/$postId") },
-                    onAuthorClick = { userId -> navController.navigate("profile/$userId") },
-                    onNotificationClick = { navController.navigate("notifications") },
-                    onSearchClick = { navController.navigate("discover") },
-                )
             }
             composable(
                 route = "postDetail/{postId}",
@@ -148,11 +141,11 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
             }
             composable("post") { PostScreen(onClose = { navController.popBackStack() }) }
             composable("me") {
-                MeScreen(
-                    onLogout = onLogout,
-                    onNavigateToMTAccounts = { navController.navigate("mt_accounts") },
-                    onNavigateToAlerts = { navController.navigate("alerts") },
-                    onNavigateToSettings = { navController.navigate("settings/language") },
+                ProfileScreen(
+                    userId = session.userId.ifEmpty { "me" },
+                    onBack = { },
+                    onPostClick = { postId -> navController.navigate("postDetail/$postId") },
+                    onSettingsClick = { navController.navigate("settings/language") },
                 )
             }
             composable("mt_accounts") {

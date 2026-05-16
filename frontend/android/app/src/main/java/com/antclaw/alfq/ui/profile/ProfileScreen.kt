@@ -3,6 +3,9 @@ package com.antclaw.alfq.ui.profile
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.components.PostCard
-import com.antclaw.alfq.ui.components.StatCell
 import com.antclaw.alfq.ui.components.TraderStatRow
 import com.antclaw.alfq.ui.feed.AsyncPhase
 import com.antclaw.alfq.ui.social.UiEvent
@@ -25,6 +27,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
     onPostClick: (postId: String) -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -39,9 +42,13 @@ fun ProfileScreen(
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             // Top bar
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack) { Text(stringResource(R.string.common_back)) }
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.common_back))
+                }
                 Text(stringResource(R.string.profile_title), fontWeight = FontWeight.Bold)
-                Spacer(Modifier.width(64.dp)) // balance centering
+                IconButton(onClick = onSettingsClick) {
+                    Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.me_settings))
+                }
             }
 
             when {
@@ -113,7 +120,8 @@ fun ProfileScreen(
                                         Text(
                                             when (tab) {
                                                 ProfileTab.POSTS -> stringResource(R.string.profile_tab_posts)
-                                                ProfileTab.STATS -> stringResource(R.string.profile_tab_stats)
+                                                ProfileTab.MEDIA -> stringResource(R.string.profile_tab_media)
+                                                ProfileTab.LIKES -> stringResource(R.string.profile_tab_likes)
                                             },
                                             fontWeight = if (state.currentTab == tab) FontWeight.Bold else FontWeight.Normal,
                                         )
@@ -150,27 +158,31 @@ fun ProfileScreen(
                                 else -> {
                                     items(state.posts, key = { it.postId }) { post ->
                                         PostCard(
-                                            post = post, onCardClick = { onPostClick(post.postId) },
+                                            post = post, onPostClick = { onPostClick(post.postId) },
                                             onAuthorClick = {}, onLikeClick = {}, onShareClick = {},
                                         )
                                     }
                                 }
                             }
                         }
-                        ProfileTab.STATS -> {
+                        ProfileTab.MEDIA -> {
                             item {
-                                Card(Modifier.fillMaxWidth().padding(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                                    Column(Modifier.padding(16.dp)) {
-                                        Text(stringResource(R.string.profile_stats_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                        Spacer(Modifier.height(12.dp))
-                                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                                            StatCell(stringResource(R.string.profile_win_rate), "${(state.winRate * 100).toInt()}%")
-                                            StatCell(stringResource(R.string.profile_profit_factor), String.format("%.2f", state.profitFactor))
-                                            StatCell(stringResource(R.string.profile_sharpe), String.format("%.2f", state.sharpeRatio))
-                                            StatCell(stringResource(R.string.profile_total_trades), "${state.totalTrades}")
-                                        }
-                                    }
-                                }
+                                Text(
+                                    stringResource(R.string.feed_empty_title),
+                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                )
+                            }
+                        }
+                        ProfileTab.LIKES -> {
+                            item {
+                                Text(
+                                    stringResource(R.string.feed_empty_title),
+                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                )
                             }
                         }
                     }

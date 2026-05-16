@@ -26,6 +26,10 @@ type FeedPostRow struct {
 	ShareCount       int32
 	CreatedAt        time.Time
 	OriginalPostID   *string
+	// Ranked fields (computed, not stored in DB)
+	Score          float64
+	AuthorCredScore float64
+	VisibilityScore float64
 }
 
 // FeedCommentRow is the flat DB row for alfq_comments.
@@ -47,6 +51,7 @@ type FeedRepository interface {
 	CheckPostVisibility(ctx context.Context, postID, currentUserID string) (bool, error)
 
 	GetFeed(ctx context.Context, filter string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error)
+	GetFollowingFeed(ctx context.Context, userID string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error)
 	ListUserPosts(ctx context.Context, userID, filter string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error)
 
 	LikePost(ctx context.Context, postID, userID string) error
@@ -72,6 +77,12 @@ const feedSelectColumns = `p.id, p.author_id, p.author_name, p.content, p.post_t
 	(SELECT COUNT(*) FROM alfq_comments WHERE post_id = p.id)::int4 AS comment_count,
 	(SELECT COUNT(*) FROM alfq_posts WHERE original_post_id = p.id AND post_type = 'share')::int4 AS share_count,
 	p.created_at, p.original_post_id`
+
+// feedInsertReturningColumns is used for INSERT RETURNING (no table alias allowed).
+const feedInsertReturningColumns = `id, author_id, author_name, content, post_type,
+	signal_pair, signal_direction, signal_confidence, visibility, circle_id,
+	0::int4 AS like_count, 0::int4 AS comment_count, 0::int4 AS share_count,
+	NOW() AS created_at, original_post_id`
 
 func scanFeedPost(scanner interface{ Scan(dest ...interface{}) error }) (*FeedPostRow, error) {
 	var r FeedPostRow
@@ -179,7 +190,7 @@ func (r *feedRepo) CreatePost(ctx context.Context, row *FeedPostRow) (*FeedPostR
 		INSERT INTO alfq_posts (author_id, author_name, content, post_type,
 			signal_pair, signal_direction, signal_confidence, visibility, circle_id, original_post_id)
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-		RETURNING `+feedSelectColumns,
+		RETURNING `+feedInsertReturningColumns,
 		row.AuthorID, row.AuthorName, row.Content, row.PostType,
 		row.SignalPair, row.SignalDirection, row.SignalConfidence, row.Visibility, row.CircleID, row.OriginalPostID,
 	))
@@ -253,6 +264,16 @@ func (r *feedRepo) GetFeed(ctx context.Context, filter string, cursor *SocialCur
 	args := []interface{}{limit + 1}
 	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p WHERE p.visibility = 'public'`
 	query = appendFeedFilter(query, filter)
+	query, args = AppendCursor(query, args, cursor, "p.created_at, p.id", CursorDesc, 2)
+	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT $1`
+	return r.executePaginatedFeed(ctx, query, args, limit, currentUserID)
+}
+
+func (r *feedRepo) GetFollowingFeed(ctx context.Context, userID string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error) {
+	args := []interface{}{limit + 1, userID}
+	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p
+		WHERE p.author_id IN (SELECT following_id FROM alfq_follows WHERE follower_id = $2)
+		  AND p.visibility = 'public'`
 	query, args = AppendCursor(query, args, cursor, "p.created_at, p.id", CursorDesc, 2)
 	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT $1`
 	return r.executePaginatedFeed(ctx, query, args, limit, currentUserID)

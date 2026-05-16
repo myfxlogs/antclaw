@@ -8,203 +8,163 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.antclaw.alfq.ui.social.PostType
 import com.antclaw.alfq.ui.social.PostUi
-import com.antclaw.alfq.ui.social.PostVisibility
 import com.antclaw.alfq.ui.social.SignalCardUi
 import com.antclaw.alfq.ui.social.ChartShareUi
-import com.antclaw.alfq.ui.theme.BearRed
-import com.antclaw.alfq.ui.theme.BullGreen
-import com.antclaw.alfq.ui.theme.SpacingMd
-import com.antclaw.alfq.ui.theme.SpacingSm
-import com.antclaw.alfq.ui.theme.SpacingXs
+import com.antclaw.alfq.ui.theme.*
+import java.time.Duration
+import java.time.Instant
 
-/**
- * 通用帖子卡片 — 支持 TEXT / SIGNAL_CARD / CHART_SHARE / SHARE 四种类型。
- */
 @Composable
 fun PostCard(
     post: PostUi,
-    onLikeClick: () -> Unit = {},
-    onCommentClick: () -> Unit = {},
-    onShareClick: () -> Unit = {},
-    onCardClick: () -> Unit = {},
+    onPostClick: (String) -> Unit = {},
     onAuthorClick: (String) -> Unit = {},
+    onLikeClick: () -> Unit = {},
+    onShareClick: () -> Unit = {},
+    onReportClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
-        onClick = onCardClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = modifier.fillMaxWidth().clickable { onPostClick(post.postId) },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
-        Column(modifier = Modifier.padding(SpacingMd)) {
-            PostHeader(post.authorId, post.authorName, post.createdAt.timeAgo(), post.visibility, onAuthorClick)
-            Spacer(modifier = Modifier.height(SpacingSm))
-            PostBody(post)
-            Spacer(modifier = Modifier.height(SpacingMd))
-            PostActions(post, onLikeClick, onCommentClick, onShareClick)
-        }
-    }
-}
-
-// ── Sub-composables ──
-
-@Composable
-private fun PostHeader(
-    authorId: String,
-    authorName: String,
-    timeAgo: String,
-    visibility: PostVisibility,
-    onAuthorClick: (String) -> Unit,
-) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Surface(
-            modifier = Modifier.size(36.dp).clickable { onAuthorClick(authorId) },
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(authorName.take(1).uppercase(), style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-            }
-        }
-        Spacer(modifier = Modifier.width(SpacingSm))
-        Column(modifier = Modifier.clickable { onAuthorClick(authorId) }) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(authorName, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                if (visibility != PostVisibility.PUBLIC) {
-                    Spacer(modifier = Modifier.width(SpacingXs))
-                    Text(visibilityLabel(visibility), style = MaterialTheme.typography.labelSmall)
+        Row(Modifier.padding(12.dp)) {
+            // 头像
+            Surface(
+                modifier = Modifier.size(40.dp).clickable { onAuthorClick(post.authorId) },
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(post.authorName.take(1).uppercase(), fontWeight = FontWeight.Bold)
                 }
             }
-            Text(timeAgo, style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-        }
-    }
-}
 
-@Composable
-private fun PostBody(post: PostUi) {
-    when (post.postType) {
-        PostType.SIGNAL_CARD -> SignalPostBody(post)
-        PostType.CHART_SHARE -> ChartShareBody(post)
-        PostType.SHARE -> SharePostBody(post.content)
-        else -> TextPostBody(post.content)
-    }
-}
+            Spacer(Modifier.width(12.dp))
 
-@Composable
-private fun TextPostBody(content: String) {
-    Text(content, style = MaterialTheme.typography.bodyMedium, maxLines = 8, overflow = TextOverflow.Ellipsis)
-}
-
-@Composable
-private fun SignalPostBody(post: PostUi) {
-    Column {
-        if (post.content.isNotBlank()) {
-            Text(post.content, style = MaterialTheme.typography.bodyMedium, maxLines = 4, overflow = TextOverflow.Ellipsis)
-            Spacer(modifier = Modifier.height(SpacingSm))
-        }
-        post.signalCard?.let { signal ->
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                Row(Modifier.padding(SpacingSm), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(SpacingSm)) {
-                    Text(signal.pair, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                    Text(signal.direction.uppercase(), style = MaterialTheme.typography.labelSmall,
-                        color = signalDirectionColor(signal.direction))
-                    Text("${signal.confidence}%", style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ChartShareBody(post: PostUi) {
-    Column {
-        if (post.content.isNotBlank()) {
-            Text(post.content, style = MaterialTheme.typography.bodyMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
-            Spacer(modifier = Modifier.height(SpacingSm))
-        }
-        post.chartShare?.let { chart ->
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                Column(Modifier.padding(SpacingSm)) {
-                    Text("📈 ${chart.pair}", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                    if (chart.chartUrl == null) {
-                        Spacer(modifier = Modifier.height(SpacingSm))
-                        Text("[Chart]", style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+            Column(Modifier.weight(1f)) {
+                // 头部行：用户名 + @codeId + 时间 + 菜单
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(post.authorName, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(Modifier.width(4.dp))
+                    Text("@${post.authorCodeId.ifEmpty { post.authorId.take(8) }}",
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.bodySmall)
+                    Text(" · ${timeAgo(post.createdAt)}",
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                        style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.weight(1f))
+                    Box {
+                        IconButton(onClick = { showMenu = true }, modifier = Modifier.size(24.dp)) {
+                            Icon(Icons.Default.MoreVert, "更多", modifier = Modifier.size(16.dp))
+                        }
+                        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                            DropdownMenuItem(text = { Text("举报") }, onClick = { onReportClick(); showMenu = false })
+                            DropdownMenuItem(text = { Text("不感兴趣") }, onClick = { showMenu = false })
+                        }
                     }
                 }
+
+                Spacer(Modifier.height(4.dp))
+
+                // 正文
+                Text(post.content, style = MaterialTheme.typography.bodyLarge, maxLines = 10, overflow = TextOverflow.Ellipsis)
+
+                // 信号卡片
+                post.signalCard?.let { signal ->
+                    Spacer(Modifier.height(8.dp))
+                    SignalCardEmbed(signal)
+                }
+                // 图表分享
+                post.chartShare?.let { chart ->
+                    Spacer(Modifier.height(8.dp))
+                    ChartShareEmbed(chart)
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                // 互动按钮行
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    ActionButton(Icons.Default.Email, "${post.commentCount}", onClick = { onPostClick(post.postId) })
+                    ActionButton(Icons.Default.Share, "${post.shareCount}", onClick = { onShareClick() })
+                    ActionButton(
+                        if (post.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        "${post.likeCount}",
+                        onClick = { onLikeClick() },
+                        tint = if (post.isLiked) Color.Red else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun SharePostBody(content: String) {
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-        Text(content.ifBlank { "Reposted" }, style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(SpacingSm),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+private fun ActionButton(icon: ImageVector, text: String, onClick: () -> Unit = {}, tint: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) {
+    Row(Modifier.clickable(onClick = onClick).padding(horizontal = 4.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = tint)
+        if (text != "0") {
+            Spacer(Modifier.width(2.dp))
+            Text(text, style = MaterialTheme.typography.labelSmall, color = tint)
+        }
     }
 }
 
 @Composable
-private fun PostActions(post: PostUi, onLike: () -> Unit, onComment: () -> Unit, onShare: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        ActionButton(
-            icon = if (post.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-            tint = if (post.isLiked) Color(0xFFE91E63) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            count = post.likeCount,
-            onClick = onLike,
-        )
-        ActionButton(
-            icon = Icons.Default.Email,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            count = post.commentCount,
-            onClick = onComment,
-        )
-        ActionButton(
-            icon = Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            count = post.shareCount,
-            onClick = onShare,
-        )
+private fun SignalCardEmbed(signal: SignalCardUi) {
+    Card(
+        Modifier.fillMaxWidth().padding(0.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Row(Modifier.padding(SpacingSm), verticalAlignment = Alignment.CenterVertically) {
+            Text(signal.pair, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            Spacer(Modifier.width(SpacingSm))
+            Text(signal.direction, fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                color = if (signal.direction.lowercase() == "buy") BullGreen else BearRed)
+            Spacer(Modifier.width(4.dp))
+            Text("${signal.confidence}%", style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.weight(1f))
+            Text("置信度", style = MaterialTheme.typography.labelSmall)
+            Spacer(Modifier.width(SpacingSm))
+            Text("${signal.confidence}%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+        }
     }
 }
 
 @Composable
-private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, tint: Color, count: Int, onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
-        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
-    }
-    if (count > 0) {
-        Text(formatCount(count), style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+private fun ChartShareEmbed(chart: ChartShareUi) {
+    // 图表分享缩略图占位
+    Surface(Modifier.fillMaxWidth().height(160.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+        Box(contentAlignment = Alignment.Center) {
+            Text("📈 ${chart.pair}", style = MaterialTheme.typography.titleMedium)
+        }
     }
 }
 
-// ── Helpers ──
-
-private fun visibilityLabel(v: PostVisibility) = when (v) {
-    PostVisibility.FOLLOWERS_ONLY -> "👥"
-    PostVisibility.CIRCLE_ONLY -> "🔵"
-    else -> ""
-}
-
-@Composable
-private fun signalDirectionColor(dir: String) = when (dir) {
-    "bullish" -> BullGreen
-    "bearish" -> BearRed
-    else -> MaterialTheme.colorScheme.onSurface
+private fun timeAgo(instant: Instant): String {
+    val seconds = Duration.between(instant, Instant.now()).seconds
+    return when {
+        seconds < 60 -> "刚刚"
+        seconds < 3600 -> "${seconds / 60}分钟"
+        seconds < 86400 -> "${seconds / 3600}小时"
+        seconds < 259200 -> "${seconds / 86400}天"
+        else -> {
+            val dt = instant.atZone(java.time.ZoneId.systemDefault())
+            "${dt.monthValue}/${dt.dayOfMonth}"
+        }
+    }
 }
