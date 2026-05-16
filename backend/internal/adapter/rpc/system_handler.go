@@ -69,8 +69,8 @@ func (h *SystemHandler) Info(_ context.Context, _ *connect.Request[antclawv1.Inf
 func (h *SystemHandler) GetOnlineUsers(ctx context.Context, _ *connect.Request[antclawv1.GetOnlineUsersRequest]) (*connect.Response[antclawv1.GetOnlineUsersResponse], error) {
 	list := h.presence.List()
 
-	// 批量查询用户展示信息（display_name / username / code_id）
-	type userInfo struct{ displayName, username, codeID string }
+	// 批量查询用户展示信息
+	type userInfo struct{ displayName, username, codeID, email string }
 	userInfoMap := make(map[string]userInfo, len(list))
 	if len(list) > 0 && h.pg != nil {
 		ids := make([]string, 0, len(list))
@@ -78,7 +78,7 @@ func (h *SystemHandler) GetOnlineUsers(ctx context.Context, _ *connect.Request[a
 			ids = append(ids, u.UserID)
 		}
 		rows, err := h.pg.Query(ctx,
-			`SELECT id::text, COALESCE(display_name,''), COALESCE(username,''), COALESCE(code_id,'')
+			`SELECT id::text, COALESCE(display_name,''), COALESCE(username,''), COALESCE(code_id,''), COALESCE(email,'')
 			   FROM users WHERE id::text = ANY($1)`,
 			ids,
 		)
@@ -87,7 +87,7 @@ func (h *SystemHandler) GetOnlineUsers(ctx context.Context, _ *connect.Request[a
 			for rows.Next() {
 				var uid string
 				var info userInfo
-				if err := rows.Scan(&uid, &info.displayName, &info.username, &info.codeID); err == nil {
+				if err := rows.Scan(&uid, &info.displayName, &info.username, &info.codeID, &info.email); err == nil {
 					userInfoMap[uid] = info
 				}
 			}
@@ -103,6 +103,8 @@ func (h *SystemHandler) GetOnlineUsers(ctx context.Context, _ *connect.Request[a
 			RemoteAddr:  u.RemoteAddr,
 			ConnectedAt: u.ConnectedAt.Unix(),
 			CodeId:      info.codeID,
+			Email:       info.email,
+			UserAgent:   u.UserAgent,
 		})
 	}
 	return connect.NewResponse(&antclawv1.GetOnlineUsersResponse{

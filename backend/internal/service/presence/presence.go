@@ -21,7 +21,8 @@ type Connection struct {
 // OnlineUser represents an aggregated online user (from one or more connections).
 type OnlineUser struct {
 	UserID      string    `json:"user_id"`
-	RemoteAddr  string    `json:"remote_addr"` // 最后建连的地址
+	RemoteAddr  string    `json:"remote_addr"`
+	UserAgent   string    `json:"user_agent"`
 	ConnectedAt time.Time `json:"connected_at"`
 	ConnCount   int       `json:"conn_count"`
 }
@@ -91,6 +92,7 @@ func (t *Tracker) List() []OnlineUser {
 			if u.ConnectedAt.IsZero() || c.ConnectedAt.Before(u.ConnectedAt) {
 				u.ConnectedAt = c.ConnectedAt
 				u.RemoteAddr = c.RemoteAddr
+				u.UserAgent = c.UserAgent
 			}
 		}
 		out = append(out, u)

@@ -49,6 +49,8 @@ message OnlineUserInfo {
   string remote_addr = 3;
   int64 connected_at = 4;         // unix 秒
   string code_id = 5;             // 5 位数字 ID（用户可见）
+  string email = 6;               // 用户邮箱
+  string user_agent = 7;          // 设备 User-Agent
 }
 
 message GetOnlineUsersResponse {

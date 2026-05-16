@@ -13,7 +13,7 @@ interface PushStats {
 
 interface OnlineState {
   count: number
-  users: { userId: string; codeId: string; displayName: string; remoteAddr: string; connectedAt: number }[]
+  users: { userId: string; codeId: string; displayName: string; email: string; userAgent: string; remoteAddr: string; connectedAt: number }[]
 }
 
 const PUSH_TYPE_LABELS: Record<string, string> = {
@@ -99,7 +99,7 @@ export default function Dashboard() {
               <thead>
                 <tr className="border-b text-left text-gray-500">
                   <th className="pb-2">用户</th>
-                  <th className="pb-2">Code ID</th>
+                  <th className="pb-2">用户ID</th>
                   <th className="pb-2">来源</th>
                   <th className="pb-2">连接时长</th>
                 </tr>
@@ -107,9 +107,9 @@ export default function Dashboard() {
               <tbody>
                 {online.users.map(u => (
                   <tr key={u.userId} className="border-b border-gray-50">
-                    <td className="py-2 text-sm text-gray-700">{u.displayName || '-'}</td>
+                    <td className="py-2 text-sm text-gray-700">{u.email || u.displayName || '-'}</td>
                     <td className="py-2 font-mono text-xs text-gray-600">{u.codeId || u.userId.substring(0, 12)}...</td>
-                    <td className="py-2 text-gray-500">{u.remoteAddr}</td>
+                    <td className="py-2 text-xs text-gray-500">{u.userAgent || u.remoteAddr}</td>
                     <td className="py-2 text-gray-500">{timeAgo(u.connectedAt)}</td>
                   </tr>
                 ))}

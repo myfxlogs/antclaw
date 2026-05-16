@@ -52,6 +52,7 @@ FOUND=$(grep -r -E "\bark\b|ARK" \
     --exclude-dir=gen \
     --exclude-dir=.github \
     --exclude-dir=bak0428 \
+    --exclude-dir=third_party \
     --exclude="ARK-Intelligent-功能清单.md" \
     --exclude="naming-guard.sh" \
     --exclude="similarity-guard.py" \

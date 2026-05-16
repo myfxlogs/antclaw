@@ -437,6 +437,8 @@ type OnlineUserInfo struct {
 	RemoteAddr    string                 `protobuf:"bytes,3,opt,name=remote_addr,json=remoteAddr,proto3" json:"remote_addr,omitempty"`
 	ConnectedAt   int64                  `protobuf:"varint,4,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"` // unix 秒
 	CodeId        string                 `protobuf:"bytes,5,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`                 // 5 位数字 ID（用户可见）
+	Email         string                 `protobuf:"bytes,6,opt,name=email,proto3" json:"email,omitempty"`
+	UserAgent     string                 `protobuf:"bytes,7,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -502,6 +504,20 @@ func (x *OnlineUserInfo) GetConnectedAt() int64 {
 func (x *OnlineUserInfo) GetCodeId() string {
 	if x != nil {
 		return x.CodeId
+	}
+	return ""
+}
+
+func (x *OnlineUserInfo) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *OnlineUserInfo) GetUserAgent() string {
+	if x != nil {
+		return x.UserAgent
 	}
 	return ""
 }
