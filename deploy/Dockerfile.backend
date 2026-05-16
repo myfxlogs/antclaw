@@ -4,6 +4,9 @@
 FROM golang:1.23-alpine AS builder
 
 ENV GOTOOLCHAIN=auto
+# 低资源服务器编译限制：单线程、内存上限 1200MiB
+ENV GOMAXPROCS=1
+ENV GOMEMLIMIT=1200MiB
 WORKDIR /app
 
 # Copy gen/go first (dependency)
@@ -21,21 +24,21 @@ ARG GIT_COMMIT=dev
 ARG PROTO_VERSION=1.0.0
 ARG MIN_CLIENT_VERSION=1.0.0
 WORKDIR /app/backend
-RUN go build -ldflags "\
+RUN go build -p 1 -ldflags "\
   -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
   -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT} \
   -X github.com/antclaw/antclaw/internal/adapter/rpc.ProtoVersion=${PROTO_VERSION} \
   -X github.com/antclaw/antclaw/internal/adapter/rpc.MinClientVersion=${MIN_CLIENT_VERSION}" \
   -o ../bin/antclaw-api ./cmd/antclaw-api
-RUN go build -ldflags "\
+RUN go build -p 1 -ldflags "\
   -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
   -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT}" \
   -o ../bin/antclaw-worker ./cmd/antclaw-worker
-RUN go build -ldflags "\
+RUN go build -p 1 -ldflags "\
   -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
   -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT}" \
   -o ../bin/antclaw-backtest-runner ./cmd/antclaw-backtest-runner
-RUN go build -ldflags "\
+RUN go build -p 1 -ldflags "\
   -X github.com/antclaw/antclaw/internal/adapter/rpc.Version=${VERSION} \
   -X github.com/antclaw/antclaw/internal/adapter/rpc.GitCommit=${GIT_COMMIT}" \
   -o ../bin/antclaw-cli ./cmd/antclaw-cli

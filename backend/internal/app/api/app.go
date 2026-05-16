@@ -59,7 +59,12 @@ func corsMiddleware(h http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Connect-Protocol-Version")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Connect-Protocol-Version, Connect-Timeout-Ms, X-User-Agent")
+		w.Header().Set("Access-Control-Expose-Headers", "Connect-Error-Code, Connect-Error-Message, Connect-Protocol-Version")
+		w.Header().Set("Access-Control-Max-Age", "7200")
+		w.Header().Add("Vary", "Origin")
+		w.Header().Add("Vary", "Access-Control-Request-Method")
+		w.Header().Add("Vary", "Access-Control-Request-Headers")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
@@ -71,7 +76,7 @@ func corsMiddleware(h http.Handler) http.Handler {
 // Handler returns the composed HTTP handler ready for http.Server.
 func (a *App) Handler() http.Handler {
 	if a.handler == nil {
-		a.handler = h2c.NewHandler(corsMiddleware(a.mux), &http2.Server{})
+		a.handler = corsMiddleware(h2c.NewHandler(a.mux, &http2.Server{}))
 	}
 	return a.handler
 }
