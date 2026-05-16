@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -76,6 +78,13 @@ func streamSSE(w http.ResponseWriter, r *http.Request, rdb *redisv9.Client, stre
 	}
 }
 
+// generateConnID 生成唯一连接标识符: userID-timestamp-randomHex(8)
+func generateConnID(userID string) string {
+	b := make([]byte, 8)
+	_, _ = rand.Read(b)
+	return fmt.Sprintf("%s-%d-%s", userID, time.Now().UnixNano(), hex.EncodeToString(b))
+}
+
 // jobsEventsHandler streams job events from Redis Streams to the browser via SSE.
 func jobsEventsHandler(rdb *redisv9.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -113,10 +122,17 @@ func userNotificationsSSE(rdb *redisv9.Client, pt *presence.Tracker) http.Handle
 		log.Printf("SSE notifications: connected user=%s remote=%s role=%s", userID, r.RemoteAddr, role)
 		// 管理端用户不纳入在线统计
 		if role != "admin" && role != "super_admin" {
-			pt.Register(userID, r.RemoteAddr)
+			connID := generateConnID(userID)
+			pt.Register(presence.Connection{
+				ConnID:      connID,
+				UserID:      userID,
+				RemoteAddr:  r.RemoteAddr,
+				UserAgent:   r.UserAgent(),
+				ConnectedAt: time.Now(),
+			})
 			defer func() {
-				pt.Unregister(userID)
-				log.Printf("SSE notifications: disconnected user=%s", userID)
+				pt.Unregister(userID, connID)
+				log.Printf("SSE notifications: disconnected user=%s conn=%s", userID, connID)
 			}()
 		} else {
 			defer log.Printf("SSE notifications: admin disconnected user=%s", userID)

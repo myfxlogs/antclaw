@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -257,12 +258,15 @@ func (h *AuthHandler) upsertDevice(ctx context.Context, userID string, client *a
 	if h.pg == nil || client == nil || client.DeviceId == "" {
 		return
 	}
-	_, _ = h.pg.Exec(ctx, `
+	_, err := h.pg.Exec(ctx, `
 		INSERT INTO devices (device_id, user_id)
 		VALUES ($1, $2)
 		ON CONFLICT (device_id) DO UPDATE SET user_id=$2, updated_at=NOW()`,
 		client.DeviceId, userID,
 	)
+	if err != nil {
+		log.Printf("upsertDevice: db error device=%s user=%s err=%v", client.DeviceId, userID, err)
+	}
 }
 
 // helpers

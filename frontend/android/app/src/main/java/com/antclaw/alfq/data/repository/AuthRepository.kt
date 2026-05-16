@@ -4,91 +4,80 @@ import antclaw.v1.Auth
 import com.antclaw.alfq.data.device.DeviceInfoCollector
 import com.antclaw.alfq.data.local.TokenStore
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
-import com.antclaw.alfq.data.sse.SseClient
 import com.connectrpc.MethodSpec
 import com.connectrpc.ResponseMessage
 import com.connectrpc.StreamType
 import com.connectrpc.getOrThrow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
     private val tokenStore: TokenStore,
     private val deviceInfoCollector: DeviceInfoCollector,
-    private val sseManager: SseClient,
-    private val deviceRepository: DeviceRepository,
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    suspend fun login(email: String, password: String): Result<String> {
+    // ── 公共工具 ──
+
+    /** 构造 Login/Register 共用 ClientInfo。 */
+    private fun buildClientInfo(): Auth.ClientInfo = Auth.ClientInfo.newBuilder()
+        .setDeviceId(deviceInfoCollector.getDeviceId())
+        .setUserAgent(deviceInfoCollector.getUserAgent())
+        .setIpAddress("")
+        .build()
+
+    suspend fun login(email: String, password: String): Result<AuthSessionResult> {
         return try {
             val client = ConnectTransportProvider.createProtocolClient()
-            
-            val clientInfo = Auth.ClientInfo.newBuilder()
-                .setDeviceId(deviceInfoCollector.getDeviceId())
-                .setUserAgent(deviceInfoCollector.getUserAgent())
-                .setIpAddress("")
-                .build()
-            
             val request = Auth.LoginRequest.newBuilder()
                 .setEmail(email)
                 .setPassword(password)
-                .setClient(clientInfo)
+                .setClient(buildClientInfo())
                 .build()
                 
             val spec = MethodSpec("antclaw.v1.AuthService/Login",
                 Auth.LoginRequest::class, Auth.LoginResponse::class, StreamType.UNARY)
             val res: ResponseMessage<Auth.LoginResponse> = client.unary(request, emptyMap(), spec)
             val resp = res.getOrThrow()
-            val accessToken = resp.accessToken
-            val refreshToken = resp.refreshToken
-            ConnectTransportProvider.setToken(accessToken)
-            tokenStore.saveTokens(accessToken, refreshToken, resp.userId)
-            onLoginSuccess()
-            Result.success(accessToken)
+
+            Result.success(
+                AuthSessionResult(
+                    userId = resp.userId,
+                    accessToken = resp.accessToken,
+                    refreshToken = resp.refreshToken,
+                    codeId = resp.codeId,
+                )
+            )
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun register(email: String, password: String): Result<String> {
+    suspend fun register(email: String, password: String): Result<AuthSessionResult> {
         return try {
             val client = ConnectTransportProvider.createProtocolClient()
-            
-            val clientInfo = Auth.ClientInfo.newBuilder()
-                .setDeviceId(deviceInfoCollector.getDeviceId())
-                .setUserAgent(deviceInfoCollector.getUserAgent())
-                .setIpAddress("")
-                .build()
-            
             val displayName = email.substringBefore("@")
             val request = Auth.RegisterRequest.newBuilder()
                 .setEmail(email)
                 .setDisplayName(displayName)
                 .setPassword(password)
-                .setClient(clientInfo)
+                .setClient(buildClientInfo())
                 .build()
                 
             val spec = MethodSpec("antclaw.v1.AuthService/Register",
                 Auth.RegisterRequest::class, Auth.RegisterResponse::class, StreamType.UNARY)
             val res: ResponseMessage<Auth.RegisterResponse> = client.unary(request, emptyMap(), spec)
             val resp = res.getOrThrow()
-            ConnectTransportProvider.setToken(resp.accessToken)
-            tokenStore.saveTokens(resp.accessToken, resp.refreshToken, resp.userId)
-            onLoginSuccess()
-            Result.success(resp.accessToken)
+
+            Result.success(
+                AuthSessionResult(
+                    userId = resp.userId,
+                    accessToken = resp.accessToken,
+                    refreshToken = resp.refreshToken,
+                    displayName = displayName,
+                    codeId = resp.codeId,
+                )
+            )
         } catch (e: Exception) {
             Result.failure(e)
-        }
-    }
-
-    /** 登录 / 注册成功后：异步上报设备信息。SSE 由 SessionViewModel 统一管理。 */
-    private fun onLoginSuccess() {
-        scope.launch {
-            deviceRepository.reportDeviceInfo()
         }
     }
 
@@ -102,8 +91,6 @@ class AuthRepository @Inject constructor(
                 Auth.RefreshRequest::class, Auth.RefreshResponse::class, StreamType.UNARY)
             val res: ResponseMessage<Auth.RefreshResponse> = client.unary(request, emptyMap(), spec)
             val resp = res.getOrThrow()
-            ConnectTransportProvider.setToken(resp.accessToken)
-            tokenStore.saveAccessToken(resp.accessToken)
             Result.success(resp.accessToken)
         } catch (e: Exception) {
             Result.failure(e)
@@ -116,13 +103,15 @@ class AuthRepository @Inject constructor(
             val spec = MethodSpec("antclaw.v1.AuthService/Logout",
                 Auth.LogoutRequest::class, Auth.LogoutResponse::class, StreamType.UNARY)
             client.unary(Auth.LogoutRequest.getDefaultInstance(), emptyMap(), spec)
-        } catch (_: Exception) { } finally {
-            ConnectTransportProvider.clearToken()
-            tokenStore.clearTokens()
-        }
+        } catch (_: Exception) { }
     }
 
     suspend fun restoreToken(): String? {
-        return tokenStore.getAccessToken()?.also { ConnectTransportProvider.setToken(it) }
+        return tokenStore.getAccessToken()
+    }
+
+    /** 从持久存储恢复 userId（供 autoLogin 使用）。 */
+    suspend fun restoredUserId(): String? {
+        return tokenStore.getUserId()
     }
 }

@@ -79,7 +79,38 @@ class DeviceInfoCollector @Inject constructor(
         return "AntClaw/$appVersion (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL})"
     }
 
-    // 设备信息收集
+    // ── 基础设备信息（不需要 consent）──
+    // 用于登录后立即补全管理端设备列表基础字段
+    fun collectBasic(): DeviceInfo {
+        return DeviceInfo(
+            deviceId = getDeviceId(),
+            deviceType = DeviceType.PHONE,
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            brand = Build.BRAND,
+            osVersion = Build.VERSION.RELEASE,
+            apiLevel = Build.VERSION.SDK_INT,
+            securityPatch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Build.VERSION.SECURITY_PATCH
+            } else "unknown",
+            screenWidth = 0,
+            screenHeight = 0,
+            densityDpi = 0,
+            networkType = NetworkType.UNKNOWN,
+            batteryLevel = -1,
+            isCharging = false,
+            appVersionName = getAppVersionName(),
+            appVersionCode = getAppVersionCode(),
+            packageName = context.packageName,
+            timezone = TimeZone.getDefault().id,
+            locale = Locale.getDefault().language,
+            isEmulator = isRunningOnEmulator(),
+            collectedAt = System.currentTimeMillis(),
+            sessionId = getSessionId(),
+        )
+    }
+
+    // 设备信息收集（完整版，需 consent）
     suspend fun collect(): DeviceInfo? {
         if (!consentGiven) return null
         
@@ -90,34 +121,17 @@ class DeviceInfoCollector @Inject constructor(
         return withContext(Dispatchers.IO) {
             runCatching {
                 val displayMetrics = getDisplayMetrics()
-                
-                val info = DeviceInfo(
-                    deviceId = getDeviceId(),
+                val info = collectBasic().copy(
                     deviceType = getDeviceType(displayMetrics),
-                    manufacturer = Build.MANUFACTURER,
-                    model = Build.MODEL,
-                    brand = Build.BRAND,
-                    osVersion = Build.VERSION.RELEASE,
-                    apiLevel = Build.VERSION.SDK_INT,
-                    securityPatch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        Build.VERSION.SECURITY_PATCH
-                    } else "unknown",
                     screenWidth = displayMetrics.widthPixels,
                     screenHeight = displayMetrics.heightPixels,
                     densityDpi = displayMetrics.densityDpi,
                     networkType = getNetworkType(),
                     batteryLevel = getBatteryLevel(),
                     isCharging = isCharging(),
-                    appVersionName = getAppVersionName(),
-                    appVersionCode = getAppVersionCode(),
-                    packageName = context.packageName,
-                    timezone = TimeZone.getDefault().id,
-                    locale = Locale.getDefault().language,
-                    isEmulator = isRunningOnEmulator(),
                     collectedAt = System.currentTimeMillis(),
-                    sessionId = getSessionId()
+                    sessionId = getSessionId(),
                 )
-
                 cachedDeviceInfo = info
                 info
             }.getOrElse {

@@ -12,15 +12,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
+import com.antclaw.alfq.data.repository.AuthSessionResult
 
 @Composable
 fun RegisterScreen(
     onBack: () -> Unit,
-    onRegisterSuccess: (String) -> Unit,
+    onRegisterSuccess: (AuthSessionResult) -> Unit,
     vm: RegisterViewModel = hiltViewModel()
 ) {
     val state by vm.state.collectAsState()
-    LaunchedEffect(state.registerSuccess) { if (state.registerSuccess) { onRegisterSuccess(state.accessToken) } }
 
     Column(modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -39,7 +39,7 @@ fun RegisterScreen(
             singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(onClick = { vm.register() },
+        Button(onClick = { vm.register { result -> onRegisterSuccess(result) } },
             enabled = state.email.isNotBlank() && state.password.isNotBlank() && !state.loading,
             modifier = Modifier.fillMaxWidth().height(50.dp)) {
             if (state.loading) { CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary) }

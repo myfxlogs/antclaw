@@ -1,6 +1,7 @@
 package com.antclaw.alfq.ui.session
 
 import com.antclaw.alfq.data.local.TokenStoreApi
+import com.antclaw.alfq.data.repository.DeviceReportApi
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
 import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
@@ -27,24 +28,40 @@ class SessionViewModelTest {
         kotlinx.coroutines.Dispatchers.resetMain()
     }
 
-    @Test fun `login success`() = runTest(scheduler) {
-        val vm = SessionViewModel(FakeTok(), FakeSse(), SessionExpiredNotifier())
+    @Test fun `login success saves token sets session connects sse and reports device`() = runTest(scheduler) {
+        val sse = FakeSse()
+        val deviceApi = FakeDeviceReportApi()
+        val vm = SessionViewModel(FakeTok(), sse, SessionExpiredNotifier(), deviceApi)
         advanceUntilIdle()
         vm.onLoginSuccess("u1", "acc", "ref", "Alice")
         advanceUntilIdle()
         assertEquals(SessionState.AUTHENTICATED, vm.session.value.state)
         assertEquals("acc", ConnectTransportProvider.getToken())
+        assertEquals("Alice", vm.session.value.displayName)
+        assertTrue(sse.connected)
+        assertTrue(deviceApi.reported)
+    }
+
+    @Test fun `device report failure does not block login`() = runTest(scheduler) {
+        val sse = FakeSse()
+        val deviceApi = FakeDeviceReportApi(fail = true)
+        val vm = SessionViewModel(FakeTok(), sse, SessionExpiredNotifier(), deviceApi)
+        advanceUntilIdle()
+        vm.onLoginSuccess("u1", "acc", "ref", "Alice")
+        advanceUntilIdle()
+        assertEquals(SessionState.AUTHENTICATED, vm.session.value.state)
+        assertTrue(sse.connected)
     }
 
     @Test fun `session expired`() = runTest(scheduler) {
-        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), FakeSse(), SessionExpiredNotifier())
+        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), FakeSse(), SessionExpiredNotifier(), FakeDeviceReportApi())
         advanceUntilIdle()
         vm.onSessionExpired(); advanceUntilIdle()
         assertEquals(SessionState.EXPIRED, vm.session.value.state)
     }
 
     @Test fun `logout`() = runTest(scheduler) {
-        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), FakeSse(), SessionExpiredNotifier())
+        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), FakeSse(), SessionExpiredNotifier(), FakeDeviceReportApi())
         advanceUntilIdle()
         vm.logout(); advanceUntilIdle()
         assertEquals(SessionState.UNAUTHENTICATED, vm.session.value.state)
@@ -52,7 +69,7 @@ class SessionViewModelTest {
 
     @Test fun `foreground reconnect`() = runTest(scheduler) {
         val sse = FakeSse()
-        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), sse, SessionExpiredNotifier())
+        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), sse, SessionExpiredNotifier(), FakeDeviceReportApi())
         advanceUntilIdle()
         sse.disconnect(); assertFalse(sse.connected)
         vm.onForeground(); advanceUntilIdle()
@@ -61,7 +78,7 @@ class SessionViewModelTest {
 
     @Test fun `background disconnect`() = runTest(scheduler) {
         val sse = FakeSse()
-        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), sse, SessionExpiredNotifier())
+        val vm = SessionViewModel(FakeTok("tok", userId = "u1"), sse, SessionExpiredNotifier(), FakeDeviceReportApi())
         advanceUntilIdle(); assertTrue(sse.connected)
         vm.onBackground()
         assertFalse(sse.connected)
@@ -87,4 +104,12 @@ class FakeSse : SseClient {
     override fun disconnect() { connected = false }
     override fun reconnect() { disconnect(); connect() }
     override fun destroy() { connected = false }
+}
+
+class FakeDeviceReportApi(val fail: Boolean = false) : DeviceReportApi {
+    var reported = false; private set
+    override suspend fun reportDeviceInfo() {
+        reported = true
+        if (fail) throw RuntimeException("simulated device report failure")
+    }
 }

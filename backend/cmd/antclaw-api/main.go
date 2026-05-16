@@ -254,7 +254,8 @@ if err := auth.LoadKeys(); err != nil {
 	mux.Handle(antclawv1connect.NewTreasuryServiceHandler(rpc.NewTreasuryHandler()))
 	mux.Handle(antclawv1connect.NewSentimentExtrasServiceHandler(rpc.NewSentimentExtrasHandlerWithResolver(resolver)))
 	mux.Handle(antclawv1connect.NewRegimeServiceHandler(rpc.NewRegimeHandler(regime.NewService(pgPool))))
-	mux.Handle(antclawv1connect.NewDeviceServiceHandler(rpc.NewDeviceHandler(pgPool)))
+	mux.Handle(antclawv1connect.NewDeviceServiceHandler(rpc.NewDeviceHandler(pgPool),
+		connect.WithInterceptors(auth.AuthInterceptor(true))))
 
 	// Notification handler —— 要求登录态。
 	notificationHandler := rpc.NewNotificationHandler(notifySvc, queries)

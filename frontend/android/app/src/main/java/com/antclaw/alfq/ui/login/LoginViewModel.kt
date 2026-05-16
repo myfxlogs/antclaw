@@ -3,6 +3,7 @@ package com.antclaw.alfq.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.repository.AuthRepository
+import com.antclaw.alfq.data.repository.AuthSessionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,11 +26,18 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-    fun autoLogin(onSuccess: (String) -> Unit) {
+    /** 从持久存储恢复 token 和 userId，尝试自动登录。 */
+    fun autoLogin(onSuccess: (AuthSessionResult) -> Unit) {
         viewModelScope.launch {
             val token = authRepo.restoreToken()
             if (token != null) {
-                onSuccess(token)
+                onSuccess(
+                    AuthSessionResult(
+                        userId = authRepo.restoredUserId() ?: "",
+                        accessToken = token,
+                        refreshToken = "",
+                    )
+                )
             }
         }
     }
@@ -42,14 +50,14 @@ class LoginViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(password = password, error = null)
     }
 
-    fun login(onSuccess: (String) -> Unit) {
+    fun login(onSuccess: (AuthSessionResult) -> Unit) {
         val state = _uiState.value
         viewModelScope.launch {
             _uiState.value = state.copy(loading = true, error = null)
             authRepo.login(state.email, state.password)
-                .onSuccess { token ->
+                .onSuccess { result ->
                     _uiState.value = _uiState.value.copy(loading = false)
-                    onSuccess(token)
+                    onSuccess(result)
                 }
                 .onFailure { e ->
                     _uiState.value = _uiState.value.copy(

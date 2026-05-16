@@ -3,6 +3,7 @@ package com.antclaw.alfq.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.repository.AuthRepository
+import com.antclaw.alfq.data.repository.AuthSessionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +16,6 @@ data class RegisterUiState(
     val password: String = "",
     val loading: Boolean = false,
     val error: String? = null,
-    val registerSuccess: Boolean = false,
-    val accessToken: String = "",
 )
 
 @HiltViewModel
@@ -30,21 +29,16 @@ class RegisterViewModel @Inject constructor(
     fun updateEmail(email: String) = _state.update { it.copy(email = email, error = null) }
     fun updatePassword(password: String) = _state.update { it.copy(password = password, error = null) }
 
-    fun register() {
+    fun register(onSuccess: (AuthSessionResult) -> Unit) {
         val s = _state.value
         if (s.email.isBlank() || s.password.isBlank()) return
 
         viewModelScope.launch {
             _state.update { it.copy(loading = true, error = null) }
             authRepo.register(s.email, s.password).fold(
-                onSuccess = { token ->
-                    _state.update {
-                        it.copy(
-                            loading = false,
-                            registerSuccess = true,
-                            accessToken = token
-                        )
-                    }
+                onSuccess = { result ->
+                    _state.update { it.copy(loading = false) }
+                    onSuccess(result)
                 },
                 onFailure = { e ->
                     _state.update {

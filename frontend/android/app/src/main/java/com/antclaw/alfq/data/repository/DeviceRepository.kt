@@ -13,26 +13,25 @@ import javax.inject.Singleton
 /**
  * 设备信息上报仓库
  *
- * 登录成功后异步调用 ReportDeviceInfo RPC 补全完整设备信息
- * （model、brand、os_version、screen 等），补充 login 时仅写入 device_id 的记录。
+ * 登录成功后异步调用 ReportDeviceInfo RPC 补全设备信息。
+ * 优先使用完整采集（需 consent），无 consent 时回落基础上报，
+ * 确保管理端至少看到 device_id / brand / model / os_version 等基础字段。
  */
 @Singleton
 class DeviceRepository @Inject constructor(
     private val deviceInfoCollector: DeviceInfoCollector
-) {
+) : DeviceReportApi {
     companion object {
         private const val TAG = "DeviceRepository"
     }
 
     /**
-     * 登录 / 注册成功后调用，异步上报完整设备信息。
+     * 登录 / 注册成功后调用，异步上报设备信息。
      * 失败静默——不影响主流程。
      */
-    suspend fun reportDeviceInfo() {
-        val di = deviceInfoCollector.collect() ?: run {
-            Log.w(TAG, "reportDeviceInfo: consent not given or collect failed, skipping")
-            return
-        }
+    override suspend fun reportDeviceInfo() {
+        val di = deviceInfoCollector.collect()
+            ?: deviceInfoCollector.collectBasic()
 
         try {
             val client = ConnectTransportProvider.createProtocolClient()

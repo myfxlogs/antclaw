@@ -1,8 +1,10 @@
 package com.antclaw.alfq.ui.session
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.local.TokenStoreApi
+import com.antclaw.alfq.data.repository.DeviceReportApi
 import com.antclaw.alfq.data.rpc.ConnectTransportProvider
 import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
@@ -29,13 +31,18 @@ sealed class SessionEvent {
     data object LoggedOut : SessionEvent()
 }
 
-/** 集中管理登录态、Token、用户身份、SSE 连接。 */
+/** 集中管理登录态、Token、用户身份、SSE 连接、设备上报。 */
 @HiltViewModel
 class SessionViewModel @Inject constructor(
     private val tokenStore: TokenStoreApi,
     private val sseClient: SseClient,
     private val sessionNotifier: SessionExpiredNotifier,
+    private val deviceReportApi: DeviceReportApi,
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "SessionViewModel"
+    }
 
     private val _session = MutableStateFlow(SessionInfo())
     val session: StateFlow<SessionInfo> = _session.asStateFlow()
@@ -70,6 +77,15 @@ class SessionViewModel @Inject constructor(
             ConnectTransportProvider.setToken(accessToken)
             setSession(SessionState.AUTHENTICATED, userId, displayName)
             sseClient.connect()
+            // 异步上报设备详情 — 失败不阻断登录
+            launch {
+                try {
+                    deviceReportApi.reportDeviceInfo()
+                    Log.i(TAG, "deviceReport: success")
+                } catch (e: Exception) {
+                    Log.e(TAG, "deviceReport: failed", e)
+                }
+            }
         }
     }
 

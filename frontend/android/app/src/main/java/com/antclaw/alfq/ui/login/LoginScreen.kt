@@ -12,16 +12,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
+import com.antclaw.alfq.data.repository.AuthSessionResult
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: (String) -> Unit,
+    onLoginSuccess: (AuthSessionResult) -> Unit,
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    LaunchedEffect(Unit) { viewModel.autoLogin { token -> onLoginSuccess(token) } }
+    LaunchedEffect(Unit) { viewModel.autoLogin { result -> onLoginSuccess(result) } }
 
     Column(modifier = Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -49,7 +50,7 @@ fun LoginScreen(
                 style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 8.dp))
         }
 
-        Button(onClick = { viewModel.login { token -> onLoginSuccess(token) } },
+        Button(onClick = { viewModel.login { result -> onLoginSuccess(result) } },
             enabled = !state.loading && state.email.isNotBlank() && state.password.isNotBlank(),
             modifier = Modifier.fillMaxWidth().height(52.dp)) {
             if (state.loading) {
