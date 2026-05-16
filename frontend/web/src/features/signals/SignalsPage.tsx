@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@connectrpc/connect'
 import { SignalsService } from '@antclaw/proto/antclaw/v1/signals_pb'
 import { transport } from '../_shared/transport'
-import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
 const client = createClient(SignalsService, transport)
 
@@ -26,10 +26,11 @@ export default function SignalsPage() {
       for (const pair of pairs) {
         try {
           const resp = await client.getBias({ pair, timeframe: '1D' })
+          const bias = resp.biases?.[0]
           results.push({
             pair,
-            direction: resp.direction || 'neutral',
-            confidence: Math.round((resp.confidence || 0) * 100),
+            direction: bias?.direction || 'neutral',
+            confidence: Math.round((bias?.confidence || 0) * 100),
           })
         } catch {
           results.push({ pair, direction: 'neutral', confidence: 0 })

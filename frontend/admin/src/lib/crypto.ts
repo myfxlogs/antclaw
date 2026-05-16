@@ -151,7 +151,7 @@ export async function sendSecurePut(
   const sig = await signRequest(token, bodyB64)
   // 3) 通过 Connect 调用 CryptoService.PostEnvelope
   const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8082'
-  const transport = createConnectTransport({ baseUrl: API_BASE_URL })
+  const transport = createConnectTransport({ baseUrl: API_BASE_URL, useBinaryFormat: true })
   const client = createClient(CryptoService, transport)
   const res = await client.postEnvelope({
     bodyB64,

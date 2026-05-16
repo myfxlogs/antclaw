@@ -16,7 +16,7 @@ async function tryRefresh(): Promise<string | null> {
 
   refreshPromise = (async () => {
     try {
-      const noAuthTransport = createConnectTransport({ baseUrl: API_BASE_URL })
+      const noAuthTransport = createConnectTransport({ baseUrl: API_BASE_URL, useBinaryFormat: true })
       const client = createClient(AuthService, noAuthTransport)
       const res = await client.refresh(create(RefreshRequestSchema, { refreshToken }))
       if (res.accessToken) {
@@ -39,6 +39,7 @@ async function tryRefresh(): Promise<string | null> {
 // Create transport with auth + refresh interceptor
 export const transport = createConnectTransport({
   baseUrl: API_BASE_URL,
+  useBinaryFormat: true,
   interceptors: [
     (next) => async (req) => {
       const token = localStorage.getItem('token')
