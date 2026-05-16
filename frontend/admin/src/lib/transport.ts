@@ -4,7 +4,7 @@ import { createClient } from '@connectrpc/connect'
 import { create } from '@bufbuild/protobuf'
 import { AuthService, RefreshRequestSchema } from '@antclaw/proto/antclaw/v1/auth_pb'
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8082'
+export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8082'
 
 // Single-flight refresh state
 let refreshPromise: Promise<string | null> | null = null

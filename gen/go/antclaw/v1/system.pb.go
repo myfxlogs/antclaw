@@ -437,8 +437,8 @@ type OnlineUserInfo struct {
 	RemoteAddr    string                 `protobuf:"bytes,3,opt,name=remote_addr,json=remoteAddr,proto3" json:"remote_addr,omitempty"`
 	ConnectedAt   int64                  `protobuf:"varint,4,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"` // unix 秒
 	CodeId        string                 `protobuf:"bytes,5,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`                 // 5 位数字 ID（用户可见）
-	Email         string                 `protobuf:"bytes,6,opt,name=email,proto3" json:"email,omitempty"`
-	UserAgent     string                 `protobuf:"bytes,7,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	Email         string                 `protobuf:"bytes,6,opt,name=email,proto3" json:"email,omitempty"`                                 // 用户邮箱
+	UserAgent     string                 `protobuf:"bytes,7,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`        // 设备 User-Agent
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -774,14 +774,17 @@ const file_antclaw_v1_system_proto_rawDesc = "" +
 	"\x0fserver_timezone\x18\a \x01(\tR\x0eserverTimezone\x12\x1f\n" +
 	"\vserver_time\x18\b \x01(\x03R\n" +
 	"serverTime\"\x17\n" +
-	"\x15GetOnlineUsersRequest\"\xa9\x01\n" +
+	"\x15GetOnlineUsersRequest\"\xde\x01\n" +
 	"\x0eOnlineUserInfo\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1f\n" +
 	"\vremote_addr\x18\x03 \x01(\tR\n" +
 	"remoteAddr\x12!\n" +
 	"\fconnected_at\x18\x04 \x01(\x03R\vconnectedAt\x12\x17\n" +
-	"\acode_id\x18\x05 \x01(\tR\x06codeId\"`\n" +
+	"\acode_id\x18\x05 \x01(\tR\x06codeId\x12\x14\n" +
+	"\x05email\x18\x06 \x01(\tR\x05email\x12\x1d\n" +
+	"\n" +
+	"user_agent\x18\a \x01(\tR\tuserAgent\"`\n" +
 	"\x16GetOnlineUsersResponse\x12\x14\n" +
 	"\x05count\x18\x01 \x01(\x05R\x05count\x120\n" +
 	"\x05users\x18\x02 \x03(\v2\x1a.antclaw.v1.OnlineUserInfoR\x05users\"\x15\n" +

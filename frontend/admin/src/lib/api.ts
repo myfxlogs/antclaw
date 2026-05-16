@@ -1,6 +1,6 @@
 import { create } from '@bufbuild/protobuf'
 import { createClient } from '@connectrpc/connect'
-// Transport is in ./transport.ts
+import { API_BASE_URL } from './transport'
 
 import { AuthService, LoginRequestSchema, ClientInfoSchema } from '@antclaw/proto/antclaw/v1/auth_pb'
 import {
@@ -286,6 +286,8 @@ export async function getOnlineUsers(): Promise<{ count: number; users: OnlineUs
       userId: u.userId,
       codeId: u.codeId || '',
       displayName: u.displayName || '',
+      email: u.email || '',
+      userAgent: u.userAgent || '',
       remoteAddr: u.remoteAddr,
       connectedAt: Number(u.connectedAt),
     })),

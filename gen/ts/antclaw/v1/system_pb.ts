@@ -235,6 +235,20 @@ export type OnlineUserInfo = Message<"antclaw.v1.OnlineUserInfo"> & {
    * @generated from field: string code_id = 5;
    */
   codeId: string;
+
+  /**
+   * 用户邮箱
+   *
+   * @generated from field: string email = 6;
+   */
+  email: string;
+
+  /**
+   * 设备 User-Agent
+   *
+   * @generated from field: string user_agent = 7;
+   */
+  userAgent: string;
 };
 
 /**
