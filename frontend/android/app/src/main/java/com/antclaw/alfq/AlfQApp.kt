@@ -38,7 +38,7 @@ import com.antclaw.alfq.ui.mt.BindMtAccountScreen
 import com.antclaw.alfq.ui.session.SessionState
 import com.antclaw.alfq.ui.session.SessionViewModel
 import com.antclaw.alfq.ui.theme.AlfQTheme
-import com.antclaw.alfq.navigation.BottomNavBarWithFAB
+import com.antclaw.alfq.navigation.BottomNavBar
 
 // ── Constants ──
 private const val DEFAULT_PAIR = "EURUSD"
@@ -106,7 +106,7 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
 
     Scaffold(
         bottomBar = {
-            BottomNavBarWithFAB(
+            BottomNavBar(
                 navController = navController,
                 notificationCount = notifState.unreadCount,
                 onChatClick = { navController.navigate("chat") }
@@ -164,7 +164,19 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
             composable("bind_mt_account") { BindMtAccountScreen(onBack = { navController.popBackStack() }) }
             composable("alerts") { AlertScreen(onBack = { navController.popBackStack() }) }
             composable("chat") { ChatScreen(onBack = { navController.popBackStack() }) }
-            composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
+            composable("notifications") {
+                NotificationCenterScreen(
+                    onBack = { navController.popBackStack() },
+                    onNotificationClick = { notif ->
+                        val d = notif.data
+                        when {
+                            d["post_id"] != null -> navController.navigate("postDetail/${d["post_id"]}")
+                            d["user_id"] != null -> navController.navigate("profile/${d["user_id"]}")
+                            d["signal_id"] != null -> navController.navigate("signal/${d["signal_id"]}")
+                        }
+                    },
+                )
+            }
             composable("notification_prefs") { NotificationPrefsScreen(onBack = { navController.popBackStack() }) }
             composable("settings/language") { LanguagePickerScreen(onBack = { navController.popBackStack() }) }
             composable("device_info") { DeviceInfoScreen() }
@@ -181,7 +193,7 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId") ?: DEFAULT_USER_ID
-                ProfileScreen(userId = userId, onBack = { navController.popBackStack() })
+                ProfileScreen(userId = userId, onBack = { navController.popBackStack() }, onPostClick = { postId -> navController.navigate("postDetail/$postId") })
             }
         }
     }

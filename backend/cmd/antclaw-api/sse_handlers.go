@@ -122,6 +122,8 @@ func userNotificationsSSE(rdb *redisv9.Client, pt *presence.Tracker) http.Handle
 		log.Printf("SSE notifications: connected user=%s remote=%s role=%s", userID, r.RemoteAddr, role)
 		// 管理端用户不纳入在线统计
 		if role != "admin" && role != "super_admin" {
+			// 单设备限制：新连接时清除该用户所有旧连接
+			pt.DisconnectUser(userID)
 			connID := generateConnID(userID)
 			pt.Register(presence.Connection{
 				ConnID:      connID,

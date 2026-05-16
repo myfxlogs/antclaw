@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/antclaw/antclaw/internal/domain/apperror"
 	"github.com/antclaw/antclaw/internal/infra/apiclient"
 	macrov1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 )
@@ -32,8 +33,8 @@ type MacroDataStore struct {
 	fedWatchData      *macrov1.GetFedWatchResponse
 }
 
-// NewService creates a new MacroService with sample data (no external API).
-// Deprecated: Use NewServiceWithFRED for production with real data.
+// NewService creates a new MacroService. Returns errors when no real data is available.
+// Deprecated: Use NewServiceWithFRED for production with FRED API integration.
 func NewService() *Service {
 	return NewServiceWithFRED(nil)
 }
@@ -152,7 +153,7 @@ func generateTradingEconData(country string) []*macrov1.TeIndicator {
 }
 
 // GetFred returns FRED economic data.
-// Fetches real data from FRED API if configured, otherwise falls back to sample data.
+// Requires FRED API configuration; returns an error if not configured or fetch fails.
 func (s *Service) GetFred(ctx context.Context, seriesID string) (*macrov1.GetFredResponse, error) {
 	seriesNames := map[string]string{
 		"GDP":        "Gross Domestic Product",
@@ -175,22 +176,13 @@ func (s *Service) GetFred(ctx context.Context, seriesID string) (*macrov1.GetFre
 				Data:       realData,
 			}, nil
 		}
-		// Log error but continue to fallback
-		log.Printf("FRED API fetch failed for %s: %v, using fallback data", seriesID, err)
+		if err != nil {
+			log.Printf("FRED API fetch failed for %s: %v", seriesID, err)
+			return nil, fmt.Errorf("%w: FRED %s: %v", apperror.ErrUpstreamUnavailable, seriesID, err)
+		}
 	}
 
-	// Fallback to sample data
-	data, ok := s.dataStore.fredData[seriesID]
-	if !ok {
-		// Default to GDP if series not found
-		data = s.dataStore.fredData["GDP"]
-	}
-
-	return &macrov1.GetFredResponse{
-		SeriesId:   seriesID,
-		SeriesName: seriesNames[seriesID],
-		Data:       data,
-	}, nil
+	return nil, fmt.Errorf("%w: FRED client not configured", apperror.ErrProviderNotConfigured)
 }
 
 // fetchFromFRED fetches real data from FRED API and converts to proto format.

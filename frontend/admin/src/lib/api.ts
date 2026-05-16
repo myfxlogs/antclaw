@@ -60,7 +60,41 @@ import {
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8082'
 
-// Create transport with auth interceptor
+// Single-flight refresh state
+let refreshPromise: Promise<string | null> | null = null
+
+async function tryRefresh(): Promise<string | null> {
+  const refreshToken = localStorage.getItem('refreshToken')
+  if (!refreshToken) return null
+
+  if (refreshPromise) return refreshPromise
+
+  refreshPromise = (async () => {
+    try {
+      const { AuthService, RefreshRequestSchema } = await import('@antclaw/proto/antclaw/v1/auth_pb')
+      const { create } = await import('@bufbuild/protobuf')
+      // Use a separate transport without the auth interceptor (no Bearer token needed for refresh)
+      const noAuthTransport = createConnectTransport({ baseUrl: API_BASE_URL })
+      const client = createClient(AuthService, noAuthTransport)
+      const res = await client.refresh(create(RefreshRequestSchema, { refreshToken }))
+      if (res.accessToken) {
+        localStorage.setItem('token', res.accessToken)
+        return res.accessToken
+      }
+    } catch {
+      localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
+      window.location.href = '/login'
+    } finally {
+      refreshPromise = null
+    }
+    return null
+  })()
+
+  return refreshPromise
+}
+
+// Create transport with auth + refresh interceptor
 const transport = createConnectTransport({
   baseUrl: API_BASE_URL,
   interceptors: [
@@ -69,7 +103,16 @@ const transport = createConnectTransport({
       if (token) {
         req.header.set('Authorization', `Bearer ${token}`)
       }
-      return await next(req)
+      const res = await next(req)
+      // On 401, attempt token refresh
+      if ((res as any).code === 'unauthenticated') {
+        const newToken = await tryRefresh()
+        if (newToken) {
+          req.header.set('Authorization', `Bearer ${newToken}`)
+          return next(req)
+        }
+      }
+      return res
     },
   ],
 })
@@ -112,9 +155,12 @@ export async function login(email: string, password: string) {
   const request = create(LoginRequestSchema, { email, password, client: clientInfo })
   const response = await authClient.login(request)
   
-  // Store token
+  // Store tokens
   if (response.accessToken) {
     localStorage.setItem('token', response.accessToken)
+  }
+  if (response.refreshToken) {
+    localStorage.setItem('refreshToken', response.refreshToken)
   }
   
   return {
@@ -127,6 +173,7 @@ export async function login(email: string, password: string) {
 
 export async function logout() {
   localStorage.removeItem('token')
+  localStorage.removeItem('refreshToken')
 }
 
 // Dashboard API - Using AdminService

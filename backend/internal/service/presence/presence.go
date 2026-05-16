@@ -51,6 +51,13 @@ func (t *Tracker) Register(c Connection) {
 	cm[c.ConnID] = c
 }
 
+// DisconnectUser removes all connections for a user (single-device enforcement).
+func (t *Tracker) DisconnectUser(userID string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	delete(t.conns, userID)
+}
+
 // Unregister removes a specific connection.
 // When the user's last connection is removed, the user goes offline.
 func (t *Tracker) Unregister(userID, connID string) {

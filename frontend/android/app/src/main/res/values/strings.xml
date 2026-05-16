@@ -102,6 +102,8 @@
     <string name="profile_following">Following</string>
     <string name="profile_follow">Follow</string>
     <string name="profile_unfollow">Unfollow</string>
+    <string name="profile_tab_posts">Posts</string>
+    <string name="profile_tab_stats">Stats</string>
     <string name="profile_stats_title">Trading Record</string>
     <string name="profile_win_rate">Win Rate</string>
     <string name="profile_profit_factor">Profit Factor</string>
@@ -194,6 +196,34 @@
     <string name="common_error">Load failed</string>
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
+
+    <!-- Device Info -->
+    <string name="device_title">Device Information</string>
+    <string name="device_collect">Collect Device Info</string>
+    <string name="device_empty">No device information available</string>
+    <string name="device_consent_title">Device Information Collection</string>
+    <string name="device_consent_body">To provide the best experience, we collect anonymous device information. This helps us understand how the app is being used and improve our services.</string>
+    <string name="device_consent_grant">Grant Consent</string>
+    <string name="device_consent_denied">Data collection consent denied</string>
+    <string name="device_consent_required">Consent required to collect device info</string>
+    <string name="device_retry">Retry</string>
+    <string name="device_refresh">Refresh</string>
+    <string name="device_error">Error</string>
+    <string name="device_error_collect">Failed to collect device info</string>
+    <string name="device_error_generic">An error occurred while collecting device info: %1$s</string>
+
+    <!-- SSE Debug -->
+    <string name="sse_debug_title">SSE Connection Diagnostics</string>
+    <string name="sse_debug_base_url">Base URL</string>
+    <string name="sse_debug_token_present">Set</string>
+    <string name="sse_debug_token_missing">Not set</string>
+    <string name="sse_debug_state">SSE Connection State</string>
+    <string name="sse_debug_last_error">Last Connection Error</string>
+    <string name="sse_debug_last_report">Last Device Report</string>
+    <string name="sse_debug_none">None</string>
+    <string name="sse_debug_no_record">No record</string>
+    <string name="sse_debug_footer">For debugging and operations only.</string>
+    <string name="sse_debug_back">Back</string>
 
     <!-- 信号方向 -->
     <string name="direction_bullish">↗</string>

@@ -52,7 +52,7 @@ fun FeedScreen(
             val layoutInfo = listState.layoutInfo
             val totalItems = layoutInfo.totalItemsCount
             val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            totalItems > 0 && lastVisible >= totalItems - 3 && state.hasMore && !state.isAppending
+            totalItems > 0 && lastVisible >= totalItems - 3 && state.hasMore && state.phase != AsyncPhase.Appending
         }
     }
     LaunchedEffect(shouldLoadMore.value) {
@@ -63,12 +63,12 @@ fun FeedScreen(
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             FeedTopBar(notificationCount, onSearchClick, onNotificationClick)
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-            FeedTabs(state.currentTab, onTabClick = { viewModel.load(it) })
+            FeedTabs(viewModel.currentTab, onTabClick = { viewModel.load(it) })
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             FeedContent(
                 posts = state.posts,
-                isLoading = state.isLoading,
-                isAppending = state.isAppending,
+                isLoading = state.phase == AsyncPhase.Loading,
+                isAppending = state.phase == AsyncPhase.Appending,
                 error = state.error,
                 appendError = state.appendError,
                 listState = listState,
@@ -139,7 +139,6 @@ private fun FeedTabs(currentTab: HomeFeedTab, onTabClick: (HomeFeedTab) -> Unit)
                         text = when (tab) {
                             HomeFeedTab.RECOMMENDED -> stringResource(R.string.feed_tab_recommended)
                             HomeFeedTab.SIGNALS -> stringResource(R.string.feed_tab_signals)
-                            HomeFeedTab.LATEST -> stringResource(R.string.feed_tab_latest)
                         },
                         fontWeight = if (currentTab == tab) FontWeight.Bold else FontWeight.Normal,
                     )

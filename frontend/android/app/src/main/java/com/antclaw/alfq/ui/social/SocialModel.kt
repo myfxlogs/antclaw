@@ -4,7 +4,7 @@ import java.time.Instant
 
 // ── Feed Tab ──
 
-enum class FeedTab { FOLLOWING, FOR_YOU }
+enum class FeedTab(val filter: String) { FOLLOWING("following"), FOR_YOU("for_you") }
 
 // ── Feed State ──
 

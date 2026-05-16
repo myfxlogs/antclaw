@@ -10,9 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * 帖子发布状态
- */
+data class PostDraft(
+    val content: String = "",
+    val signalPair: String = "",
+    val signalDirection: String = "",
+    val signalConfidence: Int = 0,
+    val visibility: String = "public",
+)
+
 sealed class PostState {
     object Idle : PostState()
     object Loading : PostState()
@@ -20,9 +25,6 @@ sealed class PostState {
     data class Error(val message: String) : PostState()
 }
 
-/**
- * 帖子发布 ViewModel
- */
 @HiltViewModel
 class PostViewModel @Inject constructor(
     private val repository: SocialRepository,
@@ -31,18 +33,36 @@ class PostViewModel @Inject constructor(
     private val _postState = MutableStateFlow<PostState>(PostState.Idle)
     val postState: StateFlow<PostState> = _postState.asStateFlow()
 
-    fun post(content: String, signalPair: String, signalDirection: String, signalConfidence: Int, visibility: String) {
+    /** 最近一次提交失败的草稿，供重试复用。 */
+    private var lastFailedDraft: PostDraft? = null
+
+    fun post(draft: PostDraft) {
         if (_postState.value is PostState.Loading) return
         viewModelScope.launch {
             _postState.value = PostState.Loading
             try {
-                repository.createPost(content, signalPair, signalDirection, signalConfidence, visibility)
+                repository.createPost(
+                    draft.content, draft.signalPair,
+                    draft.signalDirection, draft.signalConfidence,
+                    draft.visibility,
+                )
+                lastFailedDraft = null
                 _postState.value = PostState.Success
             } catch (e: Exception) {
+                lastFailedDraft = draft
                 _postState.value = PostState.Error(e.message ?: "发布失败，请重试")
             }
         }
     }
 
-    fun reset() { _postState.value = PostState.Idle }
+    /** 重试上次失败提交的 payload。 */
+    fun retry() {
+        val draft = lastFailedDraft ?: return
+        post(draft)
+    }
+
+    fun reset() {
+        _postState.value = PostState.Idle
+        lastFailedDraft = null
+    }
 }

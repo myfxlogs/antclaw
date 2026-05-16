@@ -7,9 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.antclaw.alfq.R
 import com.antclaw.alfq.data.device.DeviceInfoViewModel
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -32,10 +35,10 @@ fun DeviceInfoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Device Information") },
+                title = { Text(stringResource(R.string.device_title)) },
                 actions = {
                     IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.device_refresh))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -56,7 +59,7 @@ fun DeviceInfoScreen(
                     ConsentSection(onConsentGranted = { viewModel.requestConsent(true) })
                 }
                 DeviceInfoViewModel.ConsentStatus.DENIED -> {
-                    Text("Data collection consent denied", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.device_consent_denied), color = MaterialTheme.colorScheme.error)
                 }
                 DeviceInfoViewModel.ConsentStatus.GRANTED -> {
                     // Show device info
@@ -96,24 +99,22 @@ fun ConsentSection(onConsentGranted: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Device Information Collection",
+                text = stringResource(R.string.device_consent_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "To provide you with the best experience, we would like to collect " +
-                        "anonymous device information. This helps us understand how our app " +
-                        "is being used and improve our services.",
+                text = stringResource(R.string.device_consent_body),
                 style = MaterialTheme.typography.bodyMedium,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = onConsentGranted,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Grant Consent")
+                Text(stringResource(R.string.device_consent_grant))
             }
         }
     }
@@ -134,13 +135,13 @@ fun ErrorSection(error: String, onRetry: () -> Unit) {
         ) {
             Icon(
                 Icons.Default.Warning,
-                contentDescription = "Error",
+                contentDescription = stringResource(R.string.device_error),
                 modifier = Modifier.size(48.dp),
                 tint = MaterialTheme.colorScheme.error
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Error",
+                text = stringResource(R.string.device_error),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.error
@@ -149,14 +150,14 @@ fun ErrorSection(error: String, onRetry: () -> Unit) {
             Text(
                 text = error,
                 style = MaterialTheme.typography.bodyMedium,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = onRetry,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Retry")
+                Text(stringResource(R.string.device_retry))
             }
         }
     }
@@ -180,13 +181,13 @@ fun EmptyState(onCollect: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No device information available",
+            text = stringResource(R.string.device_empty),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onCollect) {
-            Text("Collect Device Info")
+            Text(stringResource(R.string.device_collect))
         }
     }
 }

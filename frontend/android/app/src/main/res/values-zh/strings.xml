@@ -76,6 +76,8 @@
     <string name="profile_following">正在关注</string>
     <string name="profile_follow">关注</string>
     <string name="profile_unfollow">取消关注</string>
+    <string name="profile_tab_posts">帖子</string>
+    <string name="profile_tab_stats">数据</string>
     <string name="profile_stats_title">交易战绩</string>
     <string name="profile_win_rate">胜率</string>
     <string name="profile_profit_factor">盈亏比</string>
@@ -153,4 +155,28 @@
     <string name="common_error">加载失败</string>
     <string name="common_ok">确定</string>
     <string name="common_cancel">取消</string>
+    <string name="device_title">设备信息</string>
+    <string name="device_collect">收集设备信息</string>
+    <string name="device_empty">暂无设备信息</string>
+    <string name="device_consent_title">设备信息收集</string>
+    <string name="device_consent_body">为提供最佳体验，我们收集匿名设备信息以帮助了解应用使用情况及改进服务。</string>
+    <string name="device_consent_grant">同意</string>
+    <string name="device_consent_denied">已拒绝数据收集授权</string>
+    <string name="device_consent_required">需授权后才能收集设备信息</string>
+    <string name="device_retry">重试</string>
+    <string name="device_refresh">刷新</string>
+    <string name="device_error">错误</string>
+    <string name="device_error_collect">设备信息收集失败</string>
+    <string name="device_error_generic">收集设备信息时发生错误: %1$s</string>
+    <string name="sse_debug_title">SSE 连接诊断</string>
+    <string name="sse_debug_base_url">Base URL</string>
+    <string name="sse_debug_token_present">已设置</string>
+    <string name="sse_debug_token_missing">未设置</string>
+    <string name="sse_debug_state">SSE 连接状态</string>
+    <string name="sse_debug_last_error">最近连接错误</string>
+    <string name="sse_debug_last_report">最近设备上报</string>
+    <string name="sse_debug_none">无</string>
+    <string name="sse_debug_no_record">无记录</string>
+    <string name="sse_debug_footer">仅供联调和运维诊断使用。</string>
+    <string name="sse_debug_back">返回</string>
 </resources>

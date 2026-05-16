@@ -6,9 +6,11 @@ import (
 	"time"
 
 	userv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
+	"github.com/antclaw/antclaw/internal/domain/apperror"
 )
 
 // Service implements User profile management business logic.
+// NOTE: Currently uses in-memory maps. PostgreSQL migration tracked in docs.
 type Service struct {
 	users         map[string]*userv1.User
 	memberships   map[string]*userv1.Membership
@@ -19,64 +21,42 @@ type Service struct {
 
 // NewService creates a new UserService.
 func NewService() *Service {
-	s := &Service{
-		users:         make(map[string]*userv1.User),
-		memberships:   make(map[string]*userv1.Membership),
-		history:       make(map[string][]*userv1.HistoryItem),
-		pins:          make(map[string][]*userv1.Pin),
-		feedbackCount: 0,
+	return &Service{
+		users:       make(map[string]*userv1.User),
+		memberships: make(map[string]*userv1.Membership),
+		history:     make(map[string][]*userv1.HistoryItem),
+		pins:        make(map[string][]*userv1.Pin),
 	}
+}
 
-	// Pre-populate sample user
-	now := time.Now().Unix()
-	s.users["user-1"] = &userv1.User{
-		UserId:        "user-1",
-		Email:         "demo@antclaw.io",
-		Username:      "demo_user",
-		DisplayName:   "Demo User",
-		Locale:        userv1.Locale_LOCALE_EN_US,
-		Timezone:      "UTC",
-		Roles:         []string{"user"},
-		EmailVerified: true,
-		CreatedAt:     now - 86400*30,
-		UpdatedAt:     now,
+// checkUserID returns ErrPermissionDenied if userID is empty.
+func checkUserID(userID string) error {
+	if userID == "" {
+		return fmt.Errorf("%w: userID is empty", apperror.ErrPermissionDenied)
 	}
-	s.memberships["user-1"] = &userv1.Membership{
-		Tier:           userv1.MembershipTier_MEMBERSHIP_TIER_PREMIUM,
-		ExpiresAt:      now + 86400*365,
-		QuotaDaily:     1000,
-		QuotaUsedToday: 45,
-	}
-
-	// Pre-populate sample history
-	s.history["user-1"] = []*userv1.HistoryItem{
-		{ItemId: "hist-1", Type: "query", Title: "EURUSD analysis", Payload: "{\"pair\":\"EURUSD\"}", CreatedAt: now - 3600},
-		{ItemId: "hist-2", Type: "chart", Title: "VIX breakdown", Payload: "{\"indicator\":\"VIX\"}", CreatedAt: now - 7200},
-	}
-
-	return s
+	return nil
 }
 
 // GetMe returns the current user profile.
 func (s *Service) GetMe(ctx context.Context, userID string) (*userv1.GetMeResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	user, ok := s.users[userID]
 	if !ok {
-		return nil, fmt.Errorf("user not found: %s", userID)
+		return nil, fmt.Errorf("%w: user %s", apperror.ErrNotFound, userID)
 	}
 	return &userv1.GetMeResponse{User: user}, nil
 }
 
 // UpdateSettings updates user settings.
 func (s *Service) UpdateSettings(ctx context.Context, userID, displayName string, locale userv1.Locale, timezone string) (*userv1.UpdateSettingsResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	user, ok := s.users[userID]
 	if !ok {
-		return nil, fmt.Errorf("user not found: %s", userID)
+		return nil, fmt.Errorf("%w: user %s", apperror.ErrNotFound, userID)
 	}
 	if displayName != "" {
 		user.DisplayName = displayName
@@ -93,14 +73,14 @@ func (s *Service) UpdateSettings(ctx context.Context, userID, displayName string
 
 // GetMembership returns membership info.
 func (s *Service) GetMembership(ctx context.Context, userID string) (*userv1.GetMembershipResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	membership, ok := s.memberships[userID]
 	if !ok {
+		// Return free tier as default when no membership record exists.
 		membership = &userv1.Membership{
 			Tier:           userv1.MembershipTier_MEMBERSHIP_TIER_FREE,
-			ExpiresAt:      0,
 			QuotaDaily:     100,
 			QuotaUsedToday: 0,
 		}
@@ -124,8 +104,8 @@ func (s *Service) StartOnboarding(ctx context.Context) (*userv1.StartOnboardingR
 
 // GetHistory returns interaction history.
 func (s *Service) GetHistory(ctx context.Context, userID, cursor string, pageSize int32) (*userv1.GetHistoryResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	items := s.history[userID]
 	if items == nil {
@@ -139,8 +119,8 @@ func (s *Service) GetHistory(ctx context.Context, userID, cursor string, pageSiz
 
 // ClearHistory clears interaction history.
 func (s *Service) ClearHistory(ctx context.Context, userID string, all bool, types []string) (*userv1.ClearHistoryResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	count := int32(len(s.history[userID]))
 	if all {
@@ -151,8 +131,8 @@ func (s *Service) ClearHistory(ctx context.Context, userID string, all bool, typ
 
 // ListPins lists pinned items.
 func (s *Service) ListPins(ctx context.Context, userID string) (*userv1.ListPinsResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	pins := s.pins[userID]
 	if pins == nil {
@@ -163,8 +143,8 @@ func (s *Service) ListPins(ctx context.Context, userID string) (*userv1.ListPins
 
 // Pin creates a new pin.
 func (s *Service) Pin(ctx context.Context, userID, itemID, itemType, title string) (*userv1.PinResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	pin := &userv1.Pin{
 		PinId:     fmt.Sprintf("pin-%d", time.Now().Unix()),
@@ -179,8 +159,8 @@ func (s *Service) Pin(ctx context.Context, userID, itemID, itemType, title strin
 
 // Unpin removes a pin.
 func (s *Service) Unpin(ctx context.Context, userID, pinID string) (*userv1.UnpinResponse, error) {
-	if userID == "" {
-		userID = "user-1"
+	if err := checkUserID(userID); err != nil {
+		return nil, err
 	}
 	var filtered []*userv1.Pin
 	for _, pin := range s.pins[userID] {
@@ -200,8 +180,22 @@ func (s *Service) SubmitFeedback(ctx context.Context, category, content, contact
 	}, nil
 }
 
-// SetAiKey sets user AI key (BYOK).
+// SetAiKey sets the user's AI API key.
 func (s *Service) SetAiKey(ctx context.Context, userID string, provider userv1.AiProvider, apiKey string) (*userv1.SetAiKeyResponse, error) {
-	// In a real implementation, this would securely store the API key
-	return &userv1.SetAiKeyResponse{Success: true}, nil
+	if err := checkUserID(userID); err != nil {
+		return nil, err
+	}
+	return nil, fmt.Errorf("%w: AI key management via BYOK service", apperror.ErrNotFound)
+}
+
+// GetUser returns a user by ID (public profile).
+func (s *Service) GetUser(ctx context.Context, userID string) (*userv1.User, error) {
+	if err := checkUserID(userID); err != nil {
+		return nil, err
+	}
+	user, ok := s.users[userID]
+	if !ok {
+		return nil, fmt.Errorf("%w: user %s", apperror.ErrNotFound, userID)
+	}
+	return user, nil
 }

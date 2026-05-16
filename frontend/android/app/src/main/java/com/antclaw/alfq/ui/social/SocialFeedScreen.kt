@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
+import com.antclaw.alfq.ui.feed.AsyncPhase
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antclaw.alfq.ui.components.PostCard
 import com.antclaw.alfq.ui.theme.SpacingMd
@@ -50,7 +51,7 @@ fun SocialFeedScreen(
             val layoutInfo = listState.layoutInfo
             val totalItems = layoutInfo.totalItemsCount
             val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            totalItems > 0 && lastVisible >= totalItems - 3 && state.hasMore && !state.isLoading
+            totalItems > 0 && lastVisible >= totalItems - 3 && state.hasMore && state.phase != AsyncPhase.Appending && state.phase != AsyncPhase.Loading
         }
     }
     LaunchedEffect(shouldLoadMore.value) {
@@ -69,13 +70,13 @@ fun SocialFeedScreen(
                 )
                 // ── Tab Row ──
                 TabRow(
-                    selectedTabIndex = state.currentTab.ordinal,
+                    selectedTabIndex = viewModel.currentTab.ordinal,
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 ) {
                     FeedTab.entries.forEach { tab ->
                         Tab(
-                            selected = state.currentTab == tab,
+                            selected = viewModel.currentTab == tab,
                             onClick = { viewModel.loadFeed(tab) },
                             text = {
                                 Text(
@@ -83,7 +84,7 @@ fun SocialFeedScreen(
                                         FeedTab.FOLLOWING -> stringResource(R.string.social_tab_following)
                                         FeedTab.FOR_YOU -> stringResource(R.string.social_tab_for_you)
                                     },
-                                    fontWeight = if (state.currentTab == tab) FontWeight.Bold else FontWeight.Normal,
+                                    fontWeight = if (viewModel.currentTab == tab) FontWeight.Bold else FontWeight.Normal,
                                 )
                             },
                         )
@@ -102,7 +103,7 @@ fun SocialFeedScreen(
         },
     ) { padding ->
         when {
-            state.isLoading && state.posts.isEmpty() -> {
+            state.phase == AsyncPhase.Loading && state.posts.isEmpty() -> {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(padding),
                     contentAlignment = Alignment.Center,
@@ -131,7 +132,7 @@ fun SocialFeedScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = if (state.currentTab == FeedTab.FOLLOWING)
+                            text = if (viewModel.currentTab == FeedTab.FOLLOWING)
                                 stringResource(R.string.social_empty_following)
                             else stringResource(R.string.social_empty_for_you),
                             style = MaterialTheme.typography.bodyLarge,

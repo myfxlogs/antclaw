@@ -128,6 +128,31 @@ func TestListAggregationEarliestConnectedAt(t *testing.T) {
 	}
 }
 
+func TestDisconnectUser_RemovesAll(t *testing.T) {
+	tr := NewTracker()
+	tr.Register(Connection{ConnID: "c1", UserID: "u1", ConnectedAt: time.Now()})
+	tr.Register(Connection{ConnID: "c2", UserID: "u1", ConnectedAt: time.Now()})
+	tr.Register(Connection{ConnID: "c3", UserID: "u2", ConnectedAt: time.Now()})
+
+	tr.DisconnectUser("u1")
+	if tr.Count() != 1 {
+		t.Fatalf("expected 1 user (u2) remaining, got %d", tr.Count())
+	}
+	list := tr.List()
+	if len(list) != 1 || list[0].UserID != "u2" {
+		t.Fatalf("expected only u2, got %+v", list)
+	}
+}
+
+func TestDisconnectUser_Nonexistent(t *testing.T) {
+	tr := NewTracker()
+	tr.Register(Connection{ConnID: "c1", UserID: "u1", ConnectedAt: time.Now()})
+	tr.DisconnectUser("no-such-user")
+	if tr.Count() != 1 {
+		t.Fatal("expected u1 still connected")
+	}
+}
+
 func TestThreadSafety(t *testing.T) {
 	tr := NewTracker()
 	var wg sync.WaitGroup

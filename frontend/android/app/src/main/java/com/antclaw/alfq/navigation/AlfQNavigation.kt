@@ -35,7 +35,7 @@ private val mainTabs = listOf(
 )
 
 @Composable
-fun BottomNavBarWithFAB(
+fun BottomNavBar(
     navController: NavController,
     notificationCount: Int = 0,
     onChatClick: () -> Unit = {}
