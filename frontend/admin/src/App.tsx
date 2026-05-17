@@ -12,6 +12,7 @@ import Strategies from './pages/Strategies'
 import SystemAI from './pages/SystemAI'
 import Login from './pages/Login'
 import PushManagement from './pages/PushManagement'
+import SocialManagement from './pages/SocialManagement'
 import Devices from './pages/Devices'
 
 // M-A..M-G features
@@ -75,6 +76,7 @@ function AppRoutes() {
           <Route path="system-ai" element={<SystemAI />} />
           <Route path="settings" element={<Settings />} />
           <Route path="push" element={<PushManagement />} />
+          <Route path="social" element={<SocialManagement />} />
           <Route path="devices" element={<Devices />} />
 
           {/* features */}

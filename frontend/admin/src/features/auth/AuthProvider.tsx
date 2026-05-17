@@ -124,11 +124,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
       memRefreshToken = res.refreshToken ?? null
 
       // Parse user info from response
+      // A13-patch: admin/super_admin get all permissions by default
+      // since backend login response doesn't include permissions field yet.
+      const roles: string[] = (res as any).roles ?? ['admin']
+      const allPerms = [
+        'admin.users.read', 'admin.users.ban', 'admin.users.reset_password', 'admin.users.set_role',
+        'admin.social.read', 'admin.social.moderate', 'admin.social.delete',
+        'admin.push.send',
+        'admin.audit.read',
+        'admin.system.manage',
+        'admin.ai.manage',
+      ]
+      const defaultPerms = (roles.includes('admin') || roles.includes('super_admin')) ? allPerms : []
       const user: CurrentUser = {
         userId: res.userId ?? '',
         email,
-        roles: (res as any).roles ?? ['admin'],
-        permissions: (res as any).permissions ?? [],
+        roles,
+        permissions: (res as any).permissions?.length ? (res as any).permissions : defaultPerms,
       }
       memUser = user
       setCurrentUser(user)

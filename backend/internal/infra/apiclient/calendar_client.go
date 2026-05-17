@@ -74,6 +74,17 @@ func (f *MQL5Fetcher) SetBaseURL(url string) {
 	f.baseURL = strings.TrimRight(url, "/")
 }
 
+// SetHTTPClient replaces the http.Client (e.g. to inject a proxy transport).
+// Useful when the data center IP is blocked by the upstream (as with MQL5).
+func (f *MQL5Fetcher) SetHTTPClient(c *http.Client) {
+	if c == nil {
+		return
+	}
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.httpClient = c
+}
+
 func (f *MQL5Fetcher) getBaseURL() string {
 	f.mu.RLock()
 	defer f.mu.RUnlock()

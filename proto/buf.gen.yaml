@@ -6,7 +6,7 @@ plugins:
     out: gen/go
     opt:
       - paths=source_relative
-  - plugin: connectrpc/go
+  - plugin: connect-go
     out: gen/go
     opt:
       - paths=source_relative
@@ -16,5 +16,5 @@ plugins:
       - target=ts
   - plugin: kotlin
     out: gen/kotlin
-  - plugin: connectrpc/kotlin
+  - plugin: connect-kotlin
     out: gen/kotlin

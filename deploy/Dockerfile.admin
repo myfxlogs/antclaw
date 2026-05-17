@@ -28,6 +28,8 @@ COPY frontend/packages/ ./frontend/packages/
 RUN pnpm install
 
 # Build admin app
+# Same-origin reverse proxy – API base is / (no CORS)
+ENV VITE_API_BASE_URL=/
 WORKDIR /app/frontend/admin
 RUN pnpm build
 

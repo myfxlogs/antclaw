@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Users, Activity, ClipboardList, Database, KeyRound,
   Settings, LogOut, TrendingUp, Bot, BarChart3, LineChart, Globe2, Send,
   Layers, Shield, MessageCircle, Wand2, ChevronDown, ChevronRight, Smartphone,
+  Users2,
 } from 'lucide-react'
 import { useAuth } from '../features/auth/AuthProvider'
 import { Permissions } from '../features/auth/permissions'
@@ -27,6 +28,7 @@ const groups: NavGroup[] = [
       { path: '/system-ai', label: 'AI 配置', icon: Bot, permission: Permissions.AI_MANAGE },
       { path: '/devices', label: '设备管理', icon: Smartphone },
       { path: '/push', label: '推送管理', icon: Send, permission: Permissions.PUSH_SEND },
+      { path: '/social', label: '社交管理', icon: Users2, permission: Permissions.SOCIAL_READ },
       { path: '/settings', label: '设置', icon: Settings },
     ],
   },
