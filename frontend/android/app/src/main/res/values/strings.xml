@@ -2,13 +2,13 @@
 <resources>
     <!-- App -->
     <string name="app_name">Alpha</string>
-    <string name="app_tagline">Trader’s Social Terminal</string>
+    <string name="app_tagline">Trader\'s Social Terminal</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_discover">Discover</string>
     <string name="nav_post">Post</string>
-    <string name="nav_notifications">通知</string>
+    <string name="nav_notifications">Notifications</string>
     <string name="nav_messages">Messages</string>
     <string name="nav_me">Me</string>
     <string name="nav_social">Social</string>
@@ -19,8 +19,10 @@
     <string name="login_password">Password</string>
     <string name="login_button">Login</string>
     <string name="login_register">Register</string>
-    <string name="login_forgot_password">Forgot password</string>
+    <string name="login_forgot_password">Forgot password?</string>
     <string name="login_error_default">Login failed</string>
+    <string name="session_expired_message">Session expired. Please log in again.</string>
+    <string name="splash_loading">Loading…</string>
 
     <!-- Register -->
     <string name="register_title">Register Alpha</string>
@@ -44,6 +46,8 @@
     <string name="feed_retry">Retry</string>
     <string name="feed_system_signal">System Signal</string>
     <string name="feed_time_just_now">just now</string>
+    <string name="feed_append_failed">Load failed, tap to retry</string>
+    <string name="feed_no_more">— No more —</string>
 
     <!-- Signal Detail -->
     <string name="signal_detail_back">Back</string>
@@ -55,7 +59,7 @@
     <string name="discover_hot_traders">Hot Traders</string>
     <string name="discover_action_view">View</string>
     <string name="discover_empty_title">No recommended traders</string>
-    <string name="discover_empty_body">Follow some traders and they’ll appear here</string>
+    <string name="discover_empty_body">Follow some traders and they\'ll appear here</string>
 
     <!-- Social -->
     <string name="social_title">Social</string>
@@ -73,7 +77,29 @@
     <string name="post_visibility_public">Public</string>
     <string name="post_visibility_followers">Followers</string>
     <string name="post_visibility_circle">Circle</string>
+    <string name="post_visibility_unavailable">Coming soon</string>
     <string name="post_success">Published!</string>
+    <string name="post_detail_title">Post</string>
+    <string name="post_report">Report</string>
+    <string name="post_not_interested">Not interested</string>
+    <string name="post_more_options">More</string>
+    <string name="signal_confidence_label">Confidence</string>
+    <string name="comment_empty">No comments yet</string>
+    <string name="snackbar_action_rollback">Operation failed, rolled back</string>
+    <string name="snackbar_share_failed">Share failed</string>
+    <string name="snackbar_follow_failed">Follow operation failed, rolled back</string>
+    <string name="snackbar_comment_failed">Comment failed</string>
+    <string name="snackbar_load_more_failed">Failed to load more</string>
+    <string name="snackbar_posts_load_failed">Failed to load posts</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">just now</string>
+    <string name="time_minutes_short">%d min</string>
+    <string name="time_hours_short">%d hr</string>
+    <string name="time_days_short">%d d</string>
+    <string name="time_minutes_ago">%d min ago</string>
+    <string name="time_hours_ago">%d hr ago</string>
+    <string name="time_days_ago">%d d ago</string>
 
     <!-- Chat -->
     <string name="chat_title">Messages</string>
@@ -153,6 +179,8 @@
     <string name="bind_live">Live</string>
     <string name="bind_confirm">Confirm Binding</string>
     <string name="bind_binding">Binding…</string>
+    <string name="bind_step_completed">Step completed</string>
+    <string name="bind_server_selected">Server selected</string>
 
     <!-- Alerts -->
     <string name="alerts_title">My Alerts</string>
@@ -173,6 +201,10 @@
     <string name="notif_mark_all_read">Mark All Read</string>
     <string name="notif_empty">No notifications</string>
     <string name="notif_load_failed">Load failed</string>
+    <string name="notif_filter_all">All</string>
+    <string name="notif_filter_interactions">Interactions</string>
+    <string name="notif_filter_follows">Follows</string>
+    <string name="notif_filter_signals">Signals</string>
 
     <!-- Notification Preferences -->
     <string name="notif_prefs_title">Notification Preferences</string>
@@ -186,12 +218,27 @@
     <string name="notif_prefs_weekly_digest">Weekly Digest</string>
     <string name="notif_prefs_filter">Filter</string>
     <string name="notif_prefs_high_impact_only">High-impact events only</string>
+    <string name="notif_channel_alerts_name">Market Alerts</string>
+    <string name="notif_channel_alerts_desc">Economic calendar, macro regime, options/onchain risk</string>
+    <string name="notif_channel_signals_name">Trading Signals</string>
+    <string name="notif_channel_signals_desc">COT signals, surprises, multi-asset resonance</string>
+    <string name="notif_channel_digests_name">Digests &amp; Reports</string>
+    <string name="notif_channel_digests_desc">Morning reports, weekly outlooks, calibration updates</string>
+    <string name="notif_channel_system_name">System</string>
+    <string name="notif_channel_system_desc">Account and system maintenance notifications</string>
 
     <!-- Language -->
     <string name="settings_language">Language</string>
     <string name="settings_language_title">Select Language</string>
 
-    <!-- 通用 -->
+    <!-- Error messages (AppError mapping) -->
+    <string name="error_network">Network error. Check your connection and try again.</string>
+    <string name="error_auth_expired">Session expired. Please log in again.</string>
+    <string name="error_validation">Invalid input. Please correct and retry.</string>
+    <string name="error_server">Service unavailable. Please try again later.</string>
+    <string name="error_unknown">Operation failed. Please try again later.</string>
+
+    <!-- Common -->
     <string name="common_back">Back</string>
     <string name="common_close">Close</string>
     <string name="common_loading">Loading…</string>
@@ -199,6 +246,14 @@
     <string name="common_error">Load failed</string>
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_send">Send</string>
+    <string name="comment_reply">Reply</string>
+    <string name="comment_hint">Write a comment…</string>
+    <string name="mt_account_type_prefix">[%s] </string>
+    <string name="a11y_like">Like</string>
+    <string name="a11y_comment">Comment</string>
+    <string name="a11y_share">Share</string>
+    <string name="a11y_bind_account">Bind account</string>
 
     <!-- Device Info -->
     <string name="device_title">Device Information</string>
@@ -214,10 +269,37 @@
     <string name="device_error">Error</string>
     <string name="device_error_collect">Failed to collect device info</string>
     <string name="device_error_generic">An error occurred while collecting device info: %1$s</string>
+    <string name="device_label_os">Operating System</string>
+    <string name="device_label_screen">Screen</string>
+    <string name="device_label_network">Network</string>
+    <string name="device_label_battery">Battery</string>
+    <string name="device_label_application">Application</string>
+    <string name="device_label_system">System</string>
+    <string name="device_label_model">Model</string>
+    <string name="device_label_brand">Brand</string>
+    <string name="device_label_device_type">Type</string>
+    <string name="device_label_version">Version</string>
+    <string name="device_label_api_level">API Level</string>
+    <string name="device_label_security_patch">Security Patch</string>
+    <string name="device_label_resolution">Resolution</string>
+    <string name="device_label_density">Density</string>
+    <string name="device_label_network_type">Type</string>
+    <string name="device_label_battery_level">Level</string>
+    <string name="device_label_charging">Charging</string>
+    <string name="device_label_yes">Yes</string>
+    <string name="device_label_no">No</string>
+    <string name="device_label_version_code">Version Code</string>
+    <string name="device_label_package">Package</string>
+    <string name="device_label_device">Device</string>
+    <string name="device_label_manufacturer">Manufacturer</string>
+    <string name="device_label_timezone">Timezone</string>
+    <string name="device_label_locale">Locale</string>
+    <string name="device_label_emulator">Emulator</string>
 
     <!-- SSE Debug -->
     <string name="sse_debug_title">SSE Connection Diagnostics</string>
     <string name="sse_debug_base_url">Base URL</string>
+    <string name="sse_debug_access_token">Access Token</string>
     <string name="sse_debug_token_present">Set</string>
     <string name="sse_debug_token_missing">Not set</string>
     <string name="sse_debug_state">SSE Connection State</string>
@@ -228,12 +310,12 @@
     <string name="sse_debug_footer">For debugging and operations only.</string>
     <string name="sse_debug_back">Back</string>
 
-    <!-- 信号方向 -->
+    <!-- Signal direction -->
     <string name="direction_bullish">↗</string>
     <string name="direction_bearish">↘</string>
     <string name="direction_neutral">→</string>
 
-    <!-- 服务器列表（MT 绑定向导） -->
+    <!-- Server list (MT binding wizard) -->
     <string-array name="mt_server_list">
         <item>ICMarkets-Demo</item>
         <item>ICMarkets-Live</item>

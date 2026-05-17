@@ -1,5 +1,6 @@
 package com.antclaw.alfq.data.session
 
+import com.antclaw.alfq.testutil.CoroutineTestBase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.*
@@ -7,13 +8,7 @@ import org.junit.*
 import org.junit.Assert.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SessionExpiredNotifierTest {
-
-    private val scheduler = kotlinx.coroutines.test.TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(scheduler)
-
-    @Before fun setup() { kotlinx.coroutines.Dispatchers.setMain(testDispatcher) }
-    @After fun tearDown() { kotlinx.coroutines.Dispatchers.resetMain() }
+class SessionExpiredNotifierTest : CoroutineTestBase() {
 
     @Test fun `notify emits to subscriber`() = runTest(scheduler) {
         val notifier = SessionExpiredNotifier()

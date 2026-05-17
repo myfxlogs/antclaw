@@ -5,21 +5,35 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"connectrpc.com/connect"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/service"
+	feedpkg "github.com/antclaw/antclaw/internal/service/feed"
 )
 
 // Service holds the trader business logic.
 type Service struct {
-	repo postgres.TraderRepository
+	repo     postgres.TraderRepository
+	limiter  feedpkg.SocialRateLimiter
+	eventPub feedpkg.SocialEventPublisher
 }
 
 func NewService(repo postgres.TraderRepository) *Service {
-	return &Service{repo: repo}
+	return &Service{repo: repo, limiter: feedpkg.NoopRateLimiter{}, eventPub: feedpkg.NoopEventPublisher{}}
+}
+
+// WithRateLimiter attaches a rate limiter for write operations (S12-P0-04).
+func (s *Service) WithRateLimiter(limiter feedpkg.SocialRateLimiter) *Service {
+	s.limiter = limiter
+	return s
+}
+
+// WithEventPublisher attaches an event publisher for notification events (S12-P0-05).
+func (s *Service) WithEventPublisher(pub feedpkg.SocialEventPublisher) *Service {
+	s.eventPub = pub
+	return s
 }
 
 // ----- Profile -----
@@ -34,7 +48,7 @@ func (s *Service) GetProfile(ctx context.Context, currentUserID string, req *alf
 	}
 	if currentUserID != "" && currentUserID != req.UserId {
 		if isFollowing, err := s.repo.IsFollowing(ctx, currentUserID, req.UserId); err != nil {
-			log.Printf("trader: IsFollowing(%s, %s): %v", currentUserID, req.UserId, err)
+			feedpkg.NewSocialLogger().Error("is_following", currentUserID, "", err)
 		} else {
 			row.IsFollowing = isFollowing
 		}
@@ -46,7 +60,15 @@ func (s *Service) UpdateProfile(ctx context.Context, userID string, req *alfqv1.
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
 	}
-	if err := s.repo.UpdateProfile(ctx, userID, req.DisplayName); err != nil {
+	row := &postgres.TraderProfileRow{
+		DisplayName:    req.DisplayName,
+		Bio:            req.Bio,
+		ShowWinRate:    req.ShowWinRate,
+		ShowProfitFact: req.ShowProfitFactor,
+		ShowSharpe:     req.ShowSharpe,
+		ShowTotalTrad:  req.ShowTotalTrades,
+	}
+	if err := s.repo.UpdateProfile(ctx, userID, row); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("update profile: %w", err))
 	}
 	return s.GetProfile(ctx, userID, &alfqv1.GetTraderProfileRequest{UserId: userID})
@@ -58,6 +80,9 @@ func (s *Service) Follow(ctx context.Context, userID string, req *alfqv1.FollowR
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
 	}
+	if err := s.limiter.Allow(ctx, userID, feedpkg.RateLimitFollow); err != nil {
+		return nil, err
+	}
 	if userID == req.TargetUserId {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("cannot follow yourself"))
 	}
@@ -67,9 +92,17 @@ func (s *Service) Follow(ctx context.Context, userID string, req *alfqv1.FollowR
 	if err := s.repo.Follow(ctx, userID, req.TargetUserId); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("follow: %w", err))
 	}
+	// S12-P0-05: publish notification event
+	followerName, _ := s.repo.GetUserName(ctx, userID)
+	_ = s.eventPub.Publish(ctx, feedpkg.SocialEvent{
+		Type:      "user_followed",
+		ActorID:   userID,
+		ActorName: followerName,
+		TargetID:  req.TargetUserId,
+	})
 	cnt, err := s.repo.GetFollowerCount(ctx, req.TargetUserId)
 	if err != nil {
-		log.Printf("trader: GetFollowerCount(%s): %v", req.TargetUserId, err)
+		feedpkg.NewSocialLogger().Error("get_follower_count", req.TargetUserId, "", err)
 	}
 	return &alfqv1.FollowResponse{Success: true, FollowerCount: cnt}, nil
 }
@@ -83,7 +116,7 @@ func (s *Service) Unfollow(ctx context.Context, userID string, req *alfqv1.Unfol
 	}
 	cnt, err := s.repo.GetFollowerCount(ctx, req.TargetUserId)
 	if err != nil {
-		log.Printf("trader: GetFollowerCount(%s): %v", req.TargetUserId, err)
+		feedpkg.NewSocialLogger().Error("get_follower_count", req.TargetUserId, "", err)
 	}
 	return &alfqv1.FollowResponse{Success: true, FollowerCount: cnt}, nil
 }

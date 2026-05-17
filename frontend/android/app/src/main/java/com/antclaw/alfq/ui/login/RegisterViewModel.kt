@@ -1,10 +1,14 @@
 package com.antclaw.alfq.ui.login
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.antclaw.alfq.R
+import com.antclaw.alfq.data.error.toAppError
 import com.antclaw.alfq.data.repository.AuthRepository
 import com.antclaw.alfq.data.repository.AuthSessionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +24,8 @@ data class RegisterUiState(
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val authRepo: AuthRepository
+    private val authRepo: AuthRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RegisterUiState())
@@ -41,10 +46,11 @@ class RegisterViewModel @Inject constructor(
                     onSuccess(result)
                 },
                 onFailure = { e ->
+                    val appError = e.toAppError()
                     _state.update {
                         it.copy(
                             loading = false,
-                            error = e.message ?: "注册失败，请重试"
+                            error = e.message ?: appContext.getString(R.string.register_error_default)
                         )
                     }
                 }

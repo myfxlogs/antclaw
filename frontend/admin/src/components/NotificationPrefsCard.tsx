@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Bell, Save, Loader2 } from 'lucide-react'
 import {
   NotificationPrefsItem,
@@ -30,6 +31,7 @@ const SEVERITIES: { key: string; label: string }[] = [
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/
 
 export default function NotificationPrefsCard() {
+  const { t } = useTranslation()
   const [prefs, setPrefs] = useState<NotificationPrefsItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -40,7 +42,7 @@ export default function NotificationPrefsCard() {
       try {
         setPrefs(await getNotificationPrefs())
       } catch (e: any) {
-        setMsg({ kind: 'err', text: '加载偏好失败：' + (e?.message || e) })
+        setMsg({ kind: 'err', text: t('notifications.loadPrefsError', { message: e?.message || String(e) }) })
       } finally {
         setLoading(false)
       }
@@ -69,16 +71,16 @@ export default function NotificationPrefsCard() {
   const onSave = async () => {
     setMsg(null)
     if (!HHMM.test(prefs.quiet_start) || !HHMM.test(prefs.quiet_end)) {
-      setMsg({ kind: 'err', text: '静默时段格式错误，需为 HH:MM' })
+      setMsg({ kind: 'err', text: t('notifications.quietTimeFormatError') })
       return
     }
     setSaving(true)
     try {
       const out = await updateNotificationPrefs(prefs)
       setPrefs(out)
-      setMsg({ kind: 'ok', text: '已保存' })
+      setMsg({ kind: 'ok', text: t('notifications.saved') })
     } catch (e: any) {
-      setMsg({ kind: 'err', text: '保存失败：' + (e?.message || e) })
+      setMsg({ kind: 'err', text: t('notifications.saveError', { message: e?.message || String(e) }) })
     } finally {
       setSaving(false)
       setTimeout(() => setMsg(null), 2500)

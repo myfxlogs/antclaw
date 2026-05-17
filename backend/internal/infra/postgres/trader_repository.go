@@ -39,7 +39,7 @@ type UserInfoRow struct {
 // TraderRepository defines data operations for trader profiles and follows.
 type TraderRepository interface {
 	GetProfile(ctx context.Context, userID string) (*TraderProfileRow, error)
-	UpdateProfile(ctx context.Context, userID string, displayName string) error
+	UpdateProfile(ctx context.Context, userID string, row *TraderProfileRow) error
 	CheckUserExists(ctx context.Context, userID string) (bool, error)
 	GetUserName(ctx context.Context, userID string) (string, error)
 
@@ -62,7 +62,7 @@ func NewTraderRepository(pool *pgxpool.Pool) TraderRepository { return &traderRe
 
 // ----- shared helpers -----
 
-const userInfoSelect = `u.id, COALESCE(u.display_name, u.email), 'normal',
+const userInfoSelect = `u.id, COALESCE(NULLIF(u.display_name,''), u.username, u.code_id, 'User-' || LEFT(u.id::text, 8)), 'normal',
 	(SELECT COUNT(*) FROM alfq_follows WHERE following_id = u.id)::int4`
 
 func scanUserInfo(scanner interface{ Scan(dest ...interface{}) error }) (*UserInfoRow, error) {
@@ -104,8 +104,8 @@ func (r *traderRepo) executePaginatedUserList(ctx context.Context, query string,
 
 // ----- Profile -----
 
-const profileSelect = `id, COALESCE(display_name, email), '', 'normal',
-	false, false, false, false,
+const profileSelect = `id, ` + PublicDisplayNameExpr + `, COALESCE(bio,''), 'normal',
+	COALESCE(show_win_rate, false), COALESCE(show_profit_factor, false), COALESCE(show_sharpe, false), COALESCE(show_total_trades, false),
 	0.0, 0.0, 0.0, 0,
 	(SELECT COUNT(*) FROM alfq_follows WHERE following_id = $1)::int4,
 	(SELECT COUNT(*) FROM alfq_follows WHERE follower_id = $1)::int4,
@@ -124,10 +124,17 @@ func (r *traderRepo) GetProfile(ctx context.Context, userID string) (*TraderProf
 	return row, err
 }
 
-func (r *traderRepo) UpdateProfile(ctx context.Context, userID string, displayName string) error {
+func (r *traderRepo) UpdateProfile(ctx context.Context, userID string, row *TraderProfileRow) error {
 	_, err := r.pool.Exec(ctx,
-		`UPDATE users SET display_name = COALESCE(NULLIF($1,''), display_name) WHERE id = $2`,
-		displayName, userID)
+		`UPDATE users SET
+			display_name = COALESCE(NULLIF($1,''), display_name),
+			bio = COALESCE(NULLIF($2,''), bio),
+			show_win_rate = $3,
+			show_profit_factor = $4,
+			show_sharpe = $5,
+			show_total_trades = $6
+		WHERE id = $7`,
+		row.DisplayName, row.Bio, row.ShowWinRate, row.ShowProfitFact, row.ShowSharpe, row.ShowTotalTrad, userID)
 	return err
 }
 
@@ -141,7 +148,7 @@ func (r *traderRepo) CheckUserExists(ctx context.Context, userID string) (bool, 
 func (r *traderRepo) GetUserName(ctx context.Context, userID string) (string, error) {
 	var name string
 	err := r.pool.QueryRow(ctx,
-		`SELECT COALESCE(display_name, email) FROM users WHERE id=$1`, userID).Scan(&name)
+		`SELECT `+PublicDisplayNameExpr+` FROM users WHERE id=$1`, userID).Scan(&name)
 	return name, err
 }
 

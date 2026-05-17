@@ -3,7 +3,7 @@ package com.antclaw.alfq.data.repository
 import antclaw.v1.Auth
 import com.antclaw.alfq.data.device.DeviceInfoCollector
 import com.antclaw.alfq.data.local.TokenStore
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+import com.antclaw.alfq.data.rpc.ProtocolClientFactory
 import com.connectrpc.MethodSpec
 import com.connectrpc.ResponseMessage
 import com.connectrpc.StreamType
@@ -13,6 +13,7 @@ import javax.inject.Inject
 class AuthRepository @Inject constructor(
     private val tokenStore: TokenStore,
     private val deviceInfoCollector: DeviceInfoCollector,
+    private val clientFactory: ProtocolClientFactory,
 ) {
 
     // ── 公共工具 ──
@@ -26,7 +27,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun login(email: String, password: String): Result<AuthSessionResult> {
         return try {
-            val client = ConnectTransportProvider.createProtocolClient()
+            val client = clientFactory.create()
             val request = Auth.LoginRequest.newBuilder()
                 .setEmail(email)
                 .setPassword(password)
@@ -53,7 +54,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun register(email: String, password: String): Result<AuthSessionResult> {
         return try {
-            val client = ConnectTransportProvider.createProtocolClient()
+            val client = clientFactory.create()
             val displayName = email.substringBefore("@")
             val request = Auth.RegisterRequest.newBuilder()
                 .setEmail(email)
@@ -83,7 +84,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun refresh(): Result<String> {
         return try {
-            val client = ConnectTransportProvider.createProtocolClient()
+            val client = clientFactory.create()
             val refreshToken = tokenStore.getRefreshToken()
                 ?: return Result.failure(Exception("No refresh token available"))
             val request = Auth.RefreshRequest.newBuilder().setRefreshToken(refreshToken).build()
@@ -99,7 +100,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun logout() {
         try {
-            val client = ConnectTransportProvider.createProtocolClient()
+            val client = clientFactory.create()
             val spec = MethodSpec("antclaw.v1.AuthService/Logout",
                 Auth.LogoutRequest::class, Auth.LogoutResponse::class, StreamType.UNARY)
             client.unary(Auth.LogoutRequest.getDefaultInstance(), emptyMap(), spec)

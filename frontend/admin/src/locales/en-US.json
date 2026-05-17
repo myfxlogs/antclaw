@@ -11,6 +11,18 @@
     "settings": "Settings",
     "logout": "Logout"
   },
+  "login": {
+    "title": "AntClaw Admin",
+    "subtitle": "Admin Login",
+    "email": "Email / User ID",
+    "password": "Password",
+    "loginButton": "Login",
+    "emailPlaceholder": "Email or 5-digit user ID",
+    "passwordPlaceholder": "Enter password",
+    "loginError": "Login failed. Check your credentials.",
+    "requiredEmail": "Email or user ID is required",
+    "requiredPassword": "Password is required"
+  },
   "dashboard": {
     "title": "Dashboard",
     "stats": {
@@ -55,7 +67,16 @@
     "actions": "Actions",
     "ban": "Ban",
     "unban": "Unban",
-    "setRole": "Set Role"
+    "setRole": "Set Role",
+    "loading": "Loading...",
+    "noUsers": "No users",
+    "searchPlaceholder": "Search email...",
+    "filterRole": "Filter role",
+    "filterStatus": "Filter status",
+    "allRoles": "All roles",
+    "allStatus": "All status",
+    "passwordResetSuccess": "Password reset successfully for {{email}}",
+    "passwordResetFailed": "Failed to reset password"
   },
   "jobs": {
     "title": "Job Management",
@@ -79,7 +100,13 @@
     "enable": "Enable",
     "disable": "Disable",
     "jobId": "Job ID",
-    "runAll": "Run All Jobs"
+    "runAll": "Run All Jobs",
+    "triggered": "Triggered: {{jobId}}",
+    "triggerFailed": "Trigger failed: {{jobId}}",
+    "triggeredAll": "Triggered {{ok}} jobs",
+    "triggeredAllWithFailures": "Triggered {{ok}} jobs ({{fail}} failed)",
+    "toggleFailed": "Toggle failed: {{jobId}}",
+    "lastErrorLabel": "Last error:"
   },
   "audit": {
     "title": "Audit Logs",
@@ -88,12 +115,75 @@
     "resource": "Resource",
     "details": "Details",
     "createdAt": "Created At",
-    "ipAddress": "IP Address"
+    "ipAddress": "IP Address",
+    "loading": "Loading...",
+    "noLogs": "No logs",
+    "filterAction": "Filter action",
+    "filterUser": "Filter user",
+    "allActions": "All actions",
+    "allUsers": "All users"
   },
   "settings": {
     "title": "System Settings",
     "general": "General Settings",
     "security": "Security Settings",
-    "notifications": "Notification Settings"
+    "notifications": "Notification Settings",
+    "save": "Save",
+    "cancel": "Cancel",
+    "cacheCleared": "Cache cleared"
+  },
+  "common": {
+    "sseError": "SSE connection lost or broken",
+    "loading": "Loading...",
+    "loadError": "Load failed: {{error}}",
+    "noData": "No data"
+  },
+  "datasources": {
+    "loadError": "Load failed: {{message}}",
+    "noChanges": "No changes to save",
+    "updated": "{{name}} updated",
+    "saveError": "Save failed: {{message}}"
+  },
+  "notifications": {
+    "loadPrefsError": "Failed to load preferences: {{message}}",
+    "quietTimeFormatError": "Invalid quiet time format. Expected HH:MM",
+    "saved": "Saved",
+    "saveError": "Save failed: {{message}}"
+  },
+  "systemai": {
+    "loadError": "Failed to load config",
+    "secretSavedDiscovering": "Secret saved. Discovering models...",
+    "secretAutoSaveFailed": "Auto-save secret failed",
+    "modelsDiscovered": "Auto-discovered {{count}} model(s)",
+    "configSaved": "Config saved",
+    "secretCleared": "Secret cleared. Provider config reset to defaults.",
+    "validationPassed": "Validation passed: {{count}} model(s) found",
+    "autoValidationFailed": "Auto-validation failed",
+    "validationFailed": "Validation failed",
+    "validationNeedsKey": "Validation failed: this provider requires an API key. Please save a secret first and try again.",
+    "modelFetchFailed": "Failed to fetch models",
+    "providerNotSupported": "This provider does not support automatic model discovery. Please enter models manually.",
+    "baseUrlRequired": "Please enter a Base URL.",
+    "baseUrlInvalid": "Invalid Base URL. Please enter a full address, e.g. https://model.myfxlogs.org or https://model.myfxlogs.org/v1",
+    "freeTierExhausted": "Free tier exhausted. Disable free-tier-only in your provider console or switch to a paid key.",
+    "quotaExhausted": "Quota exhausted or rate-limited. Check billing/rate limits and retry later.",
+    "quota403": "Request denied (quota). Check billing/quota in your provider console.",
+    "unauthorized": "Authentication failed. Check your API Key/Secret.",
+    "endpointNotFound": "Model endpoint not found. Verify the Base URL matches the service protocol (some require /v1).",
+    "timeout": "Request timed out. Check network connectivity and retry.",
+    "unreachable": "Cannot reach the model service. Check the Base URL, network, or gateway.",
+    "invalidModels": "Model service returned an incompatible /models response.",
+    "noModelsReturned": "No models returned. Check account permissions or service config.",
+    "defaultFetchError": "Failed to fetch models. Check Base URL and secret config."
+  },
+  "devices": {
+    "deleteConfirm": "Confirm delete this device?",
+    "deleteFailed": "Delete failed"
+  },
+  "strategies": {
+    "backtestComplete": "Backtest complete! Total return: {{pnl}}%"
+  },
+  "ai": {
+    "loadProviderError": "Failed to load AI provider: {{message}}"
   }
 }

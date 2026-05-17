@@ -29,7 +29,7 @@ export default function Settings() {
 
   const handleClearCache = () => {
     localStorage.removeItem('token')
-    alert('Cache cleared')
+    alert(t('settings.cacheCleared'))
   }
 
   return (

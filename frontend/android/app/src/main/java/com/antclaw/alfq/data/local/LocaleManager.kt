@@ -1,5 +1,6 @@
 package com.antclaw.alfq.data.local
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -47,30 +48,21 @@ object LocaleManager {
         saveSelectedLanguage(context, bestMatchLocale(languageTag))
     }
 
+    @SuppressLint("AppBundleLocaleChanges")
     fun applyLocale(context: Context, languageTag: String): Context {
         val locale = buildLocale(languageTag)
         Locale.setDefault(locale)
         
         val config = Configuration(context.resources.configuration)
         
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            config.setLocales(android.os.LocaleList(locale))
-        } else {
-            @Suppress("DEPRECATION")
-            config.setLocale(locale)
-        }
+        config.setLocales(android.os.LocaleList(locale))
         return context.createConfigurationContext(config)
     }
 
     private fun buildLocale(languageTag: String): Locale {
         // zh-TW 用 Locale("zh","TW") 确保匹配 values-zh-rTW
         if (languageTag == "zh-TW") return Locale("zh", "TW")
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Locale.forLanguageTag(languageTag)
-        } else {
-            @Suppress("DEPRECATION")
-            Locale(languageTag)
-        }
+        return Locale.forLanguageTag(languageTag)
     }
 
     fun getAvailableLanguages(): List<Pair<String, String>> = listOf(
@@ -91,12 +83,7 @@ object LocaleManager {
 
     private fun detectDeviceLanguage(context: Context): String {
         val config = context.resources.configuration
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            config.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            config.locale
-        }
+        val locale = config.locales[0]
         return if (locale != null) {
             val lang = locale.language.lowercase(Locale.ENGLISH)
             val country = locale.country.uppercase(Locale.ENGLISH)

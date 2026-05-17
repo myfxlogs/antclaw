@@ -39,16 +39,15 @@ class AndroidNotificationHelper(private val context: Context) {
     }
 
     private fun createChannels() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ALERTS,
-                "市场警报",
+                context.getString(R.string.notif_channel_alerts_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "经济日历、宏观 regime、options/onchain 风险"
+                description = context.getString(R.string.notif_channel_alerts_desc)
                 enableVibration(true)
             }
         )
@@ -56,20 +55,20 @@ class AndroidNotificationHelper(private val context: Context) {
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_SIGNALS,
-                "交易信号",
+                context.getString(R.string.notif_channel_signals_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "COT 信号、surprise、多资产共振"
+                description = context.getString(R.string.notif_channel_signals_desc)
             }
         )
 
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_DIGESTS,
-                "摘要与报告",
+                context.getString(R.string.notif_channel_digests_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "晨报、周度展望、校准更新"
+                description = context.getString(R.string.notif_channel_digests_desc)
                 enableVibration(false)
             }
         )
@@ -77,10 +76,10 @@ class AndroidNotificationHelper(private val context: Context) {
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_SYSTEM,
-                "系统通知",
+                context.getString(R.string.notif_channel_system_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "账户、系统维护通知"
+                description = context.getString(R.string.notif_channel_system_desc)
             }
         )
     }
@@ -127,9 +126,7 @@ class AndroidNotificationHelper(private val context: Context) {
             .setContentIntent(pending)
             .setGroup(GROUP_KEY)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(channel)
-        }
+        builder.setChannelId(channel)
 
         try {
             NotificationManagerCompat.from(context).notify(notifId.incrementAndGet(), builder.build())

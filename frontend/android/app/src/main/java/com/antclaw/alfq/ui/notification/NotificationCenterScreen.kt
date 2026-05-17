@@ -70,7 +70,12 @@ fun NotificationCenterScreen(
 
 @Composable
 private fun NotificationFilterTabs(selected: Int, onSelect: (Int) -> Unit) {
-    val filters = listOf("全部", "互动", "关注", "信号")
+    val filters = listOf(
+        stringResource(R.string.notif_filter_all),
+        stringResource(R.string.notif_filter_interactions),
+        stringResource(R.string.notif_filter_follows),
+        stringResource(R.string.notif_filter_signals),
+    )
     ScrollableTabRow(
         selectedTabIndex = selected,
         edgePadding = 0.dp,

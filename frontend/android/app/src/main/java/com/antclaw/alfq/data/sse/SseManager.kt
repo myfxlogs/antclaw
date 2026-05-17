@@ -1,19 +1,14 @@
 package com.antclaw.alfq.data.sse
 
-import android.util.Log
-import antclaw.v1.NotificationOuterClass
+import android.content.Context
 import com.antclaw.alfq.data.notification.ClientNotification
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
-import kotlinx.coroutines.*
+import com.antclaw.alfq.data.rpc.ProtocolClientFactory
+import com.antclaw.alfq.data.rpc.TokenManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.sse.EventSource
-import okhttp3.sse.EventSourceListener
-import okhttp3.sse.EventSources
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,180 +21,56 @@ interface SseClient {
 }
 
 /**
- * 统一 SSE 管理器
+ * SSE 管理器 facade — 组合 NetworkMonitor + SseConnectionController + NotificationEventParser。
  *
- * 职责：
- * 1. 维持 /sse/notifications 长连接（在线状态上报）
- * 2. 解析 event: notification → 推送 ClientNotification
- * 3. 暴露连接状态 + 通知流
- *
- * 合并前身：SseManager + NotificationSseClient（消除双 SSE 连接）
+ * 对外提供简洁的 SseClient 接口 + 通知/连接状态流。
+ * 内部委托给拆分后的子组件。
  */
 @Singleton
-class SseManager @Inject constructor() : SseClient {
+class SseManager @Inject constructor(
+    @ApplicationContext appContext: Context,
+    tokenManager: TokenManager,
+    clientFactory: ProtocolClientFactory,
+) : SseClient {
+    private val networkMonitor: NetworkMonitor
+    private val eventParser = NotificationEventParser()
+    private val connectionController: SseConnectionController
 
-    companion object {
-        private const val TAG = "SseManager"
-        private const val BASE_DELAY_MS = 3000L
-        private const val MAX_DELAY_MS = 30000L
-        private const val CONNECT_TIMEOUT_SEC = 30L
-
-        fun backoffDelay(retry: Int, baseMs: Long = BASE_DELAY_MS, maxMs: Long = MAX_DELAY_MS): Long =
-            (baseMs * (1L shl (retry - 1))).coerceAtMost(maxMs)
+    init {
+        networkMonitor = NetworkMonitor(appContext)
+        connectionController = SseConnectionController(
+            tokenManager, clientFactory, networkMonitor, eventParser
+        )
+        networkMonitor.start()
     }
 
-    private var eventSource: EventSource? = null
-    private var reconnectJob: Job? = null
-    private var retryCount = 0
-    private var lastConnectAttempt = 0L // anti-jitter
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    // ── SseClient ──
+    override fun connect() = connectionController.connect()
+    override fun disconnect() = connectionController.disconnect()
+    override fun reconnect() = connectionController.reconnect()
+    override fun destroy() {
+        connectionController.destroy()
+        networkMonitor.stop()
+    }
 
-    // 原始通知 JSON 流（向后兼容）
-    private val _notificationEvents = MutableSharedFlow<String>(extraBufferCapacity = 64)
-    val notificationEvents: SharedFlow<String> = _notificationEvents
+    // ── Exposed flows ──
 
-    // 已解析的 ClientNotification 流（供 NotificationViewModel 使用）
-    private val _notifications = MutableSharedFlow<ClientNotification>(extraBufferCapacity = 32)
-    val notifications: SharedFlow<ClientNotification> = _notifications
+    /** 原始通知 JSON 流（向后兼容） */
+    val notificationEvents: SharedFlow<String> = eventParser.notificationEvents
 
-    // 连接状态
-    private val _connectionState = MutableSharedFlow<ConnectionState>(replay = 1, extraBufferCapacity = 16)
-    val connectionState: SharedFlow<ConnectionState> = _connectionState
+    /** 已解析的 ClientNotification 流 */
+    val notifications: SharedFlow<ClientNotification> = eventParser.notifications
 
-    /** 兼容 NotificationSseClient 的 connected 属性名 */
-    val connected: SharedFlow<Boolean> = _connectionState.let { flow ->
+    /** 连接状态 */
+    val connectionState: SharedFlow<SseConnectionController.ConnectionState> =
+        connectionController.connectionState
+
+    /** 兼容旧 connected 属性名 */
+    val connected: SharedFlow<Boolean> = connectionController.connectionState.let { flow ->
         val out = MutableSharedFlow<Boolean>(replay = 1, extraBufferCapacity = 4)
-        scope.launch {
-            flow.collect { state -> out.emit(state == ConnectionState.CONNECTED) }
+        GlobalScope.launch {
+            flow.collect { state -> out.emit(state == SseConnectionController.ConnectionState.CONNECTED) }
         }
         out
-    }
-
-    enum class ConnectionState {
-        CONNECTING, CONNECTED, DISCONNECTED, ERROR
-    }
-
-    /** 登录成功后调用，建立 SSE 长连接。线程安全，可在主线程调用。 */
-    override fun connect() {
-        scope.launch {
-            try {
-                connectInternal()
-            } catch (e: Exception) {
-                Log.e(TAG, "SSE connect failed", e)
-                _connectionState.emit(ConnectionState.ERROR)
-                scheduleReconnect()
-            }
-        }
-    }
-
-    private suspend fun connectInternal() {
-        // Anti-jitter: skip if called within 500ms of last attempt
-        val now = System.currentTimeMillis()
-        if (now - lastConnectAttempt < 500) {
-            Log.d(TAG, "connect: skipping (anti-jitter, ${now - lastConnectAttempt}ms since last)")
-            return
-        }
-        lastConnectAttempt = now
-
-        val token = ConnectTransportProvider.getToken()
-        if (token.isNullOrEmpty()) {
-            Log.w(TAG, "connect: no token available, skipping SSE")
-            return
-        }
-        reconnectJob?.cancel()
-        disconnect()
-
-        _connectionState.emit(ConnectionState.CONNECTING)
-
-        val baseUrl = ConnectTransportProvider.baseUrl.trimEnd('/')
-        val sseUrl = "$baseUrl/sse/notifications"
-
-        val client = OkHttpClient.Builder()
-            .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.MILLISECONDS)
-            .build()
-
-        val request = Request.Builder()
-            .url(sseUrl)
-            .header("Authorization", "Bearer $token")
-            .header("Accept", "text/event-stream")
-            .build()
-
-        val factory = EventSources.createFactory(client)
-        eventSource = factory.newEventSource(request, object : EventSourceListener() {
-            override fun onOpen(eventSource: EventSource, response: Response) {
-                Log.i(TAG, "SSE connected: ${response.code}")
-                retryCount = 0
-                scope.launch { _connectionState.emit(ConnectionState.CONNECTED) }
-            }
-
-            override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
-                when (type) {
-                    "notification" -> {
-                        scope.launch {
-                            _notificationEvents.emit(data)
-                            parseAndEmit(data)
-                        }
-                    }
-                    else -> Log.d(TAG, "SSE event type=$type data=$data")
-                }
-            }
-
-            override fun onClosed(eventSource: EventSource) {
-                Log.i(TAG, "SSE closed, scheduling reconnect")
-                scope.launch { _connectionState.emit(ConnectionState.DISCONNECTED) }
-                scheduleReconnect()
-            }
-
-            override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
-                Log.e(TAG, "SSE failure: ${t?.message} code=${response?.code}", t)
-                scope.launch { _connectionState.emit(ConnectionState.ERROR) }
-                scheduleReconnect()
-            }
-        })
-    }
-
-    /** 登出/前台→后台切换时调用。 */
-    override fun disconnect() {
-        reconnectJob?.cancel()
-        reconnectJob = null
-        eventSource?.cancel()
-        eventSource = null
-        scope.launch { _connectionState.emit(ConnectionState.DISCONNECTED) }
-    }
-
-    /** 断开后立即重连（前后台切换用）。 */
-    override fun reconnect() {
-        disconnect()
-        connect()
-    }
-
-    private fun scheduleReconnect() {
-        reconnectJob?.cancel()
-        reconnectJob = scope.launch {
-            retryCount++
-            val delayMs = backoffDelay(retryCount)
-            Log.i(TAG, "SSE reconnecting in ${delayMs}ms (retry #$retryCount)")
-            delay(delayMs)
-            connect()
-        }
-    }
-
-    /** 生命周期清理。 */
-    override fun destroy() {
-        disconnect()
-        scope.cancel()
-    }
-
-    // ── Protobuf 解析 ──
-
-    private suspend fun parseAndEmit(data: String) {
-        try {
-            val bytes = android.util.Base64.decode(data, android.util.Base64.DEFAULT)
-            val proto = NotificationOuterClass.Notification.parseFrom(bytes)
-            _notifications.emit(ClientNotification.fromProto(proto))
-        } catch (e: Exception) {
-            Log.e(TAG, "Parse SSE notification failed", e)
-        }
     }
 }

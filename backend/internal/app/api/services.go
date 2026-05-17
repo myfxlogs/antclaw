@@ -98,9 +98,10 @@ func InitServices(inf *Infra) *Services {
 	presenceTracker := presence.NewTracker()
 
 	feedRepo := infrapq.NewFeedRepository(pgPool)
-	feedSvc := feedpkg.NewService(feedRepo)
+	eventPub := feedpkg.NewNotifyEventPublisher(notifySvc)
+	feedSvc := feedpkg.NewService(feedRepo).WithRateLimiter(feedpkg.NewRedisRateLimiter(inf.RDB)).WithEventPublisher(eventPub)
 	traderRepo := infrapq.NewTraderRepository(pgPool)
-	traderSvc := traderpkg.NewService(traderRepo)
+	traderSvc := traderpkg.NewService(traderRepo).WithRateLimiter(feedpkg.NewRedisRateLimiter(inf.RDB)).WithEventPublisher(eventPub)
 	searchRepo := infrapq.NewSearchRepository(pgPool)
 	searchSvc := searchpkg.NewService(searchRepo)
 	trendRepo := infrapq.NewTrendRepository(pgPool)

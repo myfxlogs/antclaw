@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -18,7 +19,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.components.PostCard
 import com.antclaw.alfq.ui.components.TraderStatRow
-import com.antclaw.alfq.ui.feed.AsyncPhase
 import com.antclaw.alfq.ui.social.UiEvent
 
 @Composable
@@ -31,10 +31,15 @@ fun ProfileScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     LaunchedEffect(userId) { viewModel.load(userId) }
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
-            if (event is UiEvent.Snackbar) snackbarHostState.showSnackbar(event.message)
+            when (event) {
+                is UiEvent.Snackbar -> snackbarHostState.showSnackbar(event.message)
+                is UiEvent.SnackbarRes -> snackbarHostState.showSnackbar(context.resources.getString(event.resId))
+                else -> {}
+            }
         }
     }
 
@@ -134,7 +139,7 @@ fun ProfileScreen(
                     when (state.currentTab) {
                         ProfileTab.POSTS -> {
                             when {
-                                state.postsPhase == AsyncPhase.Loading -> {
+                                state.postsLoading -> {
                                     item { Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }
                                 }
                                 state.postsError != null -> {

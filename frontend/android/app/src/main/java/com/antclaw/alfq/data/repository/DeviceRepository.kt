@@ -3,7 +3,7 @@ package com.antclaw.alfq.data.repository
 import android.util.Log
 import antclaw.v1.Device
 import com.antclaw.alfq.data.device.DeviceInfoCollector
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+import com.antclaw.alfq.data.rpc.ProtocolClientFactory
 import com.connectrpc.MethodSpec
 import com.connectrpc.StreamType
 import com.connectrpc.getOrThrow
@@ -19,7 +19,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class DeviceRepository @Inject constructor(
-    private val deviceInfoCollector: DeviceInfoCollector
+    private val deviceInfoCollector: DeviceInfoCollector,
+    private val clientFactory: ProtocolClientFactory,
 ) : DeviceReportApi {
     companion object {
         private const val TAG = "DeviceRepository"
@@ -34,7 +35,7 @@ class DeviceRepository @Inject constructor(
             ?: deviceInfoCollector.collectBasic()
 
         try {
-            val client = ConnectTransportProvider.createProtocolClient()
+            val client = clientFactory.create()
 
             val deviceInfo = Device.DeviceInfo.newBuilder()
                 .setDeviceId(di.deviceId)

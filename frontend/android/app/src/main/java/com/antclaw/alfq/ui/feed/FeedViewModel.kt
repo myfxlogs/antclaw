@@ -38,8 +38,13 @@ class FeedViewModel @Inject constructor(
         controller.load(tab.filter)
     }
 
+    fun retryLoad() {
+        controller.load(_currentTab.filter)
+    }
+
     fun refresh() = controller.refresh(_currentTab.filter)
     fun loadMore() = controller.loadMore(_currentTab.filter)
+    fun retryLoadMore() = controller.retryLoadMore(_currentTab.filter)
     fun toggleLike(postId: String) = controller.toggleLike(postId)
     fun sharePost(postId: String) = controller.sharePost(postId)
 }

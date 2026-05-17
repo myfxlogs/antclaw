@@ -1,15 +1,16 @@
 package com.antclaw.alfq.ui.chat
 
+import android.content.Context
+import android.text.format.DateUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.repository.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 data class ConversationItem(
@@ -24,6 +25,7 @@ data class ChatUiState(
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val chatRepo: ChatRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
@@ -39,14 +41,17 @@ class ChatViewModel @Inject constructor(
                 }
                 _uiState.value = ChatUiState(conversations = items)
             } catch (e: Exception) {
-                _uiState.value = ChatUiState(error = e.message ?: "加载失败")
+                _uiState.value = ChatUiState(error = e.message ?: appContext.getString(com.antclaw.alfq.R.string.common_error))
             }
         }
     }
 
     private fun formatTime(epochSeconds: Long): String {
         if (epochSeconds <= 0) return ""
-        val mins = ChronoUnit.MINUTES.between(Instant.ofEpochSecond(epochSeconds), Instant.now())
-        return when { mins < 1 -> "刚刚"; mins < 60 -> "${mins}分钟前"; mins < 1440 -> "${mins / 60}小时前"; else -> "${mins / 1440}天前" }
+        return DateUtils.getRelativeTimeSpanString(
+            epochSeconds * 1000,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS
+        ).toString()
     }
 }

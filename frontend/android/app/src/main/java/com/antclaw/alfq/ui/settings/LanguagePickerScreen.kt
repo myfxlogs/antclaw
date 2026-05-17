@@ -58,7 +58,7 @@ fun LanguagePickerScreen(onBack: () -> Unit) {
                         Text(name, style = MaterialTheme.typography.bodyLarge,
                             fontWeight = if (selected == code) FontWeight.Bold else FontWeight.Normal)
                         if (selected == code) {
-                            Icon(Icons.Default.Check, contentDescription = null,
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.common_ok),
                                 tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                         }
                     }

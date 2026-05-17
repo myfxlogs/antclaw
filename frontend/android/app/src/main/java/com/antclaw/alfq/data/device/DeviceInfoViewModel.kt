@@ -1,14 +1,20 @@
 package com.antclaw.alfq.data.device
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.antclaw.alfq.R
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class DeviceInfoViewModel @Inject constructor(
-    private val deviceInfoCollector: DeviceInfoCollector
+    private val deviceInfoCollector: DeviceInfoCollector,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     private val _deviceInfo = MutableStateFlow<DeviceInfo?>(null)
@@ -33,7 +39,7 @@ class DeviceInfoViewModel @Inject constructor(
 
     fun collectDeviceInfo() {
         if (!deviceInfoCollector.hasConsent()) {
-            _error.value = "需要用户同意才能收集设备信息"
+            _error.value = appContext.getString(R.string.device_consent_required)
             return
         }
 
@@ -44,9 +50,9 @@ class DeviceInfoViewModel @Inject constructor(
             try {
                 val info = deviceInfoCollector.collect()
                 _deviceInfo.value = info
-                if (info == null) _error.value = "设备信息收集失败"
+                if (info == null) _error.value = appContext.getString(R.string.device_error_collect)
             } catch (e: Exception) {
-                _error.value = "收集设备信息时发生错误: ${e.message}"
+                _error.value = appContext.getString(R.string.device_error_generic, e.message ?: "")
             } finally {
                 _isLoading.value = false
             }

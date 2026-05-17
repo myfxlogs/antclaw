@@ -1,5 +1,6 @@
 // useSSE：订阅 EventSource 事件并把最近 N 条聚合到 state；卸载自动 close。
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const RAW_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8082'
 
@@ -14,6 +15,7 @@ function joinSSE(channel: string): string {
 }
 
 export function useSSE<T = unknown>(channel: string, max = 50) {
+  const { t } = useTranslation()
   const [items, setItems] = useState<T[]>([])
   const [error, setError] = useState<string | null>(null)
   useEffect(() => {
@@ -28,7 +30,7 @@ export function useSSE<T = unknown>(channel: string, max = 50) {
       }
     }
     es.onerror = () => {
-      setError('SSE 连接异常或已断开')
+      setError(t('common.sseError'))
     }
     return () => es.close()
   }, [channel, max])

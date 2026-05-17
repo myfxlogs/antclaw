@@ -1,116 +1,235 @@
 package com.antclaw.alfq.ui.feed
 
-import com.antclaw.alfq.data.local.TokenStoreApi
-import com.antclaw.alfq.data.repository.SocialRepository
-import com.antclaw.alfq.data.rpc.FeedRpc
-import com.antclaw.alfq.data.rpc.ProfileRpc
+import com.antclaw.alfq.data.error.AppErrorCategory
 import com.antclaw.alfq.ui.social.*
-import com.connectrpc.ProtocolClientInterface
-import io.mockk.mockk
+import com.antclaw.alfq.testutil.CoroutineTestBase
+import com.antclaw.alfq.testutil.FakeSocialRepo
+import com.antclaw.alfq.testutil.postUi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.Assert.*
-import java.time.Instant
 
+/**
+ * FeedViewModel + TimelineController 集成测试。
+ * 覆盖：首屏四态、分页失败、点赞/分享失败回滚。
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
-class FeedViewModelTest {
+class FeedViewModelTest : CoroutineTestBase() {
 
-    private val scheduler = TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(scheduler)
+    // ══════ 首屏四态 ══════
 
-    @Before fun setup() { kotlinx.coroutines.Dispatchers.setMain(testDispatcher) }
-    @After fun tearDown() { kotlinx.coroutines.Dispatchers.resetMain() }
-
-    @Test fun `first load succeeds`() = runTest(scheduler) {
-        val repo = FakeRepo(listOf(post("p1")))
+    @Test fun `initial load success populates posts`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1"), postUi("p2")))
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
+        val s = vm.uiState.value
+        assertEquals(InitialPhase.Success, s.initialPhase)
+        assertEquals(2, s.posts.size)
+        assertNull(s.initialError)
+    }
+
+    @Test fun `initial load empty shows Empty phase`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = emptyList())
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+        assertEquals(InitialPhase.Empty, vm.uiState.value.initialPhase)
+    }
+
+    @Test fun `initial load failure sets Error phase with AppError`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(failFirstPage = true)
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+        val s = vm.uiState.value
+        assertEquals(InitialPhase.Error, s.initialPhase)
+        assertNotNull(s.initialError)
+        assertEquals(AppErrorCategory.UNKNOWN, s.initialError!!.category)
+    }
+
+    @Test fun `retry after failure re-enters Loading then succeeds`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(failFirstPage = true)
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+        assertEquals(InitialPhase.Error, vm.uiState.value.initialPhase)
+
+        repo.failFirstPage = false
+        repo.posts = listOf(postUi("ok"))
+        vm.retryLoad()
+        advanceUntilIdle()
+        assertEquals(InitialPhase.Success, vm.uiState.value.initialPhase)
         assertEquals(1, vm.uiState.value.posts.size)
     }
 
-    @Test fun `first load fails`() = runTest(scheduler) {
-        val repo = FakeRepo(fail = true)
-        val vm = FeedViewModel(repo)
-        advanceUntilIdle()
-        assertEquals("err", vm.uiState.value.error)
-    }
+    // ══════ 分页 ══════
 
-    @Test fun `refresh keeps old data`() = runTest(scheduler) {
-        val repo = FakeRepo(listOf(post("p1")))
+    @Test fun `loadMore appends posts and updates cursor`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1")), cursor = "c1")
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
-        repo.fail = true; vm.refresh(); advanceUntilIdle()
         assertEquals(1, vm.uiState.value.posts.size)
-        assertEquals("err", vm.uiState.value.error)
+        assertTrue(vm.uiState.value.hasMore)
+
+        repo.posts = listOf(postUi("p2"), postUi("p3"))
+        repo.cursor = "c2"
+        vm.loadMore()
+        advanceUntilIdle()
+
+        val s = vm.uiState.value
+        assertEquals(3, s.posts.size)
+        assertEquals("c2", s.nextCursor)
+        assertEquals(AppendPhase.Idle, s.appendPhase)
     }
 
-    @Test fun `loadMore appends`() = runTest(scheduler) {
-        val repo = FakeRepo(listOf(post("p1")), "next")
+    @Test fun `loadMore failure sets appendError without clearing posts`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1")), cursor = "c1")
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
-        repo.posts = listOf(post("p2")); repo.cursor = null
-        vm.loadMore(); advanceUntilIdle()
-        assertEquals(2, vm.uiState.value.posts.size)
-    }
-
-    @Test fun `loadMore fails`() = runTest(scheduler) {
-        val repo = FakeRepo(listOf(post("p1")), "next")
-        val vm = FeedViewModel(repo)
-        advanceUntilIdle()
-        repo.fail = true; vm.loadMore(); advanceUntilIdle()
         assertEquals(1, vm.uiState.value.posts.size)
-        assertEquals("err", vm.uiState.value.appendError)
+
+        repo.failAppend = true
+        vm.loadMore()
+        advanceUntilIdle()
+
+        val s = vm.uiState.value
+        assertEquals(AppendPhase.Error, s.appendPhase)
+        assertNotNull(s.appendError)
+        assertEquals(1, s.posts.size)
     }
 
-    @Test fun `like optimistic then rollback`() = runTest(scheduler) {
-        val repo = FakeRepo(listOf(post("p1")))
+    @Test fun `retryLoadMore re-attempts after append failure`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1")), cursor = "c1")
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
-        repo.failLike = true; vm.toggleLike("p1"); advanceUntilIdle()
-        assertFalse(vm.uiState.value.posts[0].isLiked)
-        assertEquals(5, vm.uiState.value.posts[0].likeCount)
+
+        repo.failAppend = true
+        vm.loadMore()
+        advanceUntilIdle()
+        assertEquals(AppendPhase.Error, vm.uiState.value.appendPhase)
+
+        repo.failAppend = false
+        repo.posts = listOf(postUi("p2"))
+        repo.cursor = "c2"
+        vm.retryLoadMore()
+        advanceUntilIdle()
+
+        val s = vm.uiState.value
+        assertEquals(AppendPhase.Idle, s.appendPhase)
+        assertEquals(2, s.posts.size)
     }
 
-    @Test fun `share rollback`() = runTest(scheduler) {
-        val repo = FakeRepo(listOf(post("p1")))
+    @Test fun `loadMore does nothing when no cursor`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1")), cursor = null)
         val vm = FeedViewModel(repo)
         advanceUntilIdle()
-        repo.failShare = true; vm.sharePost("p1"); advanceUntilIdle()
-        assertEquals(0, vm.uiState.value.posts[0].shareCount)
+        assertEquals(InitialPhase.Success, vm.uiState.value.initialPhase)
+        assertNull(vm.uiState.value.nextCursor)
+
+        vm.loadMore()
+        advanceUntilIdle()
+        assertEquals(AppendPhase.Idle, vm.uiState.value.appendPhase)
+    }
+
+    // ══════ 点赞回滚 ══════
+
+    @Test fun `toggleLike updates optimistically then confirms`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1", likeCount = 5, isLiked = false)))
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+
+        vm.toggleLike("p1")
+        advanceUntilIdle()
+
+        val p = vm.uiState.value.posts.first { it.postId == "p1" }
+        assertTrue(p.isLiked)
+        assertEquals(6, p.likeCount)
+    }
+
+    @Test fun `toggleLike failure rolls back isLiked and likeCount`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1", likeCount = 5, isLiked = false)), failLike = true)
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+
+        // 先启动收集再触发事件（文档要求：SharedFlow 先 collect 再触发）
+        var snackbarEmitted = false
+        val job = launch {
+            vm.uiEvent.collect { event ->
+                if (event is UiEvent.SnackbarRes) snackbarEmitted = true
+            }
+        }
+
+        vm.toggleLike("p1")
+        advanceUntilIdle()
+
+        val p = vm.uiState.value.posts.first { it.postId == "p1" }
+        assertFalse(p.isLiked)
+        assertEquals(5, p.likeCount)
+        assertTrue(snackbarEmitted)
+        job.cancel()
+    }
+
+    @Test fun `toggleLike unlike rolls back on failure`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1", likeCount = 5, isLiked = true)), failLike = true)
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+
+        vm.toggleLike("p1")
+        advanceUntilIdle()
+
+        val p = vm.uiState.value.posts.first { it.postId == "p1" }
+        assertTrue(p.isLiked)
+        assertEquals(5, p.likeCount)
+    }
+
+    // ══════ 分享回滚 ══════
+
+    @Test fun `sharePost increments shareCount optimistically`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1", shareCount = 0)))
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+
+        vm.sharePost("p1")
+        advanceUntilIdle()
+
+        val p = vm.uiState.value.posts.first { it.postId == "p1" }
+        assertEquals(1, p.shareCount)
+    }
+
+    @Test fun `sharePost failure rolls back shareCount and emits Snackbar`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1", shareCount = 0)), failShare = true)
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+
+        // 先启动收集再触发事件
+        var snackbarEmitted = false
+        val job = launch {
+            vm.uiEvent.collect { event ->
+                if (event is UiEvent.SnackbarRes) snackbarEmitted = true
+            }
+        }
+
+        vm.sharePost("p1")
+        advanceUntilIdle()
+
+        val p = vm.uiState.value.posts.first { it.postId == "p1" }
+        assertEquals(0, p.shareCount)
+        assertTrue(snackbarEmitted)
+        job.cancel()
+    }
+
+    @Test fun `viewModel initializes with recommended tab`() = runTest(scheduler) {
+        val repo = FakeSocialRepo(posts = listOf(postUi("p1")))
+        val vm = FeedViewModel(repo)
+        advanceUntilIdle()
+        assertEquals(HomeFeedTab.RECOMMENDED, vm.currentTab)
+    }
+
+    @Test fun `selectTab changes current tab and reloads`() = runTest(scheduler) {
+        val vm = FeedViewModel(FakeSocialRepo(posts = listOf(postUi("p1"))))
+        advanceUntilIdle()
+        vm.selectTab(HomeFeedTab.FOLLOWING)
+        advanceUntilIdle()
+        assertEquals(HomeFeedTab.FOLLOWING, vm.currentTab)
     }
 }
 
-class FakeRepo(
-    var posts: List<PostUi> = emptyList(),
-    var cursor: String? = null,
-    var fail: Boolean = false,
-    var failLike: Boolean = false,
-    var failShare: Boolean = false,
-) : SocialRepository(
-    FeedRpc(mockk<ProtocolClientInterface>(relaxed = true)),
-    ProfileRpc(mockk<ProtocolClientInterface>(relaxed = true)),
-    mockk<TokenStoreApi>(relaxed = true),
-) {
-    override suspend fun getFeed(c: String, ps: Int, f: String) =
-        if (fail) throw RuntimeException("err") else if (c.isEmpty()) posts to cursor else posts to null
-    override suspend fun getPost(id: String) = posts.first { it.postId == id }
-    override suspend fun likePost(id: String) =
-        if (failLike) throw RuntimeException("err") else post("x").copy(isLiked = true, likeCount = 6)
-    override suspend fun unlikePost(id: String) =
-        if (failLike) throw RuntimeException("err") else post("x").copy(isLiked = false, likeCount = 4)
-    override suspend fun sharePost(id: String, c: String) =
-        if (failShare) throw RuntimeException("err") else post("x")
-    override suspend fun commentOnPost(a: String, b: String, c: String?) = CommentUi("c1", a, "u", "n", b)
-    override suspend fun listComments(a: String, b: String, c: Int) = emptyList<CommentUi>() to null
-    override suspend fun createPost(a: String, b: String, c: String, d: Int, e: String) = post("new", a)
-    override suspend fun listUserPosts(a: String, b: String, c: Int, d: String) = posts to null
-    override suspend fun getProfile(a: String) = TraderProfileUi(a, "T")
-    override suspend fun follow(a: String) = 1
-    override suspend fun unfollow(a: String) = 0
-}
-
-private fun post(id: String, content: String = "t") = PostUi(
-    postId = id, authorId = "a", authorName = "A", content = content,
-    postType = PostType.TEXT, likeCount = 5, shareCount = 0, createdAt = Instant.now(),
-)

@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -19,16 +19,30 @@ import (
 
 // Service holds the feed business logic.
 type Service struct {
-	repo postgres.FeedRepository
-	rdb  *infraredis.Client
+	repo     postgres.FeedRepository
+	rdb      *infraredis.Client
+	limiter  SocialRateLimiter
+	eventPub SocialEventPublisher
 }
 
 func NewService(repo postgres.FeedRepository) *Service {
-	return &Service{repo: repo}
+	return &Service{repo: repo, limiter: NoopRateLimiter{}, eventPub: NoopEventPublisher{}}
 }
 
 func NewServiceWithRedis(repo postgres.FeedRepository, rdb *infraredis.Client) *Service {
-	return &Service{repo: repo, rdb: rdb}
+	return &Service{repo: repo, rdb: rdb, limiter: NoopRateLimiter{}, eventPub: NoopEventPublisher{}}
+}
+
+// WithRateLimiter attaches a rate limiter for write operations (S12-P0-04).
+func (s *Service) WithRateLimiter(limiter SocialRateLimiter) *Service {
+	s.limiter = limiter
+	return s
+}
+
+// WithEventPublisher attaches an event publisher for notification events (S12-P0-05).
+func (s *Service) WithEventPublisher(pub SocialEventPublisher) *Service {
+	s.eventPub = pub
+	return s
 }
 
 // normalizeFilter returns the canonical filter: all / signals_only / posts_only / shares.
@@ -67,18 +81,30 @@ func (s *Service) CreatePost(ctx context.Context, userID string, req *alfqv1.Cre
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
 	}
-	if req.Content == "" && req.PostType != "signal_card" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("content is required"))
+	if err := s.limiter.Allow(ctx, userID, RateLimitCreatePost); err != nil {
+		return nil, err
 	}
-	if req.Visibility == "circle" {
+	// S12-P0-03: unified content validation
+	if err := ValidateCreatePostRequest(req.Content, req.PostType, req.SignalDirection, req.SignalConfidence, req.Visibility); err != nil {
+		return nil, err
+	}
+	// S12-P0-01: strict visibility validation — no silent fallback to public
+	vis := strings.TrimSpace(req.Visibility)
+	if vis == "" {
+		vis = "public" // default per product spec
+	}
+	switch vis {
+	case "public", "followers":
+		// allowed
+	case "circle":
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("circle visibility not yet supported"))
+	default:
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("visibility must be public or followers"))
 	}
-	if req.Visibility != "public" && req.Visibility != "followers" {
-		req.Visibility = "public"
-	}
+	req.Visibility = vis
 	name, err := s.repo.GetUserName(ctx, userID)
 	if err != nil {
-		log.Printf("feed: GetUserName(%s): %v", userID, err)
+		NewSocialLogger().Error("get_user_name", userID, "", err)
 		name = ""
 	}
 
@@ -216,6 +242,9 @@ func (s *Service) toggleLike(ctx context.Context, userID, postID string, isLike 
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
 	}
+	if err := s.limiter.Allow(ctx, userID, RateLimitLikePost); err != nil {
+		return nil, err
+	}
 	if err := s.checkPostAccessible(ctx, postID, userID); err != nil {
 		// NotFound from checkPostAccessible is fine; translate appropriately
 		return nil, err
@@ -238,15 +267,18 @@ func (s *Service) CommentOnPost(ctx context.Context, userID string, req *alfqv1.
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
 	}
-	if req.Content == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("content is required"))
+	if err := s.limiter.Allow(ctx, userID, RateLimitCommentOnPost); err != nil {
+		return nil, err
+	}
+	if err := ValidateCommentRequest(req.Content); err != nil {
+		return nil, err
 	}
 	if err := s.checkPostAccessible(ctx, req.PostId, userID); err != nil {
 		return nil, err
 	}
 	name, err := s.repo.GetUserName(ctx, userID)
 	if err != nil {
-		log.Printf("feed: GetUserName(%s): %v", userID, err)
+		NewSocialLogger().Error("get_user_name", userID, req.PostId, err)
 		name = ""
 	}
 	row := &postgres.FeedCommentRow{
@@ -269,6 +301,20 @@ func (s *Service) CommentOnPost(ctx context.Context, userID string, req *alfqv1.
 	row, err = s.repo.CreateComment(ctx, row)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create comment: %w", err))
+	}
+	// S12-P0-05: publish notification event (non-blocking, failure logged)
+	// Don't notify when commenting on own post
+	postRow, _, _ := s.repo.GetPost(ctx, req.PostId, "")
+	if postRow != nil && postRow.AuthorID != userID {
+		_ = s.eventPub.Publish(ctx, SocialEvent{
+			Type:       "post_commented",
+			ActorID:    userID,
+			ActorName:  name,
+			TargetID:   postRow.AuthorID,
+			PostID:     req.PostId,
+			PostTitle:  postRow.Content,
+			CommentID:  row.ID,
+		})
 	}
 	return feedCommentRowToProto(row), nil
 }
@@ -302,12 +348,18 @@ func (s *Service) SharePost(ctx context.Context, userID string, req *alfqv1.Shar
 	if userID == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("login required"))
 	}
+	if err := s.limiter.Allow(ctx, userID, RateLimitSharePost); err != nil {
+		return nil, err
+	}
+	if err := ValidateSharePostRequest(req.Comment); err != nil {
+		return nil, err
+	}
 	if err := s.checkPostAccessible(ctx, req.PostId, userID); err != nil {
 		return nil, err
 	}
 	name, err := s.repo.GetUserName(ctx, userID)
 	if err != nil {
-		log.Printf("feed: GetUserName(%s): %v", userID, err)
+		NewSocialLogger().Error("get_user_name", userID, req.PostId, err)
 		name = ""
 	}
 	opid := req.PostId
@@ -321,6 +373,18 @@ func (s *Service) SharePost(ctx context.Context, userID string, req *alfqv1.Shar
 	})
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("share post: %w", err))
+	}
+	// S12-P0-05: notify original post author (skip if sharing own post)
+	origRow, _, _ := s.repo.GetPost(ctx, req.PostId, "")
+	if origRow != nil && origRow.AuthorID != userID {
+		_ = s.eventPub.Publish(ctx, SocialEvent{
+			Type:       "post_shared",
+			ActorID:    userID,
+			ActorName:  name,
+			TargetID:   origRow.AuthorID,
+			PostID:     req.PostId,
+			PostTitle:  origRow.Content,
+		})
 	}
 	return PostRowToProto(row, nil), nil
 }

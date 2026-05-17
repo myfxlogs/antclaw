@@ -88,7 +88,7 @@ class MTAccountsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     binding = false,
-                    bindError = e.message ?: "\u7ed1\u5b9a\u5931\u8d25"
+                    bindError = e.message ?: "binding failed"
                 )
             }
         }
@@ -112,7 +112,7 @@ class MTAccountsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     binding = false,
-                    bindError = e.message ?: "\u7ed1\u5b9a\u5931\u8d25"
+                    bindError = e.message ?: "binding failed"
                 )
             }
         }

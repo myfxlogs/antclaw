@@ -114,13 +114,13 @@ export default function Users() {
     if (!selectedUser || !newPassword) return
     try {
       await adminResetPassword(selectedUser.user_id, newPassword)
-      alert(`Password reset successfully for ${selectedUser.email}`)
+      alert(t('users.passwordResetSuccess', { email: selectedUser.email }))
       setShowResetModal(false)
       setSelectedUser(null)
       setNewPassword('')
     } catch (err) {
       console.error('Failed to reset password:', err)
-      alert('Failed to reset password')
+      alert(t('users.passwordResetFailed'))
     }
   }
 

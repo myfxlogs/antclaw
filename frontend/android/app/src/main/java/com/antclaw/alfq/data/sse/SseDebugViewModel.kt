@@ -2,7 +2,7 @@ package com.antclaw.alfq.data.sse
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+import com.antclaw.alfq.data.rpc.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SseDebugState(
-    val baseUrl: String = ConnectTransportProvider.baseUrl,
+    val baseUrl: String = "",
     val hasToken: Boolean = false,
     val sseState: String = "UNKNOWN",
     val lastError: String? = null,
@@ -21,6 +21,7 @@ data class SseDebugState(
 @HiltViewModel
 class SseDebugViewModel @Inject constructor(
     private val sseManager: SseManager,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SseDebugState())
@@ -30,7 +31,7 @@ class SseDebugViewModel @Inject constructor(
         viewModelScope.launch {
             sseManager.connectionState.collect { connState ->
                 _state.value = _state.value.copy(
-                    hasToken = ConnectTransportProvider.getToken() != null,
+                    hasToken = tokenManager.getToken() != null,
                     sseState = connState.name,
                 )
             }
@@ -39,7 +40,7 @@ class SseDebugViewModel @Inject constructor(
 
     fun refresh() {
         _state.value = _state.value.copy(
-            hasToken = ConnectTransportProvider.getToken() != null,
+            hasToken = tokenManager.getToken() != null,
         )
     }
 }

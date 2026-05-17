@@ -6,6 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.antclaw.alfq.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.antclaw.alfq.ui.social.CommentUi
@@ -18,9 +20,9 @@ import com.antclaw.alfq.ui.theme.SpacingSm
 @Composable
 fun CommentItem(
     comment: CommentUi,
+    modifier: Modifier = Modifier,
     depth: Int = 0,
     onReplyClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().padding(start = (depth * 28).dp),
@@ -50,7 +52,7 @@ fun CommentItem(
                 Spacer(modifier = Modifier.height(SpacingSm))
                 TextButton(onClick = onReplyClick, contentPadding = PaddingValues(0.dp),
                     modifier = Modifier.height(28.dp)) {
-                    Text("Reply", style = MaterialTheme.typography.labelSmall,
+                    Text(stringResource(R.string.comment_reply), style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 }
             }

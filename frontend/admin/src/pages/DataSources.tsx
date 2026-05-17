@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { KeyRound, Save, RefreshCw, Trash2, Lock, Unlock } from 'lucide-react'
 import { listDataSources, updateDataSource } from '../lib/api'
 
@@ -13,6 +14,7 @@ interface DataSourceConfig {
 }
 
 export default function DataSources() {
+  const { t } = useTranslation()
   const [items, setItems] = useState<DataSourceConfig[]>([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Record<string, { endpoint?: string; secret?: string }>>({})
@@ -25,7 +27,7 @@ export default function DataSources() {
       const data = await listDataSources()
       setItems(data.items || [])
     } catch (e: any) {
-      setMessage({ kind: 'err', text: `加载失败: ${e.message}` })
+      setMessage({ kind: 'err', text: t('datasources.loadError', { message: e.message }) })
     } finally {
       setLoading(false)
     }
@@ -53,7 +55,7 @@ export default function DataSources() {
           payload.secret = draft.secret
         }
         if (Object.keys(payload).length === 0) {
-          setMessage({ kind: 'err', text: '没有要保存的修改' })
+          setMessage({ kind: 'err', text: t('datasources.noChanges') })
           return
         }
       } else {
@@ -65,12 +67,12 @@ export default function DataSources() {
         secret: payload.secret as string | undefined,
         clear_secret: payload.clear_secret as boolean | undefined,
       })
-      setMessage({ kind: 'ok', text: `${item.name} 已更新` })
+      setMessage({ kind: 'ok', text: t('datasources.updated', { name: item.name }) })
       // 清空 secret 输入避免明文残留
       setEditing((prev) => ({ ...prev, [item.source_id]: { ...prev[item.source_id], secret: '' } }))
       await load()
     } catch (e: any) {
-      setMessage({ kind: 'err', text: `保存失败: ${e.message}` })
+      setMessage({ kind: 'err', text: t('datasources.saveError', { message: e.message }) })
     } finally {
       setSaving(null)
     }

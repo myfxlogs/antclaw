@@ -22,7 +22,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    LaunchedEffect(Unit) { viewModel.autoLogin { result -> onLoginSuccess(result) } }
+    // 根级自动登录由 SessionViewModel.init 统一完成，LoginScreen 不再重复执行。
 
     Column(modifier = Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -45,8 +45,9 @@ fun LoginScreen(
             singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (state.error != null) {
-            Text(state.error!!, color = MaterialTheme.colorScheme.error,
+        val errorRes = state.errorRes
+        if (errorRes != null) {
+            Text(stringResource(errorRes), color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 8.dp))
         }
 

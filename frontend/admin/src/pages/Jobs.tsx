@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { RotateCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import i18n from '../lib/i18n'
 import { listJobs, runJob, setJobEnabled } from '../lib/api'
 
 interface Job {
@@ -18,7 +19,7 @@ function formatTime(isoTime: string): string {
   try {
     const d = new Date(isoTime)
     if (isNaN(d.getTime())) return '-'
-    return d.toLocaleString('zh-CN', { hour12: false })
+    return d.toLocaleString(i18n.language, { hour12: false })
   } catch {
     return '-'
   }
@@ -95,10 +96,10 @@ export default function Jobs() {
       await runJob(jobId)
       // 立即把该行状态切到 running，等 SSE 推送最终状态（succeeded/failed）
       setJobs((prev) => prev.map((j) => (j.job_id === jobId ? { ...j, status: 'running' } : j)))
-      showToast(`已触发：${jobId}`, 'ok')
+      showToast(t('jobs.triggered', { jobId }), 'ok')
     } catch (err) {
       console.error('Failed to run job:', err)
-      showToast(`触发失败：${jobId}`, 'err')
+      showToast(t('jobs.triggerFailed', { jobId }), 'err')
     }
   }
 
@@ -119,7 +120,7 @@ export default function Jobs() {
       }
     }
     setRunningAll(false)
-    showToast(`已触发 ${ok} 个任务${fail ? `（失败 ${fail}）` : ''}`, fail ? 'err' : 'ok')
+    showToast(fail ? t('jobs.triggeredAllWithFailures', { ok, fail }) : t('jobs.triggeredAll', { ok }), fail ? 'err' : 'ok')
   }
 
   const handleToggleEnabled = async (jobId: string, currentEnabled: boolean) => {
@@ -131,7 +132,7 @@ export default function Jobs() {
       )
     } catch (err) {
       console.error('Failed to toggle job:', err)
-      showToast(`切换启用状态失败：${jobId}`, 'err')
+      showToast(t('jobs.toggleFailed', { jobId }), 'err')
     } finally {
       setToggling(null)
     }
@@ -179,10 +180,10 @@ export default function Jobs() {
               ? 'bg-gray-300 text-gray-600 cursor-wait'
               : 'bg-blue-600 text-white hover:bg-blue-700'
           }`}
-          title={t('jobs.runAll') || '启动全部任务'}
+          title={t('jobs.runAll')}
         >
           <RotateCw className="w-4 h-4" />
-          {runningAll ? t('jobs.running') : (t('jobs.runAll') || '启动全部任务')}
+          {runningAll ? t('jobs.running') : t('jobs.runAll')}
         </button>
       </div>
 
@@ -248,7 +249,7 @@ export default function Jobs() {
               {job.last_error && (
                 <tr className="bg-red-50">
                   <td colSpan={7} className="px-6 py-2 text-xs text-red-700">
-                    <span className="font-semibold mr-2">最近错误:</span>
+                    <span className="font-semibold mr-2">{t('jobs.lastErrorLabel')}</span>
                     <span className="break-all">{job.last_error}</span>
                   </td>
                 </tr>

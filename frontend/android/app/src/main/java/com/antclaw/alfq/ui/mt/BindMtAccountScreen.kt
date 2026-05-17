@@ -46,7 +46,7 @@ fun BindMtAccountScreen(onBack: () -> Unit, vm: MTAccountsViewModel = hiltViewMo
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Surface(shape = MaterialTheme.shapes.extraLarge, color = if (i < step) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.size(32.dp)) {
                         Box(contentAlignment = Alignment.Center) {
-                            if (i < step) Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(16.dp))
+                            if (i < step) Icon(Icons.Default.Check, contentDescription = stringResource(R.string.bind_step_completed), tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(16.dp))
                             else Text("${i+1}", style = MaterialTheme.typography.labelMedium, color = if (i < step) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
@@ -77,7 +77,7 @@ fun BindMtAccountScreen(onBack: () -> Unit, vm: MTAccountsViewModel = hiltViewMo
                         if (filtered.isNotEmpty()) LazyColumn(Modifier.heightIn(max = 160.dp)) {
                             items(filtered) { srv -> Surface(onClick = { selectedServer = srv; server = srv }, color = if (selectedServer == srv) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxWidth()) {
                                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    if (selectedServer == srv) { Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)) }
+                                    if (selectedServer == srv) { Icon(Icons.Default.Check, contentDescription = stringResource(R.string.bind_server_selected), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)) }
                                     Text(srv, style = MaterialTheme.typography.bodyMedium)
                                 }
                             }}

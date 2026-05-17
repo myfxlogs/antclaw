@@ -17,7 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.social.PostUi
 import com.antclaw.alfq.ui.social.SignalCardUi
 import com.antclaw.alfq.ui.social.ChartShareUi
@@ -28,12 +30,12 @@ import java.time.Instant
 @Composable
 fun PostCard(
     post: PostUi,
+    modifier: Modifier = Modifier,
     onPostClick: (String) -> Unit = {},
     onAuthorClick: (String) -> Unit = {},
     onLikeClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onReportClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -70,11 +72,11 @@ fun PostCard(
                     Spacer(Modifier.weight(1f))
                     Box {
                         IconButton(onClick = { showMenu = true }, modifier = Modifier.size(24.dp)) {
-                            Icon(Icons.Default.MoreVert, "更多", modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.MoreVert, stringResource(R.string.post_more_options), modifier = Modifier.size(16.dp))
                         }
                         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                            DropdownMenuItem(text = { Text("举报") }, onClick = { onReportClick(); showMenu = false })
-                            DropdownMenuItem(text = { Text("不感兴趣") }, onClick = { showMenu = false })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.post_report)) }, onClick = { onReportClick(); showMenu = false })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.post_not_interested)) }, onClick = { showMenu = false })
                         }
                     }
                 }
@@ -99,11 +101,12 @@ fun PostCard(
 
                 // 互动按钮行
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ActionButton(Icons.Default.Email, "${post.commentCount}", onClick = { onPostClick(post.postId) })
-                    ActionButton(Icons.Default.Share, "${post.shareCount}", onClick = { onShareClick() })
+                    ActionButton(Icons.Default.Email, "${post.commentCount}", stringResource(R.string.a11y_comment), onClick = { onPostClick(post.postId) })
+                    ActionButton(Icons.Default.Share, "${post.shareCount}", stringResource(R.string.a11y_share), onClick = { onShareClick() })
                     ActionButton(
                         if (post.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         "${post.likeCount}",
+                        stringResource(R.string.a11y_like),
                         onClick = { onLikeClick() },
                         tint = if (post.isLiked) Color.Red else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     )
@@ -114,9 +117,9 @@ fun PostCard(
 }
 
 @Composable
-private fun ActionButton(icon: ImageVector, text: String, onClick: () -> Unit = {}, tint: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) {
+private fun ActionButton(icon: ImageVector, text: String, contentDesc: String, onClick: () -> Unit = {}, tint: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) {
     Row(Modifier.clickable(onClick = onClick).padding(horizontal = 4.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = tint)
+        Icon(icon, contentDescription = contentDesc, modifier = Modifier.size(18.dp), tint = tint)
         if (text != "0") {
             Spacer(Modifier.width(2.dp))
             Text(text, style = MaterialTheme.typography.labelSmall, color = tint)
@@ -138,7 +141,7 @@ private fun SignalCardEmbed(signal: SignalCardUi) {
             Spacer(Modifier.width(4.dp))
             Text("${signal.confidence}%", style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.weight(1f))
-            Text("置信度", style = MaterialTheme.typography.labelSmall)
+            Text(stringResource(R.string.signal_confidence_label), style = MaterialTheme.typography.labelSmall)
             Spacer(Modifier.width(SpacingSm))
             Text("${signal.confidence}%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
         }
@@ -155,13 +158,14 @@ private fun ChartShareEmbed(chart: ChartShareUi) {
     }
 }
 
+@Composable
 private fun timeAgo(instant: Instant): String {
     val seconds = Duration.between(instant, Instant.now()).seconds
     return when {
-        seconds < 60 -> "刚刚"
-        seconds < 3600 -> "${seconds / 60}分钟"
-        seconds < 86400 -> "${seconds / 3600}小时"
-        seconds < 259200 -> "${seconds / 86400}天"
+        seconds < 60 -> stringResource(R.string.time_just_now)
+        seconds < 3600 -> stringResource(R.string.time_minutes_short, seconds / 60)
+        seconds < 86400 -> stringResource(R.string.time_hours_short, seconds / 3600)
+        seconds < 259200 -> stringResource(R.string.time_days_short, seconds / 86400)
         else -> {
             val dt = instant.atZone(java.time.ZoneId.systemDefault())
             "${dt.monthValue}/${dt.dayOfMonth}"

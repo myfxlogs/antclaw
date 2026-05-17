@@ -74,7 +74,9 @@
     "filterRole": "筛选角色",
     "filterStatus": "筛选状态",
     "allRoles": "全部角色",
-    "allStatus": "全部状态"
+    "allStatus": "全部状态",
+    "passwordResetSuccess": "密码重置成功：{{email}}",
+    "passwordResetFailed": "密码重置失败"
   },
   "jobs": {
     "title": "任务管理",
@@ -98,7 +100,13 @@
     "enable": "启用",
     "disable": "停用",
     "jobId": "采集ID",
-    "runAll": "启动全部任务"
+    "runAll": "启动全部任务",
+    "triggered": "已触发：{{jobId}}",
+    "triggerFailed": "触发失败：{{jobId}}",
+    "triggeredAll": "已触发 {{ok}} 个任务",
+    "triggeredAllWithFailures": "已触发 {{ok}} 个任务（失败 {{fail}}）",
+    "toggleFailed": "切换启用状态失败：{{jobId}}",
+    "lastErrorLabel": "最近错误:"
   },
   "audit": {
     "title": "审计日志",
@@ -121,6 +129,61 @@
     "security": "安全设置",
     "notifications": "通知设置",
     "save": "保存",
-    "cancel": "取消"
+    "cancel": "取消",
+    "cacheCleared": "缓存已清除"
+  },
+  "common": {
+    "sseError": "SSE 连接异常或已断开",
+    "loading": "加载中...",
+    "loadError": "加载失败：{{error}}",
+    "noData": "暂无数据"
+  },
+  "datasources": {
+    "loadError": "加载失败: {{message}}",
+    "noChanges": "没有要保存的修改",
+    "updated": "{{name}} 已更新",
+    "saveError": "保存失败: {{message}}"
+  },
+  "notifications": {
+    "loadPrefsError": "加载偏好失败：{{message}}",
+    "quietTimeFormatError": "静默时段格式错误，需为 HH:MM",
+    "saved": "已保存",
+    "saveError": "保存失败：{{message}}"
+  },
+  "systemai": {
+    "loadError": "加载配置失败",
+    "secretSavedDiscovering": "密钥已保存，正在自动发现模型...",
+    "secretAutoSaveFailed": "密钥自动保存失败",
+    "modelsDiscovered": "已自动发现 {{count}} 个模型",
+    "configSaved": "配置已保存",
+    "secretCleared": "密钥已删除，厂商配置已恢复默认初始化",
+    "validationPassed": "验证通过：发现 {{count}} 个模型",
+    "autoValidationFailed": "自动验证失败",
+    "validationFailed": "验证失败",
+    "validationNeedsKey": "验证失败：当前厂商通常需要 API Key。请先填写并保存密钥，再重试验证连接。",
+    "modelFetchFailed": "拉取模型失败",
+    "providerNotSupported": "此厂商不支持自助模型发现，请手动填写",
+    "baseUrlRequired": "请先填写 Base URL（模型服务地址）。",
+    "baseUrlInvalid": "Base URL 格式无效：请填写完整地址，例如 https://model.myfxlogs.org 或 https://model.myfxlogs.org/v1",
+    "freeTierExhausted": "免费额度已耗尽：请在厂商控制台关闭「仅使用免费档」或更换付费 Key。",
+    "quotaExhausted": "配额受限或被限流：厂商已拒绝调用，请检查计费/速率限制或稍后重试。",
+    "quota403": "调用被拒（配额受限）：请检查厂商控制台的计费/配额状态。",
+    "unauthorized": "鉴权失败：请检查 API Key/Secret 是否正确。",
+    "endpointNotFound": "模型端点不存在：请确认 Base URL 与服务协议匹配（部分服务需要 /v1）。",
+    "timeout": "请求超时：请检查网络连通性或稍后重试。",
+    "unreachable": "无法连接到模型服务：请检查 Base URL、网络或网关。",
+    "invalidModels": "模型服务返回格式不兼容 /models 协议。",
+    "noModelsReturned": "模型服务未返回可用模型，请检查账号权限或服务配置。",
+    "defaultFetchError": "拉取模型失败，请检查 Base URL 与密钥配置。"
+  },
+  "devices": {
+    "deleteConfirm": "确认删除该设备信息？",
+    "deleteFailed": "删除失败"
+  },
+  "strategies": {
+    "backtestComplete": "回测完成! 总收益: {{pnl}}%"
+  },
+  "ai": {
+    "loadProviderError": "加载 AI 提供商失败：{{message}}"
   }
 }

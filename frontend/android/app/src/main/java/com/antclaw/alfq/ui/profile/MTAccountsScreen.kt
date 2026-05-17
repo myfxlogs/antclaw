@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import java.util.Locale
 import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.theme.BullGreen
 
@@ -29,7 +30,7 @@ fun MTAccountsScreen(
             TextButton(onClick = onBack) { Text(stringResource(R.string.common_back)) }
             Text(stringResource(R.string.mt_title), style = MaterialTheme.typography.titleLarge)
             TextButton(onClick = onBindClick) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.a11y_bind_account), modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(stringResource(R.string.mt_bind_new))
             }
@@ -49,7 +50,7 @@ fun MTAccountsScreen(
                     Text(stringResource(R.string.mt_empty_title), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = onBindClick) {
-                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.a11y_bind_account), modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(stringResource(R.string.mt_empty_action))
                     }
@@ -77,7 +78,7 @@ fun MtAccountCard(account: MtAccountItem, onRemove: () -> Unit) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("[${account.type}] ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.mt_account_type_prefix, account.type), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         Text("${account.label.ifEmpty { account.server }} #${account.account}", style = MaterialTheme.typography.titleSmall)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
@@ -92,8 +93,8 @@ fun MtAccountCard(account: MtAccountItem, onRemove: () -> Unit) {
             if (account.balance > 0 || account.equity > 0) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    AccountStat(stringResource(R.string.mt_balance), "$${String.format("%.0f", account.balance)}")
-                    AccountStat(stringResource(R.string.mt_equity), "$${String.format("%.0f", account.equity)}")
+                    AccountStat(stringResource(R.string.mt_balance), "$${String.format(Locale.ROOT, "%.0f", account.balance)}")
+                    AccountStat(stringResource(R.string.mt_equity), "$${String.format(Locale.ROOT, "%.0f", account.equity)}")
                     AccountStat(stringResource(R.string.mt_server), account.server)
                 }
             }

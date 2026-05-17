@@ -18,22 +18,26 @@ import com.antclaw.alfq.ui.theme.SpacingMd
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostScreen(viewModel: PostViewModel = hiltViewModel(), onClose: () -> Unit = {}) {
+fun PostScreen(
+    viewModel: PostViewModel = hiltViewModel(),
+    onClose: () -> Unit = {},
+    onPostCreated: () -> Unit = {},
+) {
     var content by remember { mutableStateOf("") }
     var signalPair by remember { mutableStateOf("") }
     var visibility by remember { mutableStateOf("public") }
 
     val postState by viewModel.postState.collectAsState()
     val isLoading = postState is PostState.Loading
-    val errorMessage = (postState as? PostState.Error)?.message
+    val appError = (postState as? PostState.Error)?.error
 
-    // 成功后清空输入
+    // 发布成功后：清空输入并通过回调通知父级（导航回 Feed）
     LaunchedEffect(postState) {
         if (postState is PostState.Success) {
             content = ""
             signalPair = ""
-            kotlinx.coroutines.delay(2000)
             viewModel.reset()
+            onPostCreated()
         }
     }
 
@@ -103,28 +107,36 @@ fun PostScreen(viewModel: PostViewModel = hiltViewModel(), onClose: () -> Unit =
                 }
             }
             Spacer(modifier = Modifier.height(SpacingMd))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                // 公开 / 关注者 — 可用
                 listOf(
-                    "public" to stringResource(R.string.post_visibility_public),
-                    "followers" to stringResource(R.string.post_visibility_followers),
-                    "circle" to stringResource(R.string.post_visibility_circle)
-                ).forEach { (v, label) ->
+                    "public" to R.string.post_visibility_public,
+                    "followers" to R.string.post_visibility_followers,
+                ).forEach { (v, resId) ->
                     FilterChip(
                         selected = visibility == v,
                         onClick = { visibility = v },
-                        label = { Text(label) }
+                        label = { Text(stringResource(resId)) },
                     )
                 }
+                // 圈子 — 后端未实现，前端禁用入口
+                FilterChip(
+                    selected = false,
+                    onClick = {},
+                    enabled = false,
+                    label = { Text(stringResource(R.string.post_visibility_circle)) },
+                )
+                Text(
+                    text = stringResource(R.string.post_visibility_unavailable),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                )
             }
 
             Spacer(modifier = Modifier.height(SpacingMd))
 
-            if (postState is PostState.Success) {
-                Text(stringResource(R.string.post_success), color = MaterialTheme.colorScheme.primary)
-            }
-
-            if (errorMessage != null) {
-                Text(errorMessage, color = MaterialTheme.colorScheme.error)
+            if (appError != null) {
+                Text(stringResource(appError.userMessageRes), color = MaterialTheme.colorScheme.error)
                 TextButton(onClick = { viewModel.retry() }) {
                     Text(stringResource(R.string.common_retry))
                 }

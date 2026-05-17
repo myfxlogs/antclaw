@@ -2,6 +2,8 @@ package com.antclaw.alfq.ui.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.antclaw.alfq.R
+import com.antclaw.alfq.data.error.toAppError
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.ui.social.CommentUi
 import com.antclaw.alfq.ui.social.UiEvent
@@ -33,7 +35,7 @@ class PostDetailViewModel @Inject constructor(
                 val post = repository.getPost(postId)
                 _state.update { it.copy(post = post, isLoading = false) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Failed to load post", isLoading = false) }
+                _state.update { it.copy(error = e.toAppError(), isLoading = false) }
             }
             loadComments(postId)
         }
@@ -49,7 +51,7 @@ class PostDetailViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 android.util.Log.e("PostDetail", "Load comments failed: ${e.message}", e)
-                _state.update { it.copy(commentError = e.message, isLoadingComments = false) }
+                _state.update { it.copy(commentError = e.toAppError(), isLoadingComments = false) }
             }
         }
     }
@@ -73,7 +75,7 @@ class PostDetailViewModel @Inject constructor(
             } catch (e: Exception) {
                 android.util.Log.e("PostDetail", "Append comments failed: ${e.message}", e)
                 _state.update { it.copy(isAppendingComments = false) }
-                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "加载更多评论失败"))
+                _uiEvent.emit(if (e.message != null) UiEvent.Snackbar(e.message!!) else UiEvent.SnackbarRes(R.string.snackbar_load_more_failed))
             }
         }
     }
@@ -98,7 +100,7 @@ class PostDetailViewModel @Inject constructor(
             } catch (e: Exception) {
                 android.util.Log.e("PostDetail", "Like/unlike failed: ${e.message}", e)
                 _state.update { it.copy(post = post) }
-                _uiEvent.emit(UiEvent.Snackbar("操作失败，已回滚"))
+                _uiEvent.emit(UiEvent.SnackbarRes(R.string.snackbar_action_rollback))
             }
         }
     }
@@ -112,7 +114,7 @@ class PostDetailViewModel @Inject constructor(
             } catch (e: Exception) {
                 android.util.Log.e("PostDetail", "Share failed: ${e.message}", e)
                 _state.update { it.copy(post = post) }
-                _uiEvent.emit(UiEvent.Snackbar("分享失败"))
+                _uiEvent.emit(UiEvent.SnackbarRes(R.string.snackbar_share_failed))
             }
         }
     }
@@ -130,7 +132,7 @@ class PostDetailViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 android.util.Log.e("PostDetail", "Send comment failed: ${e.message}", e)
-                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "评论失败"))
+                _uiEvent.emit(if (e.message != null) UiEvent.Snackbar(e.message!!) else UiEvent.SnackbarRes(R.string.snackbar_comment_failed))
             }
         }
     }

@@ -61,11 +61,13 @@ func registerHandlers(mux *http.ServeMux, inf *Infra, svc *Services, boot time.T
 	mux.Handle(antclawv1connect.NewDataSourceServiceHandler(rpc.NewDataSourceConnectHandler(svc.DataSource), adminInt))
 	mux.Handle(antclawv1connect.NewAdminDataServiceHandler(rpc.NewAdminDataConnectHandler(pg), adminInt))
 
-	// ── Auth-required social ──
+	// ── Social services: mixed public/read and auth-required/write ──
+	// See docs/安卓客户端技术文档包/12-服务端社交板块整改落地指南.md §S12-P0-06
 	mux.Handle(antclawv1connect.NewFeedServiceHandler(rpc.NewFeedHandler(svc.Feed)))
 	mux.Handle(antclawv1connect.NewTraderServiceHandler(rpc.NewTraderHandler(svc.Trader)))
 	mux.Handle(antclawv1connect.NewChatServiceHandler(rpc.NewChatHandler(pg)))
-	mux.Handle(antclawv1connect.NewCircleServiceHandler(rpc.NewCircleHandler(pg)))
+	// CircleService disabled — circle publishing is not yet supported.
+	// mux.Handle(antclawv1connect.NewCircleServiceHandler(rpc.NewCircleHandler(pg)))
 	mux.Handle(antclawv1connect.NewMarketplaceServiceHandler(rpc.NewMarketplaceHandler(pg)))
 	mux.Handle(antclawv1connect.NewSearchServiceHandler(rpc.NewSearchHandler(svc.Search)))
 	mux.Handle(antclawv1connect.NewTrendServiceHandler(rpc.NewTrendHandler(svc.Trend)))

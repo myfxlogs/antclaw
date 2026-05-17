@@ -93,7 +93,7 @@ fun ConsentSection(onConsentGranted: () -> Unit) {
         ) {
             Icon(
                 Icons.Default.Info,
-                contentDescription = "Info",
+                contentDescription = stringResource(R.string.device_title),
                 modifier = Modifier.size(48.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -175,7 +175,7 @@ fun EmptyState(onCollect: () -> Unit) {
     ) {
         Icon(
             Icons.Default.Info,
-            contentDescription = "Devices",
+            contentDescription = stringResource(R.string.device_title),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
         )
@@ -203,75 +203,75 @@ fun DeviceInfoContent(deviceInfo: com.antclaw.alfq.data.device.DeviceInfo) {
     ) {
         // Device Card
         DeviceCard(
-            title = "Device",
+            title = stringResource(R.string.device_label_device),
             icon = Icons.Default.Phone,
             items = listOf(
-                "Manufacturer" to deviceInfo.manufacturer,
-                "Model" to deviceInfo.model,
-                "Brand" to deviceInfo.brand,
-                "Type" to deviceInfo.deviceType.name
+                stringResource(R.string.device_label_manufacturer) to deviceInfo.manufacturer,
+                stringResource(R.string.device_label_model) to deviceInfo.model,
+                stringResource(R.string.device_label_brand) to deviceInfo.brand,
+                stringResource(R.string.device_label_device_type) to deviceInfo.deviceType.name
             )
         )
 
         // OS Card
         DeviceCard(
-            title = "Operating System",
+            title = stringResource(R.string.device_label_os),
             icon = Icons.Default.Build,
             items = listOf(
-                "Version" to deviceInfo.osVersion,
-                "API Level" to deviceInfo.apiLevel.toString(),
-                "Security Patch" to deviceInfo.securityPatch
+                stringResource(R.string.device_label_version) to deviceInfo.osVersion,
+                stringResource(R.string.device_label_api_level) to deviceInfo.apiLevel.toString(),
+                stringResource(R.string.device_label_security_patch) to deviceInfo.securityPatch
             )
         )
 
         // Screen Card
         DeviceCard(
-            title = "Screen",
+            title = stringResource(R.string.device_label_screen),
             icon = Icons.Default.Star,
             items = listOf(
-                "Resolution" to "${deviceInfo.screenWidth} x ${deviceInfo.screenHeight}",
-                "Density" to "${deviceInfo.densityDpi} dpi"
+                stringResource(R.string.device_label_resolution) to "${deviceInfo.screenWidth} x ${deviceInfo.screenHeight}",
+                stringResource(R.string.device_label_density) to "${deviceInfo.densityDpi} dpi"
             )
         )
 
         // Network Card
         DeviceCard(
-            title = "Network",
+            title = stringResource(R.string.device_label_network),
             icon = Icons.Default.Settings,
             items = listOf(
-                "Type" to deviceInfo.networkType.name
+                stringResource(R.string.device_label_network_type) to deviceInfo.networkType.name
             )
         )
 
         // Battery Card
         DeviceCard(
-            title = "Battery",
+            title = stringResource(R.string.device_label_battery),
             icon = Icons.Default.Star,
             items = listOf(
-                "Level" to "${deviceInfo.batteryLevel}%",
-                "Charging" to if (deviceInfo.isCharging) "Yes" else "No"
+                stringResource(R.string.device_label_battery_level) to "${deviceInfo.batteryLevel}%",
+                stringResource(R.string.device_label_charging) to if (deviceInfo.isCharging) stringResource(R.string.device_label_yes) else stringResource(R.string.device_label_no)
             )
         )
 
         // App Card
         DeviceCard(
-            title = "Application",
+            title = stringResource(R.string.device_label_application),
             icon = Icons.Default.Star,
             items = listOf(
-                "Version" to deviceInfo.appVersionName,
-                "Version Code" to deviceInfo.appVersionCode.toString(),
-                "Package" to deviceInfo.packageName
+                stringResource(R.string.device_label_version) to deviceInfo.appVersionName,
+                stringResource(R.string.device_label_version_code) to deviceInfo.appVersionCode.toString(),
+                stringResource(R.string.device_label_package) to deviceInfo.packageName
             )
         )
 
         // System Card
         DeviceCard(
-            title = "System",
+            title = stringResource(R.string.device_label_system),
             icon = Icons.Default.Settings,
             items = listOf(
-                "Timezone" to deviceInfo.timezone,
-                "Locale" to deviceInfo.locale,
-                "Emulator" to if (deviceInfo.isEmulator) "Yes" else "No"
+                stringResource(R.string.device_label_timezone) to deviceInfo.timezone,
+                stringResource(R.string.device_label_locale) to deviceInfo.locale,
+                stringResource(R.string.device_label_emulator) to if (deviceInfo.isEmulator) stringResource(R.string.device_label_yes) else stringResource(R.string.device_label_no)
             )
         )
     }

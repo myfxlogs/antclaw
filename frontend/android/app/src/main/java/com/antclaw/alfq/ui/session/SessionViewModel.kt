@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antclaw.alfq.data.local.TokenStoreApi
 import com.antclaw.alfq.data.repository.DeviceReportApi
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+import com.antclaw.alfq.data.rpc.TokenManager
 import com.antclaw.alfq.data.session.SessionExpiredNotifier
 import com.antclaw.alfq.data.sse.SseClient
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +35,7 @@ sealed class SessionEvent {
 @HiltViewModel
 class SessionViewModel @Inject constructor(
     private val tokenStore: TokenStoreApi,
+    private val tokenManager: TokenManager,
     private val sseClient: SseClient,
     private val sessionNotifier: SessionExpiredNotifier,
     private val deviceReportApi: DeviceReportApi,
@@ -66,7 +67,7 @@ class SessionViewModel @Inject constructor(
                 setSession(SessionState.UNAUTHENTICATED)
             }
         }
-        ConnectTransportProvider.init(tokenStore, sessionNotifier)
+        tokenManager.restore(sessionNotifier)
     }
 
     fun onLoginSuccess(userId: String, accessToken: String, refreshToken: String, displayName: String = "") {
@@ -74,7 +75,7 @@ class SessionViewModel @Inject constructor(
             tokenStore.saveAccessToken(accessToken)
             tokenStore.saveRefreshToken(refreshToken)
             tokenStore.saveUserId(userId)
-            ConnectTransportProvider.setToken(accessToken)
+            tokenManager.setToken(accessToken)
             setSession(SessionState.AUTHENTICATED, userId, displayName)
             sseClient.connect()
             // 异步上报设备详情 — 失败不阻断登录
@@ -124,7 +125,7 @@ class SessionViewModel @Inject constructor(
 
     private suspend fun clearSession() {
         tokenStore.clearTokens()
-        ConnectTransportProvider.clearToken()
+        tokenManager.clearToken()
         sseClient.disconnect()
     }
 }

@@ -1,10 +1,15 @@
 package com.antclaw.alfq
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.antclaw.alfq.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -35,8 +40,10 @@ import com.antclaw.alfq.ui.settings.LanguagePickerScreen
 import com.antclaw.alfq.ui.device.DeviceInfoScreen
 import com.antclaw.alfq.ui.debug.SseDebugScreen
 import com.antclaw.alfq.ui.mt.BindMtAccountScreen
+import com.antclaw.alfq.ui.session.SessionEvent
 import com.antclaw.alfq.ui.session.SessionState
 import com.antclaw.alfq.ui.session.SessionViewModel
+import com.antclaw.alfq.ui.session.SplashLoadingScreen
 import com.antclaw.alfq.ui.theme.AlfQTheme
 import com.antclaw.alfq.navigation.BottomNavBar
 
@@ -48,23 +55,46 @@ private const val DEFAULT_USER_ID = "me"
 fun AlfQApp() {
     val sessionVm: SessionViewModel = hiltViewModel()
     val session by sessionVm.session.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 监听 SessionEvent（过期 / 登出）
+    val expiredMessage = stringResource(R.string.session_expired_message)
+    LaunchedEffect(Unit) {
+        sessionVm.events.collect { event ->
+            when (event) {
+                is SessionEvent.RequireLogin -> {
+                    snackbarHostState.showSnackbar(message = expiredMessage)
+                }
+                is SessionEvent.LoggedOut -> { /* UI 自动切换到登录页 */ }
+            }
+        }
+    }
 
     AlfQTheme(darkTheme = isSystemInDarkTheme()) {
-        when (session.state) {
-            SessionState.AUTHENTICATED -> MainContent(
-                onLogout = { sessionVm.logout() },
-                sessionVm = sessionVm,
-            )
-            else -> AuthContent(
-                onLoginSuccess = { result ->
-                    sessionVm.onLoginSuccess(
-                        userId = result.userId,
-                        accessToken = result.accessToken,
-                        refreshToken = result.refreshToken,
-                        displayName = result.displayName,
+        Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
+            Box(modifier = Modifier.padding(padding)) {
+                when (session.state) {
+                    SessionState.UNKNOWN -> {
+                        // 启动恢复中：只展示品牌加载页，不渲染任何业务导航
+                        SplashLoadingScreen()
+                    }
+                    SessionState.AUTHENTICATED -> MainContent(
+                        onLogout = { sessionVm.logout() },
+                        sessionVm = sessionVm,
                     )
-                },
-            )
+                    SessionState.UNAUTHENTICATED,
+                    SessionState.EXPIRED -> AuthContent(
+                        onLoginSuccess = { result ->
+                            sessionVm.onLoginSuccess(
+                                userId = result.userId,
+                                accessToken = result.accessToken,
+                                refreshToken = result.refreshToken,
+                                displayName = result.displayName,
+                            )
+                        },
+                    )
+                }
+            }
         }
     }
 }
@@ -139,7 +169,16 @@ fun MainContent(onLogout: () -> Unit, sessionVm: SessionViewModel) {
                 val postId = backStackEntry.arguments?.getString("postId") ?: ""
                 PostDetailScreen(postId = postId, onBack = { navController.popBackStack() })
             }
-            composable("post") { PostScreen(onClose = { navController.popBackStack() }) }
+            composable("post") {
+                PostScreen(
+                    onClose = { navController.popBackStack() },
+                    onPostCreated = {
+                        navController.navigate("feed") {
+                            popUpTo("feed") { inclusive = true }
+                        }
+                    },
+                )
+            }
             composable("me") {
                 ProfileScreen(
                     userId = session.userId.ifEmpty { "me" },

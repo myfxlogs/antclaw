@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Smartphone, Search, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { listDevices, deleteDevice, type DeviceInfo } from '../lib/api'
 
 export default function Devices() {
+  const { t } = useTranslation()
   const [devices, setDevices] = useState<DeviceInfo[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [osFilter, setOsFilter] = useState('')
 
   const handleDelete = async (deviceId: string) => {
-    if (!confirm('确认删除该设备信息？')) return
-    try { await deleteDevice(deviceId); refresh() } catch { alert('删除失败') }
+    if (!confirm(t('devices.deleteConfirm'))) return
+    try { await deleteDevice(deviceId); refresh() } catch { alert(t('devices.deleteFailed')) }
   }
   const refresh = () => {
     listDevices({ osTypeFilter: osFilter }).then(d => { setDevices(d.devices); setTotal(d.total) })

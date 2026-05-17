@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/gen/go/antclaw/v1/antclawv1connect"
+	"github.com/antclaw/antclaw/internal/infra/postgres"
 )
 
 type ChatHandler struct{ pool *pgxpool.Pool }
@@ -17,7 +18,7 @@ func NewChatHandler(pool *pgxpool.Pool) *ChatHandler { return &ChatHandler{pool:
 func (h *ChatHandler) SendMessage(ctx context.Context, req *connect.Request[alfqv1.SendMessageRequest]) (*connect.Response[alfqv1.Message], error) {
 	uid := userIDFromHTTP(ctx, req)
 	var name string
-	h.pool.QueryRow(ctx, "SELECT COALESCE(display_name, email) FROM users WHERE id=$1", uid).Scan(&name)
+	h.pool.QueryRow(ctx, "SELECT "+postgres.PublicDisplayNameExpr+" FROM users WHERE id=$1", uid).Scan(&name)
 	r := req.Msg
 	m := &alfqv1.Message{SenderId: uid, SenderName: name, Content: r.Content, MessageType: r.MessageType, SignalData: r.SignalData, ConversationId: r.ConversationId}
 	var ts time.Time

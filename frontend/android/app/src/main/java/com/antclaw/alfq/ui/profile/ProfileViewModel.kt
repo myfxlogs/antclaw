@@ -1,13 +1,15 @@
 package com.antclaw.alfq.ui.profile
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.antclaw.alfq.R
 import com.antclaw.alfq.data.repository.ProfileRepository
 import com.antclaw.alfq.data.repository.SocialRepository
-import com.antclaw.alfq.ui.feed.AsyncPhase
 import com.antclaw.alfq.ui.social.PostUi
 import com.antclaw.alfq.ui.social.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -31,7 +33,7 @@ data class ProfileUiState(
     val currentTab: ProfileTab = ProfileTab.POSTS,
     // Posts tab
     val posts: List<PostUi> = emptyList(),
-    val postsPhase: AsyncPhase = AsyncPhase.Idle,
+    val postsLoading: Boolean = false,
     val postsError: String? = null,
 )
 
@@ -39,6 +41,7 @@ data class ProfileUiState(
 class ProfileViewModel @Inject constructor(
     private val profileRepo: ProfileRepository,
     private val socialRepo: SocialRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
     private var currentUserId = ""
 
@@ -62,21 +65,21 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(loading = false, error = e.message ?: "加载失败") }
+                _uiState.update { it.copy(loading = false, error = e.message ?: appContext.getString(R.string.common_error)) }
             }
         }
         loadPosts()
     }
 
     fun loadPosts() {
-        if (_uiState.value.postsPhase == AsyncPhase.Loading) return
-        _uiState.update { it.copy(postsPhase = AsyncPhase.Loading, postsError = null) }
+        if (_uiState.value.postsLoading) return
+        _uiState.update { it.copy(postsLoading = true, postsError = null) }
         viewModelScope.launch {
             try {
                 val (posts, _) = socialRepo.listUserPosts(currentUserId)
-                _uiState.update { it.copy(posts = posts, postsPhase = AsyncPhase.Idle) }
+                _uiState.update { it.copy(posts = posts, postsLoading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(postsPhase = AsyncPhase.Idle, postsError = e.message ?: "加载帖子失败") }
+                _uiState.update { it.copy(postsLoading = false, postsError = e.message ?: appContext.getString(R.string.snackbar_posts_load_failed)) }
             }
         }
     }
@@ -101,7 +104,7 @@ class ProfileViewModel @Inject constructor(
                 _uiState.update { it.copy(isFollowing = !previous.isFollowing, followerCount = fc, isFollowLoading = false) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isFollowing = previous.isFollowing, followerCount = previous.followerCount, isFollowLoading = false) }
-                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "关注操作失败，已回滚"))
+                _uiEvent.emit(if (e.message != null) UiEvent.Snackbar(e.message!!) else UiEvent.SnackbarRes(R.string.snackbar_follow_failed))
             }
         }
     }

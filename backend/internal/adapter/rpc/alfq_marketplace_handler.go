@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/gen/go/antclaw/v1/antclawv1connect"
+	"github.com/antclaw/antclaw/internal/infra/postgres"
 )
 
 type MarketplaceHandler struct{ pool *pgxpool.Pool }
@@ -35,7 +36,7 @@ func (h *MarketplaceHandler) ListProducts(ctx context.Context, req *connect.Requ
 func (h *MarketplaceHandler) PublishProduct(ctx context.Context, req *connect.Request[alfqv1.PublishProductRequest]) (*connect.Response[alfqv1.Product], error) {
 	uid := userIDFromHTTP(ctx, req)
 	var name string
-	h.pool.QueryRow(ctx, "SELECT COALESCE(display_name, email) FROM users WHERE id=$1", uid).Scan(&name)
+	h.pool.QueryRow(ctx, "SELECT "+postgres.PublicDisplayNameExpr+" FROM users WHERE id=$1", uid).Scan(&name)
 	r := req.Msg
 	p := &alfqv1.Product{AuthorId: uid, AuthorName: name, Name: r.Name, Category: r.Category, Description: r.Description, Symbol: r.Symbol, PurchaseType: r.PurchaseType, Price: r.Price, TrialDays: r.TrialDays}
 	var ts time.Time

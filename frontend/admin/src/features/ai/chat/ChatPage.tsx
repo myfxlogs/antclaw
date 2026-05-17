@@ -5,6 +5,7 @@
 //   - 顶部展示当前选中的 provider/model
 //   - 每条 AI 回复显示本轮 prompt/completion/total token 与累计消耗
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { create } from '@bufbuild/protobuf'
 import { createClient } from '@connectrpc/connect'
 import { AIService, RunWithToolsRequestSchema } from '@antclaw/proto/antclaw/v1/ai_pb'
@@ -37,6 +38,7 @@ interface ProviderOption {
 }
 
 export default function ChatPage() {
+  const { t } = useTranslation()
   const [userId] = useState<string>(() => localStorage.getItem('user_id') || 'admin')
   const [threadId, setThreadId] = useState<string>('')
   const [input, setInput] = useState('')
@@ -75,7 +77,7 @@ export default function ChatPage() {
           setModel(pickFirst.defaultModel || (pickFirst.models?.[0] ?? ''))
         }
       })
-      .catch((e) => setErr(`加载 AI 提供商失败：${e?.message || e}`))
+      .catch((e) => setErr(t('ai.loadProviderError', { message: e?.message || String(e) })))
     return () => {
       alive = false
     }

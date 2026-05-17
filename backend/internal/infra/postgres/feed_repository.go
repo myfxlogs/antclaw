@@ -73,9 +73,9 @@ func NewFeedRepository(pool *pgxpool.Pool) FeedRepository { return &feedRepo{poo
 
 const feedSelectColumns = `p.id, p.author_id, p.author_name, p.content, p.post_type,
 	p.signal_pair, p.signal_direction, p.signal_confidence, p.visibility, p.circle_id,
-	(SELECT COUNT(*) FROM alfq_likes WHERE post_id = p.id)::int4 AS like_count,
-	(SELECT COUNT(*) FROM alfq_comments WHERE post_id = p.id)::int4 AS comment_count,
-	(SELECT COUNT(*) FROM alfq_posts WHERE original_post_id = p.id AND post_type = 'share')::int4 AS share_count,
+	COALESCE(s.like_count, 0)::int4 AS like_count,
+	COALESCE(s.comment_count, 0)::int4 AS comment_count,
+	COALESCE(s.share_count, 0)::int4 AS share_count,
 	p.created_at, p.original_post_id`
 
 // feedInsertReturningColumns is used for INSERT RETURNING (no table alias allowed).
@@ -186,7 +186,7 @@ func (r *feedRepo) loadLikedByBatch(ctx context.Context, posts []*FeedPostRow, c
 // ----- Post CRUD -----
 
 func (r *feedRepo) CreatePost(ctx context.Context, row *FeedPostRow) (*FeedPostRow, error) {
-	return scanFeedPost(r.pool.QueryRow(ctx, `
+	result, err := scanFeedPost(r.pool.QueryRow(ctx, `
 		INSERT INTO alfq_posts (author_id, author_name, content, post_type,
 			signal_pair, signal_direction, signal_confidence, visibility, circle_id, original_post_id)
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
@@ -194,11 +194,22 @@ func (r *feedRepo) CreatePost(ctx context.Context, row *FeedPostRow) (*FeedPostR
 		row.AuthorID, row.AuthorName, row.Content, row.PostType,
 		row.SignalPair, row.SignalDirection, row.SignalConfidence, row.Visibility, row.CircleID, row.OriginalPostID,
 	))
+	if err != nil {
+		return nil, err
+	}
+	// S12-P1-01: if this is a share, increment share_count of the original post
+	if row.OriginalPostID != nil && row.PostType == "share" {
+		_, _ = r.pool.Exec(ctx,
+			`INSERT INTO alfq_post_stats (post_id, share_count) VALUES ($1, 1)
+			 ON CONFLICT (post_id) DO UPDATE SET share_count = alfq_post_stats.share_count + 1, updated_at = NOW()`,
+			*row.OriginalPostID)
+	}
+	return result, nil
 }
 
 func (r *feedRepo) GetPost(ctx context.Context, postID string, currentUserID string) (*FeedPostRow, []string, error) {
 	row, err := scanFeedPost(r.pool.QueryRow(ctx,
-		`SELECT `+feedSelectColumns+` FROM alfq_posts p WHERE p.id = $1`, postID))
+		`SELECT `+feedSelectColumns+` FROM alfq_posts p LEFT JOIN alfq_post_stats s ON s.post_id = p.id WHERE p.id = $1`, postID))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -218,7 +229,7 @@ func (r *feedRepo) GetPost(ctx context.Context, postID string, currentUserID str
 func (r *feedRepo) GetUserName(ctx context.Context, userID string) (string, error) {
 	var name string
 	err := r.pool.QueryRow(ctx,
-		`SELECT COALESCE(display_name, email) FROM users WHERE id=$1`, userID).Scan(&name)
+		`SELECT `+PublicDisplayNameExpr+` FROM users WHERE id=$1`, userID).Scan(&name)
 	return name, err
 }
 
@@ -262,7 +273,7 @@ func (r *feedRepo) CheckPostVisibility(ctx context.Context, postID, currentUserI
 
 func (r *feedRepo) GetFeed(ctx context.Context, filter string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error) {
 	args := []interface{}{limit + 1}
-	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p WHERE p.visibility = 'public'`
+	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p LEFT JOIN alfq_post_stats s ON s.post_id = p.id WHERE p.visibility = 'public'`
 	query = appendFeedFilter(query, filter)
 	query, args = AppendCursor(query, args, cursor, "p.created_at, p.id", CursorDesc, 2)
 	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT $1`
@@ -271,9 +282,9 @@ func (r *feedRepo) GetFeed(ctx context.Context, filter string, cursor *SocialCur
 
 func (r *feedRepo) GetFollowingFeed(ctx context.Context, userID string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error) {
 	args := []interface{}{limit + 1, userID}
-	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p
+	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p LEFT JOIN alfq_post_stats s ON s.post_id = p.id
 		WHERE p.author_id IN (SELECT following_id FROM alfq_follows WHERE follower_id = $2)
-		  AND p.visibility = 'public'`
+		  AND (p.visibility = 'public' OR p.visibility = 'followers')`
 	query, args = AppendCursor(query, args, cursor, "p.created_at, p.id", CursorDesc, 2)
 	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT $1`
 	return r.executePaginatedFeed(ctx, query, args, limit, currentUserID)
@@ -282,7 +293,7 @@ func (r *feedRepo) GetFollowingFeed(ctx context.Context, userID string, cursor *
 func (r *feedRepo) ListUserPosts(ctx context.Context, userID, filter string, cursor *SocialCursor, limit int32, currentUserID string) ([]*FeedPostRow, [][]string, *SocialCursor, error) {
 	args := []interface{}{limit + 1, userID}
 	base := 3
-	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p WHERE p.author_id = $2`
+	query := `SELECT ` + feedSelectColumns + ` FROM alfq_posts p LEFT JOIN alfq_post_stats s ON s.post_id = p.id WHERE p.author_id = $2`
 	// Visibility: author sees all; authenticated visitors see public + followers(if following); unauthenticated see only public.
 	if currentUserID == "" {
 		query += ` AND p.visibility = 'public'`
@@ -302,13 +313,26 @@ func (r *feedRepo) ListUserPosts(ctx context.Context, userID, filter string, cur
 func (r *feedRepo) LikePost(ctx context.Context, postID, userID string) error {
 	_, err := r.pool.Exec(ctx,
 		`INSERT INTO alfq_likes (post_id, user_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`, postID, userID)
-	return err
+	if err != nil {
+		return err
+	}
+	_, _ = r.pool.Exec(ctx,
+		`INSERT INTO alfq_post_stats (post_id, like_count) VALUES ($1, 1)
+		 ON CONFLICT (post_id) DO UPDATE SET like_count = alfq_post_stats.like_count + 1, updated_at = NOW()`,
+		postID)
+	return nil
 }
 
 func (r *feedRepo) UnlikePost(ctx context.Context, postID, userID string) error {
 	_, err := r.pool.Exec(ctx,
 		`DELETE FROM alfq_likes WHERE post_id=$1 AND user_id=$2`, postID, userID)
-	return err
+	if err != nil {
+		return err
+	}
+	_, _ = r.pool.Exec(ctx,
+		`UPDATE alfq_post_stats SET like_count = GREATEST(like_count - 1, 0), updated_at = NOW() WHERE post_id = $1`,
+		postID)
+	return nil
 }
 
 func (r *feedRepo) GetLikedByUser(ctx context.Context, postID, userID string) (bool, error) {
@@ -326,7 +350,15 @@ func (r *feedRepo) CreateComment(ctx context.Context, row *FeedCommentRow) (*Fee
 		VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at`,
 		row.PostID, row.AuthorID, row.AuthorName, row.Content, row.ParentCommentID,
 	).Scan(&row.ID, &row.CreatedAt)
-	return row, err
+	if err != nil {
+		return nil, err
+	}
+	// S12-P1-01: increment comment count in stats table
+	_, _ = r.pool.Exec(ctx,
+		`INSERT INTO alfq_post_stats (post_id, comment_count) VALUES ($1, 1)
+		 ON CONFLICT (post_id) DO UPDATE SET comment_count = alfq_post_stats.comment_count + 1, updated_at = NOW()`,
+		row.PostID)
+	return row, nil
 }
 
 func (r *feedRepo) ListComments(ctx context.Context, postID string, cursor *SocialCursor, limit int32) ([]*FeedCommentRow, *SocialCursor, error) {

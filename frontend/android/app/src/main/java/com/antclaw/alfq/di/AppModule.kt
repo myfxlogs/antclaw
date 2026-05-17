@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.antclaw.alfq.data.local.AppDatabase
 import com.antclaw.alfq.data.local.TokenStore
-import com.antclaw.alfq.data.rpc.ConnectTransportProvider
+import com.antclaw.alfq.data.rpc.ProtocolClientFactory
 import com.connectrpc.ProtocolClientInterface
 import dagger.Module
 import dagger.Provides
@@ -23,7 +23,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideProtocolClient(): ProtocolClientInterface = ConnectTransportProvider.createProtocolClient()
+    fun provideProtocolClient(factory: ProtocolClientFactory): ProtocolClientInterface = factory.create()
 
     @Provides
     @Singleton

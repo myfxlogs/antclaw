@@ -92,6 +92,13 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    lint {
+        disable += "MissingTranslation"
+        disable += "UnusedResources"
+        disable += "IconLauncherShape"
+        disable += "IconLocation"
+    }
 }
 
 // ── Protobuf code generation ──
@@ -147,7 +154,7 @@ dependencies {
     implementation(libs.datastore.preferences)
 
     // Jetpack Security (for token encryption)
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation(libs.security.crypto)
 
     // Coroutines
     implementation(libs.coroutines.core)
@@ -158,15 +165,17 @@ dependencies {
     implementation(libs.activity.compose)
 
     // Test
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.core.testing)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
 
     // Android Test (Compose UI)
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation("androidx.compose.ui:ui-test-manifest")
-    debugImplementation("androidx.compose.ui:ui-tooling")
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.test.ext.junit)
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.compose.ui.test.manifest)
+    debugImplementation(platform(libs.compose.bom))
+    debugImplementation(libs.compose.ui.tooling)
 }

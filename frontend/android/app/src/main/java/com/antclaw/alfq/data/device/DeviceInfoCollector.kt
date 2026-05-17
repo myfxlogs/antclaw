@@ -1,5 +1,6 @@
 package com.antclaw.alfq.data.device
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.BatteryManager
@@ -48,6 +49,7 @@ class DeviceInfoCollector @Inject constructor(
     fun hasConsent(): Boolean = consentGiven
 
     // 设备ID管理
+    @SuppressLint("HardwareIds")
     fun getDeviceId(): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         var deviceId = prefs.getString(KEY_DEVICE_ID, null)
@@ -90,9 +92,7 @@ class DeviceInfoCollector @Inject constructor(
             brand = Build.BRAND,
             osVersion = Build.VERSION.RELEASE,
             apiLevel = Build.VERSION.SDK_INT,
-            securityPatch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Build.VERSION.SECURITY_PATCH
-            } else "unknown",
+            securityPatch = Build.VERSION.SECURITY_PATCH,
             screenWidth = 0,
             screenHeight = 0,
             densityDpi = 0,
@@ -162,36 +162,22 @@ class DeviceInfoCollector @Inject constructor(
             val connectivityManager = 
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
             
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-                when {
-                    capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true -> NetworkType.WIFI
-                    capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) == true -> {
-                        @Suppress("DEPRECATION")
-                        when ((context.getSystemService(Context.TELEPHONY_SERVICE) as android.telephony.TelephonyManager).networkType) {
-                            android.telephony.TelephonyManager.NETWORK_TYPE_LTE -> NetworkType.CELLULAR_4G
-                            android.telephony.TelephonyManager.NETWORK_TYPE_HSDPA,
-                            android.telephony.TelephonyManager.NETWORK_TYPE_HSPA,
-                            android.telephony.TelephonyManager.NETWORK_TYPE_HSPAP,
-                            android.telephony.TelephonyManager.NETWORK_TYPE_UMTS -> NetworkType.CELLULAR_3G
-                            else -> NetworkType.CELLULAR_2G
-                        }
+            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            when {
+                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true -> NetworkType.WIFI
+                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) == true -> {
+                    @Suppress("DEPRECATION")
+                    @SuppressLint("MissingPermission")
+                    when ((context.getSystemService(Context.TELEPHONY_SERVICE) as android.telephony.TelephonyManager).networkType) {
+                        android.telephony.TelephonyManager.NETWORK_TYPE_LTE -> NetworkType.CELLULAR_4G
+                        android.telephony.TelephonyManager.NETWORK_TYPE_HSDPA,
+                        android.telephony.TelephonyManager.NETWORK_TYPE_HSPA,
+                        android.telephony.TelephonyManager.NETWORK_TYPE_HSPAP,
+                        android.telephony.TelephonyManager.NETWORK_TYPE_UMTS -> NetworkType.CELLULAR_3G
+                        else -> NetworkType.CELLULAR_2G
                     }
-                    else -> NetworkType.UNKNOWN
                 }
-            } else {
-                @Suppress("DEPRECATION")
-                when (connectivityManager.activeNetworkInfo?.type) {
-                    android.net.ConnectivityManager.TYPE_WIFI -> NetworkType.WIFI
-                    android.net.ConnectivityManager.TYPE_MOBILE -> {
-                        @Suppress("DEPRECATION")
-                        when (connectivityManager.activeNetworkInfo?.subtype) {
-                            android.telephony.TelephonyManager.NETWORK_TYPE_LTE -> NetworkType.CELLULAR_4G
-                            else -> NetworkType.CELLULAR_3G
-                        }
-                    }
-                    else -> NetworkType.UNKNOWN
-                }
+                else -> NetworkType.UNKNOWN
             }
         } catch (_: Exception) {
             NetworkType.UNKNOWN

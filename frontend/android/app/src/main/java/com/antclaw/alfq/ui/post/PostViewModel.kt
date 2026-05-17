@@ -2,6 +2,8 @@ package com.antclaw.alfq.ui.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.antclaw.alfq.data.error.AppError
+import com.antclaw.alfq.data.error.toAppError
 import com.antclaw.alfq.data.repository.SocialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +24,7 @@ sealed class PostState {
     object Idle : PostState()
     object Loading : PostState()
     object Success : PostState()
-    data class Error(val message: String) : PostState()
+    data class Error(val error: AppError) : PostState()
 }
 
 @HiltViewModel
@@ -38,8 +40,8 @@ class PostViewModel @Inject constructor(
 
     fun post(draft: PostDraft) {
         if (_postState.value is PostState.Loading) return
+        _postState.value = PostState.Loading
         viewModelScope.launch {
-            _postState.value = PostState.Loading
             try {
                 repository.createPost(
                     draft.content, draft.signalPair,
@@ -50,7 +52,7 @@ class PostViewModel @Inject constructor(
                 _postState.value = PostState.Success
             } catch (e: Exception) {
                 lastFailedDraft = draft
-                _postState.value = PostState.Error(e.message ?: "发布失败，请重试")
+                _postState.value = PostState.Error(e.toAppError())
             }
         }
     }

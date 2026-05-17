@@ -109,6 +109,8 @@
     <string name="bind_live">จริง</string>
     <string name="bind_confirm">ยืนยันการผูก</string>
     <string name="bind_binding">กำลังผูก…</string>
+    <string name="bind_step_completed">ขั้นตอนเสร็จสมบูรณ์</string>
+    <string name="bind_server_selected">เลือกเซิร์ฟเวอร์แล้ว</string>
     <string name="alerts_title">การแจ้งเตือนของฉัน</string>
     <string name="alerts_add">+ เพิ่ม</string>
     <string name="alerts_empty">ไม่มีการสมัครรับการแจ้งเตือน</string>
@@ -143,6 +145,9 @@
     <string name="common_loading">กำลังโหลด…</string>
     <string name="common_retry">ลองใหม่</string>
     <string name="common_error">โหลดล้มเหลว</string>
+    <string name="comment_reply">ตอบกลับ</string>
+    <string name="comment_hint">เขียนความคิดเห็น…</string>
+    <string name="mt_account_type_prefix">[%s] </string>
     <string name="common_ok">ตกลง</string>
     <string name="common_cancel">ยกเลิก</string>
 </resources>

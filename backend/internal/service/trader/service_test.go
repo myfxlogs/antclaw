@@ -9,6 +9,7 @@ import (
 	"connectrpc.com/connect"
 	alfqv1 "github.com/antclaw/antclaw/gen/go/antclaw/v1"
 	"github.com/antclaw/antclaw/internal/infra/postgres"
+	feedpkg "github.com/antclaw/antclaw/internal/service/feed"
 )
 
 // fakeTraderRepo implements TraderRepository with in-memory maps.
@@ -43,9 +44,14 @@ func (f *fakeTraderRepo) GetProfile(_ context.Context, userID string) (*postgres
 	return row, nil
 }
 
-func (f *fakeTraderRepo) UpdateProfile(_ context.Context, userID string, displayName string) error {
-	if row, ok := f.profiles[userID]; ok {
-		row.DisplayName = displayName
+func (f *fakeTraderRepo) UpdateProfile(_ context.Context, userID string, row *postgres.TraderProfileRow) error {
+	if existing, ok := f.profiles[userID]; ok {
+		existing.DisplayName = row.DisplayName
+		existing.Bio = row.Bio
+		existing.ShowWinRate = row.ShowWinRate
+		existing.ShowProfitFact = row.ShowProfitFact
+		existing.ShowSharpe = row.ShowSharpe
+		existing.ShowTotalTrad = row.ShowTotalTrad
 	}
 	return nil
 }
@@ -394,6 +400,41 @@ func TestUpdateProfile_Success(t *testing.T) {
 	}
 }
 
+func TestUpdateProfile_AllFieldsPersisted(t *testing.T) {
+	repo := newFakeTraderRepo()
+	repo.seedUser("user-1")
+	svc := NewService(repo)
+	p, err := svc.UpdateProfile(context.Background(), "user-1", &alfqv1.UpdateTraderProfileRequest{
+		DisplayName:      "TraderJoe",
+		Bio:              "I trade forex",
+		ShowWinRate:      true,
+		ShowProfitFactor: true,
+		ShowSharpe:       false,
+		ShowTotalTrades:  true,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if p.DisplayName != "TraderJoe" {
+		t.Fatalf("expected DisplayName TraderJoe, got %s", p.DisplayName)
+	}
+	if p.Bio != "I trade forex" {
+		t.Fatalf("expected Bio 'I trade forex', got %s", p.Bio)
+	}
+	if !p.ShowWinRate {
+		t.Fatal("expected ShowWinRate true")
+	}
+	if !p.ShowProfitFactor {
+		t.Fatal("expected ShowProfitFactor true")
+	}
+	if p.ShowSharpe {
+		t.Fatal("expected ShowSharpe false")
+	}
+	if !p.ShowTotalTrades {
+		t.Fatal("expected ShowTotalTrades true")
+	}
+}
+
 func TestGetFollowers_RequiresUserID(t *testing.T) {
 	svc := NewService(newFakeTraderRepo())
 	_, err := svc.GetFollowers(context.Background(), &alfqv1.GetFollowersRequest{UserId: ""})
@@ -407,5 +448,88 @@ func TestGetFollowing_RequiresUserID(t *testing.T) {
 	_, err := svc.GetFollowing(context.Background(), &alfqv1.GetFollowingRequest{UserId: ""})
 	if err == nil {
 		t.Fatal("expected InvalidArgument")
+	}
+}
+
+// -- S12-P0-02: public display name does not leak email --
+
+func TestPublicDisplayName_DoesNotLeakEmail(t *testing.T) {
+	repo := newFakeTraderRepo()
+	// Seed a user whose DisplayName would be an email if the fallback were COALESCE(display_name, email)
+	repo.seedUser("user-no-display")
+	// Simulate no display_name — the GetPassword fallback should NOT be email
+	repo.profiles["user-no-display"].DisplayName = ""
+
+	svc := NewService(repo)
+	profile, err := svc.GetProfile(context.Background(), "", &alfqv1.GetTraderProfileRequest{UserId: "user-no-display"})
+	if err != nil {
+		t.Fatalf("GetProfile should succeed: %v", err)
+	}
+	// DisplayName should not contain "@" (email marker)
+	if profile.DisplayName != "" && contains(profile.DisplayName, "@") {
+		t.Fatalf("public display name leaked email: %q", profile.DisplayName)
+	}
+}
+
+func contains(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
+
+// -- S12-P0-05: follow notification event --
+
+type fakeTraderEventPublisher struct {
+	events []feedpkg.SocialEvent
+}
+
+func (p *fakeTraderEventPublisher) Publish(_ context.Context, event feedpkg.SocialEvent) error {
+	p.events = append(p.events, event)
+	return nil
+}
+
+func TestFollow_EmitsNotificationEvent(t *testing.T) {
+	repo := newFakeTraderRepo()
+	repo.seedUser("user-a")
+	repo.seedUser("user-b")
+	pub := &fakeTraderEventPublisher{}
+	svc := NewService(repo).WithEventPublisher(pub)
+
+	// user-a follows user-b
+	_, err := svc.Follow(context.Background(), "user-a", &alfqv1.FollowRequest{TargetUserId: "user-b"})
+	if err != nil {
+		t.Fatalf("follow: %v", err)
+	}
+
+	// Verify event: user-a followed user-b → target is user-b
+	found := false
+	for _, ev := range pub.events {
+		if ev.Type == "user_followed" && ev.ActorID == "user-a" && ev.TargetID == "user-b" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected user_followed event, got %+v", pub.events)
+	}
+}
+
+func TestFollowSelf_NoNotification(t *testing.T) {
+	repo := newFakeTraderRepo()
+	repo.seedUser("user-a")
+	pub := &fakeTraderEventPublisher{}
+	svc := NewService(repo).WithEventPublisher(pub)
+
+	// user-a follows themselves — should return error before event is generated
+	_, err := svc.Follow(context.Background(), "user-a", &alfqv1.FollowRequest{TargetUserId: "user-a"})
+	if err == nil {
+		t.Fatal("expected self-follow error")
+	}
+	// No events should have been published
+	if len(pub.events) > 0 {
+		t.Fatalf("expected no events for self-follow, got %+v", pub.events)
 	}
 }

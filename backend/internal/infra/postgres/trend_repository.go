@@ -48,6 +48,37 @@ func windowInterval(window string) string {
 }
 
 func (r *trendRepo) ListTrendingTopics(ctx context.Context, window string, limit int32) ([]*TrendingTopicRow, error) {
+	// S12-P1-03: prefer pre-aggregated table, fall back to real-time
+	rows, err := r.pool.Query(ctx,
+		`SELECT topic, post_count, engagement_count
+		 FROM trend_topics
+		 WHERE window = $1
+		 ORDER BY engagement_count DESC, post_count DESC
+		 LIMIT $2`,
+		window, limit,
+	)
+	if err != nil || rows == nil {
+		// Fall back to real-time computation if pre-agg table not available
+		return r.listTrendingTopicsRealtime(ctx, window, limit)
+	}
+	defer rows.Close()
+
+	var results []*TrendingTopicRow
+	for rows.Next() {
+		t := &TrendingTopicRow{}
+		if err := rows.Scan(&t.Topic, &t.PostCount, &t.EngagementCount); err != nil {
+			return r.listTrendingTopicsRealtime(ctx, window, limit)
+		}
+		results = append(results, t)
+	}
+	if len(results) == 0 {
+		return r.listTrendingTopicsRealtime(ctx, window, limit)
+	}
+	return results, rows.Err()
+}
+
+// listTrendingTopicsRealtime computes trending topics via live scan (fallback).
+func (r *trendRepo) listTrendingTopicsRealtime(ctx context.Context, window string, limit int32) ([]*TrendingTopicRow, error) {
 	iv := windowInterval(window)
 	rows, err := r.pool.Query(ctx,
 		`WITH recent_posts AS (
@@ -90,6 +121,36 @@ func (r *trendRepo) ListTrendingTopics(ctx context.Context, window string, limit
 }
 
 func (r *trendRepo) ListHotSymbols(ctx context.Context, window string, limit int32) ([]*HotSymbolRow, error) {
+	// S12-P1-03: prefer pre-aggregated table, fall back to real-time
+	rows, err := r.pool.Query(ctx,
+		`SELECT symbol, post_count, signal_count, engagement_count
+		 FROM hot_symbols_agg
+		 WHERE window = $1
+		 ORDER BY engagement_count DESC, post_count DESC
+		 LIMIT $2`,
+		window, limit,
+	)
+	if err != nil || rows == nil {
+		return r.listHotSymbolsRealtime(ctx, window, limit)
+	}
+	defer rows.Close()
+
+	var results []*HotSymbolRow
+	for rows.Next() {
+		h := &HotSymbolRow{}
+		if err := rows.Scan(&h.Symbol, &h.PostCount, &h.SignalCount, &h.EngagementCount); err != nil {
+			return r.listHotSymbolsRealtime(ctx, window, limit)
+		}
+		results = append(results, h)
+	}
+	if len(results) == 0 {
+		return r.listHotSymbolsRealtime(ctx, window, limit)
+	}
+	return results, rows.Err()
+}
+
+// listHotSymbolsRealtime computes hot symbols via live scan (fallback).
+func (r *trendRepo) listHotSymbolsRealtime(ctx context.Context, window string, limit int32) ([]*HotSymbolRow, error) {
 	iv := windowInterval(window)
 	rows, err := r.pool.Query(ctx,
 		`WITH recent_posts AS (

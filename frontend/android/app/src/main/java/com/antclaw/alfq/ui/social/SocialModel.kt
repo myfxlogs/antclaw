@@ -72,7 +72,10 @@ data class ChartShareUi(
 // ── One-time UI Events ──
 
 sealed class UiEvent {
+    /** 直接消息文本（旧版，逐步迁移到 SnackbarRes） */
     data class Snackbar(val message: String) : UiEvent()
+    /** 资源 ID 驱动，由 Compose 端 resolve */
+    data class SnackbarRes(val resId: Int) : UiEvent()
     data class Navigate(val route: String) : UiEvent()
 }
 

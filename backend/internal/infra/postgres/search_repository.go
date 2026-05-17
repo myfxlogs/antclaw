@@ -3,9 +3,13 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+// ErrQueryTooShort is returned when a search query is shorter than the minimum length.
+var ErrQueryTooShort = errors.New("search: query must be at least 2 characters")
 
 // SearchUserRow is a flat DB row for user search results.
 type SearchUserRow struct {
@@ -34,11 +38,14 @@ type searchRepo struct{ pool *pgxpool.Pool }
 func NewSearchRepository(pool *pgxpool.Pool) SearchRepository { return &searchRepo{pool: pool} }
 
 func (r *searchRepo) SearchUsers(ctx context.Context, query string, limit int32) ([]*SearchUserRow, error) {
+	if len(query) < 2 {
+		return nil, ErrQueryTooShort
+	}
 	rows, err := r.pool.Query(ctx,
-		`SELECT id::text, COALESCE(display_name, email), 'normal',
+		`SELECT id::text, `+PublicDisplayNameExpr+`, 'normal',
 			(SELECT COUNT(*)::int4 FROM alfq_follows WHERE following_id = users.id)
 		 FROM users
-		 WHERE display_name ILIKE '%' || $1 || '%' OR email ILIKE '%' || $1 || '%'
+		 WHERE display_name ILIKE '%' || $1 || '%'
 		 ORDER BY (SELECT COUNT(*) FROM alfq_follows WHERE following_id = users.id) DESC
 		 LIMIT $2`,
 		query, limit,
@@ -63,9 +70,12 @@ func (r *searchRepo) SearchUsers(ctx context.Context, query string, limit int32)
 }
 
 func (r *searchRepo) SearchPosts(ctx context.Context, query string, limit int32) ([]*FeedPostRow, [][]string, error) {
+	if len(query) < 2 {
+		return nil, nil, ErrQueryTooShort
+	}
 	rows, err := r.pool.Query(ctx,
 		`SELECT `+feedSelectColumns+`
-		 FROM alfq_posts p
+		 FROM alfq_posts p LEFT JOIN alfq_post_stats s ON s.post_id = p.id
 		 WHERE p.visibility = 'public'
 		   AND p.content ILIKE '%' || $1 || '%'
 		 ORDER BY p.created_at DESC, p.id DESC

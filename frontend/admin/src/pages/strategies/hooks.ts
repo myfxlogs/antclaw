@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { disableStrategy, enableStrategy, listStrategies, listStrategyRuns, runStrategy } from '../../lib/api'
+import i18n from '../../lib/i18n'
 import type { RunResult, StrategyItem } from './model'
 
 export function useStrategies() {
@@ -39,7 +40,7 @@ export function useStrategies() {
     setRunningId(id)
     try {
       const result = await runStrategy(id)
-      alert(`回测完成! 总收益: ${(result.metrics?.total_return * 100).toFixed(2)}%`)
+      alert(i18n.t('strategies.backtestComplete', { pnl: (result.metrics?.total_return * 100).toFixed(2) }))
       await load()
     } finally {
       setRunningId(null)

@@ -11,8 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.antclaw.alfq.R
 import com.antclaw.alfq.ui.components.CommentItem
 import com.antclaw.alfq.ui.theme.SpacingMd
 import com.antclaw.alfq.ui.theme.SpacingSm
@@ -39,7 +41,7 @@ fun CommentSection(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "No comments yet",
+                    text = stringResource(R.string.comment_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -79,7 +81,7 @@ fun CommentSection(
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    placeholder = { Text("Write a comment...") },
+                    placeholder = { Text(stringResource(R.string.comment_hint)) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -104,7 +106,7 @@ fun CommentSection(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Send",
+                        contentDescription = stringResource(R.string.common_send),
                         tint = if (inputText.isNotBlank())
                             MaterialTheme.colorScheme.primary
                         else

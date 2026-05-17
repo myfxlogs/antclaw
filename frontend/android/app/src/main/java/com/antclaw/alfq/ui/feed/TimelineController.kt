@@ -1,5 +1,8 @@
 package com.antclaw.alfq.ui.feed
 
+import com.antclaw.alfq.R
+import com.antclaw.alfq.data.error.toAppError
+import com.antclaw.alfq.data.error.AppError
 import com.antclaw.alfq.data.repository.SocialRepository
 import com.antclaw.alfq.ui.social.PostUi
 import com.antclaw.alfq.ui.social.UiEvent
@@ -13,15 +16,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** 信息流加载阶段 */
-enum class AsyncPhase { Idle, Loading, Refreshing, Appending }
+/** 首屏加载阶段 */
+enum class InitialPhase { Idle, Loading, Success, Empty, Error }
 
-/** 信息流统一状态 */
+/** 追加加载阶段 */
+enum class AppendPhase { Idle, Loading, Error }
+
+/** 信息流统一状态 — 首屏/追加拆分为独立阶段，避免错误态污染已有数据。 */
 data class TimelineState(
     val posts: List<PostUi> = emptyList(),
-    val phase: AsyncPhase = AsyncPhase.Idle,
-    val error: String? = null,
-    val appendError: String? = null,
+    val initialPhase: InitialPhase = InitialPhase.Idle,
+    val initialError: AppError? = null,
+    val appendPhase: AppendPhase = AppendPhase.Idle,
+    val appendError: AppError? = null,
     val nextCursor: String? = null,
     val hasMore: Boolean = true,
 )
@@ -42,20 +49,41 @@ class TimelineController(
 
     /** filter: Feed 传 tab.filter，Social 传空字符串。 */
     fun load(filter: String = "") {
-        _state.update { it.copy(phase = AsyncPhase.Loading, error = null, appendError = null, nextCursor = null) }
+        val current = _state.value
+        if (current.initialPhase == InitialPhase.Loading) return
+        _state.update {
+            it.copy(
+                initialPhase = InitialPhase.Loading,
+                initialError = null,
+                appendPhase = AppendPhase.Idle,
+                appendError = null,
+                nextCursor = null,
+            )
+        }
         fetchFirstPage(filter)
     }
 
     fun refresh(filter: String = "") {
-        _state.update { it.copy(phase = AsyncPhase.Refreshing, error = null, appendError = null, nextCursor = null) }
+        if (_state.value.initialPhase == InitialPhase.Loading) return
+        _state.update {
+            it.copy(
+                initialPhase = InitialPhase.Loading,
+                initialError = null,
+                appendPhase = AppendPhase.Idle,
+                appendError = null,
+                nextCursor = null,
+            )
+        }
         fetchFirstPage(filter)
     }
 
     fun loadMore(filter: String = "") {
         val s = _state.value
         val cursor = s.nextCursor ?: return
-        if (s.phase == AsyncPhase.Loading || s.phase == AsyncPhase.Appending || !s.hasMore) return
-        _state.update { it.copy(phase = AsyncPhase.Appending, appendError = null) }
+        // 防御：首屏未完成 / 无更多数据 / 已在追加中 均不发起
+        if (s.initialPhase != InitialPhase.Success && s.initialPhase != InitialPhase.Empty) return
+        if (s.appendPhase == AppendPhase.Loading || !s.hasMore) return
+        _state.update { it.copy(appendPhase = AppendPhase.Loading, appendError = null) }
         scope.launch {
             try {
                 val (posts, next) = repository.getFeed(cursor, 20, filter)
@@ -64,14 +92,22 @@ class TimelineController(
                         posts = it.posts + posts,
                         nextCursor = next,
                         hasMore = next != null,
-                        phase = AsyncPhase.Idle,
+                        appendPhase = AppendPhase.Idle,
                     )
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(phase = AsyncPhase.Idle, appendError = e.message ?: "加载更多失败") }
-                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "加载更多失败"))
+                _state.update {
+                    it.copy(
+                        appendPhase = AppendPhase.Error,
+                        appendError = e.toAppError(),
+                    )
+                }
             }
         }
+    }
+
+    fun retryLoadMore(filter: String = "") {
+        loadMore(filter)
     }
 
     fun toggleLike(postId: String) {
@@ -89,7 +125,7 @@ class TimelineController(
                 updatePost(postId) { it.copy(likeCount = updated.likeCount) }
             } catch (e: Exception) {
                 updatePost(postId) { post }
-                _uiEvent.emit(UiEvent.Snackbar("操作失败，已回滚"))
+                _uiEvent.emit(UiEvent.SnackbarRes(R.string.snackbar_action_rollback))
             }
         }
     }
@@ -102,7 +138,7 @@ class TimelineController(
                 repository.sharePost(postId)
             } catch (e: Exception) {
                 updatePost(postId) { post }
-                _uiEvent.emit(UiEvent.Snackbar("分享失败"))
+                _uiEvent.emit(UiEvent.SnackbarRes(R.string.snackbar_share_failed))
             }
         }
     }
@@ -116,12 +152,16 @@ class TimelineController(
                         posts = posts,
                         nextCursor = next,
                         hasMore = next != null,
-                        phase = AsyncPhase.Idle,
+                        initialPhase = if (posts.isEmpty()) InitialPhase.Empty else InitialPhase.Success,
                     )
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(phase = AsyncPhase.Idle, error = e.message ?: "加载失败") }
-                _uiEvent.emit(UiEvent.Snackbar(e.message ?: "加载失败"))
+                _state.update {
+                    it.copy(
+                        initialPhase = InitialPhase.Error,
+                        initialError = e.toAppError(),
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 // AsyncView 统一渲染 RPC 调用的 idle/loading/error/success 四态。
 // 所有 features 页面用 useAsync(loader) + <AsyncView state={s} render={...} /> 包裹。
 import { useEffect, useState, useCallback, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export type AsyncState<T> =
   | { status: 'idle' }
@@ -31,14 +32,15 @@ export function AsyncView<T>(props: {
   render: (data: T) => ReactNode
   emptyText?: string
 }) {
-  const { state, render, emptyText = '暂无数据' } = props
+  const { t } = useTranslation()
+  const { state, render, emptyText = t('common.noData') } = props
   if (state.status === 'idle' || state.status === 'loading') {
-    return <div className="p-8 text-gray-400 animate-pulse">加载中...</div>
+    return <div className="p-8 text-gray-400 animate-pulse">{t('common.loading')}</div>
   }
   if (state.status === 'error') {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded text-red-700">
-        加载失败：{state.error}
+        {t('common.loadError', { error: state.error })}
       </div>
     )
   }

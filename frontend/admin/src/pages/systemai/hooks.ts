@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   clearSystemAISecret,
   discoverSystemAIModels,
@@ -11,6 +12,7 @@ import { OFFICIAL_PROVIDER_BASE_URLS, toFriendlyDiscoverMessage } from './consta
 import type { AIConfig } from './model'
 
 export function useSystemAIPage() {
+  const { t } = useTranslation()
   const [configs, setConfigs] = useState<AIConfig[]>([])
   const [loading, setLoading] = useState(true)
   const [savingConfig, setSavingConfig] = useState(false)
@@ -28,7 +30,7 @@ export function useSystemAIPage() {
 
   const validateBaseURL = (value: string): string | null => {
     const input = value.trim()
-    if (!input) return '请先填写 Base URL（模型服务地址）。'
+    if (!input) return t('systemai.baseUrlRequired')
     let parsed: URL
     try {
       parsed = new URL(input)
@@ -70,7 +72,7 @@ export function useSystemAIPage() {
       await fetchConfigs()
     } catch (err) {
       console.error('failed to load ai configs', err)
-      setError('加载配置失败')
+      setError(t('systemai.loadError'))
     } finally {
       setLoading(false)
     }
@@ -147,11 +149,11 @@ export function useSystemAIPage() {
         // 本地即时标记密钥已配置，触发模型自动发现；不再 load() 造成全局刷新
         setDraft((prev) => prev ? { ...prev, has_secret: true } : prev)
         setLastAutoDiscoverKey('')
-        setNotice('密钥已保存，正在自动发现模型...')
+        setNotice(t('systemai.secretSavedDiscovering'))
         // 后台静默同步 configs，保持卡片状态一致（不触发 loading 骨架）
         void silentReload()
       } catch (e) {
-        const msg = e instanceof Error ? e.message : '密钥自动保存失败'
+        const msg = e instanceof Error ? e.message : t('systemai.secretAutoSaveFailed')
         setError(msg)
       } finally {
         setSavingSecret(false)
@@ -175,7 +177,7 @@ export function useSystemAIPage() {
       try {
         const baseError = validateBaseURL(base)
         if (baseError) {
-          setError(toFriendlyDiscoverMessage(baseError))
+          setError(toFriendlyDiscoverMessage(baseError, t))
           return
         }
         await persistDraftConfig(draft)
@@ -187,14 +189,14 @@ export function useSystemAIPage() {
             models,
             default_model: body?.default_model || models[0],
           } : prev)
-          setNotice(`已自动发现 ${models.length} 个模型`)
+          setNotice(t('systemai.modelsDiscovered', { count: models.length }))
           setError('')
           setValidated(false)
           setLastAutoDiscoverKey(key)
         }
       } catch (e) {
-        const msg = e instanceof Error ? e.message : '拉取模型失败'
-        setError(toFriendlyDiscoverMessage(msg))
+        const msg = e instanceof Error ? e.message : t('systemai.modelFetchFailed')
+        setError(toFriendlyDiscoverMessage(msg, t))
       } finally {
         setDiscovering(false)
       }
@@ -228,12 +230,12 @@ export function useSystemAIPage() {
         }
         const body = await validateSystemAI(draft.provider_id)
         setValidated(true)
-        setNotice(`已自动验证：发现 ${body.model_count ?? 0} 个模型`)
+        setNotice(t('systemai.validationPassed', { count: body.model_count ?? 0 }))
         setError('')
       } catch (e) {
-        const msg = e instanceof Error ? e.message : '自动验证失败'
+        const msg = e instanceof Error ? e.message : t('systemai.autoValidationFailed')
         setValidated(false)
-        setError(toFriendlyDiscoverMessage(msg))
+        setError(toFriendlyDiscoverMessage(msg, t))
       } finally {
         setValidating(false)
       }
@@ -246,7 +248,7 @@ export function useSystemAIPage() {
     setSavingConfig(true)
     try {
       await persistDraftConfig(draft)
-      setNotice('配置已保存')
+      setNotice(t('systemai.configSaved'))
       setError('')
       void silentReload()
     } finally {
@@ -289,7 +291,7 @@ export function useSystemAIPage() {
         enabled: false,
         has_secret: false,
       } : prev)
-      setNotice('密钥已删除，厂商配置已恢复默认初始化')
+      setNotice(t('systemai.secretCleared'))
       setError('')
       setValidated(false)
       void silentReload()
@@ -305,7 +307,7 @@ export function useSystemAIPage() {
       const baseError = validateBaseURL(draft.base_url)
       if (baseError) {
         setValidated(false)
-        setError(toFriendlyDiscoverMessage(baseError))
+        setError(toFriendlyDiscoverMessage(baseError, t))
         return
       }
       await persistDraftConfig(draft)
@@ -314,15 +316,15 @@ export function useSystemAIPage() {
       }
       const body = await validateSystemAI(draft.provider_id)
       setValidated(true)
-      setNotice(`验证通过：发现 ${body.model_count ?? 0} 个模型`)
+      setNotice(t('systemai.validationPassed', { count: body.model_count ?? 0 }))
       setError('')
     } catch (e) {
-      const msg = e instanceof Error ? e.message : '验证失败'
+      const msg = e instanceof Error ? e.message : t('systemai.validationFailed')
       setValidated(false)
       if (msg.includes('401/403') && !draft.has_secret && !secretInput.trim()) {
-        setError('验证失败：当前厂商通常需要 API Key。请先填写并保存密钥，再重试验证连接。')
+        setError(t('systemai.validationNeedsKey'))
       } else {
-        setError(toFriendlyDiscoverMessage(msg))
+        setError(toFriendlyDiscoverMessage(msg, t))
       }
     } finally {
       setValidating(false)

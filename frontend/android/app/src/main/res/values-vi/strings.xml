@@ -109,6 +109,8 @@
     <string name="bind_live">Live</string>
     <string name="bind_confirm">Xác nhận liên kết</string>
     <string name="bind_binding">Đang liên kết…</string>
+    <string name="bind_step_completed">Bước đã hoàn thành</string>
+    <string name="bind_server_selected">Máy chủ đã chọn</string>
     <string name="alerts_title">Cảnh báo của tôi</string>
     <string name="alerts_add">+ Thêm</string>
     <string name="alerts_empty">Chưa có cảnh báo</string>
@@ -143,6 +145,9 @@
     <string name="common_loading">Đang tải…</string>
     <string name="common_retry">Thử lại</string>
     <string name="common_error">Tải thất bại</string>
+    <string name="comment_reply">Trả lời</string>
+    <string name="comment_hint">Viết bình luận…</string>
+    <string name="mt_account_type_prefix">[%s] </string>
     <string name="common_ok">OK</string>
     <string name="common_cancel">Hủy</string>
 </resources>
