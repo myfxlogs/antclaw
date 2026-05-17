@@ -1,3 +1,5 @@
+import { getMemAccessToken } from '../features/auth/AuthProvider'
+
 // 浏览器端加密工具：RSA-OAEP（SHA-256）+ AES-256-GCM + HMAC-SHA256。
 //
 // 与后端 internal/crypto 包对接的协议：
@@ -141,7 +143,7 @@ export async function sendSecurePut(
   url: string,
   payload: unknown,
 ): Promise<{ body_b64: string }> {
-  const token = localStorage.getItem('token') || ''
+  const token = getMemAccessToken() || ''
   if (!token) throw new Error('not authenticated')
   // 1) 生成 envelope 并 base64 编码
   const envelope = await hybridEncryptJSON(payload)

@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { login } from '../lib/api'
+import { useAuth } from '../features/auth/AuthProvider'
 
 export default function Login() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { login, isLoading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,19 +24,11 @@ export default function Login() {
       return
     }
 
-    setLoading(true)
     try {
-      const response = await login(email, password) as { access_token?: string; refresh_token?: string }
-      if (response.access_token) {
-        localStorage.setItem('token', response.access_token)
-        navigate('/')
-      } else {
-        setError(t('login.loginError'))
-      }
-    } catch (err) {
+      await login(email, password)
+      navigate('/')
+    } catch {
       setError(t('login.loginError'))
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -88,10 +80,10 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '登录中...' : t('login.loginButton')}
+              {isLoading ? '登录中...' : t('login.loginButton')}
             </button>
           </form>
         </div>

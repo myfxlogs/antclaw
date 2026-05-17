@@ -10,6 +10,7 @@ import (
 	"github.com/antclaw/antclaw/internal/adapter/rpc"
 	"github.com/antclaw/antclaw/internal/adapter/storage/postgres"
 	"github.com/antclaw/antclaw/internal/auth"
+	infrapq "github.com/antclaw/antclaw/internal/infra/postgres"
 	"github.com/antclaw/antclaw/internal/service/alerts"
 	"github.com/antclaw/antclaw/internal/service/regime"
 )
@@ -55,6 +56,7 @@ func registerHandlers(mux *http.ServeMux, inf *Infra, svc *Services, boot time.T
 
 	// ── Admin (auth + admin guard) ──
 	adminInt := connect.WithInterceptors(auth.AuthInterceptor(true), auth.AdminInterceptor())
+	mux.Handle(antclawv1connect.NewAdminSocialServiceHandler(rpc.NewAdminSocialHandler(infrapq.NewModerationRepository(pg)), adminInt))
 	mux.Handle(antclawv1connect.NewAdminServiceHandler(
 		rpc.NewAdminHandler(svc.Admin, svc.Notify, svc.Presence, pg), adminInt))
 	mux.Handle(antclawv1connect.NewSystemAIServiceHandler(rpc.NewSystemAIConnectHandler(svc.SystemAI), adminInt))

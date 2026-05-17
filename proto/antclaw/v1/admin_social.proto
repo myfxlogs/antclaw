@@ -1,0 +1,199 @@
+syntax = "proto3";
+
+package antclaw.v1;
+
+option go_package = "github.com/antclaw/antclaw/gen/go/antclaw/v1;antclawv1";
+
+import "antclaw/v1/alfq_feed.proto";
+
+// AdminSocialService — 管理端社交治理 RPC（A13-P0-04, A13-P0-05）。
+service AdminSocialService {
+  rpc ListPosts(AdminListPostsRequest) returns (AdminListPostsResponse);
+  rpc GetPostDetail(AdminGetPostDetailRequest) returns (AdminPostDetail);
+  rpc ListComments(AdminListCommentsRequest) returns (AdminListCommentsResponse);
+  rpc ModerateContent(ModerateContentRequest) returns (ModerateContentResponse);
+  rpc ListReports(AdminListReportsRequest) returns (AdminListReportsResponse);
+  rpc GetReportDetail(AdminGetReportDetailRequest) returns (AdminReportDetail);
+  rpc ReviewReport(ReviewReportRequest) returns (ReviewReportResponse);
+  rpc AssignReport(AssignReportRequest) returns (AssignReportResponse);
+  rpc ListModerationCases(AdminListModerationCasesRequest) returns (AdminListModerationCasesResponse);
+}
+
+// ── Posts ──
+
+message AdminListPostsRequest {
+  int32 page_size = 1;     // default 20, max 50
+  string cursor = 2;
+  string keyword = 3;      // content search
+  string author_id = 4;
+  string post_type = 5;    // text/signal_card/chart_share/share
+  string visibility = 6;   // public/followers/circle
+  string status = 7;       // active/hidden/deleted/moderated
+}
+
+message AdminListPostsResponse {
+  repeated AdminPostSummary posts = 1;
+  string next_cursor = 2;
+  int32 total_count = 3;
+}
+
+message AdminPostSummary {
+  string post_id = 1;
+  string author_id = 2;
+  string author_name = 3;
+  string content_preview = 4; // first 200 chars
+  string post_type = 5;
+  string visibility = 6;
+  string status = 7;
+  int32 like_count = 8;
+  int32 comment_count = 9;
+  int32 share_count = 10;
+  int32 report_count = 11;
+  int64 created_at = 12;
+}
+
+message AdminGetPostDetailRequest { string post_id = 1; }
+
+message AdminPostDetail {
+  Post post = 1;
+  repeated Comment comments = 2;
+  repeated ModerationAction moderation_history = 3;
+  repeated AdminReportSummary reports = 4;
+}
+
+// ── Comments ──
+
+message AdminListCommentsRequest {
+  int32 page_size = 1;
+  string cursor = 2;
+  string post_id = 3;
+  string author_id = 4;
+  string status = 5;
+}
+
+message AdminListCommentsResponse {
+  repeated AdminCommentSummary comments = 1;
+  string next_cursor = 2;
+}
+
+message AdminCommentSummary {
+  string comment_id = 1;
+  string post_id = 2;
+  string author_id = 3;
+  string author_name = 4;
+  string content = 5;
+  string status = 6;
+  int64 created_at = 7;
+}
+
+// ── Moderation ──
+
+message ModerateContentRequest {
+  string admin_id = 1;
+  string target_type = 2;  // post / comment
+  string target_id = 3;
+  string action = 4;       // hide / restore / delete / downgrade / pin / unpin
+  string reason = 5;       // required
+  string notes = 6;
+}
+
+message ModerateContentResponse {
+  bool success = 1;
+  string case_id = 2;
+}
+
+message ModerationAction {
+  string action_id = 1;
+  string admin_id = 2;
+  string action = 3;
+  string reason = 4;
+  string notes = 5;
+  string previous_status = 6;
+  string new_status = 7;
+  int64 created_at = 8;
+}
+
+// ── Reports ──
+
+message AdminListReportsRequest {
+  int32 page_size = 1;
+  string cursor = 2;
+  string status = 3;       // pending/in_review/actioned/rejected/appealed/closed
+  string priority = 4;     // low/normal/high/critical
+  string target_type = 5;  // post/comment/user
+  string assignee_id = 6;
+}
+
+message AdminListReportsResponse {
+  repeated AdminReportSummary reports = 1;
+  string next_cursor = 2;
+  int32 total_count = 3;
+}
+
+message AdminReportSummary {
+  string report_id = 1;
+  string target_type = 2;
+  string target_id = 3;
+  string reporter_id = 4;
+  string reason = 5;
+  string priority = 6;
+  string status = 7;
+  string assignee_id = 8;
+  int64 created_at = 9;
+}
+
+message AdminGetReportDetailRequest { string report_id = 1; }
+
+message AdminReportDetail {
+  AdminReportSummary report = 1;
+  Post target_post = 2;             // if target_type=post
+  Comment target_comment = 3;       // if target_type=comment
+  repeated ModerationAction actions = 4;
+  repeated AdminReportSummary related_reports = 5;
+}
+
+message ReviewReportRequest {
+  string admin_id = 1;
+  string report_id = 2;
+  string action = 3;       // ignore/hide/delete/warn/restrict/ban
+  string reason = 4;       // required
+  string notes = 5;
+  string assignee_id = 6;  // for re-assignment
+}
+
+message ReviewReportResponse { bool success = 1; }
+
+message AssignReportRequest {
+  string report_id = 1;
+  string assignee_id = 2;
+}
+
+message AssignReportResponse { bool success = 1; }
+
+// ── Moderation Cases ──
+
+message AdminListModerationCasesRequest {
+  int32 page_size = 1;
+  string cursor = 2;
+  string status = 3;
+  string target_type = 4;
+  string assignee_id = 5;
+}
+
+message AdminListModerationCasesResponse {
+  repeated ModerationCaseSummary cases = 1;
+  string next_cursor = 2;
+}
+
+message ModerationCaseSummary {
+  string case_id = 1;
+  string source = 2;
+  string target_type = 3;
+  string target_id = 4;
+  string reporter_id = 5;
+  string reason = 6;
+  string priority = 7;
+  string status = 8;
+  string assignee_id = 9;
+  int64 created_at = 10;
+}

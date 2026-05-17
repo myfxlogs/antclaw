@@ -5,11 +5,12 @@ import {
   Settings, LogOut, TrendingUp, Bot, BarChart3, LineChart, Globe2, Send,
   Layers, Shield, MessageCircle, Wand2, ChevronDown, ChevronRight, Smartphone,
 } from 'lucide-react'
-import { logout } from '../lib/api'
+import { useAuth } from '../features/auth/AuthProvider'
+import { Permissions } from '../features/auth/permissions'
 import NotificationsBell from './NotificationsBell'
 
-interface NavItem { path: string; label: string; icon: any }
-interface NavGroup { id: string; label: string; collapsible?: boolean; items: NavItem[] }
+interface NavItem { path: string; label: string; icon: any; permission?: string }
+interface NavGroup { id: string; label: string; collapsible?: boolean; permission?: string; items: NavItem[] }
 
 const groups: NavGroup[] = [
   {
@@ -17,15 +18,15 @@ const groups: NavGroup[] = [
     label: '概览',
     items: [
       { path: '/', label: '仪表盘', icon: LayoutDashboard },
-      { path: '/users', label: '用户', icon: Users },
+      { path: '/users', label: '用户', icon: Users, permission: Permissions.USERS_READ },
       { path: '/jobs', label: '作业', icon: Activity },
-      { path: '/audit', label: '审计', icon: ClipboardList },
+      { path: '/audit', label: '审计', icon: ClipboardList, permission: Permissions.AUDIT_READ },
       { path: '/data', label: '数据汇总', icon: Database },
       { path: '/datasources', label: '数据源', icon: KeyRound },
       { path: '/strategies', label: '策略', icon: TrendingUp },
-      { path: '/system-ai', label: 'AI 配置', icon: Bot },
+      { path: '/system-ai', label: 'AI 配置', icon: Bot, permission: Permissions.AI_MANAGE },
       { path: '/devices', label: '设备管理', icon: Smartphone },
-      { path: '/push', label: '推送管理', icon: Send },
+      { path: '/push', label: '推送管理', icon: Send, permission: Permissions.PUSH_SEND },
       { path: '/settings', label: '设置', icon: Settings },
     ],
   },
@@ -111,6 +112,7 @@ function loadCollapsedState(): Record<string, boolean> {
 export default function Layout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { logout, hasPermission } = useAuth()
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => loadCollapsedState())
 
   // 当用户访问的路由属于某个折叠组时，自动展开该组，避免活跃项被隐藏。
@@ -132,7 +134,7 @@ export default function Layout() {
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }))
 
   const handleLogout = () => {
-    logout()
+    logout() // AuthProvider.logout() — clears memory state
     navigate('/login')
   }
 
@@ -146,6 +148,12 @@ export default function Layout() {
         </div>
         <nav className="px-2 py-3 space-y-3 flex-1 overflow-y-auto">
           {groups.map((g) => {
+            // Permission filtering (A13-P0-01)
+            const visibleItems = g.items.filter(
+              (it) => !it.permission || hasPermission(it.permission),
+            )
+            if (visibleItems.length === 0) return null
+
             const isCollapsed = !!(g.collapsible && collapsed[g.id])
             const header = g.collapsible ? (
               <button
@@ -168,7 +176,7 @@ export default function Layout() {
                 {header}
                 {!isCollapsed && (
                   <div className="space-y-0.5">
-                    {g.items.map((it) => {
+                    {visibleItems.map((it) => {
                       const Icon = it.icon
                       const isActive = location.pathname === it.path
                       return (

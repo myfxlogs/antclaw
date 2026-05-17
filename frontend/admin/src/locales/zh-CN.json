@@ -136,7 +136,16 @@
     "sseError": "SSE 连接异常或已断开",
     "loading": "加载中...",
     "loadError": "加载失败：{{error}}",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "retry": "重试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "reason": "原因",
+    "reasonRequired": "原因（至少10个字符）",
+    "pleaseProvideReason": "请填写操作原因",
+    "send": "发送",
+    "preview": "预览",
+    "lastUpdated": "最后更新"
   },
   "datasources": {
     "loadError": "加载失败: {{message}}",
@@ -183,7 +192,70 @@
   "strategies": {
     "backtestComplete": "回测完成! 总收益: {{pnl}}%"
   },
+  "push": {
+    "title": "推送管理",
+    "subtitle": "向在线用户推送通知",
+    "newPush": "新建推送",
+    "titleLabel": "推送标题",
+    "bodyLabel": "推送正文",
+    "preview": "预览",
+    "testSend": "测试发送",
+    "sendToAll": "全员推送",
+    "previewTitle": "推送预览",
+    "previewTarget": "目标：全部在线用户",
+    "confirmTitle": "确认全员推送",
+    "confirmDesc": "即将向全部在线用户推送通知。请确认推送内容无误。",
+    "confirmTarget": "标题：{{title}} | 严重级别：{{severity}}",
+    "confirmSend": "发送全员推送",
+    "noTitleBody": "标题和正文不能为空",
+    "history": "推送历史",
+    "updatedAt": "更新于 {{time}}",
+    "sentCount": "已发 {{sent}}/{{total}}"
+  },
   "ai": {
     "loadProviderError": "加载 AI 提供商失败：{{message}}"
+  },
+  "social": {
+    "title": "社交治理",
+    "posts": "帖子管理",
+    "reports": "举报审核",
+    "moderation": "审核记录",
+    "hide": "隐藏",
+    "restore": "恢复",
+    "delete": "删除",
+    "moderate": "处置",
+    "reasonPlaceholder": "请填写处置原因",
+    "confirmHide": "确认隐藏该内容？",
+    "confirmDelete": "确认删除该内容？此操作不可撤销。",
+    "postId": "帖子ID",
+    "author": "作者",
+    "content": "内容",
+    "status": "状态",
+    "reportCount": "举报数",
+    "active": "正常",
+    "hidden": "已隐藏",
+    "deleted": "已删除",
+    "pending": "待审核",
+    "reviewed": "已审核",
+    "assign": "分派",
+    "assignTo": "分派给"
+  },
+  "push": {
+    "testSend": "测试发送",
+    "testSendDesc": "仅发送给当前管理员",
+    "preview": "推送预览",
+    "targetCount": "目标人数",
+    "sendToAll": "全员推送",
+    "sendToAllWarning": "此操作将推送给所有在线用户，请确认消息内容无误",
+    "title": "推送管理",
+    "send": "发送推送",
+    "titlePlaceholder": "推送标题",
+    "bodyPlaceholder": "推送正文",
+    "severity": "严重级别",
+    "history": "推送历史",
+    "onlineUsers": "在线用户",
+    "sentCount": "已发送",
+    "noUsers": "无在线用户",
+    "confirmSend": "确认发送推送？"
   }
 }

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Search, Ban, Unlock, Shield, Key, Hash } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { listUsers, banUser, unbanUser, adminResetPassword, setUserCodeID } from '../lib/api'
+import DangerConfirmDialog from '../components/DangerConfirmDialog'
+import { ErrorState, LoadingSkeleton, EmptyState } from '../components/Common'
 
 interface User {
   user_id: string
@@ -17,6 +19,8 @@ export default function Users() {
   const [search, setSearch] = useState('')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState<{type:string;user:User;open:boolean;title:string;desc:string;action:(r:string)=>Promise<void>}>({type:'',user:{}as User,open:false,title:'',desc:'',action:async()=>{}})
   const [showResetModal, setShowResetModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [newPassword, setNewPassword] = useState('')
@@ -30,7 +34,7 @@ export default function Users() {
 
   const loadUsers = async () => {
     try {
-      const response = await listUsers()
+      const response = await listUsers({ email_filter: search })
       setUsers(response.users.map((u: any) => ({
         user_id: u.user_id,
         email: u.email,
@@ -39,17 +43,15 @@ export default function Users() {
         created_at: u.created_at ? new Date(u.created_at * 1000).toISOString().split('T')[0] : '-',
         code_id: u.code_id || '',
       })))
-    } catch (err) {
-      console.error('Failed to load users:', err)
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load users')
     } finally {
       setLoading(false)
     }
   }
 
-  const filteredUsers = users.filter(u => {
-    const q = search.toLowerCase()
-    return u.email.toLowerCase().includes(q) || (u.code_id || '').includes(q)
-  })
+  // Server-side search via email_filter — filteredUsers aliases users
+  const filteredUsers = users
 
   // 前端预校验（后端会再校）：5-10 位、避开 4/7、首位非 0。
   const codeIDRegex = /^[1235689][01235689]{4,9}$/
@@ -88,7 +90,7 @@ export default function Users() {
 
   const handleBan = async (userId: string) => {
     try {
-      await banUser(userId, 'Banned by admin', undefined)
+      await banUser(userId, 'moderated', undefined)
       await loadUsers()
     } catch (err) {
       console.error('Failed to ban user:', err)
@@ -124,12 +126,14 @@ export default function Users() {
     }
   }
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-64">{t('users.loading')}</div>
-  }
-
   return (
     <div className="space-y-6">
+      {error && <ErrorState message={error} onRetry={loadUsers} />}
+      {loading && <LoadingSkeleton rows={8} />}
+      {!loading && !error && users.length === 0 && (
+        <EmptyState icon={<Shield className="w-12 h-12 text-gray-300" />} title={t('users.noUsers')} />
+      )}
+      {!loading && !error && users.length > 0 && (<>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">{t('users.title')}</h1>
         <div className="relative">
@@ -194,11 +198,11 @@ export default function Users() {
                       <Key className="w-4 h-4" />
                     </button>
                     {!user.banned ? (
-                      <button onClick={() => handleBan(user.user_id)} className="p-2 text-red-600 hover:bg-red-50 rounded" title={t('users.ban')}>
+                      <button onClick={() => setConfirmOpen({type:'ban',user,open:true,title:`封禁 ${user.email}`,desc:'请输入封禁原因及过期天数',action:(_r)=>{handleBan(user.user_id);return Promise.resolve()}})} className="p-2 text-red-600 hover:bg-red-50 rounded" title={t('users.ban')}>
                         <Ban className="w-4 h-4" />
                       </button>
                     ) : (
-                      <button onClick={() => handleUnban(user.user_id)} className="p-2 text-green-600 hover:bg-green-50 rounded" title={t('users.unban')}>
+                      <button onClick={() => setConfirmOpen({type:'unban',user,open:true,title:`解封 ${user.email}`,desc:'请输入解封原因',action:()=>{handleUnban(user.user_id);return Promise.resolve()}})} className="p-2 text-green-600 hover:bg-green-50 rounded" title={t('users.unban')}>
                         <Unlock className="w-4 h-4" />
                       </button>
                     )}
@@ -302,6 +306,17 @@ export default function Users() {
           </div>
         </div>
       )}
+      </>)}
+      <DangerConfirmDialog
+        open={confirmOpen.open}
+        onClose={() => setConfirmOpen({...confirmOpen, open: false})}
+        onConfirm={confirmOpen.action}
+        title={confirmOpen.title}
+        description={confirmOpen.desc}
+        targetName={confirmOpen.user?.email || ''}
+        confirmLabel="确认执行"
+        requireReason
+      />
     </div>
   )
 }
